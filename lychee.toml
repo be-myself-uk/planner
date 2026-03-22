@@ -1,0 +1,11 @@
+exclude = [
+  "^data:",
+  "^mailto:",
+  "forms\\.gle",
+  "google\\.co\\.uk"
+]
+
+accept = [200, 403, 429]
+
+timeout = 30
+max_retries = 3
