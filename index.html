@@ -208,6 +208,30 @@
   .urgent { border-color:var(--urgent); background:var(--urgent-bg); }
   .simul { border-color:var(--simultaneous); background:var(--simultaneous-bg); }
   .success { border-color:var(--success); background:var(--success-bg); }
+  #allDoneBanner { position:relative; border-color:transparent; border-width:0; border-radius:8px; isolation:isolate; padding:20px; overflow:visible; }
+  #allDoneBanner::before {
+    content:''; position:absolute; inset:-3px; border-radius:11px; z-index:-1;
+    background: linear-gradient(135deg,
+      #f87171, #fb923c, #fbbf24, #a3e635,
+      #34d399, #38bdf8, #818cf8, #e879f9,
+      #f87171, #fb923c, #fbbf24
+    );
+    background-size:300% 300%;
+    animation: rainbow-border-spin 4s linear infinite, rainbow-pulse 2s ease-in-out infinite;
+  }
+  #allDoneBanner::after {
+    content:''; position:absolute; inset:0; border-radius:8px; z-index:-1;
+    background:var(--success-bg);
+  }
+  @keyframes rainbow-border-spin {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    #allDoneBanner::before { animation:none; background: linear-gradient(135deg, #f87171, #fb923c, #fbbf24, #34d399, #38bdf8, #818cf8, #e879f9); }
+  }
+  #confettiCanvas { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:9000; }
+  @media (prefers-reduced-motion:reduce) { #confettiCanvas { display:none; } }
   .info { border-color:var(--info); background:var(--info-bg); }
   .phase h3 { margin-top:0; margin-bottom:0; color:var(--text); }
   .phase ul { margin:15px 0 5px 0; padding-left:0; list-style:none; }
@@ -1975,6 +1999,77 @@ function restoreTrackers() {
   pc.addEventListener('touchmove', cancel, {passive:true});
   pc.addEventListener('touchcancel', cancel, {passive:true});
 })();
+
+function fadeOutConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  canvas.dataset.fadingOut = '1';
+  const FADE = 1500;
+  const startFade = performance.now();
+  (function tick(now) {
+    const p = 1 - Math.min((now - startFade) / FADE, 1);
+    canvas.style.opacity = p;
+    if (p > 0) requestAnimationFrame(tick);
+    else canvas.remove();
+  })(performance.now());
+}
+
+function launchConfetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const existing = document.getElementById('confettiCanvas');
+  if (existing) existing.remove();
+  const canvas = document.createElement('canvas');
+  canvas.id = 'confettiCanvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  // Trans flag: light blue, pink, white. Non-binary flag: yellow, white, purple, black.
+  const COLOURS = ['#55CDFC','#F7A8B8','#FFFFFF','#FCF434','#9C59D1','#2C2C2C'];
+  const DURATION = 20000;
+  const PARTICLE_COUNT = 80;
+  let W, H;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const particles = Array.from({length: PARTICLE_COUNT}, (_, i) => ({
+    x: Math.random() * W,
+    y: -20 - Math.random() * H * 0.5,
+    w: 7 + Math.random() * 6,
+    h: 4 + Math.random() * 4,
+    colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+    speed: 1.2 + Math.random() * 1.8,
+    drift: (Math.random() - 0.5) * 0.6,
+    spin: (Math.random() - 0.5) * 0.08,
+    angle: Math.random() * Math.PI * 2,
+    delay: i * (DURATION * 0.7 / PARTICLE_COUNT)
+  }));
+  const start = performance.now();
+  function draw(now) {
+    if (canvas.dataset.fadingOut) { window.removeEventListener('resize', resize); return; }
+    const elapsed = now - start;
+    if (elapsed > DURATION) { canvas.remove(); window.removeEventListener('resize', resize); return; }
+    ctx.clearRect(0, 0, W, H);
+    const fade = elapsed > DURATION - 3000 ? 1 - (elapsed - (DURATION - 3000)) / 3000 : 1;
+    ctx.globalAlpha = fade;
+    for (const p of particles) {
+      if (elapsed < p.delay) continue;
+      const t = elapsed - p.delay;
+      const px = p.x + p.drift * t * 0.05;
+      const py = p.y + p.speed * t * 0.05;
+      const ang = p.angle + p.spin * t * 0.05;
+      if (py > H + 20) continue;
+      ctx.save();
+      ctx.translate(px % W, py);
+      ctx.rotate(ang);
+      ctx.fillStyle = p.colour;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
 function checkAllDone() {
   const btns = document.querySelectorAll('.step-state-btn[data-track-id]');
   if (!btns.length) return;
@@ -1989,10 +2084,13 @@ function checkAllDone() {
     b.innerHTML = '<h3>🎉 All done!</h3><p>You have completed all the steps on your action plan.</p><p>You should be proud of yourself. Take some time to celebrate!</p>';
     gel('planContent').appendChild(b);
     announce('Congratulations! You have completed all the steps in your plan.');
+    launchConfetti();
   } else if (!done && banner) {
     banner.remove();
+    fadeOutConfetti();
   }
 }
+
 function updateNextStep() {
   const placeholders = document.querySelectorAll('.next-step-placeholder');
   if (!placeholders.length) return;
