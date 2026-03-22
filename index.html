@@ -118,6 +118,7 @@
   #cbPlanActions { display:none; }
   body.plan-ready #cbPlanActions { display:flex; gap:8px; align-items:center; }
   #cbSwitchView { display:none; }
+  body.plan-ready #cbSwitchView { display:inline-flex; }
   #planView li:not(.svc-sub-li) { display:grid; grid-template-rows:1fr; overflow:hidden; transition:grid-template-rows 0.5s ease, opacity 0.5s ease, margin 0.5s ease; }
   #planView li:not(.svc-sub-li) > * { min-height:0; overflow:hidden; }
   .collapsed-step { grid-template-rows:0fr !important; opacity:0 !important; margin-bottom:0 !important; pointer-events:none; }
