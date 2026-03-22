@@ -171,6 +171,9 @@
   .options-group.error { border-color:var(--urgent); background:var(--urgent-bg); }
   .multi-none-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
   .btn-group { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+  .wizard-btn-row { display:flex; align-items:center; margin-top:20px; gap:10px; }
+  #wizardNextBtn { margin-left:auto; }
+
   button { box-sizing:border-box; font-family:'Lexend',sans-serif; background:var(--primary); color:var(--text-invert); border:none; padding:12px 20px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; transition:background 0.3s; }
   button:hover { background:var(--primary-hover); }
   button:focus-visible { outline:3px solid var(--primary); outline-offset:3px; }
@@ -430,13 +433,20 @@
       </div>
     </div>
   </div>
+
   <div id="wizardView" class="hidden">
     <div id="wizardWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Please choose an answer to move forward.</div>
     <div id="wizardForm"></div>
+    <div id="wizardBtns" class="wizard-btn-row">
+      <button id="wizardBackBtn" class="secondary hidden" onclick="prevWizard()">← Back</button>
+      <button id="wizardNextBtn" onclick="nextWizard()">Continue →</button>
+    </div>
   </div>
+
   <div id="checklistView" class="hidden">
     <p id="checklistIntroText">Choose the answers that apply to you, then click "Show my action plan" at the bottom.</p>
     <fieldset style="border:none;padding:0;margin:0 0 20px 0;">
+
       <legend class="section-title">1. The basics</legend>
       <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
         <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">Where do you live?</p>
@@ -695,14 +705,15 @@ function announce(msg) {
   r.textContent = '';
   _annTimer = setTimeout(() => { r.textContent = msg; }, 150);
 }
-function scrollToToolbar() {
-  const bar = document.getElementById('controlBar');
-  if (bar) window.scrollTo({top: bar.offsetTop, behavior:'instant'});
-}
 function focusPlan() {
-  const h = document.getElementById('planHeading');
-  scrollToToolbar();
-  if (h) h.focus({preventScroll:true});
+  const h   = document.getElementById('planHeading');
+  const bar = document.getElementById('controlBar');
+  if (h) {
+    const barH = bar ? bar.getBoundingClientRect().height : 0;
+    const top  = h.getBoundingClientRect().top + window.scrollY - barH - 16;
+    window.scrollTo({top: Math.max(0, top), behavior:'smooth'});
+    h.focus({preventScroll:true});
+  }
 }
 
 function toggleTheme() {
@@ -916,6 +927,7 @@ function continuePlan() {
   refreshToolbarTabindex();
 }
 function reviewAnswers() {
+  fadeOutConfetti();
   V.welcome.classList.add('hidden');
   V.plan.classList.add('hidden');
   document.body.classList.remove('plan-ready','wizard-active');
@@ -926,10 +938,11 @@ function reviewAnswers() {
   V.checklist.classList.remove('hidden');
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
   const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
-  scrollToToolbar();
+  window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
 function makeChanges() {
+  fadeOutConfetti();
   isWizardMode = false;
   V.plan.classList.add('hidden');
   V.checklist.classList.remove('hidden');
@@ -939,10 +952,12 @@ function makeChanges() {
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
   const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
-  scrollToToolbar();
+  window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
+
 function toggleMode() {
+  fadeOutConfetti();
   isWizardMode = !isWizardMode;
   V.plan.classList.add('hidden');
   if (isWizardMode) {
@@ -1019,7 +1034,9 @@ function resetProgress() {
   refreshPlan();
   announce('All progress has been reset.');
 }
+
 function restartApp() {
+  fadeOutConfetti();
   [V.plan, V.wizard, V.checklist, V.welcome].forEach(v => v.classList.add('hidden'));
   V.toggle.style.display = 'none';
   document.body.classList.remove('plan-ready','wizard-active');
@@ -1345,10 +1362,13 @@ function renderWizard() {
 </label>`;
     });
   }
-  html += `</div></fieldset><div class="btn-group">`;
-  if (step > 0) html += `<button class="secondary" onclick="prevWizard()">← Back</button>`;
-  html += `<button onclick="nextWizard()">Continue →</button></div>`;
+  html += `</div></fieldset>`;
   V.form.innerHTML = html;
+  const backBtn = gel('wizardBackBtn');
+  const nextBtn = gel('wizardNextBtn');
+  if (backBtn) backBtn.classList.toggle('hidden', step === 0);
+  if (nextBtn) nextBtn.textContent = idx === total ? 'Show my plan →' : 'Continue →';
+
   if (q.type === 'multi') {
     const noneBox = V.form.querySelector('.multi-none');
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
