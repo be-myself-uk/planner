@@ -757,12 +757,14 @@ function panicExit() { window.location.replace('https://www.google.co.uk'); }
 function loadUrlParams(d) {
   const regRadio = document.querySelector(`input[name="chkRegion"][value="${d.reg || REGION.EW}"]`);
   if (regRadio) regRadio.checked = true;
-  gel('chkGoalBoth').checked   = d.goal === S.BOTH;
-  gel('chkGoalName').checked   = d.goal === S.NAME;
-  gel('chkGoalGender').checked = d.goal === S.GENDER;
+  if ([S.BOTH, S.NAME, S.GENDER].includes(d.goal)) {
+    gel('chkGoalBoth').checked   = d.goal === S.BOTH;
+    gel('chkGoalName').checked   = d.goal === S.NAME;
+    gel('chkGoalGender').checked = d.goal === S.GENDER;
+  }
   gel('chkNonUK').checked      = d.nonUK === true;
   gel('chkPhotoID').checked    = d.pid   === true;
-  const emp = d.emp || 'no';
+  const emp = ['yes','needs_update','no'].includes(d.emp) ? d.emp : 'no';
   gel('chkEmployedUpdated').checked = emp === 'yes';
   gel('chkEmployedNeeds').checked   = emp === 'needs_update';
   gel('chkEmployedNo').checked      = emp === 'no';
