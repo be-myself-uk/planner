@@ -669,7 +669,7 @@
 </template>
 <script>
 const SCHEMA_VERSION = 1774201062;
-const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', BOTH:'both', NAME:'name', GENDER:'gender' };
+const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 const SVC_MAP = {
@@ -1139,9 +1139,9 @@ function syncChecklistToWizard() {
   wizardState.newGP       = gel('chkNewGP').checked    ? S.YES : S.NO;
   wizardState.hmrc        = gel('chkHMRC').checked     ? S.YES : S.NO;
   const _dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
-  wizardState.driving  = _dlC && _dlC.value === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
+  wizardState.driving  = _dlC ? _dlC.value : S.NONE;
   const _ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
-  wizardState.passport = _ppC && _ppC.value === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
+  wizardState.passport = _ppC ? _ppC.value : S.NONE;
   wizardState.grc         = gel('chkGRC').checked      ? S.YES : S.NO;
   wizardState.birthCertName = gel('chkBirthCertName').checked ? S.YES : S.NO;
   wizardState.birthCert   = gel('chkBirthCert').checked      ? S.YES : S.NO;
@@ -1310,13 +1310,13 @@ const questions = [
   ]},
   { id:'driving', q:'Do you have a UK driving licence?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'No, I do not drive or have one']];
-    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, I do not drive']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not drive or have one']];
+    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.NONE,'No, I do not drive']];
   }},
   { id:'passport', q:'Do you have a passport?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'No, I do not have a passport']];
-    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, I do not have a passport']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not have a passport']];
+    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.NONE,'No, I do not have a passport']];
   }},
   { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
