@@ -105,10 +105,11 @@
   }
   #controlBarProgressFill {
     height:100%; width:0%;
+    /* Trans flag: blue, pink, white. Non-binary: yellow, purple. Black omitted — too harsh in a gradient. */
     background: linear-gradient(90deg,
-      #f87171, #fb923c, #fbbf24, #a3e635,
-      #34d399, #38bdf8, #818cf8, #e879f9,
-      #f87171, #fb923c
+      #55CDFC, #F7A8B8, #FFFFFF, #FCF434,
+      #9C59D1, #F7A8B8, #55CDFC, #FFFFFF,
+      #FCF434, #9C59D1, #55CDFC
     );
     background-size:200% 100%;
     animation: rainbow-flow 3s linear infinite, rainbow-pulse 2s ease-in-out infinite;
@@ -117,6 +118,7 @@
   #cbPlanActions { display:none; }
   body.plan-ready #cbPlanActions { display:flex; gap:8px; align-items:center; }
   #cbSwitchView { display:none; }
+  body.plan-ready #cbSwitchView { display:inline-flex; }
   #planView li:not(.svc-sub-li) { display:grid; grid-template-rows:1fr; overflow:hidden; transition:grid-template-rows 0.5s ease, opacity 0.5s ease, margin 0.5s ease; }
   #planView li:not(.svc-sub-li) > * { min-height:0; overflow:hidden; }
   .collapsed-step { grid-template-rows:0fr !important; opacity:0 !important; margin-bottom:0 !important; pointer-events:none; }
@@ -211,10 +213,12 @@
   #allDoneBanner { position:relative; border-color:transparent; border-width:0; border-radius:8px; isolation:isolate; padding:20px; overflow:visible; }
   #allDoneBanner::before {
     content:''; position:absolute; inset:-3px; border-radius:11px; z-index:-1;
+    /* Trans flag: #55CDFC blue, #F7A8B8 pink, #FFFFFF white
+       Non-binary flag: #FCF434 yellow, #9C59D1 purple, #2C2C2C black */
     background: linear-gradient(135deg,
-      #f87171, #fb923c, #fbbf24, #a3e635,
-      #34d399, #38bdf8, #818cf8, #e879f9,
-      #f87171, #fb923c, #fbbf24
+      #55CDFC, #F7A8B8, #FFFFFF, #FCF434,
+      #9C59D1, #2C2C2C, #55CDFC, #F7A8B8,
+      #FFFFFF, #FCF434, #9C59D1
     );
     background-size:300% 300%;
     animation: rainbow-border-spin 4s linear infinite, rainbow-pulse 2s ease-in-out infinite;
@@ -227,11 +231,12 @@
     0%   { background-position: 0% 50%; }
     100% { background-position: 300% 50%; }
   }
-  @media (prefers-reduced-motion:reduce) {
-    #allDoneBanner::before { animation:none; background: linear-gradient(135deg, #f87171, #fb923c, #fbbf24, #34d399, #38bdf8, #818cf8, #e879f9); }
-  }
+
   #confettiCanvas { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:9000; }
-  @media (prefers-reduced-motion:reduce) { #confettiCanvas { display:none; } }
+  @media (prefers-reduced-motion:reduce) {
+    #allDoneBanner::before { animation:none; background: linear-gradient(135deg, #55CDFC, #F7A8B8, #FFFFFF, #FCF434, #9C59D1, #2C2C2C); }
+    #confettiCanvas { display:none; }
+  }
   .info { border-color:var(--info); background:var(--info-bg); }
   .phase h3 { margin-top:0; margin-bottom:0; color:var(--text); }
   .phase ul { margin:15px 0 5px 0; padding-left:0; list-style:none; }
@@ -690,10 +695,16 @@ function announce(msg) {
   r.textContent = '';
   _annTimer = setTimeout(() => { r.textContent = msg; }, 150);
 }
+function scrollToToolbar() {
+  const bar = document.getElementById('controlBar');
+  if (bar) window.scrollTo({top: bar.offsetTop, behavior:'instant'});
+}
 function focusPlan() {
   const h = document.getElementById('planHeading');
-  if (h) { h.scrollIntoView({behavior:'smooth', block:'start'}); h.focus({preventScroll:true}); }
+  scrollToToolbar();
+  if (h) h.focus({preventScroll:true});
 }
+
 function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme');
   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches;
@@ -915,7 +926,7 @@ function reviewAnswers() {
   V.checklist.classList.remove('hidden');
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
   const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
-  window.scrollTo({top:0, behavior:'smooth'});
+  scrollToToolbar();
   refreshToolbarTabindex();
 }
 function makeChanges() {
@@ -928,7 +939,7 @@ function makeChanges() {
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
   const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
-  window.scrollTo({top:0, behavior:'smooth'});
+  scrollToToolbar();
   refreshToolbarTabindex();
 }
 function toggleMode() {
