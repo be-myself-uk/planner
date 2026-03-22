@@ -163,13 +163,17 @@
   .option:hover, .checkbox-item:hover:not(.locked) { background:var(--bg-details-hover); border-color:var(--primary); }
   .option.locked, .checkbox-item.locked { background:var(--disabled); color:var(--disabled-text); cursor:not-allowed; border-color:var(--disabled); }
   .option.locked input, .checkbox-item.locked input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
+  /* Locked state for plain-div radio group wrappers (driving licence, passport) */
+  div.locked { background:var(--disabled) !important; color:var(--disabled-text) !important; border-color:var(--disabled) !important; cursor:not-allowed; }
+  div.locked .option { background:transparent; border-color:transparent; color:inherit; cursor:not-allowed; pointer-events:none; }
+  div.locked .option input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
   input[type="radio"], input[type="checkbox"] { width:18px; height:18px; margin-right:12px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; }
   .lock-icon { margin-left:auto; font-size:0.9em; }
   .warning-text { color:var(--urgent); font-weight:bold; display:none; align-items:center; gap:8px; height:24px; margin-bottom:10px; }
   .warning-text.visible { display:flex; }
   .options-group { padding:4px; border:2px solid transparent; border-radius:12px; transition:border-color 0.3s,background 0.3s; margin:-6px; }
   .options-group.error { border-color:var(--urgent); background:var(--urgent-bg); }
-  .multi-none-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
+  .multi-all-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
   .btn-group { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
   .wizard-btn-row { display:flex; align-items:center; margin-top:20px; gap:10px; }
   #wizardNextBtn { margin-left:auto; }
@@ -504,7 +508,7 @@
         <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
         <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcNone" onchange="handleSvcNone(this)"> Select all</label>
+        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
       </div>
       </fieldset>
     </div>
@@ -515,8 +519,18 @@
     <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS" onchange="updateLocks()"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
-    <label class="checkbox-item" id="wrapDrivingLicence"><input type="checkbox" id="chkDrivingLicence"> UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
-    <label class="checkbox-item" id="wrapPassport"><input type="checkbox" id="chkPassport"> Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
+    <div id="wrapDrivingLicence" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
+      <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated"> Updated</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none" checked> I don't have one</label>
+    </div>
+    <div id="wrapPassport" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
+      <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> Updated</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none" checked> I don't have one</label>
+    </div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
   </div>
@@ -654,7 +668,7 @@
   </li>
 </template>
 <script>
-const SCHEMA_VERSION = 1774177841;
+const SCHEMA_VERSION = 1774201062;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -767,8 +781,13 @@ function loadUrlParams(d) {
   gel('chkVisa').checked         = d.visa === true;
   gel('chkNHS').checked          = d.nhs  === true;
   gel('chkHMRC').checked         = d.hmrc === true;
-  gel('chkDrivingLicence').checked = d.dl === true;
-  gel('chkPassport').checked     = d.pass === true;
+  // dl/pass: new URLs store 'updated'/'needs_update'/'none'; old URLs stored true/false
+  const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : (d.dl === 'updated' || d.dl === true) ? 'updated' : 'none';
+  const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : (d.pass === 'updated' || d.pass === true) ? 'updated' : 'none';
+  const _dlUrlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlUrlVal}"]`);
+  const _ppUrlR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppUrlVal}"]`);
+  if (_dlUrlR) _dlUrlR.checked = true;
+  if (_ppUrlR) _ppUrlR.checked = true;
   gel('chkGRC').checked          = d.grc  === true;
   gel('chkNewGP').checked        = d.newgp === true;
   gel('chkDWP').checked          = d.dwp   === true;
@@ -777,7 +796,7 @@ function loadUrlParams(d) {
   gel('chkBornNI').checked       = d.bni   === true;
   const loadedServices = (d.srv || '').split(',').filter(Boolean);
   Object.entries(SVC_MAP).forEach(([val, id]) => { const cb = gel(id); if (cb) cb.checked = loadedServices.includes(val); });
-  const noneBox = gel('chkSvcNone');
+  const noneBox = gel('chkSvcAll');
   if (noneBox) noneBox.checked = Object.keys(SVC_MAP).every(k => loadedServices.includes(k));
 }
 function handleUrlLoad(params) {
@@ -840,9 +859,11 @@ function copyShareableLink() {
     dp:    isWizardMode ? (w.deedpoll    === S.YES) : chk('chkDeedPoll'),
     visa:  isWizardMode ? (w.visaUpdated === S.YES) : chk('chkVisa'),
     nhs:   isWizardMode ? (w.nhs         === S.YES) : chk('chkNHS'),
-    dl:    isWizardMode ? (w.driving     === S.UPDATED) : chk('chkDrivingLicence'),
+    dl:    isWizardMode ? (w.driving  === S.NEEDS_UPDATE ? 'needs_update' : w.driving  === S.UPDATED ? 'updated' : 'none')
+                       : (() => { const r = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked'); return r ? r.value : 'none'; })(),
     hmrc:  isWizardMode ? (w.hmrc        === S.YES) : chk('chkHMRC'),
-    pass:  isWizardMode ? (w.passport    === S.UPDATED) : chk('chkPassport'),
+    pass:  isWizardMode ? (w.passport === S.NEEDS_UPDATE ? 'needs_update' : w.passport === S.UPDATED ? 'updated' : 'none')
+                        : (() => { const r = document.querySelector('input[name="chkPassportOpt"]:checked'); return r ? r.value : 'none'; })(),
     grc:   isWizardMode ? (w.grc         === S.YES) : chk('chkGRC'),
     newgp: isWizardMode ? (w.newGP       === S.YES) : chk('chkNewGP'),
     dwp:   isWizardMode ? (w.dwp         === S.YES) : chk('chkDWP'),
@@ -851,6 +872,9 @@ function copyShareableLink() {
     bni:   isWizardMode ? (w.bornInNI    === S.YES) : chk('chkBornNI'),
     srv,
   };
+  // NOTE: btoa/atob is ASCII-only. Safe here because all state values are ASCII
+  // (e.g. 'yes', 'no', 'ew'). If free-text input fields are ever added, switch to a
+  // Unicode-safe method: btoa(encodeURIComponent(json)) / decodeURIComponent(atob(str)).
   url.searchParams.set('p', btoa(JSON.stringify(ps)));
   const text = `Action Plan Link:\n${url}`;
   const showSuccess = () => {
@@ -1084,8 +1108,12 @@ function syncWizardToChecklist() {
   gel('chkNHS').checked      = wizardState.nhs         === S.YES;
   gel('chkNewGP').checked    = wizardState.newGP       === S.YES;
   gel('chkHMRC').checked     = wizardState.hmrc        === S.YES;
-  gel('chkDrivingLicence').checked = wizardState.driving  !== S.NEEDS_UPDATE;
-  gel('chkPassport').checked       = wizardState.passport !== S.NEEDS_UPDATE;
+  const _dlVal = wizardState.driving  === S.NEEDS_UPDATE ? 'needs_update' : wizardState.driving  === S.UPDATED ? 'updated' : 'none';
+  const _ppVal = wizardState.passport === S.NEEDS_UPDATE ? 'needs_update' : wizardState.passport === S.UPDATED ? 'updated' : 'none';
+  const _dlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlVal}"]`);
+  const _ppR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppVal}"]`);
+  if (_dlR) _dlR.checked = true;
+  if (_ppR) _ppR.checked = true;
   gel('chkGRC').checked      = wizardState.grc === S.YES || wizardState.birthCert === S.YES;
   gel('chkBirthCertName').checked  = wizardState.birthCertName === S.YES;
   gel('chkBirthCert').checked      = wizardState.birthCert     === S.YES;
@@ -1093,7 +1121,7 @@ function syncWizardToChecklist() {
   const selected = Array.isArray(wizardState.services) ? wizardState.services : [];
   const allSvcKeys = Object.keys(SVC_MAP);
   Object.entries(SVC_MAP).forEach(([val, id]) => { gel(id).checked = selected.includes(val); });
-  gel('chkSvcNone').checked = allSvcKeys.every(k => selected.includes(k));
+  gel('chkSvcAll').checked = allSvcKeys.every(k => selected.includes(k));
   setEmploymentRadio(wizardState.employment);
 }
 function syncChecklistToWizard() {
@@ -1110,13 +1138,15 @@ function syncChecklistToWizard() {
   wizardState.nhs         = gel('chkNHS').checked      ? S.YES : S.NO;
   wizardState.newGP       = gel('chkNewGP').checked    ? S.YES : S.NO;
   wizardState.hmrc        = gel('chkHMRC').checked     ? S.YES : S.NO;
-  wizardState.driving     = gel('chkDrivingLicence').checked ? S.UPDATED : S.NEEDS_UPDATE;
-  wizardState.passport    = gel('chkPassport').checked       ? S.UPDATED : S.NEEDS_UPDATE;
+  const _dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
+  wizardState.driving  = _dlC && _dlC.value === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
+  const _ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
+  wizardState.passport = _ppC && _ppC.value === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
   wizardState.grc         = gel('chkGRC').checked      ? S.YES : S.NO;
   wizardState.birthCertName = gel('chkBirthCertName').checked ? S.YES : S.NO;
   wizardState.birthCert   = gel('chkBirthCert').checked      ? S.YES : S.NO;
   wizardState.bornInNI    = gel('chkBornNI').checked         ? S.YES : S.NO;
-  const allTicked = gel('chkSvcNone').checked;
+  const allTicked = gel('chkSvcAll').checked;
   wizardState.services = allTicked
     ? Object.keys(SVC_MAP)
     : Object.entries(SVC_MAP).filter(([, id]) => gel(id).checked).map(([val]) => val);
@@ -1176,7 +1206,7 @@ function updateLocks() {
   if (!isEmployed) gel('chkDBS').checked      = false;
   if (!isNonUK)    gel('chkVisa').checked     = false;
   if (isGender)    gel('chkDWP').checked      = false;
-  if (isGender)    { document.querySelectorAll('.chk-service').forEach(c => c.checked = false); gel('chkSvcNone').checked = false; }
+  if (isGender)    { document.querySelectorAll('.chk-service').forEach(c => c.checked = false); gel('chkSvcAll').checked = false; }
   if (isName)      { gel('chkBirthCert').checked = false; }
   if ((!isScot && !isNI) || isGender) gel('chkBirthCertName').checked = false;
   if (!isNI)       gel('chkBornNI').checked = false;
@@ -1184,24 +1214,31 @@ function updateLocks() {
   const shouldLock = !isGender && !hasDeed;
   ['wrapNHS','wrapHMRC','wrapDrivingLicence','wrapPassport', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
-    const wrap = gel(id), cb = wrap.querySelector('input'), lock = wrap.querySelector('.lock-icon');
+    const wrap = gel(id), cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
     if (shouldLock) {
-      wrap.classList.add('locked'); cb.disabled = true;
-      cb.setAttribute('aria-describedby','lock-deed-poll-reason');
+      wrap.classList.add('locked');
+      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
+      if (id === 'wrapDrivingLicence' || id === 'wrapPassport') {
+        const noneRadio = wrap.querySelector('input[value="none"]');
+        cbs.forEach(r => r.checked = false);
+        if (noneRadio) noneRadio.checked = true;
+      } else {
+        cbs.forEach(cb => cb.checked = false);
+      }
       if (lock) lock.classList.remove('hidden');
     } else {
-      wrap.classList.remove('locked'); cb.disabled = false;
-      cb.removeAttribute('aria-describedby');
+      wrap.classList.remove('locked');
+      cbs.forEach(cb => { cb.disabled = false; cb.removeAttribute('aria-describedby'); });
       if (lock) lock.classList.add('hidden');
     }
   });
 }
-function handleSvcNone(allBox) {
+function handleSvcAll(allBox) {
   document.querySelectorAll('.chk-service').forEach(cb => cb.checked = allBox.checked);
 }
 function handleSvcItem() {
   const all = document.querySelectorAll('.chk-service');
-  gel('chkSvcNone').checked = Array.from(all).every(cb => cb.checked);
+  gel('chkSvcAll').checked = Array.from(all).every(cb => cb.checked);
 }
 function resetChecklist() {
   gel('chkRegionEW').checked   = true;
@@ -1209,10 +1246,12 @@ function resetChecklist() {
   gel('chkNonUK').checked      = false;
   gel('chkEmployedNo').checked = true;
   ['chkPhotoID','chkDBS','chkDWP','chkStudent','chkDeedPoll','chkVisa','chkNHS','chkNewGP',
-   'chkHMRC','chkDrivingLicence','chkPassport','chkGRC','chkBirthCertName','chkBirthCert',
+   'chkHMRC','chkGRC','chkBirthCertName','chkBirthCert',
    'chkBornNI','chkSvcBanks','chkSvcInsurance','chkSvcCouncil','chkSvcUtilities','chkSvcElectoral',
-   'chkSvcLandlord','chkSvcPension','chkSvcNone']
+   'chkSvcLandlord','chkSvcPension','chkSvcAll']
     .forEach(id => { gel(id).checked = false; });
+  document.querySelector('input[name="chkDrivingLicenceOpt"][value="none"]').checked = true;
+  document.querySelector('input[name="chkPassportOpt"][value="none"]').checked = true;
   updateLocks();
 }
 const questions = [
@@ -1345,9 +1384,9 @@ function renderWizard() {
     });
     const allSvcVals = opts.map(o => o.value);
     const noneChecked = allSvcVals.length > 0 && allSvcVals.every(v => selected.includes(v)) ? 'checked' : '';
-    html += `<div class="multi-none-sep"></div>
+    html += `<div class="multi-all-sep"></div>
 <label class="option" for="multi_${q.id}_none">
-  <input type="checkbox" id="multi_${q.id}_none" class="multi-none" ${noneChecked}>
+  <input type="checkbox" id="multi_${q.id}_none" class="multi-all" ${noneChecked}>
   Select all
 </label>`;
   } else {
@@ -1370,7 +1409,7 @@ function renderWizard() {
   if (nextBtn) nextBtn.textContent = idx === total ? 'Show my plan →' : 'Continue →';
 
   if (q.type === 'multi') {
-    const noneBox = V.form.querySelector('.multi-none');
+    const noneBox = V.form.querySelector('.multi-all');
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
     optBoxes.forEach(cb => {
       cb.addEventListener('change', () => { noneBox.checked = optBoxes.every(b => b.checked); });
@@ -1389,7 +1428,7 @@ function renderWizard() {
 function nextWizard() {
   const q = questions[step];
   if (q.type === 'multi') {
-    const noneBox = V.form.querySelector('.multi-none');
+    const noneBox = V.form.querySelector('.multi-all');
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
     const selected = noneBox && noneBox.checked ? optBoxes.map(cb => cb.value) : optBoxes.filter(cb => cb.checked).map(cb => cb.value);
     wizardState[q.id] = selected;
@@ -2026,7 +2065,13 @@ function restoreTrackers() {
     }, 500);
   }, {passive:true});
   const cancel = () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
-  pc.addEventListener('touchend', e => { cancel(); if (lpFired) { e.preventDefault(); lpFired = false; } });
+  pc.addEventListener('touchend', e => { cancel(); if (lpFired) { e.preventDefault(); } });
+  pc.addEventListener('click', e => {
+    if (!lpFired) return;
+    e.preventDefault();
+    e.stopPropagation();
+    lpFired = false;
+  }, { capture: true });
   pc.addEventListener('touchmove', cancel, {passive:true});
   pc.addEventListener('touchcancel', cancel, {passive:true});
 })();
@@ -2059,9 +2104,11 @@ function launchConfetti() {
   const DURATION = 20000;
   const PARTICLE_COUNT = 80;
   let W, H;
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
+  // Use ResizeObserver instead of window 'resize' so the listener is automatically
+  // cleaned up when the canvas is removed, preventing listener accumulation across calls.
+  const _ro = new ResizeObserver(() => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
+  _ro.observe(document.documentElement);
+  W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight;
   const particles = Array.from({length: PARTICLE_COUNT}, (_, i) => ({
     x: Math.random() * W,
     y: -20 - Math.random() * H * 0.5,
@@ -2076,9 +2123,9 @@ function launchConfetti() {
   }));
   const start = performance.now();
   function draw(now) {
-    if (canvas.dataset.fadingOut) { window.removeEventListener('resize', resize); return; }
+    if (canvas.dataset.fadingOut) { _ro.disconnect(); return; }
     const elapsed = now - start;
-    if (elapsed > DURATION) { canvas.remove(); window.removeEventListener('resize', resize); return; }
+    if (elapsed > DURATION) { canvas.remove(); _ro.disconnect(); return; }
     ctx.clearRect(0, 0, W, H);
     const fade = elapsed > DURATION - 3000 ? 1 - (elapsed - (DURATION - 3000)) / 3000 : 1;
     ctx.globalAlpha = fade;
@@ -2252,10 +2299,12 @@ window.onload = () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
     V.start.classList.add('hidden');
+    // If the age gate hasn't been accepted yet, show the start screen and wait;
+    // checkAgeGate() will call loadUrlParams + handleUrlLoad once confirmed.
+    if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
     let _d2 = {};
     try { _d2 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
     loadUrlParams(_d2);
-    if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
     handleUrlLoad(params);
     return;
   }
