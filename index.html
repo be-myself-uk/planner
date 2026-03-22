@@ -915,6 +915,34 @@ function checkAgeGate() {
       try { _d1 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
       if (_d1 && typeof _d1 === 'object') loadUrlParams(_d1);
       handleUrlLoad(params);
+    } else if (params.has('goal')) {
+      V.start.classList.add('hidden');
+      const b = k => params.get(k) === 'true';
+      const legacy = {
+        v: 0, reg: REGION.EW,
+        goal: params.get('goal') || S.BOTH,
+        nonUK: b('nonUK'), pid: b('pid'),
+        emp: b('emp') ? 'yes' : 'no',
+        dbs: b('dbs'), stu: false, dp: b('dp'),
+        visa: b('visa'), nhs: b('nhs'),
+        dl: b('dl') ? 'updated' : 'none',
+        hmrc: b('hmrc'),
+        pass: b('pass') ? 'updated' : 'none',
+        grc: b('grc'), newgp: false, dwp: false,
+        bcn: false, bc: false, bni: false, srv: '',
+      };
+      loadUrlParams(legacy);
+      try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+      updateLocks();
+      V.plan.classList.add('hidden');
+      document.body.classList.remove('plan-ready','wizard-active');
+      V.welcome.classList.remove('hidden');
+      gel('welcomeNormal').classList.add('hidden');
+      const outBox = gel('welcomeOutdated');
+      outBox.classList.remove('hidden');
+      outBox.querySelector('h2').textContent = 'Your link is from an older version';
+      outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+      syncChecklistToWizard();
     }
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
@@ -2303,6 +2331,37 @@ window.onload = () => {
     try { _d2 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
     if (_d2 && typeof _d2 === 'object') loadUrlParams(_d2);
     handleUrlLoad(params);
+    return;
+  }
+  if (params.has('goal')) {
+    V.start.classList.add('hidden');
+    if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
+    const b = k => params.get(k) === 'true';
+    const legacy = {
+      v: 0, reg: REGION.EW,
+      goal: params.get('goal') || S.BOTH,
+      nonUK: b('nonUK'), pid: b('pid'),
+      emp: b('emp') ? 'yes' : 'no',
+      dbs: b('dbs'), stu: false, dp: b('dp'),
+      visa: b('visa'), nhs: b('nhs'),
+      dl: b('dl') ? 'updated' : 'none',
+      hmrc: b('hmrc'),
+      pass: b('pass') ? 'updated' : 'none',
+      grc: b('grc'), newgp: false, dwp: false,
+      bcn: false, bc: false, bni: false, srv: '',
+    };
+    loadUrlParams(legacy);
+    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+    updateLocks();
+    V.plan.classList.add('hidden');
+    document.body.classList.remove('plan-ready','wizard-active');
+    V.welcome.classList.remove('hidden');
+    gel('welcomeNormal').classList.add('hidden');
+    const outBox = gel('welcomeOutdated');
+    outBox.classList.remove('hidden');
+    outBox.querySelector('h2').textContent = 'Your link is from an older version';
+    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+    syncChecklistToWizard();
     return;
   }
   const savedApp = ssg('appState');
