@@ -36,6 +36,10 @@
     --info:#1a73e8; --info-bg:#e8f0fe;
     --disabled:#e8eaed; --disabled-text:#767676;
     --disclaimer-muted:#6b7280;
+    --phase-0:#1585b8; --phase-0-bg:#e3f4fc;
+    --phase-1:#b5616f; --phase-1-bg:#fce8ec;
+    --phase-2:#8a7400; --phase-2-bg:#fef7e0;
+    --phase-3:#7b3fb5; --phase-3-bg:#f0e6f9;
   }
   [data-theme="dark"] {
     --primary:#8ab4f8; --primary-hover:#aecbfa;
@@ -49,6 +53,10 @@
     --info:#8ab4f8; --info-bg:#1e2a3b;
     --disabled:#303134; --disabled-text:#9aa0a6;
     --disclaimer-muted:#9aa0a6;
+    --phase-0:#55CDFC; --phase-0-bg:#1a2e3b;
+    --phase-1:#F7A8B8; --phase-1-bg:#3b2529;
+    --phase-2:#FCF434; --phase-2-bg:#3b3320;
+    --phase-3:#9C59D1; --phase-3-bg:#2a1e3b;
   }
   @media (prefers-color-scheme:dark) {
     :root:not([data-theme="light"]) {
@@ -63,6 +71,10 @@
       --info:#8ab4f8; --info-bg:#1e2a3b;
       --disabled:#303134; --disabled-text:#9aa0a6;
       --disclaimer-muted:#9aa0a6;
+      --phase-0:#55CDFC; --phase-0-bg:#1a2e3b;
+      --phase-1:#F7A8B8; --phase-1-bg:#3b2529;
+      --phase-2:#FCF434; --phase-2-bg:#3b3320;
+      --phase-3:#9C59D1; --phase-3-bg:#2a1e3b;
     }
   }
   .ub-group { display:flex; gap:8px; align-items:center; }
@@ -105,7 +117,6 @@
   }
   #controlBarProgressFill {
     height:100%; width:0%;
-    /* Trans flag: blue, pink, white. Non-binary: yellow, purple. Black omitted — too harsh in a gradient. */
     background: linear-gradient(90deg,
       #55CDFC, #F7A8B8, #FFFFFF, #FCF434,
       #9C59D1, #F7A8B8, #55CDFC, #FFFFFF,
@@ -118,7 +129,6 @@
   #cbPlanActions { display:none; }
   body.plan-ready #cbPlanActions { display:flex; gap:8px; align-items:center; }
   #cbSwitchView { display:none; }
-  body.plan-ready #cbSwitchView { display:inline-flex; }
   #planView li:not(.svc-sub-li) { display:grid; grid-template-rows:1fr; overflow:hidden; transition:grid-template-rows 0.5s ease, opacity 0.5s ease, margin 0.5s ease; }
   #planView li:not(.svc-sub-li) > * { min-height:0; overflow:hidden; }
   .collapsed-step { grid-template-rows:0fr !important; opacity:0 !important; margin-bottom:0 !important; pointer-events:none; }
@@ -163,7 +173,6 @@
   .option:hover, .checkbox-item:hover:not(.locked) { background:var(--bg-details-hover); border-color:var(--primary); }
   .option.locked, .checkbox-item.locked { background:var(--disabled); color:var(--disabled-text); cursor:not-allowed; border-color:var(--disabled); }
   .option.locked input, .checkbox-item.locked input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
-  /* Locked state for plain-div radio group wrappers (driving licence, passport) */
   div.locked { background:var(--disabled) !important; color:var(--disabled-text) !important; border-color:var(--disabled) !important; cursor:not-allowed; }
   div.locked .option { background:transparent; border-color:transparent; color:inherit; cursor:not-allowed; pointer-events:none; }
   div.locked .option input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
@@ -217,11 +226,13 @@
   .urgent { border-color:var(--urgent); background:var(--urgent-bg); }
   .simul { border-color:var(--simultaneous); background:var(--simultaneous-bg); }
   .success { border-color:var(--success); background:var(--success-bg); }
+  .phase-0 { border-color:var(--phase-0); background:var(--phase-0-bg); }
+  .phase-1 { border-color:var(--phase-1); background:var(--phase-1-bg); }
+  .phase-2 { border-color:var(--phase-2); background:var(--phase-2-bg); }
+  .phase-3 { border-color:var(--phase-3); background:var(--phase-3-bg); }
   #allDoneBanner { position:relative; border-color:transparent; border-width:0; border-radius:8px; isolation:isolate; padding:20px; overflow:visible; }
   #allDoneBanner::before {
     content:''; position:absolute; inset:-3px; border-radius:11px; z-index:-1;
-    /* Trans flag: #55CDFC blue, #F7A8B8 pink, #FFFFFF white
-       Non-binary flag: #FCF434 yellow, #9C59D1 purple, #2C2C2C black */
     background: linear-gradient(135deg,
       #55CDFC, #F7A8B8, #FFFFFF, #FCF434,
       #9C59D1, #2C2C2C, #55CDFC, #F7A8B8,
@@ -297,8 +308,8 @@
   .plan-top-details[open] summary::before { transform:rotate(90deg); }
   .plan-top-details[open] summary { border-bottom:1px solid var(--border); }
   .plan-top-details .plan-top-body { padding:12px 15px; font-size:0.9em; color:var(--text-muted); }
-  .tb-demo { display:inline-flex; align-items:center; gap:5px; background:var(--bg-light); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:1em; color:var(--text-muted); cursor:default; pointer-events:none; }
-  .tb-demo-panic { background:#b91c1c; border-color:rgba(255,255,255,0.55); color:#fff; }
+  .legend-toolbar { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; font-size:0.85em; }
+  .legend-tb-icon { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--bg-light); border:1px solid var(--border); border-radius:6px; font-size:1.05em; flex-shrink:0; }
   .svc-detail { margin-top:14px; }
   .svc-sub-ul { margin:8px 0 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;transition:margin 0.5s ease; }
   .svc-sub-ul:not(:has(li:not(.collapsed-svc))) { margin:0; }
@@ -334,8 +345,7 @@
     .plan-top-details .plan-top-body { color:#333; }
     .phase { page-break-inside:avoid; border:1px solid #ccc; border-left:5px solid #000; background:transparent; color:black; }
     .note { color:#555; }
-    .badge-time, .badge-next, .item-badge, .tb-demo { border:1px solid #000; color:#000; background:transparent; }
-    .tb-demo-panic { background:transparent; color:#000; border-color:#000; }
+    .badge-time, .badge-next, .item-badge, .legend-tb-icon { border:1px solid #000; color:#000; background:transparent; }
     details { display:block; border:1px solid #ccc; background:white; }
     details[open], details:not([open]) { display:block; }
     .phase details summary, .footer summary { display:none; }
@@ -537,7 +547,7 @@
   <div id="planView" class="hidden">
     <h2 id="planHeading" tabindex="-1">Your personal action plan</h2>
       <details id="planLegend" class="plan-top-details" open>
-        <summary>How to read this plan</summary>
+        <summary>Guide to your plan</summary>
         <div class="plan-top-body">
         <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
           <span>Difficulty:</span>
@@ -545,15 +555,15 @@
           <span class="item-badge badge-yellow" aria-label="Medium difficulty">Medium</span>
           <span class="item-badge badge-red" aria-label="Hard">Hard</span>
         </div>
-        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
           <span>Cost:</span>
           <span class="item-badge badge-green" aria-label="Free">Free</span>
           <span class="item-badge badge-yellow" aria-label="Low cost">£</span>
           <span class="item-badge badge-yellow" aria-label="Moderate cost">££</span>
           <span class="item-badge badge-red" aria-label="Expensive">£££</span>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <span>Progress (click to cycle, right-click or long-press to go back):</span>
+        <p style="margin:0 0 6px 0;"><strong>Progress:</strong> click to cycle, right-click or long-press to go back.</p>
+        <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:12px;">
           <span style="display:inline-flex;align-items:center;gap:4px;">
             <button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button>
             <span style="font-size:0.85em;">Not started</span>
@@ -571,17 +581,14 @@
             <span style="font-size:0.85em;">Not needed</span>
           </span>
         </div>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-          <span>Toolbar:</span>
-          <span class="tb-demo" aria-hidden="true"><span>↺</span> New plan</span>
-          <span class="tb-demo" aria-hidden="true"><span>✏️</span> Edit plan</span>
-          <span class="tb-demo" aria-hidden="true"><span>⟲</span> Reset progress</span>
-          <span class="tb-demo" aria-hidden="true"><span>👁️</span> Focus mode</span>
-          <span class="tb-demo" aria-hidden="true"><span>🔗</span> Copy link</span>
-          <span class="tb-demo" aria-hidden="true"><span>🖨️</span> Print</span>
-          <span class="tb-demo" aria-hidden="true"><span>?</span> About</span>
-          <span class="tb-demo" aria-hidden="true"><span>☀️/🌙</span> Theme</span>
-          <span class="tb-demo tb-demo-panic" aria-hidden="true"><span>⚠️</span> Quick exit</span>
+        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Toolbar</strong></p>
+        <div class="legend-toolbar" aria-hidden="true">
+          <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> start over completely. ⚠️ This deletes your plan.</span>
+          <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers.</span>
+          <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> untick all checkboxes but keep your plan.</span>
+          <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed.</span>
+          <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan.</span>
+          <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> print your plan or save it as a PDF.</span>
         </div>
         </div>
       </details>
@@ -766,12 +773,14 @@ function panicExit() { window.location.replace('https://www.google.co.uk'); }
 function loadUrlParams(d) {
   const regRadio = document.querySelector(`input[name="chkRegion"][value="${d.reg || REGION.EW}"]`);
   if (regRadio) regRadio.checked = true;
-  gel('chkGoalBoth').checked   = d.goal === S.BOTH;
-  gel('chkGoalName').checked   = d.goal === S.NAME;
-  gel('chkGoalGender').checked = d.goal === S.GENDER;
+  if ([S.BOTH, S.NAME, S.GENDER].includes(d.goal)) {
+    gel('chkGoalBoth').checked   = d.goal === S.BOTH;
+    gel('chkGoalName').checked   = d.goal === S.NAME;
+    gel('chkGoalGender').checked = d.goal === S.GENDER;
+  }
   gel('chkNonUK').checked      = d.nonUK === true;
   gel('chkPhotoID').checked    = d.pid   === true;
-  const emp = d.emp || 'no';
+  const emp = ['yes','needs_update','no'].includes(d.emp) ? d.emp : 'no';
   gel('chkEmployedUpdated').checked = emp === 'yes';
   gel('chkEmployedNeeds').checked   = emp === 'needs_update';
   gel('chkEmployedNo').checked      = emp === 'no';
@@ -781,7 +790,6 @@ function loadUrlParams(d) {
   gel('chkVisa').checked         = d.visa === true;
   gel('chkNHS').checked          = d.nhs  === true;
   gel('chkHMRC').checked         = d.hmrc === true;
-  // dl/pass: new URLs store 'updated'/'needs_update'/'none'; old URLs stored true/false
   const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : (d.dl === 'updated' || d.dl === true) ? 'updated' : 'none';
   const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : (d.pass === 'updated' || d.pass === true) ? 'updated' : 'none';
   const _dlUrlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlUrlVal}"]`);
@@ -798,6 +806,12 @@ function loadUrlParams(d) {
   Object.entries(SVC_MAP).forEach(([val, id]) => { const cb = gel(id); if (cb) cb.checked = loadedServices.includes(val); });
   const noneBox = gel('chkSvcAll');
   if (noneBox) noneBox.checked = Object.keys(SVC_MAP).every(k => loadedServices.includes(k));
+  if (d.prg && typeof d.prg === 'object') {
+    Object.entries(d.prg).forEach(([key, state]) => {
+      const s = parseInt(state, 10);
+      if (s >= 1 && s <= 3) sss('st_trk_' + key, s);
+    });
+  }
 }
 function handleUrlLoad(params) {
   isWizardMode = false;
@@ -812,7 +826,7 @@ function handleUrlLoad(params) {
     gel('welcomeNormal').classList.add('hidden');
     const outBox = gel('welcomeOutdated');
     outBox.classList.remove('hidden');
-    outBox.querySelector('h3').textContent = 'Your link appears to be incomplete';
+    outBox.querySelector('h2').textContent = 'Your link appears to be incomplete';
     outBox.querySelector('p').textContent = 'This link could not be read. Please review your answers below before generating your plan.';
     syncChecklistToWizard();
     return;
@@ -830,7 +844,7 @@ function handleUrlLoad(params) {
     gel('welcomeNormal').classList.add('hidden');
     const outBox = gel('welcomeOutdated');
     outBox.classList.remove('hidden');
-    outBox.querySelector('h3').textContent = 'Your action plan may be out of date';
+    outBox.querySelector('h2').textContent = 'Your action plan may be out of date';
     outBox.querySelector('p').textContent = 'This planner has been updated since your plan was created. We recommend reviewing your answers to make sure everything is still accurate.';
     syncChecklistToWizard();
   } else {
@@ -872,9 +886,13 @@ function copyShareableLink() {
     bni:   isWizardMode ? (w.bornInNI    === S.YES) : chk('chkBornNI'),
     srv,
   };
-  // NOTE: btoa/atob is ASCII-only. Safe here because all state values are ASCII
-  // (e.g. 'yes', 'no', 'ew'). If free-text input fields are ever added, switch to a
-  // Unicode-safe method: btoa(encodeURIComponent(json)) / decodeURIComponent(atob(str)).
+  const prg = {};
+  document.querySelectorAll('.step-state-btn[data-track-id]').forEach(btn => {
+    const id = btn.dataset.trackId;
+    const s = getStepState(id);
+    if (s > 0) prg[id.replace('trk_', '')] = s;
+  });
+  if (Object.keys(prg).length) ps.prg = prg;
   url.searchParams.set('p', btoa(JSON.stringify(ps)));
   const text = `Action Plan Link:\n${url}`;
   const showSuccess = () => {
@@ -909,10 +927,38 @@ function checkAgeGate() {
     const params = new URLSearchParams(window.location.search);
     if (params.has('p')) {
       V.start.classList.add('hidden');
-      let _d1 = {};
+      let _d1 = null;
       try { _d1 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
-      loadUrlParams(_d1);
+      if (_d1 && typeof _d1 === 'object') loadUrlParams(_d1);
       handleUrlLoad(params);
+    } else if (params.has('goal')) {
+      V.start.classList.add('hidden');
+      const b = k => params.get(k) === 'true';
+      const legacy = {
+        v: 0, reg: REGION.EW,
+        goal: params.get('goal') || S.BOTH,
+        nonUK: b('nonUK'), pid: b('pid'),
+        emp: b('emp') ? 'yes' : 'no',
+        dbs: b('dbs'), stu: false, dp: b('dp'),
+        visa: b('visa'), nhs: b('nhs'),
+        dl: b('dl') ? 'updated' : 'none',
+        hmrc: b('hmrc'),
+        pass: b('pass') ? 'updated' : 'none',
+        grc: b('grc'), newgp: false, dwp: false,
+        bcn: false, bc: false, bni: false, srv: '',
+      };
+      loadUrlParams(legacy);
+      try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+      updateLocks();
+      V.plan.classList.add('hidden');
+      document.body.classList.remove('plan-ready','wizard-active');
+      V.welcome.classList.remove('hidden');
+      gel('welcomeNormal').classList.add('hidden');
+      const outBox = gel('welcomeOutdated');
+      outBox.classList.remove('hidden');
+      outBox.querySelector('h2').textContent = 'Your link is from an older version';
+      outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+      syncChecklistToWizard();
     }
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
@@ -1021,7 +1067,7 @@ function confirmUtilityRestart(btn) {
   btn.dataset.confirming = 'true';
   btn.classList.add('ub-confirming');
   btn.textContent = 'Confirm?';
-  btn.setAttribute('aria-label', 'Confirm — this will delete your answers and action plan');
+  btn.setAttribute('aria-label', 'Confirm: this will delete your answers and action plan');
   announce('Click again to confirm. This will delete your answers and action plan.');
   setTimeout(() => { if (btn.dataset.confirming === 'true') { reset(); announce('New plan cancelled.'); } }, 4000);
 }
@@ -1036,7 +1082,7 @@ function confirmResetProgress(btn) {
   btn.dataset.confirming = 'true';
   btn.classList.add('ub-confirming');
   btn.textContent = 'Confirm?';
-  btn.setAttribute('aria-label', 'Confirm — this will untick all progress on your action plan');
+  btn.setAttribute('aria-label', 'Confirm: this will untick all progress on your action plan');
   announce('Click again to confirm. This will reset all progress on your action plan.');
   setTimeout(() => { if (btn.dataset.confirming === 'true') { reset(); announce('Reset cancelled.'); } }, 4000);
 }
@@ -1507,7 +1553,7 @@ function buildSharedPlan(p) {
     btn.dataset.stepLabel = title;
     btn.setAttribute('onclick', `cycleStepState('${trackId}')`);
     btn.setAttribute('oncontextmenu', `event.preventDefault();reverseStepState('${trackId}')`);
-    btn.setAttribute('aria-label', `${title} — Not started. Click to cycle forward, right-click or long-press to go back`);
+    btn.setAttribute('aria-label', `${title}: Not started. Click to cycle forward, right-click or long-press to go back`);
     btn.title = 'Click to cycle status · Right-click or long-press to go back';
     btn.querySelector('span').textContent = STATE_ICONS[0];
     const textDiv = node.querySelector('.tmpl-text');
@@ -1568,6 +1614,8 @@ function buildSharedPlan(p) {
   }
   let stepsHtml = '';
   const addStep = chunk => { stepsHtml += chunk; };
+  let phaseIdx = 0;
+  const nextPhaseColour = () => 'phase-' + (phaseIdx++ % 4);
   if (!isGender) {
     html += `<details class="plan-top-details">
   <summary>💡 Did you know about titles?</summary>
@@ -1606,7 +1654,7 @@ function buildSharedPlan(p) {
 <a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>
 <a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>
 <a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>`;
-    addStep(`<div class="phase urgent" aria-labelledby="phase_s${sn}">
+    addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
   <div class="phase-header"><h3 id="phase_s${sn}">Step ${sn}: The basics</h3><span class="badge-time">⏱ ${isNI ? '30 minutes – 1 day' : '10–30 minutes'}</span></div>
   <ul>
@@ -1614,9 +1662,9 @@ function buildSharedPlan(p) {
   </ul>
 </div>`);
   }
-  const openPhase = (phaseKey, colour, title, time) => {
+  const openPhase = (phaseKey, title, time) => {
     const sn = nextStep();
-    addStep(`<div class="phase ${colour}" aria-labelledby="phase_s${sn}">
+    addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
   <div class="phase-header"><h3 id="phase_s${sn}">Step ${sn}: ${title}</h3><span class="badge-time">⏱ ${time}</span></div>
   <ul>`);
@@ -1806,7 +1854,7 @@ function buildSharedPlan(p) {
         const subItems = allServices.map(svc => {
           const subId = `trk_svc_${svc}`;
           const label = svcLabels[svc] || svc;
-          return `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="trk_services_all" onclick="cycleStepState('${subId}')" oncontextmenu="event.preventDefault();reverseStepState('${subId}')" aria-pressed="false" aria-label="${label} — Not started. Click to cycle forward, right-click or long-press to go back" title="Click to cycle status · Right-click or long-press to go back"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
+          return `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="trk_services_all" onclick="cycleStepState('${subId}')" oncontextmenu="event.preventDefault();reverseStepState('${subId}')" aria-pressed="false" aria-label="${label}: Not started. Click to cycle forward, right-click or long-press to go back" title="Click to cycle status · Right-click or long-press to go back"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
         }).join('');
         const expandedDetails = allServices.map(s => svcDetails[s] || '').join('') +
           `<p style="margin-top:12px;">Most organisations will accept your deed poll or statutory declaration as proof of your name change. Contact them directly by phone, through your online account, or in writing.</p>`;
@@ -1826,22 +1874,22 @@ function buildSharedPlan(p) {
   };
   if (splitMiddle) {
     if (hasHealthGroup) {
-      openPhase('health', 'simul', 'Health and personal records', '1–3 weeks');
+      openPhase('health', 'Health and personal records', '1–3 weeks');
       buildHealthItems();
       closePhase();
     }
     if (hasWorkGroup) {
-      openPhase('work', 'simul', 'Work and qualifications', '1–3 weeks');
+      openPhase('work', 'Work and qualifications', '1–3 weeks');
       buildWorkItems();
       closePhase();
     }
     if (hasCivicGroup) {
-      openPhase('civic', 'simul', 'Civic and financial records', '1–3 weeks');
+      openPhase('civic', 'Civic and financial records', '1–3 weeks');
       buildCivicItems();
       closePhase();
     }
   } else if (hasHealthGroup || hasWorkGroup || hasCivicGroup) {
-    openPhase('main', 'simul', 'Main UK services', '1–3 weeks');
+    openPhase('main', 'Main UK services', '1–3 weeks');
     buildHealthItems();
     buildWorkItems();
     buildCivicItems();
@@ -1849,7 +1897,7 @@ function buildSharedPlan(p) {
   }
   if (hasStep3) {
     const sn = nextStep();
-    addStep(`<div class="phase" aria-labelledby="phase_s${sn}">
+    addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
   <div class="phase-header"><h3 id="phase_s${sn}">Step ${sn}: Identity documents</h3><span class="badge-time">⏱ 3–10 weeks</span></div>
   <ul>`);
@@ -1924,7 +1972,7 @@ ${isScotland
   : '<a href="https://www.gov.uk/apply-gender-recognition-certificate" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Apply for a GRC</a>'
 }`
     ) : '';
-    addStep(`<div class="phase success" aria-labelledby="phase_s${sn}">
+    addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
   <div class="phase-header"><h3 id="phase_s${sn}">Step ${sn}: ${stepTitle}</h3><span class="badge-time">⏱ ${stepTime}</span></div>
   ${grcIntro}
@@ -1959,7 +2007,7 @@ function applyStepState(id, state) {
   if (btn) {
     btn.dataset.state = state;
     btn.innerHTML = `<span aria-hidden="true">${STATE_ICONS[state]}</span>`;
-    btn.setAttribute('aria-label', `${btn.dataset.stepLabel} — ${STATE_ARIA[state]}. Click to ${STATE_LABELS[state].toLowerCase()}`);
+    btn.setAttribute('aria-label', `${btn.dataset.stepLabel}: ${STATE_ARIA[state]}. Click to ${STATE_LABELS[state].toLowerCase()}`);
     btn.setAttribute('aria-pressed', state > 0 ? 'true' : 'false');
   }
   if (textDiv) {
@@ -2099,13 +2147,10 @@ function launchConfetti() {
   canvas.setAttribute('aria-hidden', 'true');
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  // Trans flag: light blue, pink, white. Non-binary flag: yellow, white, purple, black.
   const COLOURS = ['#55CDFC','#F7A8B8','#FFFFFF','#FCF434','#9C59D1','#2C2C2C'];
   const DURATION = 20000;
   const PARTICLE_COUNT = 80;
   let W, H;
-  // Use ResizeObserver instead of window 'resize' so the listener is automatically
-  // cleaned up when the canvas is removed, preventing listener accumulation across calls.
   const _ro = new ResizeObserver(() => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
   _ro.observe(document.documentElement);
   W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight;
@@ -2299,13 +2344,42 @@ window.onload = () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
     V.start.classList.add('hidden');
-    // If the age gate hasn't been accepted yet, show the start screen and wait;
-    // checkAgeGate() will call loadUrlParams + handleUrlLoad once confirmed.
     if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
-    let _d2 = {};
+    let _d2 = null;
     try { _d2 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
-    loadUrlParams(_d2);
+    if (_d2 && typeof _d2 === 'object') loadUrlParams(_d2);
     handleUrlLoad(params);
+    return;
+  }
+  if (params.has('goal')) {
+    V.start.classList.add('hidden');
+    if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
+    const b = k => params.get(k) === 'true';
+    const legacy = {
+      v: 0, reg: REGION.EW,
+      goal: params.get('goal') || S.BOTH,
+      nonUK: b('nonUK'), pid: b('pid'),
+      emp: b('emp') ? 'yes' : 'no',
+      dbs: b('dbs'), stu: false, dp: b('dp'),
+      visa: b('visa'), nhs: b('nhs'),
+      dl: b('dl') ? 'updated' : 'none',
+      hmrc: b('hmrc'),
+      pass: b('pass') ? 'updated' : 'none',
+      grc: b('grc'), newgp: false, dwp: false,
+      bcn: false, bc: false, bni: false, srv: '',
+    };
+    loadUrlParams(legacy);
+    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+    updateLocks();
+    V.plan.classList.add('hidden');
+    document.body.classList.remove('plan-ready','wizard-active');
+    V.welcome.classList.remove('hidden');
+    gel('welcomeNormal').classList.add('hidden');
+    const outBox = gel('welcomeOutdated');
+    outBox.classList.remove('hidden');
+    outBox.querySelector('h2').textContent = 'Your link is from an older version';
+    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+    syncChecklistToWizard();
     return;
   }
   const savedApp = ssg('appState');
