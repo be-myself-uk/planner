@@ -133,7 +133,12 @@
   #planView li:not(.svc-sub-li) > * { min-height:0; overflow:hidden; }
   .collapsed-step { grid-template-rows:0fr !important; opacity:0 !important; margin-bottom:0 !important; pointer-events:none; }
   .collapsed-phase { max-height:0 !important; opacity:0 !important; margin-top:0 !important; padding:0 !important; border-width:0 !important; pointer-events:none; }
-  @media (prefers-reduced-motion:reduce) { #planView li, .phase, .collapsed-svc, .svc-sub-li, .svc-sub-ul { transition:none; } #controlBarProgressFill { transition:none; animation:none; background:var(--primary); } .ub-label { transition:none; } }
+  @keyframes legend-pulse {
+    0%, 100% { background-color:var(--bg-light); border-color:var(--border); }
+    50% { background-color:var(--info-bg); border-color:var(--primary); }
+  }
+  .legend-pulse { animation: legend-pulse 2s ease-in-out 6; }
+  @media (prefers-reduced-motion:reduce) { #planView li, .phase, .collapsed-svc, .svc-sub-li, .svc-sub-ul { transition:none; } #controlBarProgressFill { transition:none; animation:none; background:var(--primary); } .ub-label { transition:none; } .legend-pulse { animation:none; } }
   @media (pointer:coarse) { .ub-label { display:none !important; } }
   @media (max-width:600px) {
     #controlBarButtons { flex-wrap:wrap; gap:4px; }
@@ -546,7 +551,7 @@
   </div>
   <div id="planView" class="hidden">
     <h2 id="planHeading" tabindex="-1">Your personal action plan</h2>
-      <details id="planLegend" class="plan-top-details" open>
+      <details id="planLegend" class="plan-top-details">
         <summary>Guide to your plan</summary>
         <div class="plan-top-body">
         <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
@@ -984,6 +989,15 @@ function startChecklist() {
   refreshToolbarTabindex();
   document.body.classList.remove('wizard-active');
 }
+function nudgeLegend() {
+  const el = gel('planLegend');
+  if (!el || ssg('legendSeen') === '1') return;
+  sss('legendSeen', '1');
+  el.classList.add('legend-pulse');
+  const stop = () => el.classList.remove('legend-pulse');
+  el.addEventListener('toggle', stop, { once: true });
+  el.addEventListener('animationend', stop, { once: true });
+}
 function continuePlan() {
   V.welcome.classList.add('hidden');
   V.toggle.style.display = 'none';
@@ -992,7 +1006,7 @@ function continuePlan() {
   V.plan.classList.remove('hidden');
   document.body.classList.add('plan-ready');
   buildSharedPlan(planParamsFromWizard());
-  const legend = gel('planLegend'); if (legend) legend.removeAttribute('open');
+  nudgeLegend();
   focusPlan();
   refreshToolbarTabindex();
 }
@@ -1115,7 +1129,7 @@ function restartApp() {
   if (fBtn) { fBtn.classList.remove('focus-active'); fBtn.setAttribute('aria-pressed','false'); fBtn.setAttribute('aria-label','Focus mode: off'); }
   V.start.classList.remove('hidden');
   try {
-    ['appState','wizardState','isWizardMode','ageConfirmed','focusMode'].forEach(k => localStorage.removeItem(k));
+    ['appState','wizardState','isWizardMode','ageConfirmed','focusMode','legendSeen'].forEach(k => localStorage.removeItem(k));
     const keys = [];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
@@ -1510,6 +1524,7 @@ function generateWizardPlan() {
   sss('wizardState', JSON.stringify(wizardState));
   sss('isWizardMode', 'true');
   buildSharedPlan(planParamsFromWizard());
+  nudgeLegend();
   focusPlan();
   refreshToolbarTabindex();
 }
@@ -1525,6 +1540,7 @@ function generateChecklistPlan() {
   sss('wizardState', JSON.stringify(wizardState));
   sss('isWizardMode', 'false');
   buildSharedPlan(planParamsFromWizard());
+  nudgeLegend();
   focusPlan();
   refreshToolbarTabindex();
 }
