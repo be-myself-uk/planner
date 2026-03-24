@@ -115,7 +115,7 @@ Please [open an issue](../../issues) before starting significant work so we can 
 
 You are free to share and adapt this project for non-commercial purposes, as long as you give appropriate credit and distribute any adaptations under the same licence.
 
-If you are an organisation such as a registered UK charity and would like to use this project for commercial purposes, please [send an email](mailto:bemyself@bemyself.uk).
+If you are an organisation such as a registered UK charity and would like to use this project for commercial purposes, please [send an email](mailto:hello@bemyself.uk).
 
 ## Acknowledgements
 
