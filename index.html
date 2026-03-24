@@ -1332,11 +1332,7 @@ function updateLocks() {
     if (shouldLock) {
       wrap.classList.add('locked');
       cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
-      if (id === 'wrapDrivingLicence' || id === 'wrapPassport') {
-        const noneRadio = wrap.querySelector('input[value="none"]');
-        cbs.forEach(r => r.checked = false);
-        if (noneRadio) noneRadio.checked = true;
-      } else {
+      if (id !== 'wrapDrivingLicence' && id !== 'wrapPassport') {
         cbs.forEach(cb => cb.checked = false);
       }
       if (lock) lock.classList.remove('hidden');
