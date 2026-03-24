@@ -688,7 +688,7 @@
   </li>
 </template>
 <script>
-const SCHEMA_VERSION = 1774576800;
+const SCHEMA_VERSION = 1774362076;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -1329,11 +1329,7 @@ function updateLocks() {
     if (shouldLock) {
       wrap.classList.add('locked');
       cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
-      if (id === 'wrapDrivingLicence' || id === 'wrapPassport') {
-        const noneRadio = wrap.querySelector('input[value="none"]');
-        cbs.forEach(r => r.checked = false);
-        if (noneRadio) noneRadio.checked = true;
-      } else {
+      if (id !== 'wrapDrivingLicence' && id !== 'wrapPassport') {
         cbs.forEach(cb => cb.checked = false);
       }
       if (lock) lock.classList.remove('hidden');
