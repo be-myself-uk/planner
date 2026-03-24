@@ -451,6 +451,14 @@
         <button class="secondary" onclick="confirmRestart(this)"><span aria-hidden="true">↺</span> New plan</button>
       </div>
     </div>
+    <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
+      <h2>Someone shared a plan with you</h2>
+      <p>This looks like a new device or browser. Please confirm you are aged 16 or over to view the plan.</p>
+      <label class="age-gate" for="ageConfirmShared">
+        <input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()">
+        <span class="age-gate-label">I confirm that I am aged 16 or over, or that I have the consent of a parent or guardian. I understand that this planner provides general guidance only and is not legal, medical, or financial advice.</span>
+      </label>
+    </div>
   </div>
 
   <div id="wizardView" class="hidden">
@@ -680,7 +688,7 @@
   </li>
 </template>
 <script>
-const SCHEMA_VERSION = 1774201062;
+const SCHEMA_VERSION = 1774356914;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -817,6 +825,7 @@ function loadUrlParams(d) {
       if (s >= 1 && s <= 3) sss('st_trk_' + key, s);
     });
   }
+  if (d.fm === 1) sss('focusMode', '1');
 }
 function handleUrlLoad(params) {
   isWizardMode = false;
@@ -898,6 +907,7 @@ function copyShareableLink() {
     if (s > 0) prg[id.replace('trk_', '')] = s;
   });
   if (Object.keys(prg).length) ps.prg = prg;
+  if (focusMode) ps.fm = 1;
   url.searchParams.set('p', btoa(JSON.stringify(ps)));
   const text = `Action Plan Link:\n${url}`;
   const showSuccess = () => {
@@ -967,6 +977,42 @@ function checkAgeGate() {
     }
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
+  }
+}
+function checkAgeGateShared() {
+  if (!gel('ageConfirmShared').checked) return;
+  sss('ageConfirmed', 'true');
+  gel('welcomeNewDevice').classList.add('hidden');
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('p')) {
+    handleUrlLoad(params);
+  } else if (params.has('goal')) {
+    const b = k => params.get(k) === 'true';
+    const legacy = {
+      v: 0, reg: REGION.EW,
+      goal: params.get('goal') || S.BOTH,
+      nonUK: b('nonUK'), pid: b('pid'),
+      emp: b('emp') ? 'yes' : 'no',
+      dbs: b('dbs'), stu: false, dp: b('dp'),
+      visa: b('visa'), nhs: b('nhs'),
+      dl: b('dl') ? 'updated' : 'none',
+      hmrc: b('hmrc'),
+      pass: b('pass') ? 'updated' : 'none',
+      grc: b('grc'), newgp: false, dwp: false,
+      bcn: false, bc: false, bni: false, srv: '',
+    };
+    loadUrlParams(legacy);
+    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+    updateLocks();
+    V.plan.classList.add('hidden');
+    document.body.classList.remove('plan-ready','wizard-active');
+    V.welcome.classList.remove('hidden');
+    gel('welcomeNormal').classList.add('hidden');
+    const outBox = gel('welcomeOutdated');
+    outBox.classList.remove('hidden');
+    outBox.querySelector('h2').textContent = 'Your link is from an older version';
+    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+    syncChecklistToWizard();
   }
 }
 function startWizard() {
@@ -1050,7 +1096,12 @@ function toggleMode() {
     document.body.classList.add('wizard-active');
     syncChecklistToWizard();
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
-    if (step >= questions.length) step = 0;
+    if (step >= questions.length) {
+      // Find the last question the user actually saw
+      let last = questions.length - 1;
+      while (last > 0 && questions[last].cond && !questions[last].cond()) last--;
+      step = last;
+    }
     renderWizard();
   } else {
     V.wizard.classList.add('hidden');
@@ -1221,11 +1272,11 @@ function planParamsFromWizard() {
     hasDeedPoll:        wizardState.deedpoll    === S.YES,
     needsNHS:           wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO
                           ? true
-                          : wizardState.nhs === S.NO,
+                          : (wizardState.nhs === S.NO && wizardState.newGP !== S.YES),
     newGP:              wizardState.newGP       === S.YES,
     needsDriving:       wizardState.driving     === S.NEEDS_UPDATE,
     needsPassport:      wizardState.passport    === S.NEEDS_UPDATE,
-    needsHMRC:          wizardState.hmrc        === S.NO,
+    needsHMRC:          wizardState.hmrc        !== S.YES,
     dwp:                wizardState.dwp         === S.YES,
     employment:         wizardState.employment,
     dbs:                wizardState.dbs         === S.YES,
@@ -1256,6 +1307,7 @@ function updateLocks() {
   gel('wrapVisa').classList.toggle('hidden', !isNonUK);
   gel('wrapDBS').classList.toggle('hidden', !isEmployed);
   gel('wrapDWP').classList.toggle('hidden', isGender);
+  gel('wrapHMRC').classList.toggle('hidden', isGender);
   gel('wrapChkServices').classList.toggle('hidden', isGender);
   gel('wrapBirthCert').classList.toggle('hidden', isName);
   gel('wrapBirthCertName').classList.toggle('hidden', (!isScot && !isNI) || isGender);
@@ -1266,6 +1318,7 @@ function updateLocks() {
   if (!isEmployed) gel('chkDBS').checked      = false;
   if (!isNonUK)    gel('chkVisa').checked     = false;
   if (isGender)    gel('chkDWP').checked      = false;
+  if (isGender)    gel('chkHMRC').checked     = false;
   if (isGender)    { document.querySelectorAll('.chk-service').forEach(c => c.checked = false); gel('chkSvcAll').checked = false; }
   if (isName)      { gel('chkBirthCert').checked = false; }
   if ((!isScot && !isNI) || isGender) gel('chkBirthCertName').checked = false;
@@ -1713,6 +1766,7 @@ function buildSharedPlan(p) {
 <p>Updating a gender marker on HSCNI records is generally treated as a self-declaration process. A new Health and Care Number (HCN) may be issued, and the previous record sealed for privacy.</p>
 <p><strong>⚠️ Important:</strong> Because HSCNI records do not automatically update across all trusts, let any hospital departments you use know about a new HCN, to avoid fragmented care or delays.</p>
 <p><strong>⚠️ Screening note:</strong> HSCNI cancer screening invitations rely on the gender marker attached to your HCN. Changing your marker may affect which automated screening invitations you receive. Ask your GP to check you are enrolled in the screening programmes right for your body.</p>
+<p><strong>Non-binary gender markers:</strong> HSCNI systems can record gender as "Indeterminate" in some datasets. Speak to your GP practice if this applies to you, as support varies across trusts and systems.</p>
 <a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a>
 <a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>`
           : `<p>For a name-only change, your GP practice contacts the Business Services Organisation (BSO) on your behalf. They will need to see a copy of your deed poll or statutory declaration. Your Health and Care Number stays the same.</p>
@@ -1723,7 +1777,7 @@ function buildSharedPlan(p) {
           ? 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record.'
           : 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration.';
         nhsDet = (isBoth || isGender)
-          ? `<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, the gender marker on your existing number can be updated, though this can sometimes cause issues with how data is shared across different NHS systems.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`
+          ? `<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, the gender marker on your existing number can be updated, though this can sometimes cause issues with how data is shared across different NHS systems.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, it is possible to request that your gender marker be recorded as I or \"Indeterminate\", which may show as \"Not specified\" on NHS systems. Speak to your GP practice if this applies to you, as the process varies and system support is not universal.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`
           : `<p>Your GP practice can update your name once they have seen your deed poll or statutory declaration. Your NHS number stays the same for a name-only change.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`;
       }
       addStep(li('nhs', medium, cost('Free','badge-green'), nhsTitle, nhsText, nhsDet));
@@ -2036,10 +2090,9 @@ function syncSvcParent() {
   if (!subBtns.length) return;
   const parentId = subBtns[0].dataset.svcParent;
   const states = Array.from(subBtns).map(b => getStepState(b.dataset.trackId));
-  const allDone    = states.every(s => s === 2);
   const allSettled = states.every(s => s === 2 || s === 3);
   const anyActive  = states.some(s => s === 1);
-  const parentState = allDone ? 2 : allSettled ? 3 : anyActive ? 1 : 0;
+  const parentState = allSettled ? (states.includes(2) ? 2 : 3) : anyActive ? 1 : 0;
   setStepState(parentId, parentState);
   applyStepState(parentId, parentState);
 }
@@ -2142,16 +2195,11 @@ function restoreTrackers() {
 
 function fadeOutConfetti() {
   const canvas = document.getElementById('confettiCanvas');
-  if (!canvas) return;
+  if (!canvas || canvas.dataset.fadingOut) return;
   canvas.dataset.fadingOut = '1';
-  const FADE = 1500;
-  const startFade = performance.now();
-  (function tick(now) {
-    const p = 1 - Math.min((now - startFade) / FADE, 1);
-    canvas.style.opacity = p;
-    if (p > 0) requestAnimationFrame(tick);
-    else canvas.remove();
-  })(performance.now());
+  canvas.style.transition = 'opacity 1.5s ease';
+  canvas.style.opacity = '0';
+  setTimeout(() => canvas.remove(), 1500);
 }
 
 function launchConfetti() {
@@ -2184,7 +2232,7 @@ function launchConfetti() {
   }));
   const start = performance.now();
   function draw(now) {
-    if (canvas.dataset.fadingOut) { _ro.disconnect(); return; }
+    if (!document.getElementById('confettiCanvas')) { _ro.disconnect(); return; }
     const elapsed = now - start;
     if (elapsed > DURATION) { canvas.remove(); _ro.disconnect(); return; }
     ctx.clearRect(0, 0, W, H);
@@ -2360,7 +2408,12 @@ window.onload = () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
     V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
+    if (ssg('ageConfirmed') !== 'true') {
+      V.welcome.classList.remove('hidden');
+      gel('welcomeNormal').classList.add('hidden');
+      gel('welcomeNewDevice').classList.remove('hidden');
+      return;
+    }
     let _d2 = null;
     try { _d2 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
     if (_d2 && typeof _d2 === 'object') loadUrlParams(_d2);
@@ -2369,7 +2422,12 @@ window.onload = () => {
   }
   if (params.has('goal')) {
     V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true') { V.start.classList.remove('hidden'); return; }
+    if (ssg('ageConfirmed') !== 'true') {
+      V.welcome.classList.remove('hidden');
+      gel('welcomeNormal').classList.add('hidden');
+      gel('welcomeNewDevice').classList.remove('hidden');
+      return;
+    }
     const b = k => params.get(k) === 'true';
     const legacy = {
       v: 0, reg: REGION.EW,
