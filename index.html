@@ -688,7 +688,7 @@
   </li>
 </template>
 <script>
-const SCHEMA_VERSION = 1774356914;
+const SCHEMA_VERSION = 1774362076;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -860,6 +860,7 @@ function handleUrlLoad(params) {
     outBox.classList.remove('hidden');
     outBox.querySelector('h2').textContent = 'Your action plan may be out of date';
     outBox.querySelector('p').textContent = 'This planner has been updated since your plan was created. We recommend reviewing your answers to make sure everything is still accurate.';
+    loadUrlParams(d);
     syncChecklistToWizard();
   } else {
     loadUrlParams(d);
@@ -1766,7 +1767,7 @@ function buildSharedPlan(p) {
 <p>Updating a gender marker on HSCNI records is generally treated as a self-declaration process. A new Health and Care Number (HCN) may be issued, and the previous record sealed for privacy.</p>
 <p><strong>⚠️ Important:</strong> Because HSCNI records do not automatically update across all trusts, let any hospital departments you use know about a new HCN, to avoid fragmented care or delays.</p>
 <p><strong>⚠️ Screening note:</strong> HSCNI cancer screening invitations rely on the gender marker attached to your HCN. Changing your marker may affect which automated screening invitations you receive. Ask your GP to check you are enrolled in the screening programmes right for your body.</p>
-<p><strong>Non-binary gender markers:</strong> HSCNI systems can record gender as "Indeterminate" in some datasets. Speak to your GP practice if this applies to you, as support varies across trusts and systems.</p>
+<p><strong>Non-binary gender markers:</strong> It is possible to request that your gender marker be recorded as "Indeterminate", which may show up as "Not specified" in some HSCNI systems. Speak to your GP practice if this applies to you, as support varies across trusts and systems.</p>
 <a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a>
 <a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>`
           : `<p>For a name-only change, your GP practice contacts the Business Services Organisation (BSO) on your behalf. They will need to see a copy of your deed poll or statutory declaration. Your Health and Care Number stays the same.</p>
@@ -2310,8 +2311,18 @@ function refreshPlan() {
     if (li) {
       const isSvc = li.classList.contains('svc-sub-li');
       const cls = isSvc ? 'collapsed-svc' : 'collapsed-step';
-      if (focusMode && (s === 2 || s === 3)) li.classList.add(cls);
-      else li.classList.remove('collapsed-step', 'collapsed-svc');
+      if (focusMode && (s === 2 || s === 3)) {
+        if (!li.classList.contains(cls)) {
+          li.classList.add(cls);
+          if (isSvc) {
+            const onEnd = () => { li.style.display = 'none'; li.removeEventListener('transitionend', onEnd); };
+            li.addEventListener('transitionend', onEnd);
+          }
+        }
+      } else {
+        if (isSvc) li.style.display = '';
+        li.classList.remove('collapsed-step', 'collapsed-svc');
+      }
     }
   });
   const pct = Math.round((completed / btns.length) * 100);
