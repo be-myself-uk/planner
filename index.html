@@ -491,7 +491,7 @@
     <div id="wrapBornNI" class="hidden">
       <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
         <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">Were you born in Northern Ireland?</p>
-        <em class="note" style="display:block;margin-bottom:10px;">Under the Good Friday Agreement, anyone born in Northern Ireland has the right to Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>
+        <em class="note" style="display:block;margin-bottom:10px;">Under the Good Friday Agreement, anyone born in Northern Ireland can claim Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>
         <label class="checkbox-item" style="margin:0;border:none;padding:5px;background:transparent;"><input type="checkbox" id="chkBornNI"> Yes, I was born in Northern Ireland</label>
       </div>
     </div>
@@ -688,7 +688,7 @@
   </li>
 </template>
 <script>
-const SCHEMA_VERSION = 1774362076;
+const SCHEMA_VERSION = 1774576800;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -943,9 +943,6 @@ function checkAgeGate() {
     const params = new URLSearchParams(window.location.search);
     if (params.has('p')) {
       V.start.classList.add('hidden');
-      let _d1 = null;
-      try { _d1 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
-      if (_d1 && typeof _d1 === 'object') loadUrlParams(_d1);
       handleUrlLoad(params);
     } else if (params.has('goal')) {
       V.start.classList.add('hidden');
@@ -1332,7 +1329,11 @@ function updateLocks() {
     if (shouldLock) {
       wrap.classList.add('locked');
       cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
-      if (id !== 'wrapDrivingLicence' && id !== 'wrapPassport') {
+      if (id === 'wrapDrivingLicence' || id === 'wrapPassport') {
+        const noneRadio = wrap.querySelector('input[value="none"]');
+        cbs.forEach(r => r.checked = false);
+        if (noneRadio) noneRadio.checked = true;
+      } else {
         cbs.forEach(cb => cb.checked = false);
       }
       if (lock) lock.classList.remove('hidden');
@@ -1370,7 +1371,7 @@ const questions = [
     [REGION.SCOT, 'Scotland'],
     [REGION.NI,   'Northern Ireland']
   ]},
-  { id:'bornInNI', q:'Were you born in Northern Ireland?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Under the Good Friday Agreement, anyone born in Northern Ireland has the right to Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>',
+  { id:'bornInNI', q:'Were you born in Northern Ireland?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Under the Good Friday Agreement, anyone born in Northern Ireland can claim Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>',
     cond:() => wizardState.region === REGION.NI, o:() => [
     [S.YES,'Yes, I was born in Northern Ireland'],
     [S.NO, 'No, I was born elsewhere']
@@ -1652,7 +1653,7 @@ function buildSharedPlan(p) {
   if (p.wantsGRC && !isName) {
     costs.push('<strong>UK GRC application:</strong> A small application fee applies.');
     costs.push('<strong>Medical reports for GRC:</strong> Costs vary widely. A GP letter may be low cost, but a specialist report can be expensive.');
-    costs.push('<strong>Statutory declaration for GRC:</strong> A small fee applies.');
+    costs.push('<strong>Statutory declaration for GRC:</strong> The fee for swearing a statutory declaration is generally very low (usually around £5 plus £2 per exhibit). Some solicitors may try to charge much more for drafting a bespoke document, but you should only need to pay for the swearing of the oath itself.');
   }
   const hasHealthGroup = p.needsNHS || p.newGP || p.needsDriving;
   const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student || p.dwp;
@@ -1873,7 +1874,7 @@ function buildSharedPlan(p) {
     if (!isGender && p.needsHMRC) {
       addStep(li('hmrc', easy, cost('Free','badge-green'), 'HMRC and taxes',
         'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. This is useful for your privacy.',
-        `<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> HMRC has separate requirements for updating a gender marker, which may include a Gender Recognition Certificate (GRC). The GOV.UK link below explains what is needed.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>`
+        `<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. This is sometimes called "Special Section D" or "PD1" internally. Knowing these terms can help if you need to chase it up by phone. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> HMRC has separate requirements for updating a gender marker, which may include a Gender Recognition Certificate (GRC). The GOV.UK link below explains what is needed.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>`
       ));
     }
     if (p.birthCertName) {
@@ -1907,11 +1908,11 @@ function buildSharedPlan(p) {
         pension:   'Pension provider',
       };
       const svcDetails = {
-        banks:     `<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Banks are expected to accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. ${!p.photoID ? '<strong>Because you do not have photo ID right now, high-street banks might say no. Getting your updated driving licence first can help.</strong>' : 'If they say no, go back later when you have your updated driving licence.'} Some digital banks allow name changes through their apps without needing updated photo ID.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>`,
+        banks:     `<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Most banks should accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. ${!p.photoID ? '<strong>Because you do not have photo ID right now, high-street banks might say no. Getting your updated driving licence first can help.</strong>' : 'If they say no, go back later when you have your updated driving licence.'} Some digital banks allow name changes through their apps without needing updated photo ID.</p><p><strong>If you are 16 or 17:</strong> Some banks may ask for a parent or guardian to be present or to countersign, even though an unenrolled deed poll does not normally require this. If this happens, try a different branch or contact the bank directly to complain.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>`,
         insurance: `<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>`,
         council:   `<div id="svc_detail_council" class="svc-detail"><p><strong>Council Tax:</strong> Contact your local council. You may need to provide a copy of your deed poll.</p></div>`,
         utilities: `<div id="svc_detail_utilities" class="svc-detail"><p><strong>Utility bills:</strong> Contact each provider directly. Keeping these bills in your new name is also useful as evidence if you later apply for a GRC.</p></div>`,
-        electoral: `<div id="svc_detail_electoral" class="svc-detail"><p><strong>Electoral register:</strong> Contact your local council to update your details. Updating the electoral register is also important for your credit score, as credit reference agencies use it to link your records. If you are not registered to vote, you may find it harder to get a phone contract or a credit card in your new name. If you are worried about the open register, you can opt out of the public version.</p><a href="https://www.gov.uk/register-to-vote" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Register to vote</a></div>`,
+        electoral: `<div id="svc_detail_electoral" class="svc-detail"><p><strong>Electoral register:</strong> Contact your local council to update your details. Updating the electoral register is also important for your credit score, as credit reference agencies use it to link your records. If you are not registered to vote, you may find it harder to get a phone contract or a credit card in your new name. If you are worried about the open register, you can opt out of the public version.</p><p><strong>Credit file tip:</strong> A few months after updating your name with your bank and on the electoral register, check your credit report (for example through ClearScore or Experian) to make sure your old and new records have merged. A name change can sometimes create a "split file" that temporarily affects your credit score.</p><a href="https://www.gov.uk/register-to-vote" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Register to vote</a></div>`,
         landlord:  `<div id="svc_detail_landlord" class="svc-detail"><p><strong>Landlord or letting agency:</strong> Your tenancy agreement may show your old name. Ask your landlord or agency to update their records and to issue an updated agreement or letter if possible.</p></div>`,
         pension:   `<div id="svc_detail_pension" class="svc-detail"><p><strong>Pension provider:</strong> Contact your pension provider directly with your deed poll. If your pension is through your employer, your HR team may be able to handle this as part of updating your payroll details.</p></div>`,
       };
@@ -2001,8 +2002,8 @@ ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have 
     const stepTitle = (isNI && p.bornInNI) ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
     const stepTime  = (isNI && p.bornInNI) ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
     const irishPassportItem = (isNI && p.bornInNI) ? li('irish_passport', medium, splitCost('Free','£','success','simultaneous'), 'Irish passport (Good Friday Agreement route)',
-      "As someone born in Northern Ireland, you may be entitled to Irish citizenship under the Good Friday Agreement. The Republic of Ireland has a separate process for updating a gender marker on a passport, which differs from the UK GRC route.",
-      `<p>Under the Good Friday Agreement, people born in Northern Ireland have the right to Irish citizenship. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI links below have the current details on eligibility, requirements, and how to apply.</p>
+      "As someone born in Northern Ireland, you may be able to claim Irish citizenship under the Good Friday Agreement. The Republic of Ireland has a separate process for updating a gender marker on a passport, which differs from the UK GRC route.",
+      `<p>Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI links below have the current details on eligibility, requirements, and how to apply.</p>
 <p><strong>⚠️ If you do not yet have an Irish passport</strong>, the first step would be to apply for one. The gender-change update is a separate process that you can apply for once you have a passport.</p>
 <p><strong>Note on the Irish GRC:</strong> A separate Irish Gender Recognition Certificate has its own rules about who can apply, which differ from the passport gender-change route. The TENI link below explains both options.</p>
 <a href="https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/" target="_blank" rel="noopener noreferrer" class="links">🔗 Irish Passports: Documentary requirements</a>
@@ -2421,9 +2422,6 @@ window.onload = () => {
       gel('welcomeNewDevice').classList.remove('hidden');
       return;
     }
-    let _d2 = null;
-    try { _d2 = JSON.parse(atob(params.get('p') || '')); } catch(e) {}
-    if (_d2 && typeof _d2 === 'object') loadUrlParams(_d2);
     handleUrlLoad(params);
     return;
   }
