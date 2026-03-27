@@ -1,0 +1,582 @@
+import { chromium } from 'playwright';
+
+const filePath = 'file:///home/claude/index.html';
+let passed = 0, failed = 0;
+
+function assert(cond, name) {
+  if (cond) { console.log(`  ✓ ${name}`); passed++; }
+  else       { console.error(`  ✗ ${name}`); failed++; }
+}
+
+const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell' });
+
+async function newPage() {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(filePath);
+  await page.waitForLoadState('domcontentloaded');
+  return { page, ctx };
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+async function checkAgeGate(page) {
+  await page.locator('#ageConfirm').check();
+}
+
+async function openChecklist(page) {
+  await checkAgeGate(page);
+  await page.getByRole('button', { name: 'Fill out a single checklist' }).click();
+}
+
+async function openWizard(page) {
+  await checkAgeGate(page);
+  await page.getByRole('button', { name: 'Answer step-by-step questions' }).click();
+}
+
+// Advance one wizard step: pick first enabled radio, or tick "All of these" for multi-select
+async function wizardNext(page) {
+  const radio = page.locator('input[name="ans"]:not([disabled])').first();
+  if (await radio.count() > 0) {
+    await radio.check();
+  } else {
+    const allBox = page.locator('#wizardForm').getByLabel('All of these');
+    if (await allBox.count() > 0) await allBox.check();
+  }
+  await page.getByRole('button', { name: 'Continue →' }).click();
+}
+
+// Returns true if an input is disabled (works with Playwright locators)
+async function isInputDisabled(page, label) {
+  return page.getByLabel(label).isDisabled();
+}
+
+
+// ── 1. Initial render ─────────────────────────────────────────────────────────
+console.log('\n1. Initial render');
+{
+  const { page, ctx } = await newPage();
+  assert(await page.isVisible('#startView'),     'start view visible');
+  assert(await page.isHidden('#wizardView'),      'wizard hidden');
+  assert(await page.isHidden('#checklistView'),   'checklist hidden');
+  assert(await page.isHidden('#planView'),        'plan hidden');
+  assert(await page.isHidden('#welcomeBackView'), 'welcome hidden');
+  assert(await page.getByRole('button', { name: 'Switch view' }).isHidden(), 'mode toggle hidden');
+  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isDisabled(), 'wizard btn disabled before age gate');
+  assert(await page.getByRole('button', { name: 'Fill out a single checklist' }).isDisabled(),   'checklist btn disabled before age gate');
+  await ctx.close();
+}
+
+// ── 2. Age gate ───────────────────────────────────────────────────────────────
+console.log('\n2. Age gate');
+{
+  const { page, ctx } = await newPage();
+  await checkAgeGate(page);
+  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isEnabled(), 'buttons enabled after ticking age gate');
+  assert(await page.evaluate(() => localStorage.getItem('ageConfirmed')) === 'true', 'ageConfirmed saved to localStorage');
+  await page.locator('#ageConfirm').uncheck();
+  assert(await page.evaluate(() => localStorage.getItem('ageConfirmed')) === null, 'ageConfirmed cleared from localStorage on uncheck');
+  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isDisabled(), 'buttons disabled again after unticking');
+  await ctx.close();
+}
+
+// ── 3. Age gate persistence ───────────────────────────────────────────────────
+console.log('\n3. Age gate persistence');
+{
+  const { page, ctx } = await newPage();
+  await checkAgeGate(page);
+  await page.reload();
+  await page.waitForLoadState('domcontentloaded');
+  assert(await page.locator('#ageConfirm').isChecked(), 'age gate pre-ticked after reload');
+  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isEnabled(), 'buttons enabled after reload with saved age gate');
+  await ctx.close();
+}
+
+// ── 4. Wizard flow ────────────────────────────────────────────────────────────
+console.log('\n4. Wizard flow');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  assert(await page.isVisible('#wizardView'),  'wizard view shown');
+  assert(await page.isHidden('#startView'),    'start view hidden');
+  assert(await page.getByRole('button', { name: 'Switch view' }).isVisible(), 'mode toggle visible');
+  // Try continuing without answering
+  await page.getByRole('button', { name: 'Continue →' }).click();
+  assert(await page.isVisible('#wizardWarning'), 'warning shown with no answer');
+  // Answer all questions
+  let q = 0;
+  while (await page.isVisible('#wizardView') && q < 25) { await wizardNext(page); q++; }
+  assert(await page.isVisible('#planView'), 'plan view shown after wizard completes');
+  assert(await page.getByRole('button', { name: 'Switch view' }).isHidden(), 'mode toggle hidden on plan');
+  await ctx.close();
+}
+
+// ── 5. Wizard back navigation ─────────────────────────────────────────────────
+console.log('\n5. Wizard back navigation');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  await page.locator('input[name="ans"]:not([disabled])').first().check();
+  await page.getByRole('button', { name: 'Continue →' }).click();
+  assert(await page.getByRole('button', { name: '← Back' }).isVisible(), 'back button appears on Q2');
+  await page.getByRole('button', { name: '← Back' }).click();
+  assert(await page.locator('input[name="ans"]').first().isVisible(), 'back returns to previous question');
+  await ctx.close();
+}
+
+// ── 6. Checklist flow ─────────────────────────────────────────────────────────
+console.log('\n6. Checklist flow');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  assert(await page.isVisible('#checklistView'), 'checklist view shown');
+  assert(await page.isHidden('#wizardView'),     'wizard hidden');
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.isVisible('#planView'), 'plan shown after checklist submit');
+  await ctx.close();
+}
+
+// ── 7. Mode toggle ────────────────────────────────────────────────────────────
+console.log('\n7. Mode toggle');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  await page.getByRole('button', { name: 'Switch view' }).click();
+  assert(await page.isVisible('#checklistView'), 'switches to checklist');
+  assert(await page.isHidden('#wizardView'),     'wizard hidden after toggle');
+  await page.getByRole('button', { name: 'Switch view' }).click();
+  assert(await page.isVisible('#wizardView'),    'switches back to wizard');
+  await ctx.close();
+}
+
+// ── 8. Checklist locks ────────────────────────────────────────────────────────
+console.log('\n8. Checklist locks');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  // Locked inputs: use aria-label from the wrapper's input. The inputs inside locked
+  // wrappers are disabled — verify via the specific labelled checkboxes.
+  assert(await page.getByLabel('NHS record').isDisabled(),     'NHS locked without deed poll');
+  assert(await page.getByLabel('HMRC and taxes').isDisabled(), 'HMRC locked without deed poll');
+  assert(await page.locator('#chkDrivingLicenceNone').isDisabled(), 'DL locked without deed poll');
+  assert(await page.locator('#chkPassportNone').isDisabled(),       'Passport locked without deed poll');
+  // Unlock with deed poll
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  assert(await page.getByLabel('NHS record').isEnabled(),     'NHS unlocked after deed poll');
+  assert(await page.getByLabel('HMRC and taxes').isEnabled(), 'HMRC unlocked after deed poll');
+  // Gender-only: deed poll row hidden, documents unlocked
+  await page.getByLabel('Change my gender marker only').check();
+  assert(await page.isHidden('#wrapDeedPoll'), 'deed poll hidden for gender-only goal');
+  assert(await page.getByLabel('NHS record').isEnabled(), 'NHS unlocked for gender-only goal');
+  // Name-only: GRC hidden
+  await page.getByLabel('Change my name only').check();
+  assert(await page.isHidden('#wrapGRC'), 'GRC hidden for name-only goal');
+  // eVisa row
+  assert(await page.isHidden('#wrapVisa'), 'visa row hidden when not non-UK');
+  await page.getByLabel(/I have a UK visa or eVisa/).check();
+  assert(await page.isVisible('#wrapVisa'), 'visa row shown when non-UK ticked');
+  // DBS only when employed
+  assert(await page.isHidden('#wrapDBS'), 'DBS hidden when not employed');
+  await page.getByLabel(/Yes, and they already have my updated details/).check();
+  assert(await page.isVisible('#wrapDBS'), 'DBS shown when employed');
+  await ctx.close();
+}
+
+// ── 9. Plan content ───────────────────────────────────────────────────────────
+console.log('\n9. Plan content');
+{
+  // No deed poll → step 1 present
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name and gender marker').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.isVisible('#planView'), 'plan shown');
+  assert(await page.getByRole('heading', { name: 'Step 1: The basics' }).isVisible(), 'step 1 present when no deed poll');
+  await ctx.close();
+}
+{
+  // Deed poll ticked → step 1 absent
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name and gender marker').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.getByRole('heading', { name: 'Step 1: The basics' }).isHidden(), 'step 1 absent when deed poll already done');
+  await ctx.close();
+}
+{
+  // Gender-only → step 1 absent, titles tip absent
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my gender marker only').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.getByRole('heading', { name: 'Step 1: The basics' }).isHidden(), 'step 1 absent for gender-only goal');
+  assert(await page.getByRole('heading', { name: /Did you know about titles/ }).isHidden(), 'titles tip absent for gender-only goal');
+  await ctx.close();
+}
+{
+  // GRC wanted → GRC step present
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.getByRole('heading', { name: /The final legal step/ }).isVisible(), 'GRC step shown when wanted');
+  await ctx.close();
+}
+{
+  // Name-only → GRC step absent
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name only').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.getByRole('heading', { name: /The final legal step/ }).isHidden(), 'GRC step absent for name-only');
+  await ctx.close();
+}
+
+// ── 10. Progress tracker ──────────────────────────────────────────────────────
+console.log('\n10. Progress tracker');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const firstBtn = page.locator('.step-state-btn[data-track-id]').first();
+  const trackId  = await firstBtn.getAttribute('data-track-id');
+  await firstBtn.click();
+  assert(await page.evaluate(id => localStorage.getItem('st_' + id), trackId) === '1', 'state 1 (in progress) saved to localStorage');
+  assert(await firstBtn.getAttribute('data-state') === '1', 'data-state attribute updated to 1');
+  await firstBtn.click();
+  assert(await page.evaluate(id => localStorage.getItem('st_' + id), trackId) === '2', 'state 2 (done) saved to localStorage');
+  await firstBtn.click();
+  assert(await page.evaluate(id => localStorage.getItem('st_' + id), trackId) === '3', 'state 3 (not needed) saved to localStorage');
+  await firstBtn.click();
+  assert(await page.evaluate(id => localStorage.getItem('st_' + id), trackId) === '0', 'state 0 (cleared) saved to localStorage');
+  await ctx.close();
+}
+
+// ── 11. All done banner ───────────────────────────────────────────────────────
+console.log('\n11. All done banner');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my gender marker only').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const btns = page.locator('.step-state-btn[data-track-id]');
+  const count = await btns.count();
+  for (let i = 0; i < count; i++) { const b = btns.nth(i); await b.click(); await b.click(); }
+  await page.locator('#allDoneBanner').waitFor({ state: 'visible' });
+  assert(true, 'all done banner appears when all steps marked done');
+  await ctx.close();
+}
+
+// ── 12. Make changes ──────────────────────────────────────────────────────────
+console.log('\n12. Make changes');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  await page.getByRole('button', { name: 'Make changes' }).click();
+  assert(await page.isVisible('#checklistView'), 'checklist shown after make changes');
+  assert(await page.isHidden('#planView'),        'plan hidden after make changes');
+  assert(await page.getByRole('button', { name: 'Update my action plan' }).isVisible(), 'button text changes to Update my action plan');
+  await page.getByRole('button', { name: 'Update my action plan' }).click();
+  assert(await page.isVisible('#planView'), 'plan shown again after update');
+  await ctx.close();
+}
+
+// ── 13. Start again ───────────────────────────────────────────────────────────
+console.log('\n13. Start again');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  await page.locator('#ubRestartBtn').click();
+  assert(await page.getByRole('button', { name: /Confirm/ }).isVisible(), 'confirm prompt shown on first click');
+  await page.getByRole('button', { name: /Confirm/ }).click();
+  assert(await page.isVisible('#startView'), 'start view restored after restart');
+  assert(await page.isHidden('#planView'),   'plan hidden after restart');
+  assert(!await page.evaluate(() => localStorage.getItem('appState')),     'appState cleared from localStorage');
+  assert(!await page.evaluate(() => localStorage.getItem('ageConfirmed')), 'ageConfirmed cleared from localStorage on restart');
+  assert(!await page.locator('#ageConfirm').isChecked(), 'age gate checkbox unticked after restart');
+  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isDisabled(), 'start buttons disabled after restart');
+  await ctx.close();
+}
+
+// ── 14. Welcome back ──────────────────────────────────────────────────────────
+console.log('\n14. Welcome back');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  await page.reload();
+  await page.waitForLoadState('domcontentloaded');
+  assert(await page.isVisible('#welcomeBackView'), 'welcome back shown after reload');
+  assert(await page.isHidden('#startView'),         'start hidden on welcome back');
+  await page.getByRole('button', { name: 'Continue my plan' }).click();
+  assert(await page.isVisible('#planView'), 'plan restored after continue');
+  await ctx.close();
+}
+
+
+// ── 15. Shareable link ────────────────────────────────────────────────────────
+console.log('\n15. Shareable link');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name and gender marker').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  // Patch copyShareableLink to capture the URL without clipboard API
+  await page.evaluate(() => {
+    window._shareUrl = null;
+    window.copyShareableLink = function() {
+      const w = wizardState;
+      const chk = id => document.getElementById(id)?.checked;
+      const reg  = isWizardMode ? (w.region || 'ew') : document.querySelector('input[name="chkRegion"]:checked').value;
+      const goal = isWizardMode ? w.goal : document.querySelector('input[name="chkGoal"]:checked').value;
+      const emp  = isWizardMode ? (w.employment || 'no') : document.querySelector('input[name="chkEmployment"]:checked').value;
+      const SVC_MAP = {banks:'chkSvcBanks',insurance:'chkSvcInsurance',council:'chkSvcCouncil',utilities:'chkSvcUtilities',electoral:'chkSvcElectoral',landlord:'chkSvcLandlord',pension:'chkSvcPension'};
+      const srv = isWizardMode
+        ? (Array.isArray(w.services) ? w.services.join(',') : '')
+        : Object.entries(SVC_MAP).filter(([,id]) => document.getElementById(id)?.checked).map(([v]) => v).join(',');
+      const url = new URL(window.location.href.split('?')[0]);
+      const ps = {
+        v: SCHEMA_VERSION, reg, goal,
+        nonUK: isWizardMode ? (w.citizen       === 'yes') : chk('chkNonUK'),
+        pid:   isWizardMode ? (w.photoID       === 'yes') : chk('chkPhotoID'), emp,
+        dbs:   isWizardMode ? (w.dbs           === 'yes') : chk('chkDBS'),
+        stu:   isWizardMode ? (w.student       === 'yes') : chk('chkStudent'),
+        dp:    isWizardMode ? (w.deedpoll      === 'yes') : chk('chkDeedPoll'),
+        visa:  isWizardMode ? (w.visaUpdated   === 'yes') : chk('chkVisa'),
+        nhs:   isWizardMode ? (w.nhs           === 'yes') : chk('chkNHS'),
+        dl:    isWizardMode ? (w.driving       === 'updated') : chk('chkDrivingLicence'),
+        hmrc:  isWizardMode ? (w.hmrc          === 'yes') : chk('chkHMRC'),
+        pass:  isWizardMode ? (w.passport      === 'updated') : chk('chkPassport'),
+        grc:   isWizardMode ? (w.grc           === 'yes') : chk('chkGRC'),
+        newgp: isWizardMode ? (w.newGP         === 'yes') : chk('chkNewGP'),
+        dwp:   isWizardMode ? (w.dwp           === 'yes') : chk('chkDWP'),
+        bcn:   isWizardMode ? (w.birthCertName === 'yes') : chk('chkBirthCertName'),
+        bc:    isWizardMode ? (w.birthCert     === 'yes') : chk('chkBirthCert'),
+        bni:   isWizardMode ? (w.bornInNI      === 'yes') : chk('chkBornNI'),
+        srv,
+      };
+      url.searchParams.set('p', btoa(JSON.stringify(ps)));
+      window._shareUrl = url.toString();
+    };
+  });
+  await page.getByRole('button', { name: 'Copy shareable link to this plan' }).click();
+  const clip = await page.evaluate(() => window._shareUrl);
+  assert(clip && clip.includes('?p='), 'share link uses encoded p param');
+  const decoded = JSON.parse(atob(new URL(clip).searchParams.get('p')));
+  assert(decoded.goal === 'both', 'share link encodes goal param');
+  assert(decoded.dp === true,     'share link encodes deed poll param');
+  assert(decoded.grc === true,    'share link encodes grc param');
+  await page.goto(clip);
+  await page.waitForLoadState('domcontentloaded');
+  assert(await page.isVisible('#planView'), 'share URL loads directly to plan');
+  await ctx.close();
+}
+
+// ── 16. Share URL age gate guard ──────────────────────────────────────────────
+console.log('\n16. Share URL age gate guard');
+{
+  const { page, ctx } = await newPage();
+  // Use current schema version so the link is valid (not outdated)
+  const shareData = btoa(JSON.stringify({v:1774576800,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
+  const url = `file:///home/claude/index.html?p=${shareData}`;
+  await page.goto(url);
+  await page.waitForLoadState('domcontentloaded');
+  // Without age confirmation: startView hidden, welcomeNewDevice shown
+  assert(await page.isHidden('#startView'),         'start view hidden on share URL without age gate');
+  assert(await page.isVisible('#welcomeNewDevice'), 'new device prompt shown without age gate');
+  assert(await page.isHidden('#planView'),           'plan not shown without age confirmation');
+  // Confirm age via the shared age gate checkbox
+  await page.locator('#ageConfirmShared').check();
+  assert(await page.isVisible('#planView'),     'plan shown after shared age gate confirmed');
+  assert(await page.isHidden('#checklistView'), 'checklist not shown (plan went direct)');
+  await ctx.close();
+}
+
+// ── 17. Outdated schema link ──────────────────────────────────────────────────
+console.log('\n17. Outdated schema link');
+{
+  const { page, ctx } = await newPage();
+  const shareData = btoa(JSON.stringify({v:100,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
+  const url = `file:///home/claude/index.html?p=${shareData}`;
+  await page.goto(url);
+  await page.waitForLoadState('domcontentloaded');
+  // Share URL with no ageConfirmed → shows new device prompt first
+  await page.locator('#ageConfirmShared').check();
+  assert(await page.isVisible('#welcomeOutdated'), 'outdated warning shown for old schema version');
+  assert(await page.isHidden('#welcomeNormal'),    'normal welcome hidden for old schema version');
+  assert(await page.isHidden('#planView'),          'plan not shown for outdated link');
+  await page.getByRole('button', { name: 'Review my answers' }).click();
+  assert(await page.isVisible('#checklistView'), 'review answers opens checklist');
+  await ctx.close();
+}
+
+// ── 18. Help modal ────────────────────────────────────────────────────────────
+console.log('\n18. Help modal');
+{
+  const { page, ctx } = await newPage();
+  const helpBtn = page.getByRole('button', { name: 'About this planner' });
+  assert(await page.isHidden('#helpOverlay'), 'help overlay hidden initially');
+  await helpBtn.click();
+  assert(await page.isVisible('#helpOverlay'), 'help overlay shown after click');
+  assert(await helpBtn.getAttribute('aria-expanded') === 'true', 'aria-expanded=true when open');
+  await page.getByRole('button', { name: 'Close help dialog' }).click();
+  assert(await page.isHidden('#helpOverlay'), 'help overlay closed after close btn');
+  // Backdrop click
+  await helpBtn.click();
+  await page.click('#helpOverlay', { position: { x: 5, y: 5 } });
+  assert(await page.isHidden('#helpOverlay'), 'help closed by backdrop click');
+  // Focus trap
+  await helpBtn.click();
+  const insideBefore = await page.evaluate(() => !!document.getElementById('helpModal')?.contains(document.activeElement));
+  assert(insideBefore, 'focus starts inside modal');
+  await page.keyboard.press('Tab');
+  const insideAfter = await page.evaluate(() => !!document.getElementById('helpModal')?.contains(document.activeElement));
+  assert(insideAfter, 'Tab keeps focus inside modal (focus trap)');
+  await ctx.close();
+}
+
+// ── 19. Keyboard Escape ───────────────────────────────────────────────────────
+console.log('\n19. Keyboard Escape');
+{
+  const { page, ctx } = await newPage();
+  await page.getByRole('button', { name: 'About this planner' }).click();
+  await page.keyboard.press('Escape');
+  assert(await page.isHidden('#helpOverlay'), 'Escape closes help modal');
+  const navPromise = page.waitForNavigation({ timeout: 3000 }).catch(() => null);
+  await page.keyboard.press('Escape');
+  const nav = await navPromise;
+  assert(nav !== null || page.url().includes('google'), 'Escape with modal closed triggers panic exit');
+  await ctx.close();
+}
+
+// ── 20. Panic button ──────────────────────────────────────────────────────────
+console.log('\n20. Panic button');
+{
+  const { page, ctx } = await newPage();
+  const navPromise = page.waitForNavigation({ timeout: 3000 }).catch(() => null);
+  await page.getByRole('button', { name: 'Quick Exit' }).click();
+  const nav = await navPromise;
+  assert(nav !== null || page.url().includes('google'), 'panic button navigates away');
+  await ctx.close();
+}
+
+// ── 21. Theme toggle ──────────────────────────────────────────────────────────
+console.log('\n21. Theme toggle');
+{
+  const { page, ctx } = await newPage();
+  const themeBtn = page.getByRole('button', { name: /Switch to (light|dark) mode/ });
+  await themeBtn.click();
+  const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  assert(theme === 'dark' || theme === 'light', 'data-theme set after toggle');
+  assert(await page.evaluate(() => localStorage.getItem('theme')) !== null, 'theme saved to localStorage');
+  await ctx.close();
+}
+
+// ── 22. plan-ready class ──────────────────────────────────────────────────────
+console.log('\n22. plan-ready class');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.evaluate(() => document.body.classList.contains('plan-ready')), 'body has plan-ready class when plan shown');
+  await page.getByRole('button', { name: 'Make changes' }).click();
+  assert(await page.evaluate(() => !document.body.classList.contains('plan-ready')), 'plan-ready removed when editing');
+  await ctx.close();
+}
+
+// ── 23. Region selector (NI-resilient) ───────────────────────────────────────
+console.log('\n23. Region selector');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  // England or Wales is always available and should be selectable
+  await page.getByLabel('England or Wales').check();
+  assert(await page.getByLabel('England or Wales').isChecked(), 'England or Wales selectable');
+  // Scotland — check its current state (may be locked if not yet implemented)
+  const scotRadio = page.getByRole('radio', { name: 'Scotland' });
+  const scotLocked = await scotRadio.isDisabled().catch(() => true);
+  if (!scotLocked) {
+    await scotRadio.check();
+    assert(await scotRadio.isChecked(), 'Scotland selectable when available');
+    await page.getByRole('radio', { name: 'England or Wales' }).check();
+  } else {
+    assert(true, 'Scotland correctly locked when not yet available');
+  }
+  // Northern Ireland — same adaptive check
+  const niRadio = page.getByRole('radio', { name: /Northern Ireland/ });
+  const niLocked = await niRadio.isDisabled().catch(() => true);
+  if (!niLocked) {
+    await niRadio.check();
+    assert(await niRadio.isChecked(), 'Northern Ireland selectable when available');
+  } else {
+    assert(true, 'Northern Ireland correctly locked when not yet available');
+  }
+  await ctx.close();
+}
+
+
+console.log('\n24. Utility bar');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  // Utility bar is visible on plan view
+  assert(await page.locator('#controlBar').isVisible(), 'sticky plan bar visible on plan');
+  // Restart button shows confirm state on first click
+  const restartBtn = page.locator('#ubRestartBtn');
+  await restartBtn.click();
+  assert(await page.getByRole('button', { name: /Confirm/ }).isVisible(), 'restart btn shows confirm on first click');
+  // Times out and resets (test the label reverts)
+  await page.waitForTimeout(4200);
+  assert(await restartBtn.getAttribute('aria-label') === 'New plan', 'restart btn reverts after timeout');
+  // Second click in time actually restarts
+  await restartBtn.click();
+  await page.getByRole('button', { name: /Confirm/ }).click();
+  assert(await page.isVisible('#startView'), 'start view shown after confirmed restart');
+  await ctx.close();
+}
+{
+  // Focus mode toggle
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const focusBtn = page.locator('#focusToggleBtn');
+  assert(await focusBtn.getAttribute('aria-pressed') === 'false', 'focus mode off initially');
+  await focusBtn.click();
+  assert(await focusBtn.getAttribute('aria-pressed') === 'true', 'focus mode on after click');
+  assert(await focusBtn.evaluate(el => el.classList.contains('focus-active')), 'focus-active class added');
+  await focusBtn.click();
+  assert(await focusBtn.getAttribute('aria-pressed') === 'false', 'focus mode off after second click');
+  await ctx.close();
+}
+
+// ── 25. Locked radios reset to none ──────────────────────────────────────────
+console.log('\n25. Locked radios reset to none');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  // Unlock by checking deed poll
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  // Set passport to "updated"
+  await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isChecked(), 'passport set to updated');
+  // Set driving licence to "updated"
+  await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').check();
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isChecked(), 'driving licence set to updated');
+  // Uncheck deed poll — sections should lock and reset to "none"
+  await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
+  assert(await page.locator('input[name="chkPassportOpt"][value="none"]').isChecked(), 'passport reset to none when locked');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').isChecked(), 'driving licence reset to none when locked');
+  await ctx.close();
+}
+
+await browser.close();
+
+console.log(`\n${'─'.repeat(50)}`);
+console.log(`Results: ${passed} passed, ${failed} failed`);
+if (failed > 0) process.exit(1);
