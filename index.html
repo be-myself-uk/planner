@@ -520,15 +520,13 @@
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <div id="wrapDrivingLicence" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
       <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated"> Updated</label>
       <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none" checked> I don't have one</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     <div id="wrapPassport" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
       <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> Updated</label>
       <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none" checked> I don't have one</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
@@ -779,8 +777,8 @@ function loadUrlParams(d) {
   gel('chkVisa').checked         = d.visa === true;
   gel('chkNHS').checked          = d.nhs  === true;
   gel('chkHMRC').checked         = d.hmrc === true;
-  const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : (d.dl === 'updated' || d.dl === true) ? 'updated' : 'none';
-  const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : (d.pass === 'updated' || d.pass === true) ? 'updated' : 'none';
+  const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : 'updated';
+  const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : 'updated';
   const _dlUrlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlUrlVal}"]`);
   const _ppUrlR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppUrlVal}"]`);
   if (_dlUrlR) _dlUrlR.checked = true;
@@ -1170,8 +1168,8 @@ function syncWizardToChecklist() {
   gel('chkNHS').checked      = wizardState.nhs         === S.YES;
   gel('chkNewGP').checked    = wizardState.newGP       === S.YES;
   gel('chkHMRC').checked     = wizardState.hmrc        === S.YES;
-  const _dlVal = wizardState.driving  === S.NEEDS_UPDATE ? 'needs_update' : wizardState.driving  === S.UPDATED ? 'updated' : 'none';
-  const _ppVal = wizardState.passport === S.NEEDS_UPDATE ? 'needs_update' : wizardState.passport === S.UPDATED ? 'updated' : 'none';
+  const _dlVal = wizardState.driving  === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
+  const _ppVal = wizardState.passport === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
   const _dlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlVal}"]`);
   const _ppR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppVal}"]`);
   if (_dlR) _dlR.checked = true;
@@ -1276,21 +1274,36 @@ function updateLocks() {
   if (!isNI)       gel('chkBornNI').checked = false;
   if (isName || nhsChecked) gel('chkNewGP').checked = false;
   const shouldLock = !isGender && !hasDeed;
-  ['wrapNHS','wrapHMRC','wrapDrivingLicence','wrapPassport', isNonUK ? 'wrapVisa' : null].forEach(id => {
+  ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
     const wrap = gel(id), cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
     if (shouldLock) {
       wrap.classList.add('locked');
-      cbs.forEach(cb => {
-        cb.disabled = true;
-        cb.setAttribute('aria-describedby','lock-deed-poll-reason');
-        if (cb.type === 'radio') cb.checked = cb.value === 'none';
-        else cb.checked = false;
-      });
+      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); cb.checked = false; });
       if (lock) lock.classList.remove('hidden');
     } else {
       wrap.classList.remove('locked');
       cbs.forEach(cb => { cb.disabled = false; cb.removeAttribute('aria-describedby'); });
+      if (lock) lock.classList.add('hidden');
+    }
+  });
+  ['wrapDrivingLicence','wrapPassport'].forEach(id => {
+    const wrap = gel(id);
+    const lock = wrap.querySelector('.lock-icon');
+    const needsRadio = wrap.querySelector('input[value="needs_update"]');
+    const updatedRadio = wrap.querySelector('input[value="updated"]');
+    if (shouldLock) {
+      wrap.classList.add('locked');
+      needsRadio.disabled = true;
+      needsRadio.setAttribute('aria-describedby','lock-deed-poll-reason');
+      if (needsRadio.checked) { needsRadio.checked = false; updatedRadio.checked = true; }
+      updatedRadio.disabled = false;
+      updatedRadio.removeAttribute('aria-describedby');
+      if (lock) lock.classList.remove('hidden');
+    } else {
+      wrap.classList.remove('locked');
+      needsRadio.disabled = false;
+      needsRadio.removeAttribute('aria-describedby');
       if (lock) lock.classList.add('hidden');
     }
   });
@@ -1312,8 +1325,8 @@ function resetChecklist() {
    'chkBornNI','chkSvcBanks','chkSvcInsurance','chkSvcCouncil','chkSvcUtilities','chkSvcElectoral',
    'chkSvcLandlord','chkSvcPension','chkSvcAll']
     .forEach(id => { gel(id).checked = false; });
-  document.querySelector('input[name="chkDrivingLicenceOpt"][value="none"]').checked = true;
-  document.querySelector('input[name="chkPassportOpt"][value="none"]').checked = true;
+  document.querySelector('input[name="chkDrivingLicenceOpt"][value="updated"]').checked = true;
+  document.querySelector('input[name="chkPassportOpt"][value="updated"]').checked = true;
   updateLocks();
 }
 const questions = [
@@ -1373,12 +1386,12 @@ const questions = [
   { id:'driving', q:'Do you have a UK driving licence?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
       return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not drive or have one']];
-    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.NONE,'No, I do not drive']];
+    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'passport', q:'Do you have a passport?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
       return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not have a passport']];
-    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.NONE,'No, I do not have a passport']];
+    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
