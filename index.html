@@ -21,7 +21,7 @@
 </script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><defs><clipPath id=%22l%22><polygon points=%220,0 32,0 0,32%22/></clipPath><clipPath id=%22r%22><polygon points=%2232,0 32,32 0,32%22/></clipPath></defs><g clip-path=%22url(%23l)%22><rect y=%220%22 width=%2232%22 height=%226.4%22 fill=%22%235bcefa%22/><rect y=%226.4%22 width=%2232%22 height=%226.4%22 fill=%22%23f5a9b8%22/><rect y=%2212.8%22 width=%2232%22 height=%226.4%22 fill=%22%23fff%22/><rect y=%2219.2%22 width=%2232%22 height=%226.4%22 fill=%22%23f5a9b8%22/><rect y=%2225.6%22 width=%2232%22 height=%226.4%22 fill=%22%235bcefa%22/></g><g clip-path=%22url(%23r)%22><rect y=%220%22 width=%2232%22 height=%228%22 fill=%22%23fcf434%22/><rect y=%228%22 width=%2232%22 height=%228%22 fill=%22%23fff%22/><rect y=%2216%22 width=%2232%22 height=%228%22 fill=%22%239c59d1%22/><rect y=%2224%22 width=%2232%22 height=%228%22 fill=%22%232c2c2c%22/></g></svg>">
 <script>
-  try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e) {}
+  try { const t = localStorage.getItem('theme'); document.documentElement.setAttribute('data-theme', t || (window.matchMedia?.('(prefers-color-scheme:dark)').matches ? 'dark' : 'light')); } catch(e) {}
 </script>
 <style>
   :root {
@@ -57,25 +57,6 @@
     --phase-1:#F7A8B8; --phase-1-bg:#3b2529;
     --phase-2:#FCF434; --phase-2-bg:#3b3320;
     --phase-3:#9C59D1; --phase-3-bg:#2a1e3b;
-  }
-  @media (prefers-color-scheme:dark) {
-    :root:not([data-theme="light"]) {
-      --primary:#8ab4f8; --primary-hover:#aecbfa;
-      --bg-main:#000000; --bg-card:#121212; --bg-light:#202124;
-      --bg-details:#18191a; --bg-details-hover:#2d2f31;
-      --border:#3c4043; --text:#e8eaed; --text-muted:#9aa0a6; --text-invert:#202124;
-      --badge-bg:#303134; --badge-border:#5f6368;
-      --urgent:#f28b82; --urgent-bg:#3c2a28;
-      --simultaneous:#fde293; --simultaneous-bg:#3b3320;
-      --success:#81c995; --success-bg:#1e3323;
-      --info:#8ab4f8; --info-bg:#1e2a3b;
-      --disabled:#303134; --disabled-text:#9aa0a6;
-      --disclaimer-muted:#9aa0a6;
-      --phase-0:#55CDFC; --phase-0-bg:#1a2e3b;
-      --phase-1:#F7A8B8; --phase-1-bg:#3b2529;
-      --phase-2:#FCF434; --phase-2-bg:#3b3320;
-      --phase-3:#9C59D1; --phase-3-bg:#2a1e3b;
-    }
   }
   .ub-group { display:flex; gap:8px; align-items:center; }
   .ub-sep { width:1px; height:28px; background:var(--border); margin:0 4px; flex-shrink:0; }
@@ -367,11 +348,6 @@
     This planner requires JavaScript to work properly. Please enable JavaScript in your browser to continue.
   </div>
 </noscript>
-<script>
-  if (typeof window.URLSearchParams === 'undefined' || typeof document.documentElement.style.setProperty === 'undefined') {
-    document.write('<div style="text-align:center;padding:20px;background:#fce8e6;color:#c5221f;border-bottom:2px solid #c5221f;font-weight:bold;">Your browser is too old to run this planner. Please update your browser to use this tool.</div>');
-  }
-</script>
 <a class="skip-link" href="#mainContent">Skip to main content</a>
 <div id="liveRegion" aria-live="polite" aria-atomic="true"></div>
 <header class="hero">
@@ -868,6 +844,34 @@ function handleUrlLoad(params) {
     generateChecklistPlan();
   }
 }
+function handleLegacyUrl(params) {
+  const b = k => params.get(k) === 'true';
+  const legacy = {
+    v: 0, reg: REGION.EW,
+    goal: params.get('goal') || S.BOTH,
+    nonUK: b('nonUK'), pid: b('pid'),
+    emp: b('emp') ? 'yes' : 'no',
+    dbs: b('dbs'), stu: false, dp: b('dp'),
+    visa: b('visa'), nhs: b('nhs'),
+    dl: b('dl') ? 'updated' : 'none',
+    hmrc: b('hmrc'),
+    pass: b('pass') ? 'updated' : 'none',
+    grc: b('grc'), newgp: false, dwp: false,
+    bcn: false, bc: false, bni: false, srv: '',
+  };
+  loadUrlParams(legacy);
+  try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+  updateLocks();
+  V.plan.classList.add('hidden');
+  document.body.classList.remove('plan-ready','wizard-active');
+  V.welcome.classList.remove('hidden');
+  gel('welcomeNormal').classList.add('hidden');
+  const outBox = gel('welcomeOutdated');
+  outBox.classList.remove('hidden');
+  outBox.querySelector('h2').textContent = 'Your link is from an older version';
+  outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+  syncChecklistToWizard();
+}
 function copyShareableLink() {
   const w = wizardState;
   const chk = id => gel(id)?.checked;
@@ -946,32 +950,7 @@ function checkAgeGate() {
       handleUrlLoad(params);
     } else if (params.has('goal')) {
       V.start.classList.add('hidden');
-      const b = k => params.get(k) === 'true';
-      const legacy = {
-        v: 0, reg: REGION.EW,
-        goal: params.get('goal') || S.BOTH,
-        nonUK: b('nonUK'), pid: b('pid'),
-        emp: b('emp') ? 'yes' : 'no',
-        dbs: b('dbs'), stu: false, dp: b('dp'),
-        visa: b('visa'), nhs: b('nhs'),
-        dl: b('dl') ? 'updated' : 'none',
-        hmrc: b('hmrc'),
-        pass: b('pass') ? 'updated' : 'none',
-        grc: b('grc'), newgp: false, dwp: false,
-        bcn: false, bc: false, bni: false, srv: '',
-      };
-      loadUrlParams(legacy);
-      try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-      updateLocks();
-      V.plan.classList.add('hidden');
-      document.body.classList.remove('plan-ready','wizard-active');
-      V.welcome.classList.remove('hidden');
-      gel('welcomeNormal').classList.add('hidden');
-      const outBox = gel('welcomeOutdated');
-      outBox.classList.remove('hidden');
-      outBox.querySelector('h2').textContent = 'Your link is from an older version';
-      outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-      syncChecklistToWizard();
+      handleLegacyUrl(params);
     }
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
@@ -985,32 +964,7 @@ function checkAgeGateShared() {
   if (params.has('p')) {
     handleUrlLoad(params);
   } else if (params.has('goal')) {
-    const b = k => params.get(k) === 'true';
-    const legacy = {
-      v: 0, reg: REGION.EW,
-      goal: params.get('goal') || S.BOTH,
-      nonUK: b('nonUK'), pid: b('pid'),
-      emp: b('emp') ? 'yes' : 'no',
-      dbs: b('dbs'), stu: false, dp: b('dp'),
-      visa: b('visa'), nhs: b('nhs'),
-      dl: b('dl') ? 'updated' : 'none',
-      hmrc: b('hmrc'),
-      pass: b('pass') ? 'updated' : 'none',
-      grc: b('grc'), newgp: false, dwp: false,
-      bcn: false, bc: false, bni: false, srv: '',
-    };
-    loadUrlParams(legacy);
-    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-    updateLocks();
-    V.plan.classList.add('hidden');
-    document.body.classList.remove('plan-ready','wizard-active');
-    V.welcome.classList.remove('hidden');
-    gel('welcomeNormal').classList.add('hidden');
-    const outBox = gel('welcomeOutdated');
-    outBox.classList.remove('hidden');
-    outBox.querySelector('h2').textContent = 'Your link is from an older version';
-    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-    syncChecklistToWizard();
+    handleLegacyUrl(params);
   }
 }
 function startWizard() {
@@ -1095,7 +1049,6 @@ function toggleMode() {
     syncChecklistToWizard();
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
     if (step >= questions.length) {
-      // Find the last question the user actually saw
       let last = questions.length - 1;
       while (last > 0 && questions[last].cond && !questions[last].cond()) last--;
       step = last;
@@ -1328,10 +1281,12 @@ function updateLocks() {
     const wrap = gel(id), cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
     if (shouldLock) {
       wrap.classList.add('locked');
-      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
-      if (id !== 'wrapDrivingLicence' && id !== 'wrapPassport') {
-        cbs.forEach(cb => cb.checked = false);
-      }
+      cbs.forEach(cb => {
+        cb.disabled = true;
+        cb.setAttribute('aria-describedby','lock-deed-poll-reason');
+        if (cb.type === 'radio') cb.checked = cb.value === 'none';
+        else cb.checked = false;
+      });
       if (lock) lock.classList.remove('hidden');
     } else {
       wrap.classList.remove('locked');
@@ -1989,7 +1944,7 @@ function buildSharedPlan(p) {
     }
     addStep('</ul></div>');
   }
-  if (hasStep4) {
+  const buildFinalStep = () => {
     const sn = nextStep();
     const isScotland = p.region === REGION.SCOT;
     const grcIntro = isNI
@@ -2048,7 +2003,8 @@ ${isScotland
   ${birthCertItem}
   </ul>
 </div>`);
-  }
+  };
+  if (hasStep4) buildFinalStep();
   if (!stepsHtml) stepsHtml = `<div class="phase success" role="status">
   <h2>🎉 Nothing left to do!</h2>
   <p>Based on your answers, all of your main legal documents and records are already up to date. You should be proud of yourself. Take some time to celebrate!</p>
@@ -2397,7 +2353,7 @@ window.onload = () => {
     const _sd = gel('schemaDate'); if (_sd) _sd.textContent = _d.getUTCDate() + ' ' + _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _cy = gel('schemaCopyYear'); if (_cy) _cy.textContent = _d.getUTCFullYear();
   if (window.matchMedia)
-    window.matchMedia('(prefers-color-scheme:light)').addEventListener('change', () => { if (!ssg('theme')) updateThemeIcon(); });
+    window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', e => { if (!ssg('theme')) { document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); updateThemeIcon(); } });
   if (ssg('ageConfirmed') === 'true') {
     const cb = gel('ageConfirm');
     if (cb) cb.checked = true;
@@ -2430,32 +2386,7 @@ window.onload = () => {
       gel('welcomeNewDevice').classList.remove('hidden');
       return;
     }
-    const b = k => params.get(k) === 'true';
-    const legacy = {
-      v: 0, reg: REGION.EW,
-      goal: params.get('goal') || S.BOTH,
-      nonUK: b('nonUK'), pid: b('pid'),
-      emp: b('emp') ? 'yes' : 'no',
-      dbs: b('dbs'), stu: false, dp: b('dp'),
-      visa: b('visa'), nhs: b('nhs'),
-      dl: b('dl') ? 'updated' : 'none',
-      hmrc: b('hmrc'),
-      pass: b('pass') ? 'updated' : 'none',
-      grc: b('grc'), newgp: false, dwp: false,
-      bcn: false, bc: false, bni: false, srv: '',
-    };
-    loadUrlParams(legacy);
-    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-    updateLocks();
-    V.plan.classList.add('hidden');
-    document.body.classList.remove('plan-ready','wizard-active');
-    V.welcome.classList.remove('hidden');
-    gel('welcomeNormal').classList.add('hidden');
-    const outBox = gel('welcomeOutdated');
-    outBox.classList.remove('hidden');
-    outBox.querySelector('h2').textContent = 'Your link is from an older version';
-    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-    syncChecklistToWizard();
+    handleLegacyUrl(params);
     return;
   }
   const savedApp = ssg('appState');
