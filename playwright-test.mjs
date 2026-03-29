@@ -582,6 +582,74 @@ console.log('\n25. Locked radios: needs_update resets, updated stays enabled');
   await ctx.close();
 }
 
+// ── 27. Share link encodes step progress (save side) ─────────────────────────
+console.log('\n27. Share link encodes step progress (save side)');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  // Mark HMRC as done (cycle twice: 0→1→2)
+  await page.evaluate(() => {
+    cycleStepState('trk_hmrc');
+    cycleStepState('trk_hmrc');
+  });
+  assert(await page.locator('#ssb_trk_hmrc').getAttribute('data-state') === '2', 'hmrc marked as done in DOM');
+  // Verify getStepState reads the correct value from localStorage (used by copyShareableLink)
+  const stepState = await page.evaluate(() => getStepState('trk_hmrc'));
+  assert(stepState === 2, 'getStepState returns 2 from localStorage after marking done');
+  // Verify the prg object that copyShareableLink would encode
+  const prg = await page.evaluate(() => {
+    const p = {};
+    document.querySelectorAll('.step-state-btn[data-track-id]').forEach(btn => {
+      const id = btn.dataset.trackId;
+      const s = getStepState(id);
+      if (s > 0) p[id.replace('trk_', '')] = s;
+    });
+    return p;
+  });
+  assert(prg.hmrc === 2, 'prg object encodes done hmrc step for share URL');
+  // Build share URL the same way copyShareableLink does and verify prg is in it
+  const shareUrl = await page.evaluate((fp) => {
+    const prg = {};
+    document.querySelectorAll('.step-state-btn[data-track-id]').forEach(btn => {
+      const id = btn.dataset.trackId;
+      const s = getStepState(id);
+      if (s > 0) prg[id.replace('trk_', '')] = s;
+    });
+    const chk = id => document.getElementById(id)?.checked;
+    const reg = document.querySelector('input[name="chkRegion"]:checked')?.value || 'ew';
+    const goal = document.querySelector('input[name="chkGoal"]:checked')?.value || 'both';
+    const emp = document.querySelector('input[name="chkEmployment"]:checked')?.value || 'no';
+    const dl = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked')?.value || 'updated';
+    const pass = document.querySelector('input[name="chkPassportOpt"]:checked')?.value || 'updated';
+    const srv = Object.entries(SVC_MAP).filter(([,id]) => document.getElementById(id)?.checked).map(([v]) => v).join(',');
+    const ps = {
+      v: SCHEMA_VERSION, reg, goal, nonUK: chk('chkNonUK'), pid: chk('chkPhotoID'), emp,
+      dbs: chk('chkDBS'), stu: chk('chkStudent'), dp: chk('chkDeedPoll'), visa: chk('chkVisa'),
+      nhs: chk('chkNHS'), dl, hmrc: chk('chkHMRC'), pass,
+      grc: chk('chkGRC'), newgp: chk('chkNewGP'), dwp: chk('chkDWP'),
+      bcn: chk('chkBirthCertName'), bc: chk('chkBirthCert'), bni: chk('chkBornNI'), srv,
+    };
+    if (Object.keys(prg).length) ps.prg = prg;
+    const url = new URL(fp);
+    url.searchParams.set('p', btoa(JSON.stringify(ps)));
+    return url.toString();
+  }, filePath);
+  const decoded = JSON.parse(atob(new URL(shareUrl).searchParams.get('p')));
+  assert(decoded.prg && decoded.prg.hmrc === 2, 'encoded share URL contains prg with done hmrc step');
+  // Load URL on a new device and verify progress is restored
+  const { page: page2, ctx: ctx2 } = await newPage();
+  await page2.goto(shareUrl);
+  await page2.waitForLoadState('domcontentloaded');
+  await page2.locator('#ageConfirmShared').check();
+  await page2.waitForSelector('#planView:not(.hidden)');
+  const restored = await page2.locator('#ssb_trk_hmrc').getAttribute('data-state');
+  assert(restored === '2', 'hmrc step restored as done on new device from share link');
+  await ctx.close();
+  await ctx2.close();
+}
+
 // ── 26. Progress restoration from share URL ──────────────────────────────────
 console.log('\n26. Progress restoration from share URL');
 {
