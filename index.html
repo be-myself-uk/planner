@@ -156,6 +156,13 @@
   .section-title { font-weight:bold; margin:20px 0 10px 0; color:var(--text-muted); text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; }
   .wizard-legend { font-size:1.3em; font-weight:bold; color:var(--text); margin:0 0 15px 0; padding:0; border:none; line-height:1.4; }
   .option, .checkbox-item { display:flex; align-items:center; margin:10px 0; background:var(--bg-light); padding:15px; border-radius:8px; border:1px solid var(--border); cursor:pointer; transition:background 0.2s,border-color 0.2s; color:var(--text); }
+  .option-sm { margin:5px 0; border:none; padding:5px; }
+  .chk-section { background:var(--bg-light); padding:15px; border-radius:8px; border:1px solid var(--border); }
+  .chk-section--mb { margin-bottom:10px; }
+  .chk-section--mv { margin:10px 0; }
+  .chk-q { margin:0 0 8px 0; font-weight:bold; color:var(--text); }
+  .chk-q--flex { display:flex; align-items:center; margin:0 0 8px 0; font-weight:bold; color:var(--text); }
+  .cc-icon { max-width:1em; max-height:1em; margin-left:.2em; vertical-align:middle; }
   .option:hover, .checkbox-item:hover:not(.locked) { background:var(--bg-details-hover); border-color:var(--primary); }
   .option.locked, .checkbox-item.locked { background:var(--disabled); color:var(--disabled-text); cursor:not-allowed; border-color:var(--disabled); }
   .option.locked input, .checkbox-item.locked input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
@@ -302,7 +309,6 @@
   .plan-top-details { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
   .plan-top-details summary { padding:12px 15px; cursor:pointer; font-size:0.9em; font-weight:bold; color:var(--text); list-style:none; user-select:none; transition:background 0.2s; }
   .plan-top-details summary:hover { background:var(--bg-details-hover); }
-  .plan-top-details summary::-webkit-details-marker { display:none; }
   .plan-top-details summary::before { content:'▶'; display:inline-block; margin-right:10px; font-size:0.8em; transition:transform 0.2s; }
   .plan-top-details[open] summary::before { transform:rotate(90deg); }
   .plan-top-details[open] summary { border-bottom:1px solid var(--border); }
@@ -475,22 +481,22 @@
     <fieldset style="border:none;padding:0;margin:0 0 20px 0;">
 
       <legend class="section-title">1. The basics</legend>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
-        <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">Where do you live?</p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked onchange="updateLocks()"> England or Wales</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot" onchange="updateLocks()"> Scotland</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni" onchange="updateLocks()"> Northern Ireland</label>
+      <div class="chk-section chk-section--mb">
+        <p class="chk-q">Where do you live?</p>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked onchange="updateLocks()"> England or Wales</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot" onchange="updateLocks()"> Scotland</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni" onchange="updateLocks()"> Northern Ireland</label>
       </div>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);">
-        <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">What do you want to do?</p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked onchange="updateLocks()"> Change my name and gender marker</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkGoal" id="chkGoalName" value="name" onchange="updateLocks()"> Change my name only</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender" onchange="updateLocks()"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
+      <div class="chk-section">
+        <p class="chk-q">What do you want to do?</p>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked onchange="updateLocks()"> Change my name and gender marker</label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalName" value="name" onchange="updateLocks()"> Change my name only</label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender" onchange="updateLocks()"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
       </div>
     </fieldset>
     <div id="wrapBornNI" class="hidden">
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
-        <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">Were you born in Northern Ireland?</p>
+      <div class="chk-section chk-section--mb">
+        <p class="chk-q">Were you born in Northern Ireland?</p>
         <em class="note" style="display:block;margin-bottom:10px;">Under the Good Friday Agreement, anyone born in Northern Ireland can claim Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>
         <label class="checkbox-item" style="margin:0;border:none;padding:5px;background:transparent;"><input type="checkbox" id="chkBornNI"> Yes, I was born in Northern Ireland</label>
       </div>
@@ -508,11 +514,11 @@
     <label class="checkbox-item"><input type="checkbox" id="chkPhotoID"><span>I have a valid photo ID<br><em class="note" style="margin-top:2px;">Even if it shows your old name. Some organisations, such as banks, may ask for updated photo ID before accepting a name change.</em></span></label>
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment and volunteering status</legend>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);">
-        <p style="margin:0 0 10px 0;font-weight:bold;color:var(--text);">Do you currently work, or are you about to start work or volunteering?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="yes" onchange="updateLocks()"> Yes, and they already have my updated details</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update" onchange="updateLocks()"> Yes, but I need to update my details with them</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked onchange="updateLocks()"> No</label>
+      <div class="chk-section">
+        <p class="chk-q">Do you currently work, or are you about to start work or volunteering?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="yes" onchange="updateLocks()"> Yes, and they already have my updated details</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update" onchange="updateLocks()"> Yes, but I need to update my details with them</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked onchange="updateLocks()"> No</label>
       </div>
     </fieldset>
     <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role needs a Disclosure and Barring Service (DBS) check<br><em class="note" style="margin-top:2px;">A background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role needs an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
@@ -521,19 +527,19 @@
     <div id="wrapChkServices" class="hidden">
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
       <legend class="visually-hidden">Services I need to update</legend>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);">
-        <p style="margin:0 0 10px 0;font-weight:bold;color:var(--text);">Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks and financial accounts</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcUtilities" class="chk-service" onchange="handleSvcItem()"> Utility bills (gas, electric, water, broadband)</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcElectoral" class="chk-service" onchange="handleSvcItem()"> Electoral register</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
+      <div class="chk-section">
+        <p class="chk-q">Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></p>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks and financial accounts</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcUtilities" class="chk-service" onchange="handleSvcItem()"> Utility bills (gas, electric, water, broadband)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcElectoral" class="chk-service" onchange="handleSvcItem()"> Electoral register</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
       </div>
       </fieldset>
     </div>
@@ -544,15 +550,15 @@
     <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS" onchange="updateLocks()"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
-    <div id="wrapDrivingLicence" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
-      <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
+    <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
-    <div id="wrapPassport" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
-      <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
+    <div id="wrapPassport" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
@@ -659,10 +665,10 @@
       <p class="disclaimer-muted">To the fullest extent permitted by law, the author accepts no liability for any loss, harm, or adverse outcome arising from reliance on this planner, whether direct or indirect.</p>
       <p><em>Last review: <span id="schemaDate"></span></em></p>
       <p><a href="https://bemyself.uk" style="color:inherit;">Be myself</a> © <span id="schemaCopyYear"></span> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:inherit;">CC BY-NC-SA 4.0</a>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
         <a href="https://github.com/be-myself-uk" style="color:inherit;">Github</a></p>
     </div>
   </div>
@@ -1897,17 +1903,7 @@ function buildSharedPlan(p) {
       const bankNote = !p.photoID
         ? '<span class="note" style="display:inline;color:var(--urgent);">Because you do not have a photo ID right now, high-street banks might say no. It is often best to get your updated driving licence first.</span>'
         : '<span class="note" style="display:inline;">If they say no, go back later when you have your updated driving licence.</span>';
-      const svcLabels = {
-        banks:     'Banks and financial accounts',
-        insurance: 'Insurance policies',
-        council:   'Council Tax',
-        utilities: 'Utility bills',
-        electoral: 'Electoral register',
-        landlord:  'Landlord or letting agency',
-        pension:   'Pension provider',
-        mortgage:  'Mortgage or home loan lender',
-        mobile:    'Mobile or phone contract',
-      };
+      const svcLabels = Object.fromEntries(SERVICES_OPTIONS.map(o => [o.value, o.label.split(' (')[0]]));
       const svcDetails = {
         banks:     `<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Most banks should accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. ${!p.photoID ? '<strong>Because you do not have photo ID right now, high-street banks might say no. Getting your updated driving licence first can help.</strong>' : 'If they say no, go back later when you have your updated driving licence.'} Some digital banks allow name changes through their apps without needing updated photo ID.</p><p><strong>If you are 16 or 17:</strong> Some banks may ask for a parent or guardian to be present or to countersign, even though an unenrolled deed poll does not normally require this. If this happens, try a different branch or contact the bank directly to complain.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>`,
         insurance: `<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>`,
