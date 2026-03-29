@@ -156,6 +156,13 @@
   .section-title { font-weight:bold; margin:20px 0 10px 0; color:var(--text-muted); text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; }
   .wizard-legend { font-size:1.3em; font-weight:bold; color:var(--text); margin:0 0 15px 0; padding:0; border:none; line-height:1.4; }
   .option, .checkbox-item { display:flex; align-items:center; margin:10px 0; background:var(--bg-light); padding:15px; border-radius:8px; border:1px solid var(--border); cursor:pointer; transition:background 0.2s,border-color 0.2s; color:var(--text); }
+  .option-sm { margin:5px 0; border:none; padding:5px; }
+  .chk-section { background:var(--bg-light); padding:15px; border-radius:8px; border:1px solid var(--border); }
+  .chk-section--mb { margin-bottom:10px; }
+  .chk-section--mv { margin:10px 0; }
+  .chk-q { margin:0 0 8px 0; font-weight:bold; color:var(--text); }
+  .chk-q--flex { display:flex; align-items:center; margin:0 0 8px 0; font-weight:bold; color:var(--text); }
+  .cc-icon { max-width:1em; max-height:1em; margin-left:.2em; vertical-align:middle; }
   .option:hover, .checkbox-item:hover:not(.locked) { background:var(--bg-details-hover); border-color:var(--primary); }
   .option.locked, .checkbox-item.locked { background:var(--disabled); color:var(--disabled-text); cursor:not-allowed; border-color:var(--disabled); }
   .option.locked input, .checkbox-item.locked input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
@@ -166,6 +173,9 @@
   .lock-icon { margin-left:auto; font-size:0.9em; }
   .warning-text { color:var(--urgent); font-weight:bold; display:none; align-items:center; gap:8px; height:24px; margin-bottom:10px; }
   .warning-text.visible { display:flex; }
+  .save-warn-banner { display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--simultaneous-bg); color:var(--simultaneous); border:1px solid var(--simultaneous); border-radius:8px; padding:8px 12px; font-size:0.85em; margin-bottom:8px; }
+  .save-warn-banner.hidden { display:none !important; }
+  .save-warn-banner button { background:none; border:none; color:inherit; cursor:pointer; font-size:1rem; flex-shrink:0; padding:0; }
   .options-group { padding:4px; border:2px solid transparent; border-radius:12px; transition:border-color 0.3s,background 0.3s; margin:-6px; }
   .options-group.error { border-color:var(--urgent); background:var(--urgent-bg); }
   .multi-all-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
@@ -203,6 +213,13 @@
   .phase-header h3 { margin:0; }
   .badge-time { display:inline-flex; align-items:center; gap:5px; background:var(--badge-bg); color:var(--text); padding:4px 10px; border-radius:12px; font-size:0.8em; font-weight:bold; border:1px solid var(--badge-border); }
   .badge-next { display:inline-block; background:var(--primary); color:var(--text-invert); padding:3px 8px; border-radius:4px; font-size:0.75em; font-weight:bold; text-transform:uppercase; margin-bottom:5px; }
+  .focus-count-badge { display:none; font-size:0.65rem; font-weight:bold; background:var(--text); color:var(--bg); border-radius:9px; padding:1px 5px; margin-left:3px; vertical-align:middle; }
+  [aria-pressed="true"] .focus-count-badge { display:inline; }
+  .next-step-highlight { outline:2px solid var(--primary); outline-offset:2px; border-radius:4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .next-step-highlight { animation:nextStepPulse 2s ease-in-out infinite; }
+    @keyframes nextStepPulse { 0%,100% { outline-color:var(--primary); } 50% { outline-color:transparent; } }
+  }
   .item-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold; border:1px solid; margin-right:6px; margin-bottom:4px; }
   .badge-green { background:var(--success-bg); color:var(--success); border-color:var(--success); }
   .badge-yellow { background:var(--simultaneous-bg); color:var(--simultaneous); border-color:var(--simultaneous); }
@@ -267,12 +284,10 @@
   .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; }
   .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px; margin-top:40px; color:var(--text-muted); font-size:0.9em; }
   .footer-inner { max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:15px; }
-  .footer details { background:transparent; border:1px solid var(--border); margin-top:0; }
-  .footer summary { color:var(--text); background:var(--bg-light); border-bottom:none; }
-  .footer details[open] summary { border-bottom:1px solid var(--border); }
-  .footer .details-body { background:transparent; color:var(--text-muted); }
   .footer p { margin:0 0 10px 0; }
-  .disclaimer { font-size:0.85em; margin-top:20px; border-top:1px solid var(--border); padding-top:20px; }
+  .footer-inner a { color:var(--primary); }
+  .footer-meta { margin-top:10px; font-size:0.8em; color:var(--text-muted); }
+  .footer-meta p { margin:4px 0; }
   .disclaimer-muted { color:var(--disclaimer-muted); }
   .contact-btn { display:inline-block; background:var(--bg-light); color:var(--text); border:1px solid var(--border); padding:10px 15px; border-radius:8px; text-decoration:none; font-weight:bold; transition:background 0.2s; margin-top:10px; }
   .contact-btn:hover { background:var(--bg-details-hover); }
@@ -284,12 +299,17 @@
   #helpModalBody { padding:20px; overflow-y:auto; font-size:0.95em; color:var(--text); line-height:1.7; }
   #helpModalBody p { margin:0 0 16px 0; }
   #helpModalBody p:last-child { margin-bottom:0; }
+  #helpModalBody h3 { margin:16px 0 8px 0; font-size:1em; }
+  .shortcut-table { border-collapse:collapse; width:100%; margin:0.5rem 0; }
+  .shortcut-table td { padding:4px 8px; vertical-align:top; }
+  .shortcut-table td:first-child { white-space:nowrap; padding-right:12px; }
+  .shortcut-table tr:not(:last-child) td { border-bottom:1px solid var(--border); }
+  kbd { display:inline-block; padding:1px 5px; border:1px solid var(--text); border-radius:3px; font-family:monospace; font-size:0.85em; background:var(--bg-light); }
   #liveRegion { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
   .plan-cost-item { margin:0 0 6px 16px; }
   .plan-top-details { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
   .plan-top-details summary { padding:12px 15px; cursor:pointer; font-size:0.9em; font-weight:bold; color:var(--text); list-style:none; user-select:none; transition:background 0.2s; }
   .plan-top-details summary:hover { background:var(--bg-details-hover); }
-  .plan-top-details summary::-webkit-details-marker { display:none; }
   .plan-top-details summary::before { content:'▶'; display:inline-block; margin-right:10px; font-size:0.8em; transition:transform 0.2s; }
   .plan-top-details[open] summary::before { transform:rotate(90deg); }
   .plan-top-details[open] summary { border-bottom:1px solid var(--border); }
@@ -334,7 +354,7 @@
     .badge-time, .badge-next, .item-badge, .legend-tb-icon { border:1px solid #000; color:#000; background:transparent; }
     details { display:block; border:1px solid #ccc; background:white; }
     details[open], details:not([open]) { display:block; }
-    .phase details summary, .footer summary { display:none; }
+    .phase details summary { display:none; }
     .plan-top-details summary { display:block; font-weight:bold; color:black; background:transparent; padding:8px 0; border:none; }
     .plan-top-details summary::before { display:none; }
     .details-body { display:block; padding:10px 0; color:#333; }
@@ -355,6 +375,10 @@
   <p>A free UK legal identity planner. Answer a few questions and get a personal action plan for changing your name and gender marker (the M or F on your documents).</p>
 </header>
 <div id="controlBar">
+  <div id="saveWarnBanner" class="hidden save-warn-banner" role="alert">
+    <span>⚠️ Progress can't be saved on this device — you may be in private browsing mode.</span>
+    <button onclick="this.closest('.save-warn-banner').classList.add('hidden')" aria-label="Dismiss save warning">✕</button>
+  </div>
   <div id="controlBarCard" role="toolbar" aria-label="Page controls">
     <div id="controlBarButtons">
       <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit – leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
@@ -364,7 +388,7 @@
           <button class="ub-icon-btn" onclick="makeChanges()" aria-label="Make changes to answers" title="Make changes"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
           <div class="ub-sep" aria-hidden="true"></div>
           <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">⟲</span></button>
-          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span></button>
+          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
           <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy shareable link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
           <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
         </div>
@@ -395,7 +419,18 @@
         <p><strong>How does it work?</strong><br>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal action plan for you, with clear information and links to official resources.</p>
         <p><strong>Step-by-step questions or the checklist?</strong><br>Both options produce the same plan. The step-by-step wizard shows one question at a time which is good if you are not sure where to start. The checklist shows all questions at once, and this is good if you already know your situation well. You can switch between them at any time as well.</p>
         <p><strong>Is my information safe?</strong><br>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page.</p>
-        <p style="margin-bottom:0;"><strong>Is this legal, medical, or financial advice?</strong><br>No. This planner gives general guidance only. It helps you understand the steps and paperwork needed to update your legal documents. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+        <p><strong>Is this legal, medical, or financial advice?</strong><br>No. This planner gives general guidance only. It helps you understand the steps and paperwork needed to update your legal documents. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+        <h3>Keyboard shortcuts</h3>
+        <table class="shortcut-table" aria-label="Keyboard shortcuts">
+          <tbody>
+            <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
+            <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
+            <tr><td>Click step</td><td>Cycle state forward: not started → in progress → done → not needed</td></tr>
+            <tr><td>Right-click or long-press step</td><td>Cycle state backward</td></tr>
+            <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Quick exit — leaves the page immediately</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -451,22 +486,22 @@
     <fieldset style="border:none;padding:0;margin:0 0 20px 0;">
 
       <legend class="section-title">1. The basics</legend>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
-        <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">Where do you live?</p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked onchange="updateLocks()"> England or Wales</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot" onchange="updateLocks()"> Scotland</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni" onchange="updateLocks()"> Northern Ireland</label>
+      <div class="chk-section chk-section--mb">
+        <p class="chk-q">Where do you live?</p>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked onchange="updateLocks()"> England or Wales</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot" onchange="updateLocks()"> Scotland</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni" onchange="updateLocks()"> Northern Ireland</label>
       </div>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);">
-        <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">What do you want to do?</p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked onchange="updateLocks()"> Change my name and gender marker</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkGoal" id="chkGoalName" value="name" onchange="updateLocks()"> Change my name only</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender" onchange="updateLocks()"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
+      <div class="chk-section">
+        <p class="chk-q">What do you want to do?</p>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked onchange="updateLocks()"> Change my name and gender marker</label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalName" value="name" onchange="updateLocks()"> Change my name only</label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender" onchange="updateLocks()"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
       </div>
     </fieldset>
     <div id="wrapBornNI" class="hidden">
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
-        <p style="margin:0 0 8px 0;font-weight:bold;color:var(--text);">Were you born in Northern Ireland?</p>
+      <div class="chk-section chk-section--mb">
+        <p class="chk-q">Were you born in Northern Ireland?</p>
         <em class="note" style="display:block;margin-bottom:10px;">Under the Good Friday Agreement, anyone born in Northern Ireland can claim Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>
         <label class="checkbox-item" style="margin:0;border:none;padding:5px;background:transparent;"><input type="checkbox" id="chkBornNI"> Yes, I was born in Northern Ireland</label>
       </div>
@@ -484,32 +519,33 @@
     <label class="checkbox-item"><input type="checkbox" id="chkPhotoID"><span>I have a valid photo ID<br><em class="note" style="margin-top:2px;">Even if it shows your old name. Some organisations, such as banks, may ask for updated photo ID before accepting a name change.</em></span></label>
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment and volunteering status</legend>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);">
-        <p style="margin:0 0 10px 0;font-weight:bold;color:var(--text);">Do you currently work, or are you about to start work or volunteering?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="yes" onchange="updateLocks()"> Yes, and they already have my updated details</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update" onchange="updateLocks()"> Yes, but I need to update my details with them</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked onchange="updateLocks()"> No</label>
+      <div class="chk-section">
+        <p class="chk-q">Do you currently work, or are you about to start work or volunteering?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="yes" onchange="updateLocks()"> Yes, and they already have my updated details</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update" onchange="updateLocks()"> Yes, but I need to update my details with them</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked onchange="updateLocks()"> No</label>
       </div>
     </fieldset>
     <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role needs a Disclosure and Barring Service (DBS) check<br><em class="note" style="margin-top:2px;">A background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role needs an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
     <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span></span></label>
     <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, or professional memberships.</em></span></label>
+    <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I own a vehicle registered in my name<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van with a V5C logbook.</em></span></label>
     <div id="wrapChkServices" class="hidden">
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
       <legend class="visually-hidden">Services I need to update</legend>
-      <div style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);">
-        <p style="margin:0 0 10px 0;font-weight:bold;color:var(--text);">Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></p>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks and financial accounts</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcUtilities" class="chk-service" onchange="handleSvcItem()"> Utility bills (gas, electric, water, broadband)</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcElectoral" class="chk-service" onchange="handleSvcItem()"> Electoral register</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
+      <div class="chk-section">
+        <p class="chk-q">Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></p>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks and financial accounts</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcUtilities" class="chk-service" onchange="handleSvcItem()"> Utility bills (gas, electric, water, broadband)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcElectoral" class="chk-service" onchange="handleSvcItem()"> Electoral register</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
-        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
       </div>
       </fieldset>
     </div>
@@ -520,15 +556,15 @@
     <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS" onchange="updateLocks()"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
-    <div id="wrapDrivingLicence" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
-      <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
+    <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
-    <div id="wrapPassport" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
-      <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
+    <div id="wrapPassport" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
@@ -586,61 +622,100 @@
 </main>
 <footer class="footer" aria-label="Site information and resources">
   <div class="footer-inner">
-    <details>
-      <summary>ℹ️ Usage guide, Privacy policy, and Feedback</summary>
-      <div class="details-body">
-        <p><strong>🤝 You do not have to do this alone</strong></p>
-        <p>Changing your name and gender marker can involve a lot of paperwork, but there are organisations and communities across the UK that can help. Here are a few:</p>
-        <span style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
-          <a href="https://mermaids.org.uk" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">Mermaids</a>
-          <a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">Gendered Intelligence</a>
-          <a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">TransActual</a>
-          <a href="https://gires.org.uk" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">GIRES</a>
-          <a href="https://scottishtrans.org" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">Scottish Trans</a>
-          <a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">TransAid Cymru</a>
-          <a href="https://reddit.com/r/transgenderUK" target="_blank" rel="noopener noreferrer" style="color:var(--primary);">r/transgenderUK</a>
-        </span>
-        <hr>
-        <p><strong>📖 Usage guide</strong></p>
-        <p><strong>Accessibility: </strong> This page has full support for users with accessible needs or devices, as well as screen readers. You can also use tab and arrow keys to move through elements on the page.</p>
-        <p><strong>Red '⚠️' button:</strong> Quick exit. Make a quick exit at any time by clicking this button, or press Esc on your keyboard (on most browsers), to instantly close this page and go to a different website. This also removes this page from your "Back" button history.</p>
-        <p><strong>'?' button:</strong> About this planner. Opens a box with answers to common questions, such as "What is this?", "Who is it for?", and "How does it work?"</p>
-        <p><strong>'☀️' or '🌙' button:</strong> Change theme. This button switches the page between a light and dark appearance. By default, the page will use your device's setting.</p>
-        <p><strong>Get started:</strong> Click either "Answer step-by-step questions" or "Fill out a single checklist" to get started. You can switch between either mode at any time and your progress will be the same.</p>
-        <p><strong>'↹' button:</strong> This appears once you have started answering questions until you have an action plan. It will switch between answering step-by-step questions and a checklist.</p>
-        <p><strong>Action plan:</strong> Once you've gone through the questions, you have an action plan. This screen shows you a list of actions grouped by the order to tackle them in. It will also show you the approximate difficulty and cost of completing the action. Each item can also be checked off or marked as unneeded using the buttons on the left of each item on your action plan. Your action plan is saved to your device, and you can resume at any time by reopening this page where you will be prompted to continue or start a new plan. If the planner is updated, you may see a screen prompting you to review your answers.</p>
-        <p><strong>'↺' button:</strong> New plan. This deletes your answers, your action plan, and all tracked progress, taking you back to the start screen. You need to confirm by clicking a second time. This cannot be undone.</p>
-        <p><strong>'✏️' button:</strong> To make different choices responding to questions, click this button. You can switch between views if you prefer to answer questions step-by-step or using the checklist and once you have made changes, click "Update my action plan" to view your new action plan.</p>
-        <p><strong>'👁️' button:</strong> Focus mode. Clicking this button will hide items and sections on your action planned you've marked as done or not needed, making the view much more compact allowing you to focus on what items are left.</p>
-        <p><strong>'🔗' button:</strong> Share. Click to copy a link to your action plan. You can use it to return to your action plan on this device or other devices, or to share with people you fully trust. <strong>Be careful:</strong> this link includes sensitive information such as your immigration status, employment situation, and GRC intentions.</p>
-        <p><strong>'🖨️' button:</strong> Print or save to PDF. This will open the print dialog in your web browser. It will allow you to either print your action plan or save it to your device. It will show any progress you have already tracked and expand the 'More information' sections.</p>
-        <p><strong>'⟲' button:</strong> Reset progress. This resets all the progress checkboxes on your action plan back to "not started", but keeps your plan and answers intact. You need to confirm by clicking a second time.</p>
 
-        <hr>
-        <p><strong>🔒 Privacy policy</strong></p>
-        <p><strong>Data storage:</strong> This planner is designed to protect your privacy.<br>No personal information is collected, and no answers are ever sent to a server. The website runs entirely inside your own web browser.</p>
-        <p>To let you tick off tasks and return later, your progress is saved on the device you are using. You can delete all saved data at any time by clicking "New plan" or by clearing your browser history.</p>
-        <p>A security cookie may be set by Cloudflare, the hosting provider, to protect the site from automated attacks. This is not used for tracking or analytics.</p>
-        <hr>
-        <p><strong>✉️ Feedback</strong><br>This planner is built and maintained by one person. If you notice a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
-        <p><em>Crafted with love and care by Be myself</em></p>
-        <a href="https://github.com/be-myself-uk/planner/issues" target="_blank" rel="noopener noreferrer" class="contact-btn">Create GitHub issue <span class="visually-hidden">(opens in a new tab)</span></a>
-        <p class="note" style="margin-top:8px;">Opens in a new tab. Github may collect analytical data.</p>
+    <details id="footerGuide" class="plan-top-details">
+      <summary>📖 Usage guide</summary>
+      <div class="plan-top-body">
+        <p style="margin:0 0 10px 0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
+
+        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Getting started</strong></p>
+        <p style="margin:0 0 8px 0;">Click either "Answer step-by-step questions" or "Fill out a single checklist" to begin. Both produce the same plan and you can switch between them at any time.</p>
+
+        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Always available</strong></p>
+        <div class="legend-toolbar" aria-hidden="true">
+          <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
+          <span class="legend-tb-icon">?</span><span><strong>About this planner:</strong> answers common questions about what this tool does and how it keeps your information private.</span>
+          <span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
+          <span class="legend-tb-icon">↹</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist. Visible while answering questions.</span>
+        </div>
+
+        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Plan toolbar</strong></p>
+        <div class="legend-toolbar" aria-hidden="true">
+          <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
+          <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
+          <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
+          <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
+          <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
+          <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
+        </div>
+
+        <p style="margin:6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Progress:</strong> click to cycle forward, right-click or long-press to go back.</p>
+        <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:4px;">
+          <span style="display:inline-flex;align-items:center;gap:4px;">
+            <button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button>
+            <span style="font-size:0.85em;">Not started</span>
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:4px;">
+            <button class="step-state-btn" data-state="1" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>🕐</span></button>
+            <span style="font-size:0.85em;">In progress</span>
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:4px;">
+            <button class="step-state-btn" data-state="2" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✓</span></button>
+            <span style="font-size:0.85em;">Done</span>
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:4px;">
+            <button class="step-state-btn" data-state="3" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✕</span></button>
+            <span style="font-size:0.85em;">Not needed</span>
+          </span>
+        </div>
       </div>
     </details>
-    <div class="disclaimer">
-      <p><strong>Disclaimer:</strong></p>
-      <p class="disclaimer-muted">This planner provides general information about UK legal processes only. It does not constitute legal, medical, financial, or tax advice, and no professional or advisory relationship of any kind is created between you and the author by using it. This planner is intended for use by people aged 16 and over. The legal processes for those under 16 differ and require parental or guardian consent; this planner does not cover them.</p>
-      <p class="disclaimer-muted">While every effort is made to keep this information accurate and up to date, government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Government and third-party fees can change at any time, so always check the current amount with the relevant organisation before making any payment. No guarantee is made that the information here is current, complete, or free from error. You should always verify important steps against official government sources, in particular GOV.UK, and seek advice from a qualified legal professional before submitting any formal applications.</p>
-      <p class="disclaimer-muted">To the fullest extent permitted by law, the author accepts no liability for any loss, harm, or adverse outcome arising from reliance on this planner, whether direct or indirect.</p>
+
+    <details id="footerPrivacy" class="plan-top-details">
+      <summary>🤝 Support, privacy, and feedback</summary>
+      <div class="plan-top-body">
+        <p><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
+        <span style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;">
+          <a href="https://mermaids.org.uk" target="_blank" rel="noopener noreferrer">Mermaids</a>
+          <a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a>
+          <a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual</a>
+          <a href="https://gires.org.uk" target="_blank" rel="noopener noreferrer">GIRES</a>
+          <a href="https://scottishtrans.org" target="_blank" rel="noopener noreferrer">Scottish Trans</a>
+          <a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru</a>
+          <a href="https://reddit.com/r/transgenderUK" target="_blank" rel="noopener noreferrer">r/transgenderUK</a>
+        </span>
+        <hr>
+        <p><strong>🔒 Privacy</strong></p>
+        <p>No personal information is collected and no answers are ever sent to a server. This tool runs entirely inside your web browser.</p>
+        <p>To let you return to your plan later, progress is saved on the device you are using. You can delete all saved data at any time by clicking "New plan" or by clearing your browser's site data.</p>
+        <p>A security measure may be applied by Cloudflare, the hosting provider, to protect the site from automated attacks. This is not used for tracking or analytics.</p>
+        <hr>
+        <p><strong>✉️ Feedback</strong></p>
+        <p>This planner is built and maintained by one person. If you notice a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
+        <a href="https://github.com/be-myself-uk/planner/issues" target="_blank" rel="noopener noreferrer" class="contact-btn">Create GitHub issue <span class="visually-hidden">(opens in a new tab)</span></a>
+        <p class="note" style="margin-top:8px;">Opens in a new tab. GitHub may collect analytical data.</p>
+      </div>
+    </details>
+
+    <details id="footerDisclaimer" class="plan-top-details">
+      <summary>⚖️ Disclaimer</summary>
+      <div class="plan-top-body">
+        <p class="disclaimer-muted">This planner provides general information about UK legal processes only. It does not constitute legal, medical, financial, or tax advice, and no professional or advisory relationship of any kind is created between you and the author by using it. This planner is intended for use by people aged 16 and over. The legal processes for those under 16 differ and require parental or guardian consent; this planner does not cover them.</p>
+        <p class="disclaimer-muted">While every effort is made to keep this information accurate and up to date, government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Government and third-party fees can change at any time, so always check the current amount with the relevant organisation before making any payment. No guarantee is made that the information here is current, complete, or free from error. You should always verify important steps against official government sources, in particular GOV.UK, and seek advice from a qualified legal professional before submitting any formal applications.</p>
+        <p class="disclaimer-muted" style="margin-bottom:0;">To the fullest extent permitted by law, the author accepts no liability for any loss, harm, or adverse outcome arising from reliance on this planner, whether direct or indirect.</p>
+      </div>
+    </details>
+
+    <div class="footer-meta">
       <p><em>Last review: <span id="schemaDate"></span></em></p>
       <p><a href="https://bemyself.uk" style="color:inherit;">Be myself</a> © <span id="schemaCopyYear"></span> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:inherit;">CC BY-NC-SA 4.0</a>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" style="max-width:1em;max-height:1em;margin-left:.2em;vertical-align:middle;" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
-        <a href="https://github.com/be-myself-uk" style="color:inherit;">Github</a></p>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
+        <a href="https://github.com/be-myself-uk" style="color:inherit;">GitHub</a></p>
     </div>
+
   </div>
 </footer>
 <template id="tmpl-plan-item">
@@ -710,7 +785,16 @@ const STATE_ARIA   = ['Not started', 'In progress', 'Done', 'Not needed'];
 console.log("%c Crafted with love and care by Be myself | https://bemyself.uk ","background:linear-gradient(90deg,#1a73e8,#8ab4f8);color:white;font-size:14px;padding:8px;border-radius:4px;font-family:sans-serif;font-weight:bold;");
 function gel(id) { return document.getElementById(id); }
 const ssg = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
-const sss = (k,v) => { try { localStorage.setItem(k,v); } catch(e) {} };
+let _saveWarnShown = false;
+const sss = (k, v) => {
+  try { localStorage.setItem(k, v); } catch(e) {
+    if (!_saveWarnShown) {
+      _saveWarnShown = true;
+      const el = document.getElementById('saveWarnBanner');
+      if (el) el.classList.remove('hidden');
+    }
+  }
+};
 let _annTimer = 0;
 function announce(msg) {
   const r = document.getElementById('liveRegion');
@@ -795,6 +879,7 @@ function loadUrlParams(d) {
   gel('chkBirthCertName').checked= d.bcn   === true;
   gel('chkBirthCert').checked    = d.bc    === true;
   gel('chkBornNI').checked       = d.bni   === true;
+  gel('chkVehicle').checked      = d.veh   === true;
   const loadedServices = (d.srv || '').split(',').filter(Boolean);
   Object.entries(SVC_MAP).forEach(([val, id]) => { const cb = gel(id); if (cb) cb.checked = loadedServices.includes(val); });
   const noneBox = gel('chkSvcAll');
@@ -907,6 +992,7 @@ function copyShareableLink() {
     bcn:   isWizardMode ? (w.birthCertName === S.YES) : chk('chkBirthCertName'),
     bc:    isWizardMode ? (w.birthCert   === S.YES) : chk('chkBirthCert'),
     bni:   isWizardMode ? (w.bornInNI    === S.YES) : chk('chkBornNI'),
+    veh:   isWizardMode ? (w.vehicle     === S.YES) : chk('chkVehicle'),
     srv,
   };
   const prg = {};
@@ -1127,6 +1213,8 @@ function resetProgress() {
 
 function restartApp() {
   fadeOutConfetti();
+  _saveWarnShown = false;
+  const swb = gel('saveWarnBanner'); if (swb) swb.classList.add('hidden');
   [V.plan, V.wizard, V.checklist, V.welcome].forEach(v => v.classList.add('hidden'));
   V.toggle.style.display = 'none';
   document.body.classList.remove('plan-ready','wizard-active');
@@ -1170,6 +1258,7 @@ function syncWizardToChecklist() {
   gel('chkDBS').checked      = wizardState.dbs         === S.YES;
   gel('chkDWP').checked      = wizardState.dwp         === S.YES;
   gel('chkStudent').checked  = wizardState.student     === S.YES;
+  gel('chkVehicle').checked  = wizardState.vehicle     === S.YES;
   gel('chkDeedPoll').checked = wizardState.deedpoll    === S.YES;
   gel('chkNHS').checked      = wizardState.nhs         === S.YES;
   gel('chkNewGP').checked    = wizardState.newGP       === S.YES;
@@ -1200,6 +1289,7 @@ function syncChecklistToWizard() {
   wizardState.dbs         = gel('chkDBS').checked      ? S.YES : S.NO;
   wizardState.dwp         = gel('chkDWP').checked      ? S.YES : S.NO;
   wizardState.student     = gel('chkStudent').checked  ? S.YES : S.NO;
+  wizardState.vehicle     = gel('chkVehicle').checked  ? S.YES : S.NO;
   wizardState.deedpoll    = gel('chkDeedPoll').checked ? S.YES : S.NO;
   wizardState.nhs         = gel('chkNHS').checked      ? S.YES : S.NO;
   wizardState.newGP       = gel('chkNewGP').checked    ? S.YES : S.NO;
@@ -1243,6 +1333,7 @@ function planParamsFromWizard() {
     photoID:            wizardState.photoID     === S.YES,
     isNI,
     bornInNI:           wizardState.bornInNI    === S.YES,
+    vehicle:            wizardState.vehicle     === S.YES,
   };
 }
 function updateLocks() {
@@ -1264,6 +1355,7 @@ function updateLocks() {
   gel('wrapDWP').classList.toggle('hidden', isGender);
   gel('wrapHMRC').classList.toggle('hidden', isGender);
   gel('wrapChkServices').classList.toggle('hidden', isGender);
+  gel('wrapVehicle').classList.toggle('hidden', isGender);
   gel('wrapBirthCert').classList.toggle('hidden', isName);
   gel('wrapBirthCertName').classList.toggle('hidden', (!isScot && !isNI) || isGender);
   gel('wrapNewGP').classList.toggle('hidden', isName || nhsChecked);
@@ -1326,7 +1418,7 @@ function resetChecklist() {
   gel('chkGoalBoth').checked   = true;
   gel('chkNonUK').checked      = false;
   gel('chkEmployedNo').checked = true;
-  ['chkPhotoID','chkDBS','chkDWP','chkStudent','chkDeedPoll','chkVisa','chkNHS','chkNewGP',
+  ['chkPhotoID','chkDBS','chkDWP','chkStudent','chkVehicle','chkDeedPoll','chkVisa','chkNHS','chkNewGP',
    'chkHMRC','chkGRC','chkBirthCertName','chkBirthCert',
    'chkBornNI','chkSvcBanks','chkSvcInsurance','chkSvcCouncil','chkSvcUtilities','chkSvcElectoral',
    'chkSvcLandlord','chkSvcPension','chkSvcMortgage','chkSvcMobile','chkSvcAll']
@@ -1385,7 +1477,7 @@ const questions = [
     q:() => wizardState.region === REGION.SCOT
       ? 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new name and CHI number are on file from day one, with no need to update an existing record.</em>'
       : wizardState.region === REGION.NI
-      ? 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number will be issued.</em>'
+      ? 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number may be issued.</em>'
       : 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new details are on file from day one, with no need to update an existing record.</em>',
     cond:() => wizardState.goal !== S.NAME && wizardState.nhs === S.NO, o:() => [
     [S.YES,'Yes, I would like to register with a new GP'],
@@ -1427,6 +1519,9 @@ const questions = [
     cond:() => wizardState.goal !== S.GENDER,
     o:() => SERVICES_OPTIONS
   },
+  { id:'vehicle', q:'Do you own a vehicle registered in your name?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van. Updating the V5C logbook is separate from updating your driving licence.</em>', o:() => [
+    [S.YES,'Yes'],[S.NO,'No']
+  ], cond:() => wizardState.goal !== S.GENDER },
   { id:'student', q:'Do you have qualifications to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, or professional memberships.</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
@@ -1627,11 +1722,11 @@ function buildSharedPlan(p) {
   if (p.wantsGRC && !isName) {
     costs.push('<strong>UK GRC application:</strong> A small application fee applies.');
     costs.push('<strong>Medical reports for GRC:</strong> Costs vary widely. A GP letter may be low cost, but a specialist report can be expensive.');
-    costs.push('<strong>Statutory declaration for GRC:</strong> The fee for swearing a statutory declaration is generally very low (usually around £5 plus £2 per exhibit). Some solicitors may try to charge much more for drafting a bespoke document, but you should only need to pay for the swearing of the oath itself.');
+    costs.push('<strong>Statutory declaration for GRC:</strong> The fee for swearing a statutory declaration is generally very low (usually around £5 plus £2 per exhibit). Some solicitors may try to charge much more for drafting a bespoke document, but you may only need to pay for the swearing of the oath itself.');
   }
   const hasHealthGroup = p.needsNHS || p.newGP || p.needsDriving;
   const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student || p.dwp;
-  const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0);
+  const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !isGender && !p.visaAlreadyUpdated);
   const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (isNI && p.bornInNI && !isName);
   const midGroups = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length;
@@ -1674,7 +1769,7 @@ function buildSharedPlan(p) {
       ? `You need a document that records your name change before you can update most official records. In Scotland you have two options: a free unenrolled deed poll, or a Statutory Declaration recorded with the National Records of Scotland (NRS). If you choose a deed poll, <strong>keeping it unenrolled is strongly recommended.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.`
       : isNI
       ? `You need a document that records your name change before you can update most official records. In Northern Ireland, <strong>a statutory declaration is generally recommended</strong> over a basic deed poll (a small solicitor fee applies). The DVA and the Irish passport gender-change route may both accept a statutory declaration where a basic deed poll may not be enough. A free unenrolled deed poll is also valid for most purposes. The links below have the current details.`
-      : `A deed poll is a short legal document you sign to officially record your name change. You need one before you can update your details with UK services. It is completely free. <strong>You should use an "unenrolled" deed poll.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.`;
+      : `A deed poll is a short legal document you sign to officially record your name change. You need one before you can update your details with UK services. It is completely free. <strong>An unenrolled deed poll is generally all you need.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.`;
     const deedExpanded = isScot
       ? `<p><strong>Option 1: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. The GOV.UK and TransActual links below have details on the current requirements and process.</p>
 <p><strong>Option 2: Statutory Declaration with NRS.</strong> A more formal route that records the name change with the National Records of Scotland. This is not required by most organisations and there is a fee involved. The NRS link below has the current details.</p>
@@ -1694,7 +1789,8 @@ function buildSharedPlan(p) {
       : `<p>An unenrolled deed poll is a simple legal document that can be created at home at no cost. The GOV.UK and TransActual links below explain the current requirements, including who can act as a witness.</p>
 <a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>
 <a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>
-<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>`;
+<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>
+<details class="svc-detail"><summary>What if an organisation refuses?</summary><p>Many organisations are expected to update their records when given valid proof of a name change. Data protection law gives you the right to ask any organisation holding inaccurate data about you to correct it — this is sometimes called the right to rectification. If an organisation refuses without a good reason, you may be able to raise a formal complaint.</p><p>If an organisation refuses: <strong>1.</strong> Ask to speak to their data controller or data protection officer. <strong>2.</strong> Put your request in writing (email is fine) and keep a copy. <strong>3.</strong> If they still refuse after a written request, you can raise a complaint with the Information Commissioner's Office (ICO) using the link below.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></details>`;
     addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
   <div class="phase-header"><h3 id="phase_s${sn}">Step ${sn}: The basics</h3><span class="badge-time">⏱ ${isNI ? '30 minutes – 1 day' : '10–30 minutes'}</span></div>
@@ -1732,7 +1828,7 @@ function buildSharedPlan(p) {
         nhsTitle = 'HSCNI health record and Health and Care Number';
         nhsText = (isBoth || isGender)
           ? 'Your GP practice can update your gender marker through the Business Services Organisation (BSO). A new Health and Care Number (HCN) may be issued. Let any hospital departments you use know about a new number afterwards.'
-          : 'Your GP practice can update your name on your health record. They will need to see a copy of your deed poll or statutory declaration.';
+          : 'Your GP practice can update your name on your health record. They may ask to see a copy of your deed poll or statutory declaration.';
         nhsDet = (isBoth || isGender)
           ? `<p>Health and Social Care Northern Ireland (HSCNI) is administered separately from NHS England and NHS Scotland. Administrative records are managed by the Business Services Organisation (BSO).</p>
 <p>Updating a gender marker on HSCNI records is generally treated as a self-declaration process. A new Health and Care Number (HCN) may be issued, and the previous record sealed for privacy.</p>
@@ -1741,7 +1837,7 @@ function buildSharedPlan(p) {
 <p><strong>Non-binary gender markers:</strong> It is possible to request that your gender marker be recorded as "Indeterminate", which may show up as "Not specified" in some HSCNI systems. Speak to your GP practice if this applies to you, as support varies across trusts and systems.</p>
 <a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a>
 <a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>`
-          : `<p>For a name-only change, your GP practice contacts the Business Services Organisation (BSO) on your behalf. They will need to see a copy of your deed poll or statutory declaration. Your Health and Care Number stays the same.</p>
+          : `<p>For a name-only change, your GP practice contacts the Business Services Organisation (BSO) on your behalf. They may ask to see a copy of your deed poll or statutory declaration. Your Health and Care Number stays the same.</p>
 <a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a>`;
       } else {
         nhsTitle = 'NHS records';
@@ -1758,9 +1854,9 @@ function buildSharedPlan(p) {
       const isScot = p.region === REGION.SCOT;
       addStep(li('newgp', easy, cost('Free','badge-green'), 'Register with a new GP',
         isNI
-          ? 'Register at a new HSCNI GP practice using your new name and correct gender marker from the start. A new Health and Care Number will be issued.'
+          ? 'Register at a new HSCNI GP practice using your new name and correct gender marker from the start. A new Health and Care Number may be issued.'
           : isScot
-          ? 'Register at a new GP practice using your new name and correct gender marker from the start. A new CHI number will be issued.'
+          ? 'Register at a new GP practice using your new name and correct gender marker from the start. A new CHI number may be issued.'
           : 'Register at a new GP practice using your new name and gender marker from the start.',
         isNI
           ? `<p>When you register at a new HSCNI practice, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, the Business Services Organisation (BSO) will issue a new Health and Care Number. Your previous record will be sealed. Because records do not automatically update across HSCNI trusts, let any hospital departments you use know about the new HCN.</p><p><strong>⚠️ Screening note:</strong> Your HCN determines which HSCNI screening programmes you are automatically invited to. Ask your new GP to check you are enrolled in the programmes right for your body.</p><a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a><a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>`
@@ -1775,15 +1871,13 @@ function buildSharedPlan(p) {
           `The Driver &amp; Vehicle Agency (DVA) handles driving licences in Northern Ireland. The DVA has its own process for updating gender markers, which differs from the DVLA in Great Britain. The NI Direct links below have the current details.`,
           `<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>
 <p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p>
-<p><strong>Vehicle logbook (V5C):</strong> If you own a vehicle, remember to update your vehicle logbook too. It is a separate process and failing to keep it updated can result in an expensive fine.</p>
 <a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>
-<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>
-<a href="https://www.gov.uk/change-name-v5c" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name on your vehicle log book (V5C)</a>`
+<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>`
         ));
       } else {
         addStep(li('dvla', medium, splitCost('Free','£','success','simultaneous'), 'Driving licence',
-          'The DVLA handles driving licence updates. Your gender marker is stored in the number on your licence and will update automatically as part of the process. You can also use the title Mx on your driving licence.',
-          `<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><p><strong>Vehicle logbook (V5C):</strong> If you own a vehicle, remember to update your vehicle logbook too. It is a separate process and failing to keep it updated can result in an expensive fine.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a><a href="https://www.gov.uk/change-name-v5c" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name on your vehicle log book (V5C)</a>`
+          'The DVLA handles driving licence updates. Your gender marker is stored in the number on your licence and should update as part of the process. You can also use the title Mx on your driving licence.',
+          `<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>`
         ));
       }
     }
@@ -1822,13 +1916,13 @@ function buildSharedPlan(p) {
         addStep(li('dbs', medium, cost('Free','badge-green'), 'AccessNI checks',
           'Northern Ireland uses AccessNI rather than the DBS. There is a sensitive applications route that keeps your previous name off the certificate shown to your employer. <strong>It is important to contact AccessNI before any application is started.</strong>',
           `<p>Northern Ireland does not use the Disclosure and Barring Service (DBS). All criminal background checks are conducted by AccessNI.</p>
-<p>AccessNI has a sensitive applications route for trans applicants. This needs to be arranged <strong>before</strong> any online application is submitted. If previous names are entered on the standard form, they will appear on the certificate given to the employer.</p>
+<p>AccessNI has a sensitive applications route for trans applicants. This route should be set up <strong>before</strong> any online application is submitted. If previous names are entered on the standard form, they may appear on the certificate given to the employer.</p>
 <p>You can contact the AccessNI Operations Manager privately beforehand to give your previous names in confidence. AccessNI then runs the background check and issues a certificate showing only your current name. Contact details are on the NI Direct page linked below.</p>
 <a href="https://www.nidirect.gov.uk/contacts/accessni" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: AccessNI</a>`
         ));
       } else {
         addStep(li('dbs', medium, cost('Free','badge-green'), 'DBS checks',
-          'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. <strong>This needs to be arranged before any application is started.</strong>',
+          'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. <strong>This route should be set up before any application is started.</strong>',
           `<p>The DBS sensitive applications route means your previous name and gender are shared only with the DBS, not shown on the certificate given to your employer. This needs to be arranged <strong>before</strong> an application is submitted. A few days' notice is usually enough.</p><p>You can contact the DBS Sensitive Applications Team directly to set this up. Contact details are on the GOV.UK page linked below.</p><a href="https://www.gov.uk/guidance/transgender-applications" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: DBS transgender applications</a>`
         ));
       }
@@ -1873,17 +1967,7 @@ function buildSharedPlan(p) {
       const bankNote = !p.photoID
         ? '<span class="note" style="display:inline;color:var(--urgent);">Because you do not have a photo ID right now, high-street banks might say no. It is often best to get your updated driving licence first.</span>'
         : '<span class="note" style="display:inline;">If they say no, go back later when you have your updated driving licence.</span>';
-      const svcLabels = {
-        banks:     'Banks and financial accounts',
-        insurance: 'Insurance policies',
-        council:   'Council Tax',
-        utilities: 'Utility bills',
-        electoral: 'Electoral register',
-        landlord:  'Landlord or letting agency',
-        pension:   'Pension provider',
-        mortgage:  'Mortgage or home loan lender',
-        mobile:    'Mobile or phone contract',
-      };
+      const svcLabels = Object.fromEntries(SERVICES_OPTIONS.map(o => [o.value, o.label.split(' (')[0]]));
       const svcDetails = {
         banks:     `<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Most banks should accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. ${!p.photoID ? '<strong>Because you do not have photo ID right now, high-street banks might say no. Getting your updated driving licence first can help.</strong>' : 'If they say no, go back later when you have your updated driving licence.'} Some digital banks allow name changes through their apps without needing updated photo ID.</p><p><strong>If you are 16 or 17:</strong> Some banks may ask for a parent or guardian to be present or to countersign, even though an unenrolled deed poll does not normally require this. If this happens, try a different branch or contact the bank directly to complain.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>`,
         insurance: `<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>`,
@@ -1917,6 +2001,12 @@ function buildSharedPlan(p) {
           expandedDetails
         ));
       }
+    }
+    if (!isGender && p.vehicle) {
+      addStep(li('v5c', easy, cost('Free','badge-green'), 'Vehicle logbook (V5C)',
+        `Update your V5C with the ${isNI ? 'DVA' : 'DVLA'} to show your new name.`,
+        `<p><strong>Vehicle logbook (V5C):</strong> The V5C is the document that records the registered keeper of a vehicle. You can notify the ${isNI ? 'Driver &amp; Vehicle Agency (DVA)' : 'DVLA'} of your name change by sending your current V5C with a covering letter, or by completing the relevant section online. There is no fee for a name change.</p><p>This is a separate process from updating your driving licence — even if your licence is already updated, the V5C is held on a different record and will need to be updated separately.</p><a href="https://www.gov.uk/change-name-v5c" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name on your vehicle log book (V5C)</a>`
+      ));
     }
   };
   if (splitMiddle) {
@@ -1957,7 +2047,7 @@ function buildSharedPlan(p) {
       }
       if (!p.visaAlreadyUpdated) {
         addStep(li('evisa', medium, cost('Free','badge-green'), 'UK eVisa and UKVI',
-          'UKVI will need to be notified of any change to your name or gender marker.',
+          'UKVI should be notified of any change to your name or gender marker.',
           `<p>If your home country does not allow gender marker changes on passports, it may be possible to apply to the UK Home Office for an exemption to update the UK eVisa directly. This is a more complex process and organisations like Rainbow Migration can help.</p><p><strong>⚠️ Travel note:</strong> It is important that the name on any travel ticket matches your passport. Border Force and airlines may also check documents such as your eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/government/organisations/uk-visas-and-immigration" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: UK Visas and Immigration (UKVI)</a><a href="https://www.rainbowmigration.org.uk/" target="_blank" rel="noopener noreferrer" class="links">🔗 Rainbow Migration</a>`
         ));
       }
@@ -2259,7 +2349,8 @@ function checkAllDone() {
 function updateNextStep() {
   const placeholders = document.querySelectorAll('.next-step-placeholder');
   if (!placeholders.length) return;
-  let foundFirst = false, announcedLabel = '';
+  document.querySelectorAll('.next-step-highlight').forEach(el => el.classList.remove('next-step-highlight'));
+  let foundFirst = false, announcedLabel = '', foundFirstStep = false;
   placeholders.forEach(p => {
     const phase = p.closest('.phase');
     if (!phase) { p.innerHTML = ''; return; }
@@ -2275,6 +2366,18 @@ function updateNextStep() {
       foundFirst = true;
     } else { p.innerHTML = ''; }
   });
+  const allBtns = document.querySelectorAll('.step-state-btn[data-track-id]');
+  for (const btn of allBtns) {
+    const s = getStepState(btn.dataset.trackId);
+    if (s !== 2 && s !== 3) {
+      const planItem = btn.closest('.plan-item');
+      if (planItem && !planItem.classList.contains('collapsed-step')) {
+        planItem.classList.add('next-step-highlight');
+        foundFirstStep = true;
+      }
+      if (foundFirstStep) break;
+    }
+  }
   if (announcedLabel) announce(`Your next step is: ${announcedLabel}`);
 }
 function refreshPlan() {
@@ -2318,6 +2421,15 @@ function refreshPlan() {
       else phase.classList.remove('collapsed-phase');
     }
   });
+  const focusBadge = gel('focusCountBadge');
+  const focusBtn = gel('focusToggleBtn');
+  if (focusBadge && focusBtn) {
+    const hiddenCount = document.querySelectorAll('.plan-item.collapsed-step, .phase.collapsed-phase').length;
+    focusBadge.textContent = hiddenCount > 0 ? `${hiddenCount} hidden` : '';
+    if (focusMode) {
+      focusBtn.setAttribute('aria-label', `Focus mode: on, ${hiddenCount} item${hiddenCount !== 1 ? 's' : ''} hidden`);
+    }
+  }
   checkAllDone();
   updateNextStep();
 }
@@ -2386,6 +2498,11 @@ window.onload = () => {
     if (cb) cb.checked = true;
     gel('startWizardBtn').disabled    = false;
     gel('startChecklistBtn').disabled = false;
+  }
+  const disclaimerEl = gel('footerDisclaimer');
+  if (disclaimerEl && ssg('disclaimerSeen') !== '1') {
+    disclaimerEl.open = true;
+    disclaimerEl.addEventListener('toggle', () => { if (!disclaimerEl.open) sss('disclaimerSeen', '1'); }, { once: true });
   }
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
