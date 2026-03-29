@@ -103,9 +103,15 @@ This project is built and maintained by one person. Contributions that improve a
 - Welsh language support
 
 **Tech stack**
-- HTML, CSS, JS. No dependancies or external calls.
+- HTML, CSS, JS. No dependencies or external calls.
 - Single file application.
-- Tests using Playwright for WCAG compliance.
+- End-to-end tests using Playwright.
+
+**Running tests**
+```
+npm install
+npm test
+```
 
 Please [open an issue](../../issues) before starting significant work so we can discuss the approach.
 
