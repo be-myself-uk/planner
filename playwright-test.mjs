@@ -382,7 +382,7 @@ console.log('\n16. Share URL age gate guard');
 {
   const { page, ctx } = await newPage();
   // Use current schema version so the link is valid (not outdated)
-  const shareData = btoa(JSON.stringify({v:1774576800,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
+  const shareData = btoa(JSON.stringify({v:1774749697,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
   const url = `file:///home/claude/index.html?p=${shareData}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
