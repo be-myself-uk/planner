@@ -203,6 +203,13 @@
   .phase-header h3 { margin:0; }
   .badge-time { display:inline-flex; align-items:center; gap:5px; background:var(--badge-bg); color:var(--text); padding:4px 10px; border-radius:12px; font-size:0.8em; font-weight:bold; border:1px solid var(--badge-border); }
   .badge-next { display:inline-block; background:var(--primary); color:var(--text-invert); padding:3px 8px; border-radius:4px; font-size:0.75em; font-weight:bold; text-transform:uppercase; margin-bottom:5px; }
+  .focus-count-badge { display:none; font-size:0.65rem; font-weight:bold; background:var(--text); color:var(--bg); border-radius:9px; padding:1px 5px; margin-left:3px; vertical-align:middle; }
+  [aria-pressed="true"] .focus-count-badge { display:inline; }
+  .next-step-highlight { outline:2px solid var(--primary); outline-offset:2px; border-radius:4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .next-step-highlight { animation:nextStepPulse 2s ease-in-out infinite; }
+    @keyframes nextStepPulse { 0%,100% { outline-color:var(--primary); } 50% { outline-color:transparent; } }
+  }
   .item-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold; border:1px solid; margin-right:6px; margin-bottom:4px; }
   .badge-green { background:var(--success-bg); color:var(--success); border-color:var(--success); }
   .badge-yellow { background:var(--simultaneous-bg); color:var(--simultaneous); border-color:var(--simultaneous); }
@@ -284,6 +291,12 @@
   #helpModalBody { padding:20px; overflow-y:auto; font-size:0.95em; color:var(--text); line-height:1.7; }
   #helpModalBody p { margin:0 0 16px 0; }
   #helpModalBody p:last-child { margin-bottom:0; }
+  #helpModalBody h3 { margin:16px 0 8px 0; font-size:1em; }
+  .shortcut-table { border-collapse:collapse; width:100%; margin:0.5rem 0; }
+  .shortcut-table td { padding:4px 8px; vertical-align:top; }
+  .shortcut-table td:first-child { white-space:nowrap; padding-right:12px; }
+  .shortcut-table tr:not(:last-child) td { border-bottom:1px solid var(--border); }
+  kbd { display:inline-block; padding:1px 5px; border:1px solid var(--text); border-radius:3px; font-family:monospace; font-size:0.85em; background:var(--bg-light); }
   #liveRegion { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
   .plan-cost-item { margin:0 0 6px 16px; }
   .plan-top-details { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
@@ -364,7 +377,7 @@
           <button class="ub-icon-btn" onclick="makeChanges()" aria-label="Make changes to answers" title="Make changes"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
           <div class="ub-sep" aria-hidden="true"></div>
           <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">⟲</span></button>
-          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span></button>
+          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
           <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy shareable link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
           <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
         </div>
@@ -395,7 +408,18 @@
         <p><strong>How does it work?</strong><br>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal action plan for you, with clear information and links to official resources.</p>
         <p><strong>Step-by-step questions or the checklist?</strong><br>Both options produce the same plan. The step-by-step wizard shows one question at a time which is good if you are not sure where to start. The checklist shows all questions at once, and this is good if you already know your situation well. You can switch between them at any time as well.</p>
         <p><strong>Is my information safe?</strong><br>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page.</p>
-        <p style="margin-bottom:0;"><strong>Is this legal, medical, or financial advice?</strong><br>No. This planner gives general guidance only. It helps you understand the steps and paperwork needed to update your legal documents. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+        <p><strong>Is this legal, medical, or financial advice?</strong><br>No. This planner gives general guidance only. It helps you understand the steps and paperwork needed to update your legal documents. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+        <h3>Keyboard shortcuts</h3>
+        <table class="shortcut-table" aria-label="Keyboard shortcuts">
+          <tbody>
+            <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
+            <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
+            <tr><td>Click step</td><td>Cycle state forward: not started → in progress → done → not needed</td></tr>
+            <tr><td>Right-click or long-press step</td><td>Cycle state backward</td></tr>
+            <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Quick exit — leaves the page immediately</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -2259,7 +2283,8 @@ function checkAllDone() {
 function updateNextStep() {
   const placeholders = document.querySelectorAll('.next-step-placeholder');
   if (!placeholders.length) return;
-  let foundFirst = false, announcedLabel = '';
+  document.querySelectorAll('.next-step-highlight').forEach(el => el.classList.remove('next-step-highlight'));
+  let foundFirst = false, announcedLabel = '', foundFirstStep = false;
   placeholders.forEach(p => {
     const phase = p.closest('.phase');
     if (!phase) { p.innerHTML = ''; return; }
@@ -2275,6 +2300,18 @@ function updateNextStep() {
       foundFirst = true;
     } else { p.innerHTML = ''; }
   });
+  const allBtns = document.querySelectorAll('.step-state-btn[data-track-id]');
+  for (const btn of allBtns) {
+    const s = getStepState(btn.dataset.trackId);
+    if (s !== 2 && s !== 3) {
+      const planItem = btn.closest('.plan-item');
+      if (planItem && !planItem.classList.contains('collapsed-step')) {
+        planItem.classList.add('next-step-highlight');
+        foundFirstStep = true;
+      }
+      if (foundFirstStep) break;
+    }
+  }
   if (announcedLabel) announce(`Your next step is: ${announcedLabel}`);
 }
 function refreshPlan() {
@@ -2318,6 +2355,15 @@ function refreshPlan() {
       else phase.classList.remove('collapsed-phase');
     }
   });
+  const focusBadge = gel('focusCountBadge');
+  const focusBtn = gel('focusToggleBtn');
+  if (focusBadge && focusBtn) {
+    const hiddenCount = document.querySelectorAll('.plan-item.collapsed-step, .phase.collapsed-phase').length;
+    focusBadge.textContent = hiddenCount > 0 ? `${hiddenCount} hidden` : '';
+    if (focusMode) {
+      focusBtn.setAttribute('aria-label', `Focus mode: on, ${hiddenCount} item${hiddenCount !== 1 ? 's' : ''} hidden`);
+    }
+  }
   checkAllDone();
   updateNextStep();
 }
