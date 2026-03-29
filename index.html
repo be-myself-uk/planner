@@ -21,7 +21,7 @@
 </script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><defs><clipPath id=%22l%22><polygon points=%220,0 32,0 0,32%22/></clipPath><clipPath id=%22r%22><polygon points=%2232,0 32,32 0,32%22/></clipPath></defs><g clip-path=%22url(%23l)%22><rect y=%220%22 width=%2232%22 height=%226.4%22 fill=%22%235bcefa%22/><rect y=%226.4%22 width=%2232%22 height=%226.4%22 fill=%22%23f5a9b8%22/><rect y=%2212.8%22 width=%2232%22 height=%226.4%22 fill=%22%23fff%22/><rect y=%2219.2%22 width=%2232%22 height=%226.4%22 fill=%22%23f5a9b8%22/><rect y=%2225.6%22 width=%2232%22 height=%226.4%22 fill=%22%235bcefa%22/></g><g clip-path=%22url(%23r)%22><rect y=%220%22 width=%2232%22 height=%228%22 fill=%22%23fcf434%22/><rect y=%228%22 width=%2232%22 height=%228%22 fill=%22%23fff%22/><rect y=%2216%22 width=%2232%22 height=%228%22 fill=%22%239c59d1%22/><rect y=%2224%22 width=%2232%22 height=%228%22 fill=%22%232c2c2c%22/></g></svg>">
 <script>
-  try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e) {}
+  try { const t = localStorage.getItem('theme'); document.documentElement.setAttribute('data-theme', t || (window.matchMedia?.('(prefers-color-scheme:dark)').matches ? 'dark' : 'light')); } catch(e) {}
 </script>
 <style>
   :root {
@@ -57,25 +57,6 @@
     --phase-1:#F7A8B8; --phase-1-bg:#3b2529;
     --phase-2:#FCF434; --phase-2-bg:#3b3320;
     --phase-3:#9C59D1; --phase-3-bg:#2a1e3b;
-  }
-  @media (prefers-color-scheme:dark) {
-    :root:not([data-theme="light"]) {
-      --primary:#8ab4f8; --primary-hover:#aecbfa;
-      --bg-main:#000000; --bg-card:#121212; --bg-light:#202124;
-      --bg-details:#18191a; --bg-details-hover:#2d2f31;
-      --border:#3c4043; --text:#e8eaed; --text-muted:#9aa0a6; --text-invert:#202124;
-      --badge-bg:#303134; --badge-border:#5f6368;
-      --urgent:#f28b82; --urgent-bg:#3c2a28;
-      --simultaneous:#fde293; --simultaneous-bg:#3b3320;
-      --success:#81c995; --success-bg:#1e3323;
-      --info:#8ab4f8; --info-bg:#1e2a3b;
-      --disabled:#303134; --disabled-text:#9aa0a6;
-      --disclaimer-muted:#9aa0a6;
-      --phase-0:#55CDFC; --phase-0-bg:#1a2e3b;
-      --phase-1:#F7A8B8; --phase-1-bg:#3b2529;
-      --phase-2:#FCF434; --phase-2-bg:#3b3320;
-      --phase-3:#9C59D1; --phase-3-bg:#2a1e3b;
-    }
   }
   .ub-group { display:flex; gap:8px; align-items:center; }
   .ub-sep { width:1px; height:28px; background:var(--border); margin:0 4px; flex-shrink:0; }
@@ -367,11 +348,6 @@
     This planner requires JavaScript to work properly. Please enable JavaScript in your browser to continue.
   </div>
 </noscript>
-<script>
-  if (typeof window.URLSearchParams === 'undefined' || typeof document.documentElement.style.setProperty === 'undefined') {
-    document.write('<div style="text-align:center;padding:20px;background:#fce8e6;color:#c5221f;border-bottom:2px solid #c5221f;font-weight:bold;">Your browser is too old to run this planner. Please update your browser to use this tool.</div>');
-  }
-</script>
 <a class="skip-link" href="#mainContent">Skip to main content</a>
 <div id="liveRegion" aria-live="polite" aria-atomic="true"></div>
 <header class="hero">
@@ -544,15 +520,13 @@
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <div id="wrapDrivingLicence" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
       <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated"> Updated</label>
       <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none" checked> I don't have one</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     <div id="wrapPassport" style="background:var(--bg-light);padding:15px;border-radius:8px;border:1px solid var(--border);margin:10px 0;">
       <p style="display:flex;align-items:center;margin:0 0 8px 0;font-weight:bold;color:var(--text);">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> Updated</label>
       <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
-      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none" checked> I don't have one</label>
+      <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
@@ -803,8 +777,8 @@ function loadUrlParams(d) {
   gel('chkVisa').checked         = d.visa === true;
   gel('chkNHS').checked          = d.nhs  === true;
   gel('chkHMRC').checked         = d.hmrc === true;
-  const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : (d.dl === 'updated' || d.dl === true) ? 'updated' : 'none';
-  const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : (d.pass === 'updated' || d.pass === true) ? 'updated' : 'none';
+  const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : 'updated';
+  const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : 'updated';
   const _dlUrlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlUrlVal}"]`);
   const _ppUrlR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppUrlVal}"]`);
   if (_dlUrlR) _dlUrlR.checked = true;
@@ -867,6 +841,34 @@ function handleUrlLoad(params) {
     syncChecklistToWizard();
     generateChecklistPlan();
   }
+}
+function handleLegacyUrl(params) {
+  const b = k => params.get(k) === 'true';
+  const legacy = {
+    v: 0, reg: REGION.EW,
+    goal: params.get('goal') || S.BOTH,
+    nonUK: b('nonUK'), pid: b('pid'),
+    emp: b('emp') ? 'yes' : 'no',
+    dbs: b('dbs'), stu: false, dp: b('dp'),
+    visa: b('visa'), nhs: b('nhs'),
+    dl: b('dl') ? 'updated' : 'none',
+    hmrc: b('hmrc'),
+    pass: b('pass') ? 'updated' : 'none',
+    grc: b('grc'), newgp: false, dwp: false,
+    bcn: false, bc: false, bni: false, srv: '',
+  };
+  loadUrlParams(legacy);
+  try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+  updateLocks();
+  V.plan.classList.add('hidden');
+  document.body.classList.remove('plan-ready','wizard-active');
+  V.welcome.classList.remove('hidden');
+  gel('welcomeNormal').classList.add('hidden');
+  const outBox = gel('welcomeOutdated');
+  outBox.classList.remove('hidden');
+  outBox.querySelector('h2').textContent = 'Your link is from an older version';
+  outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+  syncChecklistToWizard();
 }
 function copyShareableLink() {
   const w = wizardState;
@@ -946,32 +948,7 @@ function checkAgeGate() {
       handleUrlLoad(params);
     } else if (params.has('goal')) {
       V.start.classList.add('hidden');
-      const b = k => params.get(k) === 'true';
-      const legacy = {
-        v: 0, reg: REGION.EW,
-        goal: params.get('goal') || S.BOTH,
-        nonUK: b('nonUK'), pid: b('pid'),
-        emp: b('emp') ? 'yes' : 'no',
-        dbs: b('dbs'), stu: false, dp: b('dp'),
-        visa: b('visa'), nhs: b('nhs'),
-        dl: b('dl') ? 'updated' : 'none',
-        hmrc: b('hmrc'),
-        pass: b('pass') ? 'updated' : 'none',
-        grc: b('grc'), newgp: false, dwp: false,
-        bcn: false, bc: false, bni: false, srv: '',
-      };
-      loadUrlParams(legacy);
-      try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-      updateLocks();
-      V.plan.classList.add('hidden');
-      document.body.classList.remove('plan-ready','wizard-active');
-      V.welcome.classList.remove('hidden');
-      gel('welcomeNormal').classList.add('hidden');
-      const outBox = gel('welcomeOutdated');
-      outBox.classList.remove('hidden');
-      outBox.querySelector('h2').textContent = 'Your link is from an older version';
-      outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-      syncChecklistToWizard();
+      handleLegacyUrl(params);
     }
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
@@ -985,32 +962,7 @@ function checkAgeGateShared() {
   if (params.has('p')) {
     handleUrlLoad(params);
   } else if (params.has('goal')) {
-    const b = k => params.get(k) === 'true';
-    const legacy = {
-      v: 0, reg: REGION.EW,
-      goal: params.get('goal') || S.BOTH,
-      nonUK: b('nonUK'), pid: b('pid'),
-      emp: b('emp') ? 'yes' : 'no',
-      dbs: b('dbs'), stu: false, dp: b('dp'),
-      visa: b('visa'), nhs: b('nhs'),
-      dl: b('dl') ? 'updated' : 'none',
-      hmrc: b('hmrc'),
-      pass: b('pass') ? 'updated' : 'none',
-      grc: b('grc'), newgp: false, dwp: false,
-      bcn: false, bc: false, bni: false, srv: '',
-    };
-    loadUrlParams(legacy);
-    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-    updateLocks();
-    V.plan.classList.add('hidden');
-    document.body.classList.remove('plan-ready','wizard-active');
-    V.welcome.classList.remove('hidden');
-    gel('welcomeNormal').classList.add('hidden');
-    const outBox = gel('welcomeOutdated');
-    outBox.classList.remove('hidden');
-    outBox.querySelector('h2').textContent = 'Your link is from an older version';
-    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-    syncChecklistToWizard();
+    handleLegacyUrl(params);
   }
 }
 function startWizard() {
@@ -1095,7 +1047,6 @@ function toggleMode() {
     syncChecklistToWizard();
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
     if (step >= questions.length) {
-      // Find the last question the user actually saw
       let last = questions.length - 1;
       while (last > 0 && questions[last].cond && !questions[last].cond()) last--;
       step = last;
@@ -1217,8 +1168,8 @@ function syncWizardToChecklist() {
   gel('chkNHS').checked      = wizardState.nhs         === S.YES;
   gel('chkNewGP').checked    = wizardState.newGP       === S.YES;
   gel('chkHMRC').checked     = wizardState.hmrc        === S.YES;
-  const _dlVal = wizardState.driving  === S.NEEDS_UPDATE ? 'needs_update' : wizardState.driving  === S.UPDATED ? 'updated' : 'none';
-  const _ppVal = wizardState.passport === S.NEEDS_UPDATE ? 'needs_update' : wizardState.passport === S.UPDATED ? 'updated' : 'none';
+  const _dlVal = wizardState.driving  === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
+  const _ppVal = wizardState.passport === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
   const _dlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlVal}"]`);
   const _ppR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppVal}"]`);
   if (_dlR) _dlR.checked = true;
@@ -1323,19 +1274,36 @@ function updateLocks() {
   if (!isNI)       gel('chkBornNI').checked = false;
   if (isName || nhsChecked) gel('chkNewGP').checked = false;
   const shouldLock = !isGender && !hasDeed;
-  ['wrapNHS','wrapHMRC','wrapDrivingLicence','wrapPassport', isNonUK ? 'wrapVisa' : null].forEach(id => {
+  ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
     const wrap = gel(id), cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
     if (shouldLock) {
       wrap.classList.add('locked');
-      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
-      if (id !== 'wrapDrivingLicence' && id !== 'wrapPassport') {
-        cbs.forEach(cb => cb.checked = false);
-      }
+      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); cb.checked = false; });
       if (lock) lock.classList.remove('hidden');
     } else {
       wrap.classList.remove('locked');
       cbs.forEach(cb => { cb.disabled = false; cb.removeAttribute('aria-describedby'); });
+      if (lock) lock.classList.add('hidden');
+    }
+  });
+  ['wrapDrivingLicence','wrapPassport'].forEach(id => {
+    const wrap = gel(id);
+    const lock = wrap.querySelector('.lock-icon');
+    const needsRadio = wrap.querySelector('input[value="needs_update"]');
+    const updatedRadio = wrap.querySelector('input[value="updated"]');
+    if (shouldLock) {
+      wrap.classList.add('locked');
+      needsRadio.disabled = true;
+      needsRadio.setAttribute('aria-describedby','lock-deed-poll-reason');
+      if (needsRadio.checked) { needsRadio.checked = false; updatedRadio.checked = true; }
+      updatedRadio.disabled = false;
+      updatedRadio.removeAttribute('aria-describedby');
+      if (lock) lock.classList.remove('hidden');
+    } else {
+      wrap.classList.remove('locked');
+      needsRadio.disabled = false;
+      needsRadio.removeAttribute('aria-describedby');
       if (lock) lock.classList.add('hidden');
     }
   });
@@ -1357,8 +1325,8 @@ function resetChecklist() {
    'chkBornNI','chkSvcBanks','chkSvcInsurance','chkSvcCouncil','chkSvcUtilities','chkSvcElectoral',
    'chkSvcLandlord','chkSvcPension','chkSvcAll']
     .forEach(id => { gel(id).checked = false; });
-  document.querySelector('input[name="chkDrivingLicenceOpt"][value="none"]').checked = true;
-  document.querySelector('input[name="chkPassportOpt"][value="none"]').checked = true;
+  document.querySelector('input[name="chkDrivingLicenceOpt"][value="updated"]').checked = true;
+  document.querySelector('input[name="chkPassportOpt"][value="updated"]').checked = true;
   updateLocks();
 }
 const questions = [
@@ -1418,12 +1386,12 @@ const questions = [
   { id:'driving', q:'Do you have a UK driving licence?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
       return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not drive or have one']];
-    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.NONE,'No, I do not drive']];
+    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'passport', q:'Do you have a passport?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
       return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not have a passport']];
-    return [[S.UPDATED,'Yes, and it is fully updated'],[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.NONE,'No, I do not have a passport']];
+    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
@@ -1989,7 +1957,7 @@ function buildSharedPlan(p) {
     }
     addStep('</ul></div>');
   }
-  if (hasStep4) {
+  const buildFinalStep = () => {
     const sn = nextStep();
     const isScotland = p.region === REGION.SCOT;
     const grcIntro = isNI
@@ -2048,7 +2016,8 @@ ${isScotland
   ${birthCertItem}
   </ul>
 </div>`);
-  }
+  };
+  if (hasStep4) buildFinalStep();
   if (!stepsHtml) stepsHtml = `<div class="phase success" role="status">
   <h2>🎉 Nothing left to do!</h2>
   <p>Based on your answers, all of your main legal documents and records are already up to date. You should be proud of yourself. Take some time to celebrate!</p>
@@ -2397,7 +2366,7 @@ window.onload = () => {
     const _sd = gel('schemaDate'); if (_sd) _sd.textContent = _d.getUTCDate() + ' ' + _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _cy = gel('schemaCopyYear'); if (_cy) _cy.textContent = _d.getUTCFullYear();
   if (window.matchMedia)
-    window.matchMedia('(prefers-color-scheme:light)').addEventListener('change', () => { if (!ssg('theme')) updateThemeIcon(); });
+    window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', e => { if (!ssg('theme')) { document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); updateThemeIcon(); } });
   if (ssg('ageConfirmed') === 'true') {
     const cb = gel('ageConfirm');
     if (cb) cb.checked = true;
@@ -2430,32 +2399,7 @@ window.onload = () => {
       gel('welcomeNewDevice').classList.remove('hidden');
       return;
     }
-    const b = k => params.get(k) === 'true';
-    const legacy = {
-      v: 0, reg: REGION.EW,
-      goal: params.get('goal') || S.BOTH,
-      nonUK: b('nonUK'), pid: b('pid'),
-      emp: b('emp') ? 'yes' : 'no',
-      dbs: b('dbs'), stu: false, dp: b('dp'),
-      visa: b('visa'), nhs: b('nhs'),
-      dl: b('dl') ? 'updated' : 'none',
-      hmrc: b('hmrc'),
-      pass: b('pass') ? 'updated' : 'none',
-      grc: b('grc'), newgp: false, dwp: false,
-      bcn: false, bc: false, bni: false, srv: '',
-    };
-    loadUrlParams(legacy);
-    try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-    updateLocks();
-    V.plan.classList.add('hidden');
-    document.body.classList.remove('plan-ready','wizard-active');
-    V.welcome.classList.remove('hidden');
-    gel('welcomeNormal').classList.add('hidden');
-    const outBox = gel('welcomeOutdated');
-    outBox.classList.remove('hidden');
-    outBox.querySelector('h2').textContent = 'Your link is from an older version';
-    outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-    syncChecklistToWizard();
+    handleLegacyUrl(params);
     return;
   }
   const savedApp = ssg('appState');

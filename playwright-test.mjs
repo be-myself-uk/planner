@@ -158,8 +158,8 @@ console.log('\n8. Checklist locks');
   // wrappers are disabled — verify via the specific labelled checkboxes.
   assert(await page.getByLabel('NHS record').isDisabled(),     'NHS locked without deed poll');
   assert(await page.getByLabel('HMRC and taxes').isDisabled(), 'HMRC locked without deed poll');
-  assert(await page.locator('#chkDrivingLicenceNone').isDisabled(), 'DL locked without deed poll');
-  assert(await page.locator('#chkPassportNone').isDisabled(),       'Passport locked without deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'DL locked without deed poll');
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(),       'Passport locked without deed poll');
   // Unlock with deed poll
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   assert(await page.getByLabel('NHS record').isEnabled(),     'NHS unlocked after deed poll');
@@ -555,23 +555,26 @@ console.log('\n24. Utility bar');
   await ctx.close();
 }
 
-// ── 25. Locked radios reset to none ──────────────────────────────────────────
-console.log('\n25. Locked radios reset to none');
+// ── 25. Locked radios: needs_update resets, updated stays enabled ─────────────
+console.log('\n25. Locked radios: needs_update resets, updated stays enabled');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
   // Unlock by checking deed poll
   await page.getByLabel(/Deed poll or statutory declaration/).check();
-  // Set passport to "updated"
-  await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
-  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isChecked(), 'passport set to updated');
-  // Set driving licence to "updated"
-  await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').check();
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isChecked(), 'driving licence set to updated');
-  // Uncheck deed poll — sections should lock and reset to "none"
+  // Set passport and DL to "needs_update"
+  await page.locator('input[name="chkPassportOpt"][value="needs_update"]').check();
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isChecked(), 'passport set to needs_update');
+  await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').check();
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isChecked(), 'driving licence set to needs_update');
+  // Uncheck deed poll — needs_update resets to updated; updated radio stays enabled
   await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
-  assert(await page.locator('input[name="chkPassportOpt"][value="none"]').isChecked(), 'passport reset to none when locked');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').isChecked(), 'driving licence reset to none when locked');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isChecked(), 'passport reset to updated when locked');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isChecked(), 'driving licence reset to updated when locked');
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(), 'passport needs_update disabled when locked');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'driving licence needs_update disabled when locked');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isEnabled(), 'passport updated enabled when locked');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isEnabled(), 'driving licence updated enabled when locked');
   await ctx.close();
 }
 
