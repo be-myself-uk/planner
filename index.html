@@ -506,6 +506,8 @@
         <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcElectoral" class="chk-service" onchange="handleSvcItem()"> Electoral register</label>
         <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
         <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
+        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
+        <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
         <label class="option" style="margin:5px 0;border:none;padding:5px;"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
       </div>
@@ -674,6 +676,8 @@ const SVC_MAP = {
   electoral: 'chkSvcElectoral',
   landlord:  'chkSvcLandlord',
   pension:   'chkSvcPension',
+  mortgage:  'chkSvcMortgage',
+  mobile:    'chkSvcMobile',
 };
 const SERVICES_OPTIONS = [
   { value:'banks',    label:'Banks and financial accounts' },
@@ -683,6 +687,8 @@ const SERVICES_OPTIONS = [
   { value:'electoral',label:'Electoral register' },
   { value:'landlord', label:'Landlord or letting agency' },
   { value:'pension',  label:'Pension provider' },
+  { value:'mortgage', label:'Mortgage or home loan lender' },
+  { value:'mobile',   label:'Mobile or phone contract' },
 ];
 let isWizardMode = true;
 let wizardState = {};
@@ -1323,7 +1329,7 @@ function resetChecklist() {
   ['chkPhotoID','chkDBS','chkDWP','chkStudent','chkDeedPoll','chkVisa','chkNHS','chkNewGP',
    'chkHMRC','chkGRC','chkBirthCertName','chkBirthCert',
    'chkBornNI','chkSvcBanks','chkSvcInsurance','chkSvcCouncil','chkSvcUtilities','chkSvcElectoral',
-   'chkSvcLandlord','chkSvcPension','chkSvcAll']
+   'chkSvcLandlord','chkSvcPension','chkSvcMortgage','chkSvcMobile','chkSvcAll']
     .forEach(id => { gel(id).checked = false; });
   document.querySelector('input[name="chkDrivingLicenceOpt"][value="updated"]').checked = true;
   document.querySelector('input[name="chkPassportOpt"][value="updated"]').checked = true;
@@ -1871,15 +1877,19 @@ function buildSharedPlan(p) {
         electoral: 'Electoral register',
         landlord:  'Landlord or letting agency',
         pension:   'Pension provider',
+        mortgage:  'Mortgage or home loan lender',
+        mobile:    'Mobile or phone contract',
       };
       const svcDetails = {
         banks:     `<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Most banks should accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. ${!p.photoID ? '<strong>Because you do not have photo ID right now, high-street banks might say no. Getting your updated driving licence first can help.</strong>' : 'If they say no, go back later when you have your updated driving licence.'} Some digital banks allow name changes through their apps without needing updated photo ID.</p><p><strong>If you are 16 or 17:</strong> Some banks may ask for a parent or guardian to be present or to countersign, even though an unenrolled deed poll does not normally require this. If this happens, try a different branch or contact the bank directly to complain.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>`,
         insurance: `<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>`,
         council:   `<div id="svc_detail_council" class="svc-detail"><p><strong>Council Tax:</strong> Contact your local council. You may need to provide a copy of your deed poll.</p></div>`,
         utilities: `<div id="svc_detail_utilities" class="svc-detail"><p><strong>Utility bills:</strong> Contact each provider directly. Keeping these bills in your new name is also useful as evidence if you later apply for a GRC.</p></div>`,
-        electoral: `<div id="svc_detail_electoral" class="svc-detail"><p><strong>Electoral register:</strong> Contact your local council to update your details. Updating the electoral register is also important for your credit score, as credit reference agencies use it to link your records. If you are not registered to vote, you may find it harder to get a phone contract or a credit card in your new name. If you are worried about the open register, you can opt out of the public version.</p><p><strong>Credit file tip:</strong> A few months after updating your name with your bank and on the electoral register, check your credit report (for example through ClearScore or Experian) to make sure your old and new records have merged. A name change can sometimes create a "split file" that temporarily affects your credit score.</p><a href="https://www.gov.uk/register-to-vote" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Register to vote</a></div>`,
+        electoral: `<div id="svc_detail_electoral" class="svc-detail"><p><strong>Electoral register:</strong> Contact your local council to update your details. Updating the electoral register is also important for your credit score, as credit reference agencies use it to link your records. If you are not registered to vote, you may find it harder to get a phone contract or a credit card in your new name. If you are worried about the open register, you can opt out of the public version.</p><p><strong>Anonymous registration:</strong> If you are concerned about your address being linked to your name publicly, you may be able to apply for an anonymous electoral registration. This keeps your name and address off the published register. The GOV.UK link below has further details.</p><p><strong>Credit file tip:</strong> A few months after updating your name with your bank and on the electoral register, check your credit report (for example through ClearScore or Experian) to make sure your old and new records have merged. A name change can sometimes create a "split file" that temporarily affects your credit score.</p><a href="https://www.gov.uk/register-to-vote" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Register to vote</a><a href="https://www.gov.uk/anonymous-voter-registration" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Anonymous voter registration</a></div>`,
         landlord:  `<div id="svc_detail_landlord" class="svc-detail"><p><strong>Landlord or letting agency:</strong> Your tenancy agreement may show your old name. Ask your landlord or agency to update their records and to issue an updated agreement or letter if possible.</p></div>`,
         pension:   `<div id="svc_detail_pension" class="svc-detail"><p><strong>Pension provider:</strong> Contact your pension provider directly with your deed poll. If your pension is through your employer, your HR team may be able to handle this as part of updating your payroll details.</p></div>`,
+        mortgage:  `<div id="svc_detail_mortgage" class="svc-detail"><p><strong>Mortgage or home loan lender:</strong> Contact your lender directly to update your name on the mortgage account. Your lender holds title deeds and account records separately from your everyday bank accounts, so updating your bank account does not automatically update your mortgage. You may need to provide your deed poll and, in some cases, updated photo ID.</p></div>`,
+        mobile:    `<div id="svc_detail_mobile" class="svc-detail"><p><strong>Mobile or phone contract:</strong> Contact your provider to update your name on the account. Many providers accept a deed poll, but some may ask for updated photo ID as well. If your contract is in credit or your credit file is checked as part of the update, an up-to-date electoral register entry in your new name can help.</p></div>`,
       };
       const allServices = p.services && p.services.length > 0 ? p.services : [];
       if (allServices.length > 0) {
@@ -2374,10 +2384,16 @@ window.onload = () => {
     gel('startChecklistBtn').disabled = false;
   }
   document.addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    const ov = gel('helpOverlay');
-    if (ov && !ov.classList.contains('hidden')) toggleHelp();
-    else panicExit();
+    if (e.key === 'Escape') {
+      const ov = gel('helpOverlay');
+      if (ov && !ov.classList.contains('hidden')) toggleHelp();
+      else panicExit();
+      return;
+    }
+    if (e.key === 'Enter' && V.wizard && !V.wizard.classList.contains('hidden')) {
+      const ae = document.activeElement;
+      if (ae && ae.name === 'ans' && ae.type === 'radio') { e.preventDefault(); nextWizard(); }
+    }
   });
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {

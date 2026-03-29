@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const filePath = 'file:///home/claude/index.html';
+const filePath = process.env.BEMYSELF_URL || 'file:///home/claude/index.html';
 let passed = 0, failed = 0;
 
 function assert(cond, name) {
@@ -8,7 +8,11 @@ function assert(cond, name) {
   else       { console.error(`  ✗ ${name}`); failed++; }
 }
 
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell' });
+const browser = await chromium.launch(
+  process.env.PLAYWRIGHT_EXECUTABLE_PATH
+    ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
+    : {}
+);
 
 async function newPage() {
   const ctx = await browser.newContext();
@@ -335,7 +339,7 @@ console.log('\n15. Shareable link');
       const reg  = isWizardMode ? (w.region || 'ew') : document.querySelector('input[name="chkRegion"]:checked').value;
       const goal = isWizardMode ? w.goal : document.querySelector('input[name="chkGoal"]:checked').value;
       const emp  = isWizardMode ? (w.employment || 'no') : document.querySelector('input[name="chkEmployment"]:checked').value;
-      const SVC_MAP = {banks:'chkSvcBanks',insurance:'chkSvcInsurance',council:'chkSvcCouncil',utilities:'chkSvcUtilities',electoral:'chkSvcElectoral',landlord:'chkSvcLandlord',pension:'chkSvcPension'};
+      const SVC_MAP = {banks:'chkSvcBanks',insurance:'chkSvcInsurance',council:'chkSvcCouncil',utilities:'chkSvcUtilities',electoral:'chkSvcElectoral',landlord:'chkSvcLandlord',pension:'chkSvcPension',mortgage:'chkSvcMortgage',mobile:'chkSvcMobile'};
       const srv = isWizardMode
         ? (Array.isArray(w.services) ? w.services.join(',') : '')
         : Object.entries(SVC_MAP).filter(([,id]) => document.getElementById(id)?.checked).map(([v]) => v).join(',');
@@ -383,7 +387,7 @@ console.log('\n16. Share URL age gate guard');
   const { page, ctx } = await newPage();
   // Use current schema version so the link is valid (not outdated)
   const shareData = btoa(JSON.stringify({v:1774749697,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
-  const url = `file:///home/claude/index.html?p=${shareData}`;
+  const url = `${filePath}?p=${shareData}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
   // Without age confirmation: startView hidden, welcomeNewDevice shown
@@ -402,7 +406,7 @@ console.log('\n17. Outdated schema link');
 {
   const { page, ctx } = await newPage();
   const shareData = btoa(JSON.stringify({v:100,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
-  const url = `file:///home/claude/index.html?p=${shareData}`;
+  const url = `${filePath}?p=${shareData}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
   // Share URL with no ageConfirmed → shows new device prompt first
@@ -575,6 +579,25 @@ console.log('\n25. Locked radios: needs_update resets, updated stays enabled');
   assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'driving licence needs_update disabled when locked');
   assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isEnabled(), 'passport updated enabled when locked');
   assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isEnabled(), 'driving licence updated enabled when locked');
+  await ctx.close();
+}
+
+// ── 26. Progress restoration from share URL ──────────────────────────────────
+console.log('\n26. Progress restoration from share URL');
+{
+  const { page, ctx } = await newPage();
+  // Plan with dp:true so HMRC step is generated; hmrc:false so it appears in plan; prg marks HMRC as done (state 2)
+  const shareData = btoa(JSON.stringify({v:1774749697,reg:"ew",goal:"name",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,nhs:true,dl:"updated",hmrc:false,pass:"updated",grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:"",prg:{hmrc:2}}));
+  const url = `${filePath}?p=${shareData}`;
+  await page.goto(url);
+  await page.waitForLoadState('domcontentloaded');
+  await page.locator('#ageConfirmShared').check();
+  await page.waitForSelector('#planView:not(.hidden)');
+  assert(await page.isVisible('#planView'), 'plan loads from share URL with progress data');
+  const state = await page.locator('#ssb_trk_hmrc').getAttribute('data-state');
+  assert(state === '2', 'hmrc step restored to done (state 2) from share URL prg');
+  const pressed = await page.locator('#ssb_trk_hmrc').getAttribute('aria-pressed');
+  assert(pressed === 'true', 'hmrc step aria-pressed is true when state is done');
   await ctx.close();
 }
 
