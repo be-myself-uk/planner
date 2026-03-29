@@ -1355,9 +1355,11 @@ const questions = [
     [S.NO,  'No, I am a UK citizen or have settled/pre-settled status'],
     [S.YES, 'Yes, I have a UK visa or eVisa']
   ]},
-  { id:'visaUpdated', q:'Have you already updated your UK visa or eVisa?', cond:() => wizardState.citizen === S.YES, o:() => [
-    [S.YES,'Yes'],[S.NO,'No']
-  ]},
+  { id:'visaUpdated', q:'Have you already updated your UK visa or eVisa?', cond:() => wizardState.citizen === S.YES, o:() => {
+    if (wizardState.deedpoll === S.NO)
+      return [[S.YES,'Yes',true],[S.NO,'No']];
+    return [[S.YES,'Yes'],[S.NO,'No']];
+  }},
   { id:'deedpoll',
     q:() => wizardState.region === REGION.SCOT
       ? 'Do you have a deed poll or statutory declaration for your name change?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">In Scotland, a free unenrolled deed poll is accepted by most organisations. A statutory declaration through the National Records of Scotland is also an option. Your answer helps us work out whether getting one should be your first step.</em>'
@@ -1391,17 +1393,19 @@ const questions = [
   ]},
   { id:'driving', q:'Do you have a UK driving licence?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not drive or have one']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name',true],[S.UPDATED,'No, it is updated or I don\'t have one']];
     return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'passport', q:'Do you have a passport?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.NONE,'No, I do not have a passport']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name',true],[S.UPDATED,'No, it is updated or I don\'t have one']];
     return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
-  { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => [
-    [S.YES,'Yes'],[S.NO,'No']
-  ]},
+  { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => {
+    if (wizardState.deedpoll === S.NO)
+      return [[S.YES,'Yes',true],[S.NO,'No']];
+    return [[S.YES,'Yes'],[S.NO,'No']];
+  }},
   { id:'dwp', q:() => wizardState.region === REGION.NI
     ? 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), or Employment Support Allowance. Updating your details while claiming benefits can sometimes cause delays.</em>'
     : 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em>',
@@ -1472,8 +1476,8 @@ function renderWizard() {
 </label>`;
   } else {
     opts.forEach((o, i) => {
-      const checked  = wizardState[q.id] === o[0] ? 'checked' : '';
       const disabled = o[2] ? 'disabled' : '';
+      const checked  = !o[2] && wizardState[q.id] === o[0] ? 'checked' : '';
       const locked   = o[2] ? 'locked' : '';
       const note     = o[2] ? '<span class="visually-hidden"> – not yet available</span>' : '';
       html += `<label class="option ${locked}" for="opt_${q.id}_${i}">

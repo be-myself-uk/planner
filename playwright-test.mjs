@@ -669,6 +669,43 @@ console.log('\n26. Progress restoration from share URL');
   await ctx.close();
 }
 
+// ── 28. Disabled wizard option is never checked ──────────────────────────────
+console.log('\n28. Disabled wizard option is never checked');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  // Set wizardState with deedpoll=no and driving=needs_update, then navigate to driving question
+  await page.evaluate(() => {
+    wizardState = { goal: 'name', region: 'ew', deedpoll: 'no', driving: 'needs_update' };
+    step = questions.findIndex(q => q.id === 'driving');
+    renderWizard();
+  });
+  const needsUpdateInput = page.locator('input[name="ans"][value="needs_update"]');
+  const updatedInput = page.locator('input[name="ans"][value="updated"]');
+  assert(await needsUpdateInput.isDisabled(), 'driving needs_update is disabled when no deed poll');
+  assert(!await needsUpdateInput.isChecked(), 'driving needs_update is NOT checked when disabled');
+  assert(!await updatedInput.isDisabled(), 'driving updated is NOT disabled when no deed poll');
+  await ctx.close();
+}
+
+// ── 29. HMRC Yes disabled in wizard without deed poll ─────────────────────────
+console.log('\n29. HMRC Yes disabled in wizard without deed poll');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  // Set wizardState with deedpoll=no, then navigate to hmrc question
+  await page.evaluate(() => {
+    wizardState = { goal: 'name', region: 'ew', deedpoll: 'no' };
+    step = questions.findIndex(q => q.id === 'hmrc');
+    renderWizard();
+  });
+  const yesInput = page.locator('input[name="ans"][value="yes"]');
+  const noInput  = page.locator('input[name="ans"][value="no"]');
+  assert(await yesInput.isDisabled(), 'hmrc yes is disabled when no deed poll');
+  assert(!await noInput.isDisabled(), 'hmrc no is NOT disabled when no deed poll');
+  await ctx.close();
+}
+
 await browser.close();
 
 console.log(`\n${'─'.repeat(50)}`);
