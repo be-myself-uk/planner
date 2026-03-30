@@ -1228,6 +1228,8 @@ function restartApp() {
   gel('startWizardBtn').disabled = true;
   gel('startChecklistBtn').disabled = true;
   try { window.history.replaceState({}, document.title, window.location.pathname); } catch(e) {}
+  const disclaimerElR = gel('footerDisclaimer');
+  if (disclaimerElR) disclaimerElR.open = true;
   refreshToolbarTabindex();
 }
 function setEmploymentRadio(val) {
@@ -1678,9 +1680,7 @@ function planItemHtml(id, dTag, costTag, title, desc, expanded) {
     node.querySelector('.tmpl-summary').textContent = `More information about: ${title}`;
     node.querySelector('.tmpl-expanded').innerHTML = expanded;
   }
-  const tmp = document.createElement('ul');
-  tmp.appendChild(node);
-  return tmp.innerHTML;
+  return node.firstElementChild.outerHTML;
 }
 function planDiffBadge(cls, label) {
   const span = document.createElement('span');
@@ -2390,7 +2390,7 @@ function updateNextStep() {
         p.textContent = '';
         const badge = document.createElement('span');
         badge.className = 'badge-next';
-        badge.textContent = '➡️ Your next step';
+        badge.innerHTML = '<span aria-hidden="true">➡️</span> Your next step';
         p.appendChild(badge);
       } else {
         p.textContent = '';
@@ -2524,7 +2524,7 @@ window.onload = () => {
     gel('startChecklistBtn').disabled = false;
   }
   const disclaimerEl = gel('footerDisclaimer');
-  if (disclaimerEl && ssg('disclaimerSeen') !== '1') {
+  if (disclaimerEl) {
     disclaimerEl.open = true;
     sss('disclaimerSeen', '1');
   }
