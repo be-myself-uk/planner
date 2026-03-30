@@ -50,6 +50,14 @@ async function wizardNext(page) {
 async function isInputDisabled(page, label) {
   return page.getByLabel(label).isDisabled();
 }
+async function shareUrl(page, data) {
+  return page.evaluate(([d, fp]) => {
+    const obj = Object.assign({ v: window.SCHEMA_VERSION }, d);
+    const bytes = new TextEncoder().encode(JSON.stringify(obj));
+    let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
+    return `${fp}?p=${btoa(bin)}`;
+  }, [data, filePath]);
+}
 
 console.log('\n1. Initial render');
 {
@@ -350,8 +358,7 @@ console.log('\n15. Shareable link');
 console.log('\n16. Share URL age gate guard');
 {
   const { page, ctx } = await newPage();
-  const shareData = btoa(JSON.stringify({v:1774828800,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
-  const url = `${filePath}?p=${shareData}`;
+  const url = await shareUrl(page, {reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""});
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
   assert(await page.isHidden('#startView'),         'start view hidden on share URL without age gate');
@@ -586,8 +593,7 @@ console.log('\n27. Share link encodes step progress (save side)');
 console.log('\n26. Progress restoration from share URL');
 {
   const { page, ctx } = await newPage();
-  const shareData = btoa(JSON.stringify({v:1774828800,reg:"ew",goal:"name",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,nhs:true,dl:"updated",hmrc:false,pass:"updated",grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:"",prg:{hmrc:2}}));
-  const url = `${filePath}?p=${shareData}`;
+  const url = await shareUrl(page, {reg:"ew",goal:"name",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,nhs:true,dl:"updated",hmrc:false,pass:"updated",grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:"",prg:{hmrc:2}});
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
   await page.locator('#ageConfirmShared').check();

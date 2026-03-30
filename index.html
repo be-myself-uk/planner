@@ -1089,26 +1089,10 @@ function continuePlan() {
   focusPlan();
   refreshToolbarTabindex();
 }
-function reviewAnswers() {
-  fadeOutConfetti();
-  V.welcome.classList.add('hidden');
-  V.plan.classList.add('hidden');
-  document.body.classList.remove('plan-ready','wizard-active');
-  V.toggle.style.display = 'flex';
-  isWizardMode = false;
-  updateDerivedState();
-  renderChecklist();
-  updateLocks();
-  V.checklist.classList.remove('hidden');
-  gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
-  window.scrollTo({top:0, behavior:'smooth'});
-  refreshToolbarTabindex();
-}
-function makeChanges() {
+function openChecklist() {
   fadeOutConfetti();
   isWizardMode = false;
-  V.plan.classList.add('hidden');
+  [V.welcome, V.plan].forEach(v => v.classList.add('hidden'));
   V.checklist.classList.remove('hidden');
   V.toggle.style.display = 'flex';
   document.body.classList.remove('plan-ready','wizard-active');
@@ -1116,10 +1100,13 @@ function makeChanges() {
   renderChecklist();
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
+  const introText = gel('checklistIntroText');
+  if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
   window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
+function reviewAnswers() { openChecklist(); }
+function makeChanges()   { openChecklist(); }
 
 function toggleMode() {
   fadeOutConfetti();
@@ -1232,6 +1219,12 @@ function restartApp() {
   if (disclaimerElR) disclaimerElR.open = true;
   refreshToolbarTabindex();
 }
+const CHK_MAP = [
+  ['chkNonUK','citizen'], ['chkVisa','visaUpdated'], ['chkPhotoID','photoID'],
+  ['chkDBS','dbs'], ['chkDWP','dwp'], ['chkStudent','student'], ['chkVehicle','vehicle'],
+  ['chkDeedPoll','deedpoll'], ['chkNHS','nhs'], ['chkNewGP','newGP'], ['chkHMRC','hmrc'],
+  ['chkBirthCertName','birthCertName'], ['chkBirthCert','birthCert'], ['chkBornNI','bornInNI'],
+];
 function setEmploymentRadio(val) {
   gel('chkEmployedNeeds').checked = val === S.NEEDS_UPDATE;
   gel('chkEmployedNo').checked    = val !== S.NEEDS_UPDATE;
@@ -1280,27 +1273,14 @@ function renderChecklist() {
     gel('chkGoalName').checked   = wizardState.goal === S.NAME;
     gel('chkGoalGender').checked = wizardState.goal === S.GENDER;
   }
-  gel('chkNonUK').checked    = wizardState.citizen     === S.YES;
-  gel('chkVisa').checked     = wizardState.visaUpdated === S.YES;
-  gel('chkPhotoID').checked  = wizardState.photoID     === S.YES;
-  gel('chkDBS').checked      = wizardState.dbs         === S.YES;
-  gel('chkDWP').checked      = wizardState.dwp         === S.YES;
-  gel('chkStudent').checked  = wizardState.student     === S.YES;
-  gel('chkVehicle').checked  = wizardState.vehicle     === S.YES;
-  gel('chkDeedPoll').checked = wizardState.deedpoll    === S.YES;
-  gel('chkNHS').checked      = wizardState.nhs         === S.YES;
-  gel('chkNewGP').checked    = wizardState.newGP       === S.YES;
-  gel('chkHMRC').checked     = wizardState.hmrc        === S.YES;
-  const _dlVal = wizardState.driving  === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
-  const _ppVal = wizardState.passport === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
-  const _dlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlVal}"]`);
-  const _ppR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppVal}"]`);
-  if (_dlR) _dlR.checked = true;
-  if (_ppR) _ppR.checked = true;
-  gel('chkGRC').checked      = wizardState.grc === S.YES || wizardState.birthCert === S.YES;
-  gel('chkBirthCertName').checked  = wizardState.birthCertName === S.YES;
-  gel('chkBirthCert').checked      = wizardState.birthCert     === S.YES;
-  gel('chkBornNI').checked         = wizardState.bornInNI      === S.YES;
+  CHK_MAP.forEach(([id, prop]) => { gel(id).checked = wizardState[prop] === S.YES; });
+  const docRadio = (name, state) => {
+    const v = state === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
+    document.querySelector(`input[name="${name}"][value="${v}"]`).checked = true;
+  };
+  docRadio('chkDrivingLicenceOpt', wizardState.driving);
+  docRadio('chkPassportOpt', wizardState.passport);
+  gel('chkGRC').checked = wizardState.grc === S.YES || wizardState.birthCert === S.YES;
   const selected = Array.isArray(wizardState.services) ? wizardState.services : [];
   const allSvcKeys = Object.keys(SVC_MAP);
   Object.entries(SVC_MAP).forEach(([val, id]) => { gel(id).checked = selected.includes(val); });
@@ -1348,18 +1328,20 @@ function updateLocks() {
   const nhsChecked = wizardState.nhs === S.YES;
   const isScot    = region === REGION.SCOT;
   const isNI      = region === REGION.NI;
-  gel('wrapGRC').classList.toggle('hidden', isName);
-  gel('wrapDeedPoll').classList.toggle('hidden', isGender);
-  gel('wrapVisa').classList.toggle('hidden', !isNonUK);
-  gel('wrapDBS').classList.toggle('hidden', !isEmployed);
-  gel('wrapDWP').classList.toggle('hidden', isGender || !isEmployed);
-  gel('wrapHMRC').classList.toggle('hidden', isGender);
-  gel('wrapChkServices').classList.toggle('hidden', isGender);
-  gel('wrapVehicle').classList.toggle('hidden', isGender);
-  gel('wrapBirthCert').classList.toggle('hidden', isName);
-  gel('wrapBirthCertName').classList.toggle('hidden', (!isScot && !isNI) || isGender);
-  gel('wrapNewGP').classList.toggle('hidden', isName || nhsChecked);
-  gel('wrapBornNI').classList.toggle('hidden', !isNI);
+  [
+    ['wrapGRC',           isName],
+    ['wrapDeedPoll',      isGender],
+    ['wrapVisa',          !isNonUK],
+    ['wrapDBS',           !isEmployed],
+    ['wrapDWP',           isGender || !isEmployed],
+    ['wrapHMRC',          isGender],
+    ['wrapChkServices',   isGender],
+    ['wrapVehicle',       isGender],
+    ['wrapBirthCert',     isName],
+    ['wrapBirthCertName', (!isScot && !isNI) || isGender],
+    ['wrapNewGP',         isName || nhsChecked],
+    ['wrapBornNI',        !isNI],
+  ].forEach(([id, hide]) => gel(id).classList.toggle('hidden', hide));
   document.body.setAttribute('data-region', region);
   const shouldLock = !isGender && !hasDeed;
   ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
@@ -2590,27 +2572,14 @@ window.onload = () => {
       if (region) wizardState.region = region.value;
       const goal = document.querySelector('input[name="chkGoal"]:checked');
       if (goal) wizardState.goal = goal.value;
-      wizardState.citizen     = gel('chkNonUK').checked    ? S.YES : S.NO;
-      wizardState.visaUpdated = gel('chkVisa').checked     ? S.YES : S.NO;
-      wizardState.photoID     = gel('chkPhotoID').checked  ? S.YES : S.NO;
+      CHK_MAP.forEach(([id, prop]) => { wizardState[prop] = gel(id).checked ? S.YES : S.NO; });
       const emp = document.querySelector('input[name="chkEmployment"]:checked');
       if (emp) wizardState.employment = emp.value;
-      wizardState.dbs         = gel('chkDBS').checked      ? S.YES : S.NO;
-      wizardState.dwp         = gel('chkDWP').checked      ? S.YES : S.NO;
-      wizardState.student     = gel('chkStudent').checked  ? S.YES : S.NO;
-      wizardState.vehicle     = gel('chkVehicle').checked  ? S.YES : S.NO;
-      wizardState.deedpoll    = gel('chkDeedPoll').checked ? S.YES : S.NO;
-      wizardState.nhs         = gel('chkNHS').checked      ? S.YES : S.NO;
-      wizardState.newGP       = gel('chkNewGP').checked    ? S.YES : S.NO;
-      wizardState.hmrc        = gel('chkHMRC').checked     ? S.YES : S.NO;
       const dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
       wizardState.driving  = dlC ? dlC.value : S.NONE;
       const ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
       wizardState.passport = ppC ? ppC.value : S.NONE;
-      wizardState.grc           = gel('chkGRC').checked          ? S.YES : S.NO;
-      wizardState.birthCertName = gel('chkBirthCertName').checked ? S.YES : S.NO;
-      wizardState.birthCert     = gel('chkBirthCert').checked     ? S.YES : S.NO;
-      wizardState.bornInNI      = gel('chkBornNI').checked        ? S.YES : S.NO;
+      wizardState.grc = gel('chkGRC').checked ? S.YES : S.NO;
       const allTicked = gel('chkSvcAll').checked;
       wizardState.services = allTicked
         ? Object.keys(SVC_MAP)
