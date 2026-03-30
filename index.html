@@ -270,7 +270,7 @@
   details { background:var(--bg-details); border:1px solid var(--border); border-radius:8px; margin-top:10px; overflow:hidden; }
   summary { padding:12px 15px; cursor:pointer; font-size:0.9em; font-weight:bold; color:var(--primary); list-style:none; user-select:none; transition:background 0.2s; }
   summary:hover { background:var(--bg-details-hover); }
-  summary:focus-visible { outline:3px solid var(--primary); outline-offset:-3px; }
+  summary:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
   summary::-webkit-details-marker { display:none; }
   summary::before { content:'▶'; display:inline-block; margin-right:10px; font-size:0.8em; transition:transform 0.2s; }
   details[open] summary::before { transform:rotate(90deg); }
@@ -739,6 +739,18 @@
   </li>
 </template>
 <script>
+(function() {
+function encodeState(obj) {
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+function decodeState(str) {
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
 const SCHEMA_VERSION = 1774749697;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
@@ -884,7 +896,7 @@ function handleUrlLoad(params) {
   V.wizard.classList.add('hidden');
   updateLocks();
   let d;
-  try { d = JSON.parse(atob(params.get('p') || '')); } catch(e) { d = null; }
+  try { d = decodeState(params.get('p') || ''); } catch(e) { d = null; }
   if (!d) {
     V.plan.classList.add('hidden');
     document.body.classList.remove('plan-ready','wizard-active');
@@ -982,7 +994,7 @@ function copyShareableLink() {
   });
   if (Object.keys(prg).length) ps.prg = prg;
   if (focusMode) ps.fm = 1;
-  url.searchParams.set('p', btoa(JSON.stringify(ps)));
+  url.searchParams.set('p', encodeState(ps));
   const text = `Action Plan Link:\n${url}`;
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
@@ -2365,40 +2377,32 @@ function checkAllDone() {
 }
 
 function updateNextStep() {
-  const placeholders = document.querySelectorAll('.next-step-placeholder');
-  if (!placeholders.length) return;
+  const phases = document.querySelectorAll('.phase');
+  if (!phases.length) return;
   document.querySelectorAll('.next-step-highlight').forEach(el => el.classList.remove('next-step-highlight'));
-  let foundFirst = false, announcedLabel = '', foundFirstStep = false;
-  placeholders.forEach(p => {
-    const phase = p.closest('.phase');
-    if (!phase) { p.textContent = ''; return; }
-    const btns = phase.querySelectorAll('.step-state-btn[data-track-id]');
-    const incomplete = btns.length && Array.from(btns).some(btn => {
-      const s = getStepState(btn.dataset.trackId);
-      return s !== 2 && s !== 3;
-    });
-    if (!foundFirst && incomplete) {
-      const h = phase.querySelector('h3');
-      announcedLabel = h ? h.textContent.trim() : 'next step';
-      p.textContent = '';
-      const badge = document.createElement('span');
-      badge.className = 'badge-next';
-      badge.textContent = '➡️ Your next step';
-      p.appendChild(badge);
-      foundFirst = true;
-    } else { p.textContent = ''; }
-  });
-  const allBtns = document.querySelectorAll('.step-state-btn[data-track-id]');
-  for (const btn of allBtns) {
-    const s = getStepState(btn.dataset.trackId);
-    if (s !== 2 && s !== 3) {
-      const planItem = btn.closest('.plan-item');
-      if (planItem && !planItem.classList.contains('collapsed-step')) {
-        planItem.classList.add('next-step-highlight');
-        foundFirstStep = true;
+  let announcedLabel = '', firstIncompleteBtn = null;
+  phases.forEach(phase => {
+    const btns = Array.from(phase.querySelectorAll('.step-state-btn[data-track-id]'));
+    const incompleteBtn = btns.find(btn => { const s = getStepState(btn.dataset.trackId); return s !== 2 && s !== 3; });
+    const p = phase.querySelector('.next-step-placeholder');
+    if (p) {
+      if (!firstIncompleteBtn && incompleteBtn) {
+        const h = phase.querySelector('h3');
+        announcedLabel = h ? h.textContent.trim() : 'next step';
+        p.textContent = '';
+        const badge = document.createElement('span');
+        badge.className = 'badge-next';
+        badge.textContent = '➡️ Your next step';
+        p.appendChild(badge);
+      } else {
+        p.textContent = '';
       }
-      if (foundFirstStep) break;
     }
+    if (!firstIncompleteBtn && incompleteBtn) firstIncompleteBtn = incompleteBtn;
+  });
+  if (firstIncompleteBtn) {
+    const planItem = firstIncompleteBtn.closest('.plan-item');
+    if (planItem && !planItem.classList.contains('collapsed-step')) planItem.classList.add('next-step-highlight');
   }
   if (announcedLabel) announce(`Your next step is: ${announcedLabel}`);
 }
@@ -2620,6 +2624,42 @@ window.onload = () => {
     });
   }
 }
+// Expose state variables needed by tests (V8 exposes top-level let/const to page.evaluate but not IIFE-local ones)
+Object.defineProperty(window, 'wizardState', { get: () => wizardState, set: v => { wizardState = v; }, configurable: true });
+Object.defineProperty(window, 'isWizardMode', { get: () => isWizardMode, set: v => { isWizardMode = v; }, configurable: true });
+Object.defineProperty(window, 'step', { get: () => step, set: v => { step = v; }, configurable: true });
+window.questions      = questions;
+window.SCHEMA_VERSION = SCHEMA_VERSION;
+window.SVC_MAP        = SVC_MAP;
+window.getStepState   = getStepState;
+window.renderWizard   = renderWizard;
+// Expose functions referenced from HTML event attributes
+window.panicExit             = panicExit;
+window.confirmUtilityRestart = confirmUtilityRestart;
+window.makeChanges           = makeChanges;
+window.confirmResetProgress  = confirmResetProgress;
+window.toggleFocusMode       = toggleFocusMode;
+window.copyShareableLink     = copyShareableLink;
+window.toggleMode            = toggleMode;
+window.toggleHelp            = toggleHelp;
+window.closeHelpOnBackdrop   = closeHelpOnBackdrop;
+window.toggleTheme           = toggleTheme;
+window.startWizard           = startWizard;
+window.startChecklist        = startChecklist;
+window.continuePlan          = continuePlan;
+window.confirmRestart        = confirmRestart;
+window.reviewAnswers         = reviewAnswers;
+window.prevWizard            = prevWizard;
+window.nextWizard            = nextWizard;
+window.generateChecklistPlan = generateChecklistPlan;
+window.checkAgeGate          = checkAgeGate;
+window.checkAgeGateShared    = checkAgeGateShared;
+window.updateLocks           = updateLocks;
+window.handleSvcItem         = handleSvcItem;
+window.handleSvcAll          = handleSvcAll;
+window.cycleStepState        = cycleStepState;
+window.reverseStepState      = reverseStepState;
+})();
 </script>
 </body>
 </html>
