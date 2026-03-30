@@ -1637,61 +1637,57 @@ function generateChecklistPlan() {
   focusPlan();
   refreshToolbarTabindex();
 }
-function buildSharedPlan(p) {
-  try {
-  const isGender = p.goal === S.GENDER;
-  const isName   = p.goal === S.NAME;
-  const isBoth   = p.goal === S.BOTH;
-  const isNI     = p.region === REGION.NI;
+function planItemHtml(id, dTag, costTag, title, desc, expanded) {
+  const trackId = `trk_${id}`;
+  const textId  = `text_${trackId}`;
+  const tmpl = document.getElementById('tmpl-plan-item');
+  const node = tmpl.content.cloneNode(true);
+  const btn = node.querySelector('.step-state-btn');
+  btn.id = `ssb_${trackId}`;
+  btn.dataset.trackId   = trackId;
+  btn.dataset.stepLabel = title;
+  btn.setAttribute('onclick', `cycleStepState('${trackId}')`);
+  btn.setAttribute('oncontextmenu', `event.preventDefault();reverseStepState('${trackId}')`);
+  btn.setAttribute('aria-label', `${title}: Not started. Click to cycle forward, right-click or long-press to go back`);
+  btn.title = 'Click to cycle status · Right-click or long-press to go back';
+  btn.querySelector('span').textContent = STATE_ICONS[0];
+  const textDiv = node.querySelector('.tmpl-text');
+  textDiv.id = textId;
+  const strong = node.querySelector('.tmpl-title');
+  strong.id = `${textId}_title`;
+  strong.textContent = title;
+  const badgeDiv = node.querySelector('.tmpl-badges');
+  badgeDiv.innerHTML = dTag + (costTag || '');
+  node.querySelector('.tmpl-desc').innerHTML = desc;
+  const detailsEl = node.querySelector('.tmpl-details');
+  if (expanded) {
+    detailsEl.classList.remove('hidden');
+    node.querySelector('.tmpl-summary').textContent = `More information about: ${title}`;
+    node.querySelector('.tmpl-expanded').innerHTML = expanded;
+  }
+  const tmp = document.createElement('ul');
+  tmp.appendChild(node);
+  return tmp.innerHTML;
+}
+function planDiffBadge(cls, label) { return `<span class="item-badge ${cls}"><span class="visually-hidden">Difficulty: </span>${label}</span>`; }
+const BADGE_EASY   = planDiffBadge('badge-green','Easy');
+const BADGE_MEDIUM = planDiffBadge('badge-yellow','Medium');
+const BADGE_HARD   = planDiffBadge('badge-red','Hard');
+function planNextMarker(id) { return `<div id="next_${id}" class="next-step-placeholder" aria-hidden="true"></div>`; }
+function planCostBadge(label, cls) { return `<span class="item-badge ${cls}"><span class="visually-hidden">Approximate cost: </span>${label}</span>`; }
+function planSplitCostBadge(lo, hi, clsLo, clsHi) { return `<span class="item-badge split-badge" style="background:linear-gradient(135deg,var(--${clsLo}-bg) 50%,var(--${clsHi}-bg) 50%);border-color:var(--${clsLo});"><span class="visually-hidden">Approximate cost: ${lo} to ${hi}</span><span aria-hidden="true" style="padding:0 6px 0 8px;border-right:1px solid var(--border);color:var(--${clsLo});">${lo}</span><span aria-hidden="true" style="padding:0 8px 0 6px;color:var(--${clsHi});">${hi}</span></span>`; }
+function computePlanMeta(p) {
+  const isGender  = p.goal === S.GENDER;
+  const isName    = p.goal === S.NAME;
+  const isNI      = p.region === REGION.NI;
   const isEmployed = p.employment === S.YES || p.employment === S.NEEDS_UPDATE;
-  const diff = (cls, label) => `<span class="item-badge ${cls}"><span class="visually-hidden">Difficulty: </span>${label}</span>`;
-  const easy   = diff('badge-green','Easy');
-  const medium = diff('badge-yellow','Medium');
-  const hard   = diff('badge-red','Hard');
-  const nb = id => `<div id="next_${id}" class="next-step-placeholder" aria-hidden="true"></div>`;
-  const cost = (label, cls) => `<span class="item-badge ${cls}"><span class="visually-hidden">Approximate cost: </span>${label}</span>`;
-  const splitCost = (lo, hi, clsLo, clsHi) => `<span class="item-badge split-badge" style="background:linear-gradient(135deg,var(--${clsLo}-bg) 50%,var(--${clsHi}-bg) 50%);border-color:var(--${clsLo});"><span class="visually-hidden">Approximate cost: ${lo} to ${hi}</span><span aria-hidden="true" style="padding:0 6px 0 8px;border-right:1px solid var(--border);color:var(--${clsLo});">${lo}</span><span aria-hidden="true" style="padding:0 8px 0 6px;color:var(--${clsHi});">${hi}</span></span>`;
-  const li = (id, dTag, costTag, title, desc, expanded) => {
-    const trackId = `trk_${id}`;
-    const textId  = `text_${trackId}`;
-    const tmpl = document.getElementById('tmpl-plan-item');
-    const node = tmpl.content.cloneNode(true);
-    const btn = node.querySelector('.step-state-btn');
-    btn.id = `ssb_${trackId}`;
-    btn.dataset.trackId   = trackId;
-    btn.dataset.stepLabel = title;
-    btn.setAttribute('onclick', `cycleStepState('${trackId}')`);
-    btn.setAttribute('oncontextmenu', `event.preventDefault();reverseStepState('${trackId}')`);
-    btn.setAttribute('aria-label', `${title}: Not started. Click to cycle forward, right-click or long-press to go back`);
-    btn.title = 'Click to cycle status · Right-click or long-press to go back';
-    btn.querySelector('span').textContent = STATE_ICONS[0];
-    const textDiv = node.querySelector('.tmpl-text');
-    textDiv.id = textId;
-    const strong = node.querySelector('.tmpl-title');
-    strong.id = `${textId}_title`;
-    strong.textContent = title;
-    const badgeDiv = node.querySelector('.tmpl-badges');
-    badgeDiv.innerHTML = dTag + (costTag || '');
-    node.querySelector('.tmpl-desc').innerHTML = desc;
-    const detailsEl = node.querySelector('.tmpl-details');
-    if (expanded) {
-      detailsEl.classList.remove('hidden');
-      node.querySelector('.tmpl-summary').textContent = `More information about: ${title}`;
-      node.querySelector('.tmpl-expanded').innerHTML = expanded;
-    }
-    const tmp = document.createElement('ul');
-    tmp.appendChild(node);
-    return tmp.innerHTML;
-  };
   const costs = [];
   if (p.needsPassport) costs.push(isNI ? '<strong>UK passport (if applicable):</strong> A fee applies. Check GOV.UK for current prices.' : '<strong>UK passport:</strong> A fee applies. Check GOV.UK for current prices.');
   if (p.needsDriving)  costs.push(isNI ? '<strong>DVA driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.' : '<strong>Driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.');
   if (p.student)       costs.push('<strong>Replacement certificates:</strong> Costs vary. Some universities issue replacements for free, while some exam boards charge a fee per certificate.');
   if (p.birthCertName && !isNI) costs.push('<strong>Birth certificate name change (Scotland):</strong> A fee applies. Check the NRS website for current prices.');
   if (p.birthCertName && isNI)  costs.push('<strong>GRONI name recording:</strong> A fee applies. Check NI Direct for current prices.');
-  if (p.bornInNI && !isName) {
-    costs.push('<strong>Irish passport (gender change route):</strong> Standard Irish passport fee applies, plus a small solicitor fee for the statutory declaration.');
-  }
+  if (p.bornInNI && !isName)    costs.push('<strong>Irish passport (gender change route):</strong> Standard Irish passport fee applies, plus a small solicitor fee for the statutory declaration.');
   if (p.wantsGRC && !isName) {
     costs.push('<strong>UK GRC application:</strong> A small application fee applies.');
     costs.push('<strong>Medical reports for GRC:</strong> Costs vary widely. A GP letter may be low cost, but a specialist report can be expensive.');
@@ -1702,10 +1698,7 @@ function buildSharedPlan(p) {
   const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !isGender && !p.visaAlreadyUpdated);
   const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (isNI && p.bornInNI && !isName);
-  const midGroups = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length;
-  const splitMiddle = midGroups >= 2;
-  let stepNum = 0;
-  const nextStep = () => ++stepNum;
+  const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
   let baseText = '';
   if (hasStep3)      baseText = 'most steps can be completed within 3–10 weeks';
   else if (hasHealthGroup || hasWorkGroup || hasCivicGroup) baseText = 'most steps can be completed within 1–3 weeks';
@@ -1714,6 +1707,17 @@ function buildSharedPlan(p) {
   if (hasStep4 && isNI && p.bornInNI) timeText = baseText ? `Based on your plan, ${baseText}. The Irish passport route requires 2 years of name-use proof but avoids the longer GRC timeline.` : 'The Irish passport gender-change route requires 2 years of proof that you use your new name.';
   else if (hasStep4) timeText = baseText ? `Based on your plan, ${baseText}. The GRC will take 2 or more years on top of this.` : 'Based on your plan, the GRC will take 2 or more years.';
   else if (baseText) timeText = `Based on your plan, ${baseText}.`;
+  return { isGender, isName, isNI, isEmployed, costs, timeText, hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle };
+}
+function buildSharedPlan(p) {
+  try {
+  const { isGender, isName, isNI, isEmployed, costs, timeText,
+          hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle } = computePlanMeta(p);
+  const isBoth   = p.goal === S.BOTH;
+  const easy = BADGE_EASY, medium = BADGE_MEDIUM, hard = BADGE_HARD;
+  const nb = planNextMarker, cost = planCostBadge, splitCost = planSplitCostBadge, li = planItemHtml;
+  let stepNum = 0;
+  const nextStep = () => ++stepNum;
   let html = '';
   if (costs.length || timeText) {
     let inner = '';
