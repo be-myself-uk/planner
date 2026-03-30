@@ -270,7 +270,7 @@
   details { background:var(--bg-details); border:1px solid var(--border); border-radius:8px; margin-top:10px; overflow:hidden; }
   summary { padding:12px 15px; cursor:pointer; font-size:0.9em; font-weight:bold; color:var(--primary); list-style:none; user-select:none; transition:background 0.2s; }
   summary:hover { background:var(--bg-details-hover); }
-  summary:focus-visible { outline:3px solid var(--primary); outline-offset:-3px; }
+  summary:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
   summary::-webkit-details-marker { display:none; }
   summary::before { content:'▶'; display:inline-block; margin-right:10px; font-size:0.8em; transition:transform 0.2s; }
   details[open] summary::before { transform:rotate(90deg); }
@@ -739,6 +739,18 @@
   </li>
 </template>
 <script>
+(function() {
+function encodeState(obj) {
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+function decodeState(str) {
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
 const SCHEMA_VERSION = 1774749697;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
@@ -848,42 +860,29 @@ function toggleHelp() {
 function closeHelpOnBackdrop(e) { if (e.target === gel('helpOverlay')) toggleHelp(); }
 function panicExit() { window.location.replace('https://www.google.co.uk'); }
 function loadUrlParams(d) {
-  const regRadio = document.querySelector(`input[name="chkRegion"][value="${d.reg || REGION.EW}"]`);
-  if (regRadio) regRadio.checked = true;
-  if ([S.BOTH, S.NAME, S.GENDER].includes(d.goal)) {
-    gel('chkGoalBoth').checked   = d.goal === S.BOTH;
-    gel('chkGoalName').checked   = d.goal === S.NAME;
-    gel('chkGoalGender').checked = d.goal === S.GENDER;
-  }
-  gel('chkNonUK').checked      = d.nonUK === true;
-  gel('chkPhotoID').checked    = d.pid   === true;
-  const emp = ['yes','needs_update','no'].includes(d.emp) ? d.emp : 'no';
-  gel('chkEmployedUpdated').checked = emp === 'yes';
-  gel('chkEmployedNeeds').checked   = emp === 'needs_update';
-  gel('chkEmployedNo').checked      = emp === 'no';
-  gel('chkDBS').checked          = d.dbs  === true;
-  gel('chkStudent').checked      = d.stu  === true;
-  gel('chkDeedPoll').checked     = d.dp   === true;
-  gel('chkVisa').checked         = d.visa === true;
-  gel('chkNHS').checked          = d.nhs  === true;
-  gel('chkHMRC').checked         = d.hmrc === true;
-  const _dlUrlVal = d.dl === 'needs_update' ? 'needs_update' : 'updated';
-  const _ppUrlVal = d.pass === 'needs_update' ? 'needs_update' : 'updated';
-  const _dlUrlR = document.querySelector(`input[name="chkDrivingLicenceOpt"][value="${_dlUrlVal}"]`);
-  const _ppUrlR = document.querySelector(`input[name="chkPassportOpt"][value="${_ppUrlVal}"]`);
-  if (_dlUrlR) _dlUrlR.checked = true;
-  if (_ppUrlR) _ppUrlR.checked = true;
-  gel('chkGRC').checked          = d.grc  === true;
-  gel('chkNewGP').checked        = d.newgp === true;
-  gel('chkDWP').checked          = d.dwp   === true;
-  gel('chkBirthCertName').checked= d.bcn   === true;
-  gel('chkBirthCert').checked    = d.bc    === true;
-  gel('chkBornNI').checked       = d.bni   === true;
-  gel('chkVehicle').checked      = d.veh   === true;
-  const loadedServices = (d.srv || '').split(',').filter(Boolean);
-  Object.entries(SVC_MAP).forEach(([val, id]) => { const cb = gel(id); if (cb) cb.checked = loadedServices.includes(val); });
-  const noneBox = gel('chkSvcAll');
-  if (noneBox) noneBox.checked = Object.keys(SVC_MAP).every(k => loadedServices.includes(k));
+  const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
+  const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? d.emp  : S.NO;
+  wizardState.region      = ['ew','scot','ni'].includes(d.reg) ? d.reg : REGION.EW;
+  wizardState.goal        = validGoal;
+  wizardState.citizen     = d.nonUK === true ? S.YES : S.NO;
+  wizardState.photoID     = d.pid   === true ? S.YES : S.NO;
+  wizardState.employment  = validEmp;
+  wizardState.dbs         = d.dbs   === true ? S.YES : S.NO;
+  wizardState.student     = d.stu   === true ? S.YES : S.NO;
+  wizardState.deedpoll    = d.dp    === true ? S.YES : S.NO;
+  wizardState.visaUpdated = d.visa  === true ? S.YES : S.NO;
+  wizardState.nhs         = d.nhs   === true ? S.YES : S.NO;
+  wizardState.hmrc        = d.hmrc  === true ? S.YES : S.NO;
+  wizardState.driving     = d.dl   === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
+  wizardState.passport    = d.pass === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
+  wizardState.grc         = d.grc   === true ? S.YES : S.NO;
+  wizardState.newGP       = d.newgp === true ? S.YES : S.NO;
+  wizardState.dwp         = d.dwp   === true ? S.YES : S.NO;
+  wizardState.birthCertName = d.bcn === true ? S.YES : S.NO;
+  wizardState.birthCert   = d.bc    === true ? S.YES : S.NO;
+  wizardState.bornInNI    = d.bni   === true ? S.YES : S.NO;
+  wizardState.vehicle     = d.veh   === true ? S.YES : S.NO;
+  wizardState.services    = (d.srv || '').split(',').filter(Boolean);
   if (d.prg && typeof d.prg === 'object') {
     Object.entries(d.prg).forEach(([key, state]) => {
       const s = parseInt(state, 10);
@@ -897,7 +896,7 @@ function handleUrlLoad(params) {
   V.wizard.classList.add('hidden');
   updateLocks();
   let d;
-  try { d = JSON.parse(atob(params.get('p') || '')); } catch(e) { d = null; }
+  try { d = decodeState(params.get('p') || ''); } catch(e) { d = null; }
   if (!d) {
     V.plan.classList.add('hidden');
     document.body.classList.remove('plan-ready','wizard-active');
@@ -907,7 +906,7 @@ function handleUrlLoad(params) {
     outBox.classList.remove('hidden');
     outBox.querySelector('h2').textContent = 'Your link appears to be incomplete';
     outBox.querySelector('p').textContent = 'This link could not be read. Please review your answers below before generating your plan.';
-    syncChecklistToWizard();
+    renderChecklist(); updateLocks();
     return;
   }
   const isValid =
@@ -926,10 +925,10 @@ function handleUrlLoad(params) {
     outBox.querySelector('h2').textContent = 'Your action plan may be out of date';
     outBox.querySelector('p').textContent = 'This planner has been updated since your plan was created. We recommend reviewing your answers to make sure everything is still accurate.';
     loadUrlParams(d);
-    syncChecklistToWizard();
+    renderChecklist(); updateLocks();
   } else {
     loadUrlParams(d);
-    syncChecklistToWizard();
+    renderChecklist(); updateLocks();
     generateChecklistPlan();
   }
 }
@@ -950,7 +949,6 @@ function handleLegacyUrl(params) {
   };
   loadUrlParams(legacy);
   try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
-  updateLocks();
   V.plan.classList.add('hidden');
   document.body.classList.remove('plan-ready','wizard-active');
   V.welcome.classList.remove('hidden');
@@ -959,41 +957,34 @@ function handleLegacyUrl(params) {
   outBox.classList.remove('hidden');
   outBox.querySelector('h2').textContent = 'Your link is from an older version';
   outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
-  syncChecklistToWizard();
+  renderChecklist(); updateLocks();
 }
 function copyShareableLink() {
   const w = wizardState;
-  const chk = id => gel(id)?.checked;
-  const reg  = isWizardMode ? (w.region || REGION.EW) : document.querySelector('input[name="chkRegion"]:checked').value;
-  const goal = isWizardMode ? w.goal : document.querySelector('input[name="chkGoal"]:checked').value;
-  const emp  = isWizardMode ? (w.employment || S.NO) : document.querySelector('input[name="chkEmployment"]:checked').value;
-  const srv = isWizardMode
-    ? (Array.isArray(w.services) ? w.services.join(',') : '')
-    : Object.entries(SVC_MAP).filter(([, id]) => chk(id)).map(([val]) => val).join(',');
   const url = new URL(window.location.href.split('?')[0]);
   const ps = {
-    v: SCHEMA_VERSION, reg, goal,
-    nonUK: isWizardMode ? (w.citizen     === S.YES) : chk('chkNonUK'),
-    pid:   isWizardMode ? (w.photoID     === S.YES) : chk('chkPhotoID'),
-    emp,
-    dbs:   isWizardMode ? (w.dbs         === S.YES) : chk('chkDBS'),
-    stu:   isWizardMode ? (w.student     === S.YES) : chk('chkStudent'),
-    dp:    isWizardMode ? (w.deedpoll    === S.YES) : chk('chkDeedPoll'),
-    visa:  isWizardMode ? (w.visaUpdated === S.YES) : chk('chkVisa'),
-    nhs:   isWizardMode ? (w.nhs         === S.YES) : chk('chkNHS'),
-    dl:    isWizardMode ? (w.driving  === S.NEEDS_UPDATE ? 'needs_update' : w.driving  === S.UPDATED ? 'updated' : 'none')
-                       : (() => { const r = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked'); return r ? r.value : 'none'; })(),
-    hmrc:  isWizardMode ? (w.hmrc        === S.YES) : chk('chkHMRC'),
-    pass:  isWizardMode ? (w.passport === S.NEEDS_UPDATE ? 'needs_update' : w.passport === S.UPDATED ? 'updated' : 'none')
-                        : (() => { const r = document.querySelector('input[name="chkPassportOpt"]:checked'); return r ? r.value : 'none'; })(),
-    grc:   isWizardMode ? (w.grc         === S.YES) : chk('chkGRC'),
-    newgp: isWizardMode ? (w.newGP       === S.YES) : chk('chkNewGP'),
-    dwp:   isWizardMode ? (w.dwp         === S.YES) : chk('chkDWP'),
-    bcn:   isWizardMode ? (w.birthCertName === S.YES) : chk('chkBirthCertName'),
-    bc:    isWizardMode ? (w.birthCert   === S.YES) : chk('chkBirthCert'),
-    bni:   isWizardMode ? (w.bornInNI    === S.YES) : chk('chkBornNI'),
-    veh:   isWizardMode ? (w.vehicle     === S.YES) : chk('chkVehicle'),
-    srv,
+    v: SCHEMA_VERSION,
+    reg:   w.region || REGION.EW,
+    goal:  w.goal,
+    nonUK: w.citizen      === S.YES,
+    pid:   w.photoID      === S.YES,
+    emp:   w.employment   || S.NO,
+    dbs:   w.dbs          === S.YES,
+    stu:   w.student      === S.YES,
+    dp:    w.deedpoll     === S.YES,
+    visa:  w.visaUpdated  === S.YES,
+    nhs:   w.nhs          === S.YES,
+    dl:    w.driving  === S.NEEDS_UPDATE ? 'needs_update' : w.driving  === S.UPDATED ? 'updated' : 'none',
+    hmrc:  w.hmrc         === S.YES,
+    pass:  w.passport === S.NEEDS_UPDATE ? 'needs_update' : w.passport === S.UPDATED ? 'updated' : 'none',
+    grc:   w.grc          === S.YES,
+    newgp: w.newGP        === S.YES,
+    dwp:   w.dwp          === S.YES,
+    bcn:   w.birthCertName === S.YES,
+    bc:    w.birthCert    === S.YES,
+    bni:   w.bornInNI     === S.YES,
+    veh:   w.vehicle      === S.YES,
+    srv:   Array.isArray(w.services) ? w.services.join(',') : '',
   };
   const prg = {};
   document.querySelectorAll('.step-state-btn[data-track-id]').forEach(btn => {
@@ -1003,7 +994,7 @@ function copyShareableLink() {
   });
   if (Object.keys(prg).length) ps.prg = prg;
   if (focusMode) ps.fm = 1;
-  url.searchParams.set('p', btoa(JSON.stringify(ps)));
+  url.searchParams.set('p', encodeState(ps));
   const text = `Action Plan Link:\n${url}`;
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
@@ -1089,7 +1080,7 @@ function nudgeLegend() {
 function continuePlan() {
   V.welcome.classList.add('hidden');
   V.toggle.style.display = 'none';
-  syncWizardToChecklist();
+  renderChecklist();
   updateLocks();
   V.plan.classList.remove('hidden');
   document.body.classList.add('plan-ready');
@@ -1105,11 +1096,11 @@ function reviewAnswers() {
   document.body.classList.remove('plan-ready','wizard-active');
   V.toggle.style.display = 'flex';
   isWizardMode = false;
-  syncWizardToChecklist();
+  renderChecklist();
   updateLocks();
   V.checklist.classList.remove('hidden');
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
+  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
   window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
@@ -1120,10 +1111,10 @@ function makeChanges() {
   V.checklist.classList.remove('hidden');
   V.toggle.style.display = 'flex';
   document.body.classList.remove('plan-ready','wizard-active');
-  syncWizardToChecklist();
+  renderChecklist();
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
+  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
   window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
@@ -1136,7 +1127,6 @@ function toggleMode() {
     V.checklist.classList.add('hidden');
     V.wizard.classList.remove('hidden');
     document.body.classList.add('wizard-active');
-    syncChecklistToWizard();
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
     if (step >= questions.length) {
       let last = questions.length - 1;
@@ -1148,7 +1138,7 @@ function toggleMode() {
     V.wizard.classList.add('hidden');
     V.checklist.classList.remove('hidden');
     document.body.classList.remove('wizard-active');
-    syncWizardToChecklist();
+    renderChecklist();
     updateLocks();
   }
   refreshToolbarTabindex();
@@ -1242,7 +1232,40 @@ function setEmploymentRadio(val) {
   gel('chkEmployedNeeds').checked   = val === S.NEEDS_UPDATE;
   gel('chkEmployedNo').checked      = val === S.NO || !val;
 }
-function syncWizardToChecklist() {
+function updateDerivedState() {
+  const goal     = wizardState.goal || S.BOTH;
+  const region   = wizardState.region || REGION.EW;
+  const isGender = goal === S.GENDER;
+  const isName   = goal === S.NAME;
+  const isNonUK  = wizardState.citizen === S.YES;
+  const empVal   = wizardState.employment || S.NO;
+  const isEmployed = empVal === S.YES || empVal === S.NEEDS_UPDATE;
+  const hasDeed  = wizardState.deedpoll === S.YES;
+  const isScot   = region === REGION.SCOT;
+  const isNI     = region === REGION.NI;
+  const shouldLock = !isGender && !hasDeed;
+  if (isGender) {
+    wizardState.deedpoll = S.NO;
+    wizardState.dwp      = S.NO;
+    wizardState.hmrc     = S.NO;
+    wizardState.services = [];
+    wizardState.vehicle  = S.NO;
+  }
+  if (isName)                          wizardState.birthCert     = S.NO;
+  if ((!isScot && !isNI) || isGender)  wizardState.birthCertName = S.NO;
+  if (!isNI)                           wizardState.bornInNI      = S.NO;
+  if (!isEmployed)                     wizardState.dbs           = S.NO;
+  if (!isNonUK)                        wizardState.visaUpdated   = S.NO;
+  if (shouldLock) {
+    wizardState.nhs  = S.NO;
+    wizardState.hmrc = S.NO;
+    if (isNonUK) wizardState.visaUpdated = S.NO;
+    if (wizardState.driving  === S.NEEDS_UPDATE) wizardState.driving  = S.UPDATED;
+    if (wizardState.passport === S.NEEDS_UPDATE) wizardState.passport = S.UPDATED;
+  }
+  if (isName || wizardState.nhs === S.YES) wizardState.newGP = S.NO;
+}
+function renderChecklist() {
   if (wizardState.region) {
     const r = document.querySelector(`input[name="chkRegion"][value="${wizardState.region}"]`);
     if (r) r.checked = true;
@@ -1279,34 +1302,6 @@ function syncWizardToChecklist() {
   gel('chkSvcAll').checked = allSvcKeys.every(k => selected.includes(k));
   setEmploymentRadio(wizardState.employment);
 }
-function syncChecklistToWizard() {
-  wizardState.region      = document.querySelector('input[name="chkRegion"]:checked').value;
-  wizardState.goal        = document.querySelector('input[name="chkGoal"]:checked').value;
-  wizardState.citizen     = gel('chkNonUK').checked    ? S.YES : S.NO;
-  wizardState.visaUpdated = gel('chkVisa').checked     ? S.YES : S.NO;
-  wizardState.photoID     = gel('chkPhotoID').checked  ? S.YES : S.NO;
-  wizardState.employment  = document.querySelector('input[name="chkEmployment"]:checked').value;
-  wizardState.dbs         = gel('chkDBS').checked      ? S.YES : S.NO;
-  wizardState.dwp         = gel('chkDWP').checked      ? S.YES : S.NO;
-  wizardState.student     = gel('chkStudent').checked  ? S.YES : S.NO;
-  wizardState.vehicle     = gel('chkVehicle').checked  ? S.YES : S.NO;
-  wizardState.deedpoll    = gel('chkDeedPoll').checked ? S.YES : S.NO;
-  wizardState.nhs         = gel('chkNHS').checked      ? S.YES : S.NO;
-  wizardState.newGP       = gel('chkNewGP').checked    ? S.YES : S.NO;
-  wizardState.hmrc        = gel('chkHMRC').checked     ? S.YES : S.NO;
-  const _dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
-  wizardState.driving  = _dlC ? _dlC.value : S.NONE;
-  const _ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
-  wizardState.passport = _ppC ? _ppC.value : S.NONE;
-  wizardState.grc         = gel('chkGRC').checked      ? S.YES : S.NO;
-  wizardState.birthCertName = gel('chkBirthCertName').checked ? S.YES : S.NO;
-  wizardState.birthCert   = gel('chkBirthCert').checked      ? S.YES : S.NO;
-  wizardState.bornInNI    = gel('chkBornNI').checked         ? S.YES : S.NO;
-  const allTicked = gel('chkSvcAll').checked;
-  wizardState.services = allTicked
-    ? Object.keys(SVC_MAP)
-    : Object.entries(SVC_MAP).filter(([, id]) => gel(id).checked).map(([val]) => val);
-}
 function planParamsFromWizard() {
   const isNI = wizardState.region === REGION.NI;
   return {
@@ -1337,15 +1332,15 @@ function planParamsFromWizard() {
   };
 }
 function updateLocks() {
-  const goal      = document.querySelector('input[name="chkGoal"]:checked').value;
-  const region    = document.querySelector('input[name="chkRegion"]:checked').value;
+  const goal      = wizardState.goal || S.BOTH;
+  const region    = wizardState.region || REGION.EW;
   const isGender  = goal === S.GENDER;
   const isName    = goal === S.NAME;
-  const isNonUK   = gel('chkNonUK').checked;
-  const empVal    = document.querySelector('input[name="chkEmployment"]:checked').value;
+  const isNonUK   = wizardState.citizen === S.YES;
+  const empVal    = wizardState.employment || S.NO;
   const isEmployed = empVal === 'yes' || empVal === 'needs_update';
-  const hasDeed   = gel('chkDeedPoll').checked;
-  const nhsChecked = gel('chkNHS').checked;
+  const hasDeed   = wizardState.deedpoll === S.YES;
+  const nhsChecked = wizardState.nhs === S.YES;
   const isScot    = region === REGION.SCOT;
   const isNI      = region === REGION.NI;
   gel('wrapGRC').classList.toggle('hidden', isName);
@@ -1361,23 +1356,13 @@ function updateLocks() {
   gel('wrapNewGP').classList.toggle('hidden', isName || nhsChecked);
   gel('wrapBornNI').classList.toggle('hidden', !isNI);
   document.body.setAttribute('data-region', region);
-  if (isGender)    gel('chkDeedPoll').checked = false;
-  if (!isEmployed) gel('chkDBS').checked      = false;
-  if (!isNonUK)    gel('chkVisa').checked     = false;
-  if (isGender)    gel('chkDWP').checked      = false;
-  if (isGender)    gel('chkHMRC').checked     = false;
-  if (isGender)    { document.querySelectorAll('.chk-service').forEach(c => c.checked = false); gel('chkSvcAll').checked = false; }
-  if (isName)      { gel('chkBirthCert').checked = false; }
-  if ((!isScot && !isNI) || isGender) gel('chkBirthCertName').checked = false;
-  if (!isNI)       gel('chkBornNI').checked = false;
-  if (isName || nhsChecked) gel('chkNewGP').checked = false;
   const shouldLock = !isGender && !hasDeed;
   ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
     const wrap = gel(id), cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
     if (shouldLock) {
       wrap.classList.add('locked');
-      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); cb.checked = false; });
+      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
       if (lock) lock.classList.remove('hidden');
     } else {
       wrap.classList.remove('locked');
@@ -1394,7 +1379,6 @@ function updateLocks() {
       wrap.classList.add('locked');
       needsRadio.disabled = true;
       needsRadio.setAttribute('aria-describedby','lock-deed-poll-reason');
-      if (needsRadio.checked) { needsRadio.checked = false; updatedRadio.checked = true; }
       updatedRadio.disabled = false;
       updatedRadio.removeAttribute('aria-describedby');
       if (lock) lock.classList.remove('hidden');
@@ -1414,17 +1398,19 @@ function handleSvcItem() {
   gel('chkSvcAll').checked = Array.from(all).every(cb => cb.checked);
 }
 function resetChecklist() {
-  gel('chkRegionEW').checked   = true;
-  gel('chkGoalBoth').checked   = true;
-  gel('chkNonUK').checked      = false;
-  gel('chkEmployedNo').checked = true;
-  ['chkPhotoID','chkDBS','chkDWP','chkStudent','chkVehicle','chkDeedPoll','chkVisa','chkNHS','chkNewGP',
-   'chkHMRC','chkGRC','chkBirthCertName','chkBirthCert',
-   'chkBornNI','chkSvcBanks','chkSvcInsurance','chkSvcCouncil','chkSvcUtilities','chkSvcElectoral',
-   'chkSvcLandlord','chkSvcPension','chkSvcMortgage','chkSvcMobile','chkSvcAll']
-    .forEach(id => { gel(id).checked = false; });
-  document.querySelector('input[name="chkDrivingLicenceOpt"][value="updated"]').checked = true;
-  document.querySelector('input[name="chkPassportOpt"][value="updated"]').checked = true;
+  wizardState = {
+    region: REGION.EW, goal: S.BOTH,
+    citizen: S.NO, employment: S.NO,
+    photoID: S.NO, dbs: S.NO, dwp: S.NO,
+    student: S.NO, vehicle: S.NO,
+    deedpoll: S.NO, visaUpdated: S.NO,
+    nhs: S.NO, newGP: S.NO, hmrc: S.NO,
+    driving: S.UPDATED, passport: S.UPDATED,
+    grc: S.NO, birthCertName: S.NO,
+    birthCert: S.NO, bornInNI: S.NO,
+    services: [],
+  };
+  renderChecklist();
   updateLocks();
 }
 const questions = [
@@ -1655,7 +1641,6 @@ function generateChecklistPlan() {
   document.body.classList.add('plan-ready');
   gel('checklistGenerateBtn').textContent = 'Show my action plan';
   const ip = gel('checklistIntroText'); if (ip) ip.textContent = 'Choose the answers that apply to you, then click \"Show my action plan\" at the bottom.';
-  syncChecklistToWizard();
   sss('appState', JSON.stringify({planGenerated:true, schemaVersion:SCHEMA_VERSION}));
   sss('wizardState', JSON.stringify(wizardState));
   sss('isWizardMode', 'false');
@@ -1664,61 +1649,98 @@ function generateChecklistPlan() {
   focusPlan();
   refreshToolbarTabindex();
 }
-function buildSharedPlan(p) {
-  try {
-  const isGender = p.goal === S.GENDER;
-  const isName   = p.goal === S.NAME;
-  const isBoth   = p.goal === S.BOTH;
-  const isNI     = p.region === REGION.NI;
+function planItemHtml(id, dTag, costTag, title, desc, expanded) {
+  const trackId = `trk_${id}`;
+  const textId  = `text_${trackId}`;
+  const tmpl = document.getElementById('tmpl-plan-item');
+  const node = tmpl.content.cloneNode(true);
+  const btn = node.querySelector('.step-state-btn');
+  btn.id = `ssb_${trackId}`;
+  btn.dataset.trackId   = trackId;
+  btn.dataset.stepLabel = title;
+  btn.setAttribute('onclick', `cycleStepState('${trackId}')`);
+  btn.setAttribute('oncontextmenu', `event.preventDefault();reverseStepState('${trackId}')`);
+  btn.setAttribute('aria-label', `${title}: Not started. Click to cycle forward, right-click or long-press to go back`);
+  btn.title = 'Click to cycle status · Right-click or long-press to go back';
+  btn.querySelector('span').textContent = STATE_ICONS[0];
+  const textDiv = node.querySelector('.tmpl-text');
+  textDiv.id = textId;
+  const strong = node.querySelector('.tmpl-title');
+  strong.id = `${textId}_title`;
+  strong.textContent = title;
+  const badgeDiv = node.querySelector('.tmpl-badges');
+  const diffNode = typeof dTag === 'function' ? dTag() : dTag;
+  const costNode = costTag ? (typeof costTag === 'function' ? costTag() : costTag) : null;
+  if (diffNode) badgeDiv.appendChild(diffNode);
+  if (costNode) badgeDiv.appendChild(costNode);
+  node.querySelector('.tmpl-desc').innerHTML = desc;
+  const detailsEl = node.querySelector('.tmpl-details');
+  if (expanded) {
+    detailsEl.classList.remove('hidden');
+    node.querySelector('.tmpl-summary').textContent = `More information about: ${title}`;
+    node.querySelector('.tmpl-expanded').innerHTML = expanded;
+  }
+  const tmp = document.createElement('ul');
+  tmp.appendChild(node);
+  return tmp.innerHTML;
+}
+function planDiffBadge(cls, label) {
+  const span = document.createElement('span');
+  span.className = `item-badge ${cls}`;
+  const vh = document.createElement('span');
+  vh.className = 'visually-hidden';
+  vh.textContent = 'Difficulty: ';
+  span.appendChild(vh);
+  span.appendChild(document.createTextNode(label));
+  return span;
+}
+const BADGE_EASY   = () => planDiffBadge('badge-green','Easy');
+const BADGE_MEDIUM = () => planDiffBadge('badge-yellow','Medium');
+const BADGE_HARD   = () => planDiffBadge('badge-red','Hard');
+function planNextMarker(id) { return `<div id="next_${id}" class="next-step-placeholder" aria-hidden="true"></div>`; }
+function planCostBadge(label, cls) {
+  const span = document.createElement('span');
+  span.className = `item-badge ${cls}`;
+  const vh = document.createElement('span');
+  vh.className = 'visually-hidden';
+  vh.textContent = 'Approximate cost: ';
+  span.appendChild(vh);
+  span.appendChild(document.createTextNode(label));
+  return span;
+}
+function planSplitCostBadge(lo, hi, clsLo, clsHi) {
+  const span = document.createElement('span');
+  span.className = 'item-badge split-badge';
+  span.style.background = `linear-gradient(135deg,var(--${clsLo}-bg) 50%,var(--${clsHi}-bg) 50%)`;
+  span.style.borderColor = `var(--${clsLo})`;
+  const vh = document.createElement('span');
+  vh.className = 'visually-hidden';
+  vh.textContent = `Approximate cost: ${lo} to ${hi}`;
+  const loSpan = document.createElement('span');
+  loSpan.setAttribute('aria-hidden', 'true');
+  loSpan.style.cssText = `padding:0 6px 0 8px;border-right:1px solid var(--border);color:var(--${clsLo});`;
+  loSpan.textContent = lo;
+  const hiSpan = document.createElement('span');
+  hiSpan.setAttribute('aria-hidden', 'true');
+  hiSpan.style.cssText = `padding:0 8px 0 6px;color:var(--${clsHi});`;
+  hiSpan.textContent = hi;
+  span.appendChild(vh);
+  span.appendChild(loSpan);
+  span.appendChild(hiSpan);
+  return span;
+}
+function computePlanMeta(p) {
+  const isGender  = p.goal === S.GENDER;
+  const isName    = p.goal === S.NAME;
+  const isNI      = p.region === REGION.NI;
   const isEmployed = p.employment === S.YES || p.employment === S.NEEDS_UPDATE;
-  const diff = (cls, label) => `<span class="item-badge ${cls}"><span class="visually-hidden">Difficulty: </span>${label}</span>`;
-  const easy   = diff('badge-green','Easy');
-  const medium = diff('badge-yellow','Medium');
-  const hard   = diff('badge-red','Hard');
-  const nb = id => `<div id="next_${id}" class="next-step-placeholder" aria-hidden="true"></div>`;
-  const cost = (label, cls) => `<span class="item-badge ${cls}"><span class="visually-hidden">Approximate cost: </span>${label}</span>`;
-  const splitCost = (lo, hi, clsLo, clsHi) => `<span class="item-badge split-badge" style="background:linear-gradient(135deg,var(--${clsLo}-bg) 50%,var(--${clsHi}-bg) 50%);border-color:var(--${clsLo});"><span class="visually-hidden">Approximate cost: ${lo} to ${hi}</span><span aria-hidden="true" style="padding:0 6px 0 8px;border-right:1px solid var(--border);color:var(--${clsLo});">${lo}</span><span aria-hidden="true" style="padding:0 8px 0 6px;color:var(--${clsHi});">${hi}</span></span>`;
-  const li = (id, dTag, costTag, title, desc, expanded) => {
-    const trackId = `trk_${id}`;
-    const textId  = `text_${trackId}`;
-    const tmpl = document.getElementById('tmpl-plan-item');
-    const node = tmpl.content.cloneNode(true);
-    const btn = node.querySelector('.step-state-btn');
-    btn.id = `ssb_${trackId}`;
-    btn.dataset.trackId   = trackId;
-    btn.dataset.stepLabel = title;
-    btn.setAttribute('onclick', `cycleStepState('${trackId}')`);
-    btn.setAttribute('oncontextmenu', `event.preventDefault();reverseStepState('${trackId}')`);
-    btn.setAttribute('aria-label', `${title}: Not started. Click to cycle forward, right-click or long-press to go back`);
-    btn.title = 'Click to cycle status · Right-click or long-press to go back';
-    btn.querySelector('span').textContent = STATE_ICONS[0];
-    const textDiv = node.querySelector('.tmpl-text');
-    textDiv.id = textId;
-    const strong = node.querySelector('.tmpl-title');
-    strong.id = `${textId}_title`;
-    strong.textContent = title;
-    const badgeDiv = node.querySelector('.tmpl-badges');
-    badgeDiv.innerHTML = dTag + (costTag || '');
-    node.querySelector('.tmpl-desc').innerHTML = desc;
-    const detailsEl = node.querySelector('.tmpl-details');
-    if (expanded) {
-      detailsEl.classList.remove('hidden');
-      node.querySelector('.tmpl-summary').textContent = `More information about: ${title}`;
-      node.querySelector('.tmpl-expanded').innerHTML = expanded;
-    }
-    const tmp = document.createElement('ul');
-    tmp.appendChild(node);
-    return tmp.innerHTML;
-  };
   const costs = [];
   if (p.needsPassport) costs.push(isNI ? '<strong>UK passport (if applicable):</strong> A fee applies. Check GOV.UK for current prices.' : '<strong>UK passport:</strong> A fee applies. Check GOV.UK for current prices.');
   if (p.needsDriving)  costs.push(isNI ? '<strong>DVA driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.' : '<strong>Driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.');
   if (p.student)       costs.push('<strong>Replacement certificates:</strong> Costs vary. Some universities issue replacements for free, while some exam boards charge a fee per certificate.');
   if (p.birthCertName && !isNI) costs.push('<strong>Birth certificate name change (Scotland):</strong> A fee applies. Check the NRS website for current prices.');
   if (p.birthCertName && isNI)  costs.push('<strong>GRONI name recording:</strong> A fee applies. Check NI Direct for current prices.');
-  if (p.bornInNI && !isName) {
-    costs.push('<strong>Irish passport (gender change route):</strong> Standard Irish passport fee applies, plus a small solicitor fee for the statutory declaration.');
-  }
+  if (p.bornInNI && !isName)    costs.push('<strong>Irish passport (gender change route):</strong> Standard Irish passport fee applies, plus a small solicitor fee for the statutory declaration.');
   if (p.wantsGRC && !isName) {
     costs.push('<strong>UK GRC application:</strong> A small application fee applies.');
     costs.push('<strong>Medical reports for GRC:</strong> Costs vary widely. A GP letter may be low cost, but a specialist report can be expensive.');
@@ -1729,10 +1751,7 @@ function buildSharedPlan(p) {
   const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !isGender && !p.visaAlreadyUpdated);
   const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (isNI && p.bornInNI && !isName);
-  const midGroups = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length;
-  const splitMiddle = midGroups >= 2;
-  let stepNum = 0;
-  const nextStep = () => ++stepNum;
+  const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
   let baseText = '';
   if (hasStep3)      baseText = 'most steps can be completed within 3–10 weeks';
   else if (hasHealthGroup || hasWorkGroup || hasCivicGroup) baseText = 'most steps can be completed within 1–3 weeks';
@@ -1741,6 +1760,17 @@ function buildSharedPlan(p) {
   if (hasStep4 && isNI && p.bornInNI) timeText = baseText ? `Based on your plan, ${baseText}. The Irish passport route requires 2 years of name-use proof but avoids the longer GRC timeline.` : 'The Irish passport gender-change route requires 2 years of proof that you use your new name.';
   else if (hasStep4) timeText = baseText ? `Based on your plan, ${baseText}. The GRC will take 2 or more years on top of this.` : 'Based on your plan, the GRC will take 2 or more years.';
   else if (baseText) timeText = `Based on your plan, ${baseText}.`;
+  return { isGender, isName, isNI, isEmployed, costs, timeText, hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle };
+}
+function buildSharedPlan(p) {
+  try {
+  const { isGender, isName, isNI, isEmployed, costs, timeText,
+          hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle } = computePlanMeta(p);
+  const isBoth   = p.goal === S.BOTH;
+  const easy = BADGE_EASY, medium = BADGE_MEDIUM, hard = BADGE_HARD;
+  const nb = planNextMarker, cost = planCostBadge, splitCost = planSplitCostBadge, li = planItemHtml;
+  let stepNum = 0;
+  const nextStep = () => ++stepNum;
   let html = '';
   if (costs.length || timeText) {
     let inner = '';
@@ -2347,36 +2377,32 @@ function checkAllDone() {
 }
 
 function updateNextStep() {
-  const placeholders = document.querySelectorAll('.next-step-placeholder');
-  if (!placeholders.length) return;
+  const phases = document.querySelectorAll('.phase');
+  if (!phases.length) return;
   document.querySelectorAll('.next-step-highlight').forEach(el => el.classList.remove('next-step-highlight'));
-  let foundFirst = false, announcedLabel = '', foundFirstStep = false;
-  placeholders.forEach(p => {
-    const phase = p.closest('.phase');
-    if (!phase) { p.innerHTML = ''; return; }
-    const btns = phase.querySelectorAll('.step-state-btn[data-track-id]');
-    const incomplete = btns.length && Array.from(btns).some(btn => {
-      const s = getStepState(btn.dataset.trackId);
-      return s !== 2 && s !== 3;
-    });
-    if (!foundFirst && incomplete) {
-      const h = phase.querySelector('h3');
-      announcedLabel = h ? h.textContent.trim() : 'next step';
-      p.innerHTML = '<span class="badge-next">➡️ Your next step</span>';
-      foundFirst = true;
-    } else { p.innerHTML = ''; }
-  });
-  const allBtns = document.querySelectorAll('.step-state-btn[data-track-id]');
-  for (const btn of allBtns) {
-    const s = getStepState(btn.dataset.trackId);
-    if (s !== 2 && s !== 3) {
-      const planItem = btn.closest('.plan-item');
-      if (planItem && !planItem.classList.contains('collapsed-step')) {
-        planItem.classList.add('next-step-highlight');
-        foundFirstStep = true;
+  let announcedLabel = '', firstIncompleteBtn = null;
+  phases.forEach(phase => {
+    const btns = Array.from(phase.querySelectorAll('.step-state-btn[data-track-id]'));
+    const incompleteBtn = btns.find(btn => { const s = getStepState(btn.dataset.trackId); return s !== 2 && s !== 3; });
+    const p = phase.querySelector('.next-step-placeholder');
+    if (p) {
+      if (!firstIncompleteBtn && incompleteBtn) {
+        const h = phase.querySelector('h3');
+        announcedLabel = h ? h.textContent.trim() : 'next step';
+        p.textContent = '';
+        const badge = document.createElement('span');
+        badge.className = 'badge-next';
+        badge.textContent = '➡️ Your next step';
+        p.appendChild(badge);
+      } else {
+        p.textContent = '';
       }
-      if (foundFirstStep) break;
     }
+    if (!firstIncompleteBtn && incompleteBtn) firstIncompleteBtn = incompleteBtn;
+  });
+  if (firstIncompleteBtn) {
+    const planItem = firstIncompleteBtn.closest('.plan-item');
+    if (planItem && !planItem.classList.contains('collapsed-step')) planItem.classList.add('next-step-highlight');
   }
   if (announcedLabel) announce(`Your next step is: ${announcedLabel}`);
 }
@@ -2558,7 +2584,82 @@ window.onload = () => {
     } catch(e) { console.warn('Could not restore saved app state:', e); }
   }
   V.start.classList.remove('hidden');
+
+  // Single source of truth: checklist inputs update wizardState immediately
+  const checklistEl = gel('checklistView');
+  if (checklistEl) {
+    checklistEl.addEventListener('change', () => {
+      const region = document.querySelector('input[name="chkRegion"]:checked');
+      if (region) wizardState.region = region.value;
+      const goal = document.querySelector('input[name="chkGoal"]:checked');
+      if (goal) wizardState.goal = goal.value;
+      wizardState.citizen     = gel('chkNonUK').checked    ? S.YES : S.NO;
+      wizardState.visaUpdated = gel('chkVisa').checked     ? S.YES : S.NO;
+      wizardState.photoID     = gel('chkPhotoID').checked  ? S.YES : S.NO;
+      const emp = document.querySelector('input[name="chkEmployment"]:checked');
+      if (emp) wizardState.employment = emp.value;
+      wizardState.dbs         = gel('chkDBS').checked      ? S.YES : S.NO;
+      wizardState.dwp         = gel('chkDWP').checked      ? S.YES : S.NO;
+      wizardState.student     = gel('chkStudent').checked  ? S.YES : S.NO;
+      wizardState.vehicle     = gel('chkVehicle').checked  ? S.YES : S.NO;
+      wizardState.deedpoll    = gel('chkDeedPoll').checked ? S.YES : S.NO;
+      wizardState.nhs         = gel('chkNHS').checked      ? S.YES : S.NO;
+      wizardState.newGP       = gel('chkNewGP').checked    ? S.YES : S.NO;
+      wizardState.hmrc        = gel('chkHMRC').checked     ? S.YES : S.NO;
+      const dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
+      wizardState.driving  = dlC ? dlC.value : S.NONE;
+      const ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
+      wizardState.passport = ppC ? ppC.value : S.NONE;
+      wizardState.grc           = gel('chkGRC').checked          ? S.YES : S.NO;
+      wizardState.birthCertName = gel('chkBirthCertName').checked ? S.YES : S.NO;
+      wizardState.birthCert     = gel('chkBirthCert').checked     ? S.YES : S.NO;
+      wizardState.bornInNI      = gel('chkBornNI').checked        ? S.YES : S.NO;
+      const allTicked = gel('chkSvcAll').checked;
+      wizardState.services = allTicked
+        ? Object.keys(SVC_MAP)
+        : Object.entries(SVC_MAP).filter(([, id]) => gel(id).checked).map(([val]) => val);
+      updateDerivedState();
+      renderChecklist();
+      updateLocks();
+    });
+  }
 }
+// Expose state variables needed by tests (V8 exposes top-level let/const to page.evaluate but not IIFE-local ones)
+Object.defineProperty(window, 'wizardState', { get: () => wizardState, set: v => { wizardState = v; }, configurable: true });
+Object.defineProperty(window, 'isWizardMode', { get: () => isWizardMode, set: v => { isWizardMode = v; }, configurable: true });
+Object.defineProperty(window, 'step', { get: () => step, set: v => { step = v; }, configurable: true });
+window.questions      = questions;
+window.SCHEMA_VERSION = SCHEMA_VERSION;
+window.SVC_MAP        = SVC_MAP;
+window.getStepState   = getStepState;
+window.renderWizard   = renderWizard;
+// Expose functions referenced from HTML event attributes
+window.panicExit             = panicExit;
+window.confirmUtilityRestart = confirmUtilityRestart;
+window.makeChanges           = makeChanges;
+window.confirmResetProgress  = confirmResetProgress;
+window.toggleFocusMode       = toggleFocusMode;
+window.copyShareableLink     = copyShareableLink;
+window.toggleMode            = toggleMode;
+window.toggleHelp            = toggleHelp;
+window.closeHelpOnBackdrop   = closeHelpOnBackdrop;
+window.toggleTheme           = toggleTheme;
+window.startWizard           = startWizard;
+window.startChecklist        = startChecklist;
+window.continuePlan          = continuePlan;
+window.confirmRestart        = confirmRestart;
+window.reviewAnswers         = reviewAnswers;
+window.prevWizard            = prevWizard;
+window.nextWizard            = nextWizard;
+window.generateChecklistPlan = generateChecklistPlan;
+window.checkAgeGate          = checkAgeGate;
+window.checkAgeGateShared    = checkAgeGateShared;
+window.updateLocks           = updateLocks;
+window.handleSvcItem         = handleSvcItem;
+window.handleSvcAll          = handleSvcAll;
+window.cycleStepState        = cycleStepState;
+window.reverseStepState      = reverseStepState;
+})();
 </script>
 </body>
 </html>
