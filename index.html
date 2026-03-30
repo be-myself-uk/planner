@@ -1657,7 +1657,10 @@ function planItemHtml(id, dTag, costTag, title, desc, expanded) {
   strong.id = `${textId}_title`;
   strong.textContent = title;
   const badgeDiv = node.querySelector('.tmpl-badges');
-  badgeDiv.innerHTML = dTag + (costTag || '');
+  const diffNode = typeof dTag === 'function' ? dTag() : dTag;
+  const costNode = costTag ? (typeof costTag === 'function' ? costTag() : costTag) : null;
+  if (diffNode) badgeDiv.appendChild(diffNode);
+  if (costNode) badgeDiv.appendChild(costNode);
   node.querySelector('.tmpl-desc').innerHTML = desc;
   const detailsEl = node.querySelector('.tmpl-details');
   if (expanded) {
@@ -1669,13 +1672,51 @@ function planItemHtml(id, dTag, costTag, title, desc, expanded) {
   tmp.appendChild(node);
   return tmp.innerHTML;
 }
-function planDiffBadge(cls, label) { return `<span class="item-badge ${cls}"><span class="visually-hidden">Difficulty: </span>${label}</span>`; }
-const BADGE_EASY   = planDiffBadge('badge-green','Easy');
-const BADGE_MEDIUM = planDiffBadge('badge-yellow','Medium');
-const BADGE_HARD   = planDiffBadge('badge-red','Hard');
+function planDiffBadge(cls, label) {
+  const span = document.createElement('span');
+  span.className = `item-badge ${cls}`;
+  const vh = document.createElement('span');
+  vh.className = 'visually-hidden';
+  vh.textContent = 'Difficulty: ';
+  span.appendChild(vh);
+  span.appendChild(document.createTextNode(label));
+  return span;
+}
+const BADGE_EASY   = () => planDiffBadge('badge-green','Easy');
+const BADGE_MEDIUM = () => planDiffBadge('badge-yellow','Medium');
+const BADGE_HARD   = () => planDiffBadge('badge-red','Hard');
 function planNextMarker(id) { return `<div id="next_${id}" class="next-step-placeholder" aria-hidden="true"></div>`; }
-function planCostBadge(label, cls) { return `<span class="item-badge ${cls}"><span class="visually-hidden">Approximate cost: </span>${label}</span>`; }
-function planSplitCostBadge(lo, hi, clsLo, clsHi) { return `<span class="item-badge split-badge" style="background:linear-gradient(135deg,var(--${clsLo}-bg) 50%,var(--${clsHi}-bg) 50%);border-color:var(--${clsLo});"><span class="visually-hidden">Approximate cost: ${lo} to ${hi}</span><span aria-hidden="true" style="padding:0 6px 0 8px;border-right:1px solid var(--border);color:var(--${clsLo});">${lo}</span><span aria-hidden="true" style="padding:0 8px 0 6px;color:var(--${clsHi});">${hi}</span></span>`; }
+function planCostBadge(label, cls) {
+  const span = document.createElement('span');
+  span.className = `item-badge ${cls}`;
+  const vh = document.createElement('span');
+  vh.className = 'visually-hidden';
+  vh.textContent = 'Approximate cost: ';
+  span.appendChild(vh);
+  span.appendChild(document.createTextNode(label));
+  return span;
+}
+function planSplitCostBadge(lo, hi, clsLo, clsHi) {
+  const span = document.createElement('span');
+  span.className = 'item-badge split-badge';
+  span.style.background = `linear-gradient(135deg,var(--${clsLo}-bg) 50%,var(--${clsHi}-bg) 50%)`;
+  span.style.borderColor = `var(--${clsLo})`;
+  const vh = document.createElement('span');
+  vh.className = 'visually-hidden';
+  vh.textContent = `Approximate cost: ${lo} to ${hi}`;
+  const loSpan = document.createElement('span');
+  loSpan.setAttribute('aria-hidden', 'true');
+  loSpan.style.cssText = `padding:0 6px 0 8px;border-right:1px solid var(--border);color:var(--${clsLo});`;
+  loSpan.textContent = lo;
+  const hiSpan = document.createElement('span');
+  hiSpan.setAttribute('aria-hidden', 'true');
+  hiSpan.style.cssText = `padding:0 8px 0 6px;color:var(--${clsHi});`;
+  hiSpan.textContent = hi;
+  span.appendChild(vh);
+  span.appendChild(loSpan);
+  span.appendChild(hiSpan);
+  return span;
+}
 function computePlanMeta(p) {
   const isGender  = p.goal === S.GENDER;
   const isName    = p.goal === S.NAME;
@@ -2330,7 +2371,7 @@ function updateNextStep() {
   let foundFirst = false, announcedLabel = '', foundFirstStep = false;
   placeholders.forEach(p => {
     const phase = p.closest('.phase');
-    if (!phase) { p.innerHTML = ''; return; }
+    if (!phase) { p.textContent = ''; return; }
     const btns = phase.querySelectorAll('.step-state-btn[data-track-id]');
     const incomplete = btns.length && Array.from(btns).some(btn => {
       const s = getStepState(btn.dataset.trackId);
@@ -2339,9 +2380,13 @@ function updateNextStep() {
     if (!foundFirst && incomplete) {
       const h = phase.querySelector('h3');
       announcedLabel = h ? h.textContent.trim() : 'next step';
-      p.innerHTML = '<span class="badge-next">➡️ Your next step</span>';
+      p.textContent = '';
+      const badge = document.createElement('span');
+      badge.className = 'badge-next';
+      badge.textContent = '➡️ Your next step';
+      p.appendChild(badge);
       foundFirst = true;
-    } else { p.innerHTML = ''; }
+    } else { p.textContent = ''; }
   });
   const allBtns = document.querySelectorAll('.step-state-btn[data-track-id]');
   for (const btn of allBtns) {
