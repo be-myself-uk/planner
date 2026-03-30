@@ -751,7 +751,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1774749697;
+const SCHEMA_VERSION = 1774828800;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -2583,7 +2583,6 @@ window.onload = () => {
   }
   V.start.classList.remove('hidden');
 
-  // Single source of truth: checklist inputs update wizardState immediately
   const checklistEl = gel('checklistView');
   if (checklistEl) {
     checklistEl.addEventListener('change', () => {
@@ -2622,7 +2621,6 @@ window.onload = () => {
     });
   }
 }
-// Expose state variables needed by tests (V8 exposes top-level let/const to page.evaluate but not IIFE-local ones)
 Object.defineProperty(window, 'wizardState', { get: () => wizardState, set: v => { wizardState = v; }, configurable: true });
 Object.defineProperty(window, 'isWizardMode', { get: () => isWizardMode, set: v => { isWizardMode = v; }, configurable: true });
 Object.defineProperty(window, 'step', { get: () => step, set: v => { step = v; }, configurable: true });
@@ -2631,7 +2629,6 @@ window.SCHEMA_VERSION = SCHEMA_VERSION;
 window.SVC_MAP        = SVC_MAP;
 window.getStepState   = getStepState;
 window.renderWizard   = renderWizard;
-// Expose functions referenced from HTML event attributes
 window.panicExit             = panicExit;
 window.confirmUtilityRestart = confirmUtilityRestart;
 window.makeChanges           = makeChanges;

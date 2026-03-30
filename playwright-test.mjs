@@ -22,8 +22,6 @@ async function newPage() {
   return { page, ctx };
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 async function checkAgeGate(page) {
   await page.locator('#ageConfirm').check();
 }
@@ -38,7 +36,6 @@ async function openWizard(page) {
   await page.getByRole('button', { name: 'Answer step-by-step questions' }).click();
 }
 
-// Advance one wizard step: pick first enabled radio, or tick "All of these" for multi-select
 async function wizardNext(page) {
   const radio = page.locator('input[name="ans"]:not([disabled])').first();
   if (await radio.count() > 0) {
@@ -50,13 +47,10 @@ async function wizardNext(page) {
   await page.getByRole('button', { name: 'Continue →' }).click();
 }
 
-// Returns true if an input is disabled (works with Playwright locators)
 async function isInputDisabled(page, label) {
   return page.getByLabel(label).isDisabled();
 }
 
-
-// ── 1. Initial render ─────────────────────────────────────────────────────────
 console.log('\n1. Initial render');
 {
   const { page, ctx } = await newPage();
@@ -71,7 +65,6 @@ console.log('\n1. Initial render');
   await ctx.close();
 }
 
-// ── 2. Age gate ───────────────────────────────────────────────────────────────
 console.log('\n2. Age gate');
 {
   const { page, ctx } = await newPage();
@@ -84,7 +77,6 @@ console.log('\n2. Age gate');
   await ctx.close();
 }
 
-// ── 3. Age gate persistence ───────────────────────────────────────────────────
 console.log('\n3. Age gate persistence');
 {
   const { page, ctx } = await newPage();
@@ -96,7 +88,6 @@ console.log('\n3. Age gate persistence');
   await ctx.close();
 }
 
-// ── 4. Wizard flow ────────────────────────────────────────────────────────────
 console.log('\n4. Wizard flow');
 {
   const { page, ctx } = await newPage();
@@ -104,10 +95,8 @@ console.log('\n4. Wizard flow');
   assert(await page.isVisible('#wizardView'),  'wizard view shown');
   assert(await page.isHidden('#startView'),    'start view hidden');
   assert(await page.getByRole('button', { name: 'Switch view' }).isVisible(), 'mode toggle visible');
-  // Try continuing without answering
   await page.getByRole('button', { name: 'Continue →' }).click();
   assert(await page.isVisible('#wizardWarning'), 'warning shown with no answer');
-  // Answer all questions
   let q = 0;
   while (await page.isVisible('#wizardView') && q < 25) { await wizardNext(page); q++; }
   assert(await page.isVisible('#planView'), 'plan view shown after wizard completes');
@@ -115,7 +104,6 @@ console.log('\n4. Wizard flow');
   await ctx.close();
 }
 
-// ── 5. Wizard back navigation ─────────────────────────────────────────────────
 console.log('\n5. Wizard back navigation');
 {
   const { page, ctx } = await newPage();
@@ -128,7 +116,6 @@ console.log('\n5. Wizard back navigation');
   await ctx.close();
 }
 
-// ── 6. Checklist flow ─────────────────────────────────────────────────────────
 console.log('\n6. Checklist flow');
 {
   const { page, ctx } = await newPage();
@@ -140,7 +127,6 @@ console.log('\n6. Checklist flow');
   await ctx.close();
 }
 
-// ── 7. Mode toggle ────────────────────────────────────────────────────────────
 console.log('\n7. Mode toggle');
 {
   const { page, ctx } = await newPage();
@@ -153,33 +139,25 @@ console.log('\n7. Mode toggle');
   await ctx.close();
 }
 
-// ── 8. Checklist locks ────────────────────────────────────────────────────────
 console.log('\n8. Checklist locks');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  // Locked inputs: use aria-label from the wrapper's input. The inputs inside locked
-  // wrappers are disabled — verify via the specific labelled checkboxes.
   assert(await page.getByLabel('NHS record').isDisabled(),     'NHS locked without deed poll');
   assert(await page.getByLabel('HMRC and taxes').isDisabled(), 'HMRC locked without deed poll');
   assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'DL locked without deed poll');
   assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(),       'Passport locked without deed poll');
-  // Unlock with deed poll
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   assert(await page.getByLabel('NHS record').isEnabled(),     'NHS unlocked after deed poll');
   assert(await page.getByLabel('HMRC and taxes').isEnabled(), 'HMRC unlocked after deed poll');
-  // Gender-only: deed poll row hidden, documents unlocked
   await page.getByLabel('Change my gender marker only').check();
   assert(await page.isHidden('#wrapDeedPoll'), 'deed poll hidden for gender-only goal');
   assert(await page.getByLabel('NHS record').isEnabled(), 'NHS unlocked for gender-only goal');
-  // Name-only: GRC hidden
   await page.getByLabel('Change my name only').check();
   assert(await page.isHidden('#wrapGRC'), 'GRC hidden for name-only goal');
-  // eVisa row
   assert(await page.isHidden('#wrapVisa'), 'visa row hidden when not non-UK');
   await page.getByLabel(/I have a UK visa or eVisa/).check();
   assert(await page.isVisible('#wrapVisa'), 'visa row shown when non-UK ticked');
-  // DBS and DWP only when employment needs updating
   assert(await page.isHidden('#wrapDBS'), 'DBS hidden when employment up to date');
   assert(await page.isHidden('#wrapDWP'), 'DWP hidden when employment up to date');
   await page.getByLabel(/No, I need to update them\./).check();
@@ -188,10 +166,8 @@ console.log('\n8. Checklist locks');
   await ctx.close();
 }
 
-// ── 9. Plan content ───────────────────────────────────────────────────────────
 console.log('\n9. Plan content');
 {
-  // No deed poll → step 1 present
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByLabel('Change my name and gender marker').check();
@@ -201,7 +177,6 @@ console.log('\n9. Plan content');
   await ctx.close();
 }
 {
-  // Deed poll ticked → step 1 absent
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByLabel('Change my name and gender marker').check();
@@ -211,7 +186,6 @@ console.log('\n9. Plan content');
   await ctx.close();
 }
 {
-  // Gender-only → step 1 absent, titles tip absent
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByLabel('Change my gender marker only').check();
@@ -221,7 +195,6 @@ console.log('\n9. Plan content');
   await ctx.close();
 }
 {
-  // GRC wanted → GRC step present
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
@@ -230,7 +203,6 @@ console.log('\n9. Plan content');
   await ctx.close();
 }
 {
-  // Name-only → GRC step absent
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByLabel('Change my name only').check();
@@ -239,7 +211,6 @@ console.log('\n9. Plan content');
   await ctx.close();
 }
 
-// ── 10. Progress tracker ──────────────────────────────────────────────────────
 console.log('\n10. Progress tracker');
 {
   const { page, ctx } = await newPage();
@@ -259,7 +230,6 @@ console.log('\n10. Progress tracker');
   await ctx.close();
 }
 
-// ── 11. All done banner ───────────────────────────────────────────────────────
 console.log('\n11. All done banner');
 {
   const { page, ctx } = await newPage();
@@ -274,7 +244,6 @@ console.log('\n11. All done banner');
   await ctx.close();
 }
 
-// ── 12. Make changes ──────────────────────────────────────────────────────────
 console.log('\n12. Make changes');
 {
   const { page, ctx } = await newPage();
@@ -289,7 +258,6 @@ console.log('\n12. Make changes');
   await ctx.close();
 }
 
-// ── 13. Start again ───────────────────────────────────────────────────────────
 console.log('\n13. Start again');
 {
   const { page, ctx } = await newPage();
@@ -307,7 +275,6 @@ console.log('\n13. Start again');
   await ctx.close();
 }
 
-// ── 14. Welcome back ──────────────────────────────────────────────────────────
 console.log('\n14. Welcome back');
 {
   const { page, ctx } = await newPage();
@@ -322,8 +289,6 @@ console.log('\n14. Welcome back');
   await ctx.close();
 }
 
-
-// ── 15. Shareable link ────────────────────────────────────────────────────────
 console.log('\n15. Shareable link');
 {
   const { page, ctx } = await newPage();
@@ -332,7 +297,6 @@ console.log('\n15. Shareable link');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
-  // Patch copyShareableLink to capture the URL without clipboard API
   await page.evaluate(() => {
     window._shareUrl = null;
     window.copyShareableLink = function() {
@@ -383,27 +347,22 @@ console.log('\n15. Shareable link');
   await ctx.close();
 }
 
-// ── 16. Share URL age gate guard ──────────────────────────────────────────────
 console.log('\n16. Share URL age gate guard');
 {
   const { page, ctx } = await newPage();
-  // Use current schema version so the link is valid (not outdated)
-  const shareData = btoa(JSON.stringify({v:1774749697,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
+  const shareData = btoa(JSON.stringify({v:1774828800,reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""}));
   const url = `${filePath}?p=${shareData}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
-  // Without age confirmation: startView hidden, welcomeNewDevice shown
   assert(await page.isHidden('#startView'),         'start view hidden on share URL without age gate');
   assert(await page.isVisible('#welcomeNewDevice'), 'new device prompt shown without age gate');
   assert(await page.isHidden('#planView'),           'plan not shown without age confirmation');
-  // Confirm age via the shared age gate checkbox
   await page.locator('#ageConfirmShared').check();
   assert(await page.isVisible('#planView'),     'plan shown after shared age gate confirmed');
   assert(await page.isHidden('#checklistView'), 'checklist not shown (plan went direct)');
   await ctx.close();
 }
 
-// ── 17. Outdated schema link ──────────────────────────────────────────────────
 console.log('\n17. Outdated schema link');
 {
   const { page, ctx } = await newPage();
@@ -411,7 +370,6 @@ console.log('\n17. Outdated schema link');
   const url = `${filePath}?p=${shareData}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
-  // Share URL with no ageConfirmed → shows new device prompt first
   await page.locator('#ageConfirmShared').check();
   assert(await page.isVisible('#welcomeOutdated'), 'outdated warning shown for old schema version');
   assert(await page.isHidden('#welcomeNormal'),    'normal welcome hidden for old schema version');
@@ -421,7 +379,6 @@ console.log('\n17. Outdated schema link');
   await ctx.close();
 }
 
-// ── 18. Help modal ────────────────────────────────────────────────────────────
 console.log('\n18. Help modal');
 {
   const { page, ctx } = await newPage();
@@ -432,11 +389,9 @@ console.log('\n18. Help modal');
   assert(await helpBtn.getAttribute('aria-expanded') === 'true', 'aria-expanded=true when open');
   await page.getByRole('button', { name: 'Close help dialog' }).click();
   assert(await page.isHidden('#helpOverlay'), 'help overlay closed after close btn');
-  // Backdrop click
   await helpBtn.click();
   await page.click('#helpOverlay', { position: { x: 5, y: 5 } });
   assert(await page.isHidden('#helpOverlay'), 'help closed by backdrop click');
-  // Focus trap
   await helpBtn.click();
   const insideBefore = await page.evaluate(() => !!document.getElementById('helpModal')?.contains(document.activeElement));
   assert(insideBefore, 'focus starts inside modal');
@@ -446,7 +401,6 @@ console.log('\n18. Help modal');
   await ctx.close();
 }
 
-// ── 19. Keyboard Escape ───────────────────────────────────────────────────────
 console.log('\n19. Keyboard Escape');
 {
   const { page, ctx } = await newPage();
@@ -460,7 +414,6 @@ console.log('\n19. Keyboard Escape');
   await ctx.close();
 }
 
-// ── 20. Panic button ──────────────────────────────────────────────────────────
 console.log('\n20. Panic button');
 {
   const { page, ctx } = await newPage();
@@ -471,7 +424,6 @@ console.log('\n20. Panic button');
   await ctx.close();
 }
 
-// ── 21. Theme toggle ──────────────────────────────────────────────────────────
 console.log('\n21. Theme toggle');
 {
   const { page, ctx } = await newPage();
@@ -483,7 +435,6 @@ console.log('\n21. Theme toggle');
   await ctx.close();
 }
 
-// ── 22. plan-ready class ──────────────────────────────────────────────────────
 console.log('\n22. plan-ready class');
 {
   const { page, ctx } = await newPage();
@@ -495,15 +446,12 @@ console.log('\n22. plan-ready class');
   await ctx.close();
 }
 
-// ── 23. Region selector (NI-resilient) ───────────────────────────────────────
 console.log('\n23. Region selector');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  // England or Wales is always available and should be selectable
   await page.getByLabel('England or Wales').check();
   assert(await page.getByLabel('England or Wales').isChecked(), 'England or Wales selectable');
-  // Scotland — check its current state (may be locked if not yet implemented)
   const scotRadio = page.getByRole('radio', { name: 'Scotland' });
   const scotLocked = await scotRadio.isDisabled().catch(() => true);
   if (!scotLocked) {
@@ -513,7 +461,6 @@ console.log('\n23. Region selector');
   } else {
     assert(true, 'Scotland correctly locked when not yet available');
   }
-  // Northern Ireland — same adaptive check
   const niRadio = page.getByRole('radio', { name: /Northern Ireland/ });
   const niLocked = await niRadio.isDisabled().catch(() => true);
   if (!niLocked) {
@@ -525,29 +472,23 @@ console.log('\n23. Region selector');
   await ctx.close();
 }
 
-
 console.log('\n24. Utility bar');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByRole('button', { name: 'Show my action plan' }).click();
-  // Utility bar is visible on plan view
   assert(await page.locator('#controlBar').isVisible(), 'sticky plan bar visible on plan');
-  // Restart button shows confirm state on first click
   const restartBtn = page.locator('#ubRestartBtn');
   await restartBtn.click();
   assert(await page.getByRole('button', { name: /Confirm/ }).isVisible(), 'restart btn shows confirm on first click');
-  // Times out and resets (test the label reverts)
   await page.waitForTimeout(4200);
   assert(await restartBtn.getAttribute('aria-label') === 'New plan', 'restart btn reverts after timeout');
-  // Second click in time actually restarts
   await restartBtn.click();
   await page.getByRole('button', { name: /Confirm/ }).click();
   assert(await page.isVisible('#startView'), 'start view shown after confirmed restart');
   await ctx.close();
 }
 {
-  // Focus mode toggle
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByRole('button', { name: 'Show my action plan' }).click();
@@ -561,19 +502,15 @@ console.log('\n24. Utility bar');
   await ctx.close();
 }
 
-// ── 25. Locked radios: needs_update resets, updated stays enabled ─────────────
 console.log('\n25. Locked radios: needs_update resets, updated stays enabled');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  // Unlock by checking deed poll
   await page.getByLabel(/Deed poll or statutory declaration/).check();
-  // Set passport and DL to "needs_update"
   await page.locator('input[name="chkPassportOpt"][value="needs_update"]').check();
   assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isChecked(), 'passport set to needs_update');
   await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').check();
   assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isChecked(), 'driving licence set to needs_update');
-  // Uncheck deed poll — needs_update resets to updated; updated radio stays enabled
   await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
   assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isChecked(), 'passport reset to updated when locked');
   assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isChecked(), 'driving licence reset to updated when locked');
@@ -584,23 +521,19 @@ console.log('\n25. Locked radios: needs_update resets, updated stays enabled');
   await ctx.close();
 }
 
-// ── 27. Share link encodes step progress (save side) ─────────────────────────
 console.log('\n27. Share link encodes step progress (save side)');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
-  // Mark HMRC as done (cycle twice: 0→1→2)
   await page.evaluate(() => {
     cycleStepState('trk_hmrc');
     cycleStepState('trk_hmrc');
   });
   assert(await page.locator('#ssb_trk_hmrc').getAttribute('data-state') === '2', 'hmrc marked as done in DOM');
-  // Verify getStepState reads the correct value from localStorage (used by copyShareableLink)
   const stepState = await page.evaluate(() => getStepState('trk_hmrc'));
   assert(stepState === 2, 'getStepState returns 2 from localStorage after marking done');
-  // Verify the prg object that copyShareableLink would encode
   const prg = await page.evaluate(() => {
     const p = {};
     document.querySelectorAll('.step-state-btn[data-track-id]').forEach(btn => {
@@ -611,7 +544,6 @@ console.log('\n27. Share link encodes step progress (save side)');
     return p;
   });
   assert(prg.hmrc === 2, 'prg object encodes done hmrc step for share URL');
-  // Build share URL the same way copyShareableLink does and verify prg is in it
   const shareUrl = await page.evaluate((fp) => {
     const prg = {};
     document.querySelectorAll('.step-state-btn[data-track-id]').forEach(btn => {
@@ -640,7 +572,6 @@ console.log('\n27. Share link encodes step progress (save side)');
   }, filePath);
   const decoded = JSON.parse(atob(new URL(shareUrl).searchParams.get('p')));
   assert(decoded.prg && decoded.prg.hmrc === 2, 'encoded share URL contains prg with done hmrc step');
-  // Load URL on a new device and verify progress is restored
   const { page: page2, ctx: ctx2 } = await newPage();
   await page2.goto(shareUrl);
   await page2.waitForLoadState('domcontentloaded');
@@ -652,12 +583,10 @@ console.log('\n27. Share link encodes step progress (save side)');
   await ctx2.close();
 }
 
-// ── 26. Progress restoration from share URL ──────────────────────────────────
 console.log('\n26. Progress restoration from share URL');
 {
   const { page, ctx } = await newPage();
-  // Plan with dp:true so HMRC step is generated; hmrc:false so it appears in plan; prg marks HMRC as done (state 2)
-  const shareData = btoa(JSON.stringify({v:1774749697,reg:"ew",goal:"name",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,nhs:true,dl:"updated",hmrc:false,pass:"updated",grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:"",prg:{hmrc:2}}));
+  const shareData = btoa(JSON.stringify({v:1774828800,reg:"ew",goal:"name",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,nhs:true,dl:"updated",hmrc:false,pass:"updated",grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:"",prg:{hmrc:2}}));
   const url = `${filePath}?p=${shareData}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
@@ -671,12 +600,10 @@ console.log('\n26. Progress restoration from share URL');
   await ctx.close();
 }
 
-// ── 28. Disabled wizard option is never checked ──────────────────────────────
 console.log('\n28. Disabled wizard option is never checked');
 {
   const { page, ctx } = await newPage();
   await openWizard(page);
-  // Set wizardState with deedpoll=no and driving=needs_update, then navigate to driving question
   await page.evaluate(() => {
     wizardState = { goal: 'name', region: 'ew', deedpoll: 'no', driving: 'needs_update' };
     step = questions.findIndex(q => q.id === 'driving');
@@ -690,12 +617,10 @@ console.log('\n28. Disabled wizard option is never checked');
   await ctx.close();
 }
 
-// ── 29. HMRC Yes disabled in wizard without deed poll ─────────────────────────
 console.log('\n29. HMRC Yes disabled in wizard without deed poll');
 {
   const { page, ctx } = await newPage();
   await openWizard(page);
-  // Set wizardState with deedpoll=no, then navigate to hmrc question
   await page.evaluate(() => {
     wizardState = { goal: 'name', region: 'ew', deedpoll: 'no' };
     step = questions.findIndex(q => q.id === 'hmrc');
