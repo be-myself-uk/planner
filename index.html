@@ -1088,7 +1088,7 @@ function reviewAnswers() {
   updateLocks();
   V.checklist.classList.remove('hidden');
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
+  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
   window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
@@ -1102,7 +1102,7 @@ function makeChanges() {
   renderChecklist();
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText'); if (introText) introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.';
+  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
   window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
