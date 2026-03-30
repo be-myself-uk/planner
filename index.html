@@ -1092,16 +1092,25 @@ function continuePlan() {
 function openChecklist() {
   fadeOutConfetti();
   isWizardMode = false;
-  [V.welcome, V.plan].forEach(v => v.classList.add('hidden'));
+  renderChecklist();
+  updateLocks();
+  V.checklist.classList.remove('hidden');
+  gel('checklistGenerateBtn').textContent = 'Update my action plan';
+  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
+  window.scrollTo({top:0, behavior:'smooth'});
+  refreshToolbarTabindex();
+}
+function makeChanges() {
+  fadeOutConfetti();
+  isWizardMode = false;
+  V.plan.classList.add('hidden');
   V.checklist.classList.remove('hidden');
   V.toggle.style.display = 'flex';
   document.body.classList.remove('plan-ready','wizard-active');
-  updateDerivedState();
   renderChecklist();
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
-  const introText = gel('checklistIntroText');
-  if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
+  const introText = gel('checklistIntroText'); if (introText) { introText.textContent = 'Update your answers below, then click \"Update my action plan\" at the bottom.'; introText.setAttribute('tabindex','-1'); introText.focus({preventScroll:true}); }
   window.scrollTo({top:0, behavior:'smooth'});
   refreshToolbarTabindex();
 }
