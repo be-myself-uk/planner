@@ -179,10 +179,12 @@ console.log('\n8. Checklist locks');
   assert(await page.isHidden('#wrapVisa'), 'visa row hidden when not non-UK');
   await page.getByLabel(/I have a UK visa or eVisa/).check();
   assert(await page.isVisible('#wrapVisa'), 'visa row shown when non-UK ticked');
-  // DBS only when employed
-  assert(await page.isHidden('#wrapDBS'), 'DBS hidden when not employed');
-  await page.getByLabel(/Yes, and they already have my updated details/).check();
-  assert(await page.isVisible('#wrapDBS'), 'DBS shown when employed');
+  // DBS and DWP only when employment needs updating
+  assert(await page.isHidden('#wrapDBS'), 'DBS hidden when employment up to date');
+  assert(await page.isHidden('#wrapDWP'), 'DWP hidden when employment up to date');
+  await page.getByLabel(/No, I need to update them\./).check();
+  assert(await page.isVisible('#wrapDBS'), 'DBS shown when employment needs update');
+  assert(await page.isVisible('#wrapDWP'), 'DWP shown when employment needs update');
   await ctx.close();
 }
 

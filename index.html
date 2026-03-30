@@ -308,6 +308,7 @@
   #liveRegion { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
   .plan-cost-item { margin:0 0 6px 16px; }
   .plan-top-details { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
+  .footer-inner .plan-top-details { margin-bottom:0; }
   .plan-top-details summary { padding:12px 15px; cursor:pointer; font-size:0.9em; font-weight:bold; color:var(--text); list-style:none; user-select:none; transition:background 0.2s; }
   .plan-top-details summary:hover { background:var(--bg-details-hover); }
   .plan-top-details summary::before { content:'▶'; display:inline-block; margin-right:10px; font-size:0.8em; transition:transform 0.2s; }
@@ -488,15 +489,15 @@
       <legend class="section-title">1. The basics</legend>
       <div class="chk-section chk-section--mb">
         <p class="chk-q">Where do you live?</p>
-        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked onchange="updateLocks()"> England or Wales</label>
-        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot" onchange="updateLocks()"> Scotland</label>
-        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni" onchange="updateLocks()"> Northern Ireland</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked> England or Wales</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot"> Scotland</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni"> Northern Ireland</label>
       </div>
       <div class="chk-section">
         <p class="chk-q">What do you want to do?</p>
-        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked onchange="updateLocks()"> Change my name and gender marker</label>
-        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalName" value="name" onchange="updateLocks()"> Change my name only</label>
-        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender" onchange="updateLocks()"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked> Change my name and gender marker</label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalName" value="name"> Change my name only</label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
       </div>
     </fieldset>
     <div id="wrapBornNI" class="hidden">
@@ -515,15 +516,14 @@
     </fieldset>
     <fieldset style="border:none;padding:0;margin:0 0 10px 0;">
       <legend class="section-title">3. Your circumstances</legend>
-    <label class="checkbox-item"><input type="checkbox" id="chkNonUK" onchange="updateLocks()"><span>I have a UK visa or eVisa<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating a visa or eVisa is a separate process, and the order you do things in matters.</em></span></label>
+    <label class="checkbox-item"><input type="checkbox" id="chkNonUK"><span>I have a UK visa or eVisa<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating a visa or eVisa is a separate process, and the order you do things in matters.</em></span></label>
     <label class="checkbox-item"><input type="checkbox" id="chkPhotoID"><span>I have a valid photo ID<br><em class="note" style="margin-top:2px;">Even if it shows your old name. Some organisations, such as banks, may ask for updated photo ID before accepting a name change.</em></span></label>
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment and volunteering status</legend>
       <div class="chk-section">
-        <p class="chk-q">Do you currently work, or are you about to start work or volunteering?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="yes" onchange="updateLocks()"> Yes, and they already have my updated details</label>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update" onchange="updateLocks()"> Yes, but I need to update my details with them</label>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked onchange="updateLocks()"> No</label>
+        <p class="chk-q">Are your employer or volunteering organisation's records up to date with your name or gender?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> Yes, or I'm not employed / volunteering.</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> No, I need to update them.</label>
       </div>
     </fieldset>
     <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role needs a Disclosure and Barring Service (DBS) check<br><em class="note" style="margin-top:2px;">A background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role needs an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
@@ -552,9 +552,9 @@
     </fieldset>
     <fieldset style="border:none;padding:0;margin:0 0 10px 0;">
       <legend class="section-title">4. Documents I already have updated</legend>
-    <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll" onchange="updateLocks()"><span>Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span></label>
+    <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span>Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span></label>
     <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
-    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS" onchange="updateLocks()"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
+    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
       <p class="chk-q--flex">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
@@ -1096,6 +1096,7 @@ function reviewAnswers() {
   document.body.classList.remove('plan-ready','wizard-active');
   V.toggle.style.display = 'flex';
   isWizardMode = false;
+  updateDerivedState();
   renderChecklist();
   updateLocks();
   V.checklist.classList.remove('hidden');
@@ -1111,6 +1112,7 @@ function makeChanges() {
   V.checklist.classList.remove('hidden');
   V.toggle.style.display = 'flex';
   document.body.classList.remove('plan-ready','wizard-active');
+  updateDerivedState();
   renderChecklist();
   updateLocks();
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
@@ -1138,6 +1140,7 @@ function toggleMode() {
     V.wizard.classList.add('hidden');
     V.checklist.classList.remove('hidden');
     document.body.classList.remove('wizard-active');
+    updateDerivedState();
     renderChecklist();
     updateLocks();
   }
@@ -1228,9 +1231,8 @@ function restartApp() {
   refreshToolbarTabindex();
 }
 function setEmploymentRadio(val) {
-  gel('chkEmployedUpdated').checked = val === S.YES;
-  gel('chkEmployedNeeds').checked   = val === S.NEEDS_UPDATE;
-  gel('chkEmployedNo').checked      = val === S.NO || !val;
+  gel('chkEmployedNeeds').checked = val === S.NEEDS_UPDATE;
+  gel('chkEmployedNo').checked    = val !== S.NEEDS_UPDATE;
 }
 function updateDerivedState() {
   const goal     = wizardState.goal || S.BOTH;
@@ -1239,7 +1241,7 @@ function updateDerivedState() {
   const isName   = goal === S.NAME;
   const isNonUK  = wizardState.citizen === S.YES;
   const empVal   = wizardState.employment || S.NO;
-  const isEmployed = empVal === S.YES || empVal === S.NEEDS_UPDATE;
+  const isEmployed = empVal === S.NEEDS_UPDATE;
   const hasDeed  = wizardState.deedpoll === S.YES;
   const isScot   = region === REGION.SCOT;
   const isNI     = region === REGION.NI;
@@ -1255,6 +1257,7 @@ function updateDerivedState() {
   if ((!isScot && !isNI) || isGender)  wizardState.birthCertName = S.NO;
   if (!isNI)                           wizardState.bornInNI      = S.NO;
   if (!isEmployed)                     wizardState.dbs           = S.NO;
+  if (!isEmployed)                     wizardState.dwp           = S.NO;
   if (!isNonUK)                        wizardState.visaUpdated   = S.NO;
   if (shouldLock) {
     wizardState.nhs  = S.NO;
@@ -1338,7 +1341,7 @@ function updateLocks() {
   const isName    = goal === S.NAME;
   const isNonUK   = wizardState.citizen === S.YES;
   const empVal    = wizardState.employment || S.NO;
-  const isEmployed = empVal === 'yes' || empVal === 'needs_update';
+  const isEmployed = empVal === S.NEEDS_UPDATE;
   const hasDeed   = wizardState.deedpoll === S.YES;
   const nhsChecked = wizardState.nhs === S.YES;
   const isScot    = region === REGION.SCOT;
@@ -1347,7 +1350,7 @@ function updateLocks() {
   gel('wrapDeedPoll').classList.toggle('hidden', isGender);
   gel('wrapVisa').classList.toggle('hidden', !isNonUK);
   gel('wrapDBS').classList.toggle('hidden', !isEmployed);
-  gel('wrapDWP').classList.toggle('hidden', isGender);
+  gel('wrapDWP').classList.toggle('hidden', isGender || !isEmployed);
   gel('wrapHMRC').classList.toggle('hidden', isGender);
   gel('wrapChkServices').classList.toggle('hidden', isGender);
   gel('wrapVehicle').classList.toggle('hidden', isGender);
@@ -1372,22 +1375,18 @@ function updateLocks() {
   });
   ['wrapDrivingLicence','wrapPassport'].forEach(id => {
     const wrap = gel(id);
-    const lock = wrap.querySelector('.lock-icon');
     const needsRadio = wrap.querySelector('input[value="needs_update"]');
     const updatedRadio = wrap.querySelector('input[value="updated"]');
     if (shouldLock) {
-      wrap.classList.add('locked');
       needsRadio.disabled = true;
       needsRadio.setAttribute('aria-describedby','lock-deed-poll-reason');
       updatedRadio.disabled = false;
       updatedRadio.removeAttribute('aria-describedby');
-      if (lock) lock.classList.remove('hidden');
     } else {
-      wrap.classList.remove('locked');
       needsRadio.disabled = false;
       needsRadio.removeAttribute('aria-describedby');
-      if (lock) lock.classList.add('hidden');
     }
+    wrap.classList.remove('locked');
   });
 }
 function handleSvcAll(allBox) {
@@ -1490,14 +1489,13 @@ const questions = [
     cond:() => wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'employment', q:'Do you currently work, or are you about to start work or volunteering?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em>', o:() => [
-    [S.YES,          'Yes, and they already have my updated details'],
-    [S.NEEDS_UPDATE, 'Yes, but I need to update my details with them'],
-    [S.NO,           'No']
+  { id:'employment', q:'Are your employer or volunteering organisation\'s records up to date with your name or gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em>', o:() => [
+    [S.NO,           'Yes, or I\'m not employed / volunteering.'],
+    [S.NEEDS_UPDATE, 'No, I need to update them.'],
   ]},
   { id:'dbs', q:() => wizardState.region === REGION.NI
     ? 'Does your role require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>'
-    : 'Does your role require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A Disclosure and Barring Service (DBS) check is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>', cond:() => wizardState.employment === S.YES || wizardState.employment === S.NEEDS_UPDATE, o:() => [
+    : 'Does your role require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A Disclosure and Barring Service (DBS) check is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'services', type:'multi',
@@ -1733,7 +1731,7 @@ function computePlanMeta(p) {
   const isGender  = p.goal === S.GENDER;
   const isName    = p.goal === S.NAME;
   const isNI      = p.region === REGION.NI;
-  const isEmployed = p.employment === S.YES || p.employment === S.NEEDS_UPDATE;
+  const isEmployed = p.employment === S.NEEDS_UPDATE;
   const costs = [];
   if (p.needsPassport) costs.push(isNI ? '<strong>UK passport (if applicable):</strong> A fee applies. Check GOV.UK for current prices.' : '<strong>UK passport:</strong> A fee applies. Check GOV.UK for current prices.');
   if (p.needsDriving)  costs.push(isNI ? '<strong>DVA driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.' : '<strong>Driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.');
@@ -2528,7 +2526,7 @@ window.onload = () => {
   const disclaimerEl = gel('footerDisclaimer');
   if (disclaimerEl && ssg('disclaimerSeen') !== '1') {
     disclaimerEl.open = true;
-    disclaimerEl.addEventListener('toggle', () => { if (!disclaimerEl.open) sss('disclaimerSeen', '1'); }, { once: true });
+    sss('disclaimerSeen', '1');
   }
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
