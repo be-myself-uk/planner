@@ -522,14 +522,14 @@
       <legend class="visually-hidden">Employment and volunteering status</legend>
       <div class="chk-section">
         <p class="chk-q">Are your employer or volunteering organisation's records up to date with your name or gender?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> Yes, or I'm not employed / volunteering.</label>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> No, I need to update them.</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> Yes, they are up to date (or I'm not employed or volunteering)</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> No, I need to update them</label>
       </div>
     </fieldset>
     <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role needs a Disclosure and Barring Service (DBS) check<br><em class="note" style="margin-top:2px;">A background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role needs an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
     <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span></span></label>
     <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, or professional memberships.</em></span></label>
-    <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I own a vehicle registered in my name<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van with a V5C logbook.</em></span></label>
+    <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I have a vehicle registered in my name that needs updating<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van with a V5C logbook. Updating the V5C is separate from updating your driving licence.</em></span></label>
     <div id="wrapChkServices" class="hidden">
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
       <legend class="visually-hidden">Services I need to update</legend>
@@ -1479,8 +1479,8 @@ const questions = [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'employment', q:'Are your employer or volunteering organisation\'s records up to date with your name or gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em>', o:() => [
-    [S.NO,           'Yes, or I\'m not employed / volunteering.'],
-    [S.NEEDS_UPDATE, 'No, I need to update them.'],
+    [S.NO,           'Yes, they are up to date (or I\'m not employed or volunteering)'],
+    [S.NEEDS_UPDATE, 'No, I need to update them'],
   ]},
   { id:'dbs', q:() => wizardState.region === REGION.NI
     ? 'Does your role require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>'
@@ -1492,8 +1492,8 @@ const questions = [
     cond:() => wizardState.goal !== S.GENDER,
     o:() => SERVICES_OPTIONS
   },
-  { id:'vehicle', q:'Do you own a vehicle registered in your name?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van. Updating the V5C logbook is separate from updating your driving licence.</em>', o:() => [
-    [S.YES,'Yes'],[S.NO,'No']
+  { id:'vehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van with a V5C logbook. Updating the V5C is separate from updating your driving licence.</em>', o:() => [
+    [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
   ], cond:() => wizardState.goal !== S.GENDER },
   { id:'student', q:'Do you have qualifications to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, or professional memberships.</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
