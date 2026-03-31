@@ -97,15 +97,33 @@ If you notice a broken link, an outdated process, or a bug, please [open an issu
 
 This project is built and maintained by one person. Contributions that improve accuracy, accessibility, or coverage are welcome.
 
+**Project principles**
+
+All contributions must respect these constraints:
+
+- **100% private** — no data is ever sent to a server; no analytics, tracking, or external calls of any kind
+- **Accessible** — all features must work with keyboard navigation and screen readers; follow WAI-ARIA patterns
+- **No vulnerabilities** — user input is never rendered as HTML; no external scripts, styles, or fonts
+- **No personal data storage** — users do not enter personal information; notes, reminders, and account features are out of scope
+- **Simple English** — write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
+- **General guidance only** — content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
+- **Single file** — the application is one self-contained HTML file with no build step, no framework, and no dependencies
+
 **Useful contributions include:**
 - Corrections to UK government processes or broken links
 - Accessibility improvements
 - Welsh language support
 
 **Tech stack**
-- HTML, CSS, JS. No dependancies or external calls.
+- HTML, CSS, JS. No dependencies or external calls.
 - Single file application.
-- Tests using Playwright for WCAG compliance.
+- End-to-end tests using Playwright.
+
+**Running tests**
+```
+npm install
+npm test
+```
 
 Please [open an issue](../../issues) before starting significant work so we can discuss the approach.
 
