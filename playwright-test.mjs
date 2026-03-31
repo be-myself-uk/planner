@@ -257,7 +257,7 @@ console.log('\n12. Make changes');
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.getByRole('button', { name: 'Show my action plan' }).click();
-  await page.getByRole('button', { name: 'Make changes' }).click();
+  await page.locator('#ubMakeChangesBtn').click();
   assert(await page.isVisible('#checklistView'), 'checklist shown after make changes');
   assert(await page.isHidden('#planView'),        'plan hidden after make changes');
   assert(await page.getByRole('button', { name: 'Update my action plan' }).isVisible(), 'button text changes to Update my action plan');
@@ -448,7 +448,7 @@ console.log('\n22. plan-ready class');
   await openChecklist(page);
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   assert(await page.evaluate(() => document.body.classList.contains('plan-ready')), 'body has plan-ready class when plan shown');
-  await page.getByRole('button', { name: 'Make changes' }).click();
+  await page.locator('#ubMakeChangesBtn').click();
   assert(await page.evaluate(() => !document.body.classList.contains('plan-ready')), 'plan-ready removed when editing');
   await ctx.close();
 }
