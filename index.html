@@ -557,12 +557,12 @@
     <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
-      <p class="chk-q--flex">UK driving licence <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <p class="chk-q--flex">UK driving licence</p>
       <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
       <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
     <div id="wrapPassport" class="chk-section chk-section--mv">
-      <p class="chk-q--flex">Passport <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></p>
+      <p class="chk-q--flex">Passport</p>
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
     </div>
@@ -1106,7 +1106,27 @@ function openChecklist() {
   refreshToolbarTabindex();
 }
 function reviewAnswers() { openChecklist(); }
-function makeChanges()   { openChecklist(); }
+
+function makeChanges() {
+  fadeOutConfetti();
+  if (isWizardMode) {
+    [V.plan, V.welcome, V.checklist].forEach(v => v.classList.add('hidden'));
+    document.body.classList.remove('plan-ready');
+    V.wizard.classList.remove('hidden');
+    document.body.classList.add('wizard-active');
+    V.toggle.style.display = 'flex';
+    
+    // Jump back to the last valid question in the wizard
+    if (step >= questions.length) {
+      step = questions.length - 1;
+      while (step > 0 && questions[step].cond && !questions[step].cond()) step--;
+    }
+    renderWizard();
+  } else {
+    openChecklist();
+  }
+  refreshToolbarTabindex();
+}
 
 function toggleMode() {
   fadeOutConfetti();
@@ -1254,12 +1274,10 @@ function updateDerivedState() {
   if (!isEmployed)                     wizardState.dbs           = S.NO;
   if (!isEmployed)                     wizardState.dwp           = S.NO;
   if (!isNonUK)                        wizardState.visaUpdated   = S.NO;
-  if (shouldLock) {
+if (shouldLock) {
     wizardState.nhs  = S.NO;
     wizardState.hmrc = S.NO;
     if (isNonUK) wizardState.visaUpdated = S.NO;
-    if (wizardState.driving  === S.NEEDS_UPDATE) wizardState.driving  = S.UPDATED;
-    if (wizardState.passport === S.NEEDS_UPDATE) wizardState.passport = S.UPDATED;
   }
   if (isName || wizardState.nhs === S.YES) wizardState.newGP = S.NO;
 }
@@ -1342,7 +1360,9 @@ function updateLocks() {
     ['wrapNewGP',         isName || nhsChecked],
     ['wrapBornNI',        !isNI],
   ].forEach(([id, hide]) => gel(id).classList.toggle('hidden', hide));
+  
   document.body.setAttribute('data-region', region);
+  
   const shouldLock = !isGender && !hasDeed;
   ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
@@ -1356,21 +1376,6 @@ function updateLocks() {
       cbs.forEach(cb => { cb.disabled = false; cb.removeAttribute('aria-describedby'); });
       if (lock) lock.classList.add('hidden');
     }
-  });
-  ['wrapDrivingLicence','wrapPassport'].forEach(id => {
-    const wrap = gel(id);
-    const needsRadio = wrap.querySelector('input[value="needs_update"]');
-    const updatedRadio = wrap.querySelector('input[value="updated"]');
-    if (shouldLock) {
-      needsRadio.disabled = true;
-      needsRadio.setAttribute('aria-describedby','lock-deed-poll-reason');
-      updatedRadio.disabled = false;
-      updatedRadio.removeAttribute('aria-describedby');
-    } else {
-      needsRadio.disabled = false;
-      needsRadio.removeAttribute('aria-describedby');
-    }
-    wrap.classList.remove('locked');
   });
 }
 function handleSvcAll(allBox) {
@@ -1454,12 +1459,12 @@ const questions = [
   ]},
   { id:'driving', q:'Do you have a UK driving licence?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name',true],[S.UPDATED,'No, it is updated or I don\'t have one']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'No, it is updated or I don\'t have one']];
     return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'passport', q:'Do you have a passport?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name',true],[S.UPDATED,'No, it is updated or I don\'t have one']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'No, it is updated or I don\'t have one']];
     return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
   }},
   { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => {
@@ -2506,7 +2511,7 @@ window.onload = () => {
     gel('startChecklistBtn').disabled = false;
   }
   const disclaimerEl = gel('footerDisclaimer');
-  if (disclaimerEl) {
+  if (disclaimerEl && ssg('disclaimerSeen') !== '1') {
     disclaimerEl.open = true;
     sss('disclaimerSeen', '1');
   }
