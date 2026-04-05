@@ -710,13 +710,16 @@ console.log('\n34. Progress bleed: st_ keys cleared when loading a share URL');
   await page.evaluate(() => cycleStepState('trk_deedpoll'));
   assert(await page.evaluate(() => localStorage.getItem('st_trk_deedpoll') === '1'), 'progress saved before loading share URL');
   const url = await shareUrl(page, {reg:'ew',goal:'both',nonUK:false,pid:false,emp:'no',dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:''});
-  await page.goto(url);
-  await page.waitForLoadState('domcontentloaded');
-  await page.locator('#ageConfirmShared').check();
-  await page.waitForSelector('#planView:not(.hidden)');
-  const bleed = await page.evaluate(() => localStorage.getItem('st_trk_deedpoll'));
-  assert(bleed === null, 'old st_ progress keys cleared when loading a share URL (no bleed)');
   await ctx.close();
+  const { page: page2, ctx: ctx2 } = await newPage();
+  await page2.evaluate(() => localStorage.setItem('st_trk_deedpoll', '1'));
+  await page2.goto(url);
+  await page2.waitForLoadState('domcontentloaded');
+  await page2.locator('#ageConfirmShared').check();
+  await page2.waitForSelector('#planView:not(.hidden)');
+  const bleed = await page2.evaluate(() => localStorage.getItem('st_trk_deedpoll'));
+  assert(bleed === null, 'old st_ progress keys cleared when loading a share URL (no bleed)');
+  await ctx2.close();
 }
 
 await browser.close();
