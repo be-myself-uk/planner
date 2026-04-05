@@ -167,10 +167,15 @@ console.log('\n8. Checklist locks');
   await page.getByLabel(/I have a UK visa or eVisa/).check();
   assert(await page.isVisible('#wrapVisa'), 'visa row shown when non-UK ticked');
   assert(await page.isHidden('#wrapDBS'), 'DBS hidden when employment up to date');
-  assert(await page.isHidden('#wrapDWP'), 'DWP hidden when employment up to date');
+  assert(await page.isVisible('#wrapDWP'), 'DWP always visible for name-only goal regardless of employment');
+  await page.getByLabel('Change my name and gender marker').check();
+  assert(await page.isVisible('#wrapDWP'), 'DWP always visible for both goal regardless of employment');
+  await page.getByLabel('Change my gender marker only').check();
+  assert(await page.isHidden('#wrapDWP'), 'DWP hidden for gender-only goal');
+  await page.getByLabel('Change my name only').check();
   await page.getByLabel(/No, I need to update them/).check();
   assert(await page.isVisible('#wrapDBS'), 'DBS shown when employment needs update');
-  assert(await page.isVisible('#wrapDWP'), 'DWP shown when employment needs update');
+  assert(await page.isVisible('#wrapDWP'), 'DWP still visible when employment needs update');
   await ctx.close();
 }
 
@@ -242,10 +247,10 @@ console.log('\n11. All done banner');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my gender marker only').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const btns = page.locator('.step-state-btn[data-track-id]');
   const count = await btns.count();
+  assert(count > 0, 'plan has at least one trackable step');
   for (let i = 0; i < count; i++) { const b = btns.nth(i); await b.click(); await b.click(); }
   await page.locator('#allDoneBanner').waitFor({ state: 'visible' });
   assert(true, 'all done banner appears when all steps marked done');
@@ -342,7 +347,7 @@ console.log('\n15. Shareable link');
       window._shareUrl = url.toString();
     };
   });
-  await page.getByRole('button', { name: 'Copy shareable link to this plan' }).click();
+  await page.getByRole('button', { name: 'Copy link to this plan' }).click();
   const clip = await page.evaluate(() => window._shareUrl);
   assert(clip && clip.includes('?p='), 'share link uses encoded p param');
   const decoded = JSON.parse(atob(new URL(clip).searchParams.get('p')));
@@ -415,28 +420,29 @@ console.log('\n19. Keyboard Escape');
   await page.keyboard.press('Escape');
   assert(await page.isHidden('#helpOverlay'), 'Escape closes help modal');
   let navUrl = null;
-  page.on('request', req => { navUrl = req.url(); });
+  page.on('framenavigated', frame => { if (frame === page.mainFrame()) navUrl = frame.url(); });
   try { await page.keyboard.press('Escape'); } catch {}
-  await page.waitForTimeout(300).catch(() => {});
-  assert(navUrl === null || navUrl.includes('google'), 'Escape with modal closed triggers panic exit');
+  await page.waitForTimeout(500).catch(() => {});
+  assert(navUrl !== null && navUrl.includes('google'), 'Escape with modal closed navigates to google');
   await ctx.close();
 }
 
 console.log('\n20. Panic button');
 {
   const { page, ctx } = await newPage();
+  await checkAgeGate(page);
   let navUrl = null;
-  page.on('request', req => { navUrl = req.url(); });
+  page.on('framenavigated', frame => { if (frame === page.mainFrame()) navUrl = frame.url(); });
   try { await page.getByRole('button', { name: 'Quick Exit' }).click(); } catch {}
-  await page.waitForTimeout(300).catch(() => {});
-  assert(navUrl === null || navUrl.includes('google'), 'panic button triggers navigation to google');
+  await page.waitForTimeout(500).catch(() => {});
+  assert(navUrl !== null && navUrl.includes('google'), 'panic button navigates to google');
   await ctx.close();
 }
 
 console.log('\n21. Theme toggle');
 {
   const { page, ctx } = await newPage();
-  const themeBtn = page.getByRole('button', { name: /Switch to (light|dark) mode/ });
+  const themeBtn = page.getByRole('button', { name: /Theme: switch to (light|dark) mode/ });
   await themeBtn.click();
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   assert(theme === 'dark' || theme === 'light', 'data-theme set after toggle');
@@ -642,6 +648,136 @@ console.log('\n29. HMRC Yes disabled in wizard without deed poll');
   const noInput  = page.locator('input[name="ans"][value="no"]');
   assert(await yesInput.isDisabled(), 'hmrc yes is disabled when no deed poll');
   assert(!await noInput.isDisabled(), 'hmrc no is NOT disabled when no deed poll');
+  await ctx.close();
+}
+
+console.log('\n30. visaUpdated Yes enabled for gender-only users in wizard');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  await page.evaluate(() => {
+    wizardState = { goal: 'gender', region: 'ew', citizen: 'yes', deedpoll: 'no' };
+    step = questions.findIndex(q => q.id === 'visaUpdated');
+    renderWizard();
+  });
+  const yesInput = page.locator('input[name="ans"][value="yes"]');
+  assert(!await yesInput.isDisabled(), 'visaUpdated Yes is enabled for gender-only user (no deed poll needed)');
+  await ctx.close();
+}
+
+console.log('\n31. visaUpdated Yes disabled for name/both users without deed poll');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  await page.evaluate(() => {
+    wizardState = { goal: 'name', region: 'ew', citizen: 'yes', deedpoll: 'no' };
+    step = questions.findIndex(q => q.id === 'visaUpdated');
+    renderWizard();
+  });
+  const yesInput = page.locator('input[name="ans"][value="yes"]');
+  assert(await yesInput.isDisabled(), 'visaUpdated Yes is disabled for name-only user without deed poll');
+  await ctx.close();
+}
+
+console.log('\n32. Gender-only non-UK user gets visa plan step');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my gender marker only').check();
+  await page.getByLabel(/I have a UK visa or eVisa/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.isVisible('#planView'), 'plan shown for gender-only non-UK user');
+  const evisaStep = page.locator('.step-state-btn[data-track-id="trk_evisa"]');
+  assert(await evisaStep.count() > 0, 'eVisa plan step present for gender-only non-UK user');
+  await ctx.close();
+}
+
+console.log('\n33. plan-item class present on plan list items');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const planItems = page.locator('#planContent .plan-item');
+  assert(await planItems.count() > 0, 'plan-item class present on plan list items');
+  await ctx.close();
+}
+
+console.log('\n34. Progress bleed: st_ keys cleared when loading a share URL');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  await page.evaluate(() => cycleStepState('trk_deedpoll'));
+  assert(await page.evaluate(() => localStorage.getItem('st_trk_deedpoll') === '1'), 'progress saved before loading share URL');
+  const url = await shareUrl(page, {reg:'ew',goal:'both',nonUK:false,pid:false,emp:'no',dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:''});
+  await ctx.close();
+  const { page: page2, ctx: ctx2 } = await newPage();
+  await page2.evaluate(() => localStorage.setItem('st_trk_deedpoll', '1'));
+  await page2.goto(url);
+  await page2.waitForLoadState('domcontentloaded');
+  await page2.locator('#ageConfirmShared').check();
+  await page2.waitForSelector('#planView:not(.hidden)');
+  const bleed = await page2.evaluate(() => localStorage.getItem('st_trk_deedpoll'));
+  assert(bleed === null, 'old st_ progress keys cleared when loading a share URL (no bleed)');
+  await ctx2.close();
+}
+
+console.log('\n35. WCAG: keyboard shortcuts table has column headers');
+{
+  const { page, ctx } = await newPage();
+  await page.getByRole('button', { name: 'About this planner' }).click();
+  const table = page.locator('.shortcut-table');
+  const thead = table.locator('thead');
+  assert(await thead.count() > 0, 'shortcuts table has a thead element');
+  const ths = table.locator('th[scope="col"]');
+  assert(await ths.count() === 2, 'shortcuts table has two th[scope=col] headers');
+  await ctx.close();
+}
+
+console.log('\n36. WCAG: controlBar has region landmark role');
+{
+  const { page, ctx } = await newPage();
+  const controlBar = page.locator('#controlBar');
+  assert(await controlBar.getAttribute('role') === 'region', 'controlBar has role=region');
+  assert(await controlBar.getAttribute('aria-label') !== null, 'controlBar has aria-label');
+  await ctx.close();
+}
+
+console.log('\n37. WCAG: theme button aria-label starts with visible label text');
+{
+  const { page, ctx } = await newPage();
+  const themeBtn = page.locator('#themeToggleBtn');
+  const label = await themeBtn.getAttribute('aria-label');
+  assert(label !== null && label.startsWith('Theme'), 'theme button aria-label starts with "Theme"');
+  await ctx.close();
+}
+
+console.log('\n38. WCAG: edit plan button aria-label matches visible label');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const editBtn = page.locator('#ubMakeChangesBtn');
+  assert(await editBtn.getAttribute('aria-label') === 'Edit plan', 'edit plan button aria-label is "Edit plan"');
+  await ctx.close();
+}
+
+console.log('\n39. WCAG: support organisation links are in a list');
+{
+  const { page, ctx } = await newPage();
+  const supportList = page.locator('#footerPrivacy ul').filter({ has: page.locator('a[href*="mermaids"]') });
+  assert(await supportList.count() > 0, 'support org links are wrapped in a ul');
+  const items = supportList.locator('li');
+  assert(await items.count() === 7, 'support list has 7 list items');
+  await ctx.close();
+}
+
+console.log('\n40. WCAG: CC licence SVGs have role=img');
+{
+  const { page, ctx } = await newPage();
+  const ccSvgs = page.locator('svg.cc-icon[role="img"]');
+  assert(await ccSvgs.count() === 4, 'all 4 CC licence SVGs have role=img');
   await ctx.close();
 }
 
