@@ -119,7 +119,7 @@
     50% { background-color:var(--info-bg); border-color:var(--primary); }
   }
   .legend-pulse { animation: legend-pulse 2s ease-in-out 6; }
-  @media (prefers-reduced-motion:reduce) { #planView li, .phase, .collapsed-svc, .svc-sub-li, .svc-sub-ul { transition:none; } #controlBarProgressFill { transition:none; animation:none; background:var(--primary); } .ub-label { transition:none; } .legend-pulse { animation:none; } }
+  @media (prefers-reduced-motion:reduce) { #planView li, .phase, .collapsed-svc, .svc-sub-li, .svc-sub-ul { transition:none; } #controlBarProgressFill { transition:none; animation:none; background:var(--primary); } .ub-label { transition:none; } .legend-pulse { animation:none; } .next-step-highlight { outline:none; } }
   @media (pointer:coarse) { .ub-label { display:none !important; } }
   @media (max-width:600px) {
     #controlBarButtons { flex-wrap:wrap; gap:4px; }
@@ -2387,7 +2387,10 @@ function updateNextStep() {
   });
   if (firstIncompleteBtn) {
     const planItem = firstIncompleteBtn.closest('.plan-item');
-    if (planItem && !planItem.classList.contains('collapsed-step')) planItem.classList.add('next-step-highlight');
+    if (planItem && !planItem.classList.contains('collapsed-step')) {
+      planItem.classList.add('next-step-highlight');
+      planItem.addEventListener('animationend', () => planItem.classList.remove('next-step-highlight'), { once: true });
+    }
   }
   if (announcedLabel) announce(`Your next step is: ${announcedLabel}`);
 }
