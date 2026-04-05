@@ -35,7 +35,7 @@
     --success:#137333; --success-bg:#e6f4ea;
     --info:#1a73e8; --info-bg:#e8f0fe;
     --disabled:#e8eaed; --disabled-text:#767676;
-    --disclaimer-muted:#6b7280;
+    --disclaimer-muted:#5f6368;
     --phase-0:#1585b8; --phase-0-bg:#e3f4fc;
     --phase-1:#b5616f; --phase-1-bg:#fce8ec;
     --phase-2:#8a7400; --phase-2-bg:#fef7e0;
@@ -217,7 +217,7 @@
   [aria-pressed="true"] .focus-count-badge { display:inline; }
   .next-step-highlight { outline:2px solid var(--primary); outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
-    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 3; }
+    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 6; }
     @keyframes nextStepPulse { 0%,100% { outline-color:var(--primary); } 50% { outline-color:transparent; } }
   }
   .item-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold; border:1px solid; margin-right:6px; margin-bottom:4px; }
@@ -279,6 +279,7 @@
   .details-body p { margin-top:0; margin-bottom:15px; }
   .details-body p:last-child { margin-bottom:0; }
   .details-body .links, .plan-top-body .links { display:inline-block; margin-top:8px; color:var(--primary); font-weight:bold; text-decoration:none; padding:8px 12px; background:var(--info-bg); border-radius:6px; margin-right:5px; margin-bottom:5px; transition:opacity 0.2s; }
+  .details-body .links::after, .plan-top-body .links::after { content:' (opens in a new tab)'; display:inline-block; width:1px; height:1px; overflow:hidden; white-space:nowrap; clip:rect(0,0,0,0); font-size:0; }
   .details-body .links:hover, .plan-top-body .links:hover { opacity:0.8; }
   .details-body .links:focus-visible, .plan-top-body .links:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
   .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; }
@@ -375,7 +376,7 @@
   <h1>Be myself</h1>
   <p>A free UK legal identity planner. Answer a few questions and get a personal action plan for changing your name and gender marker (the M or F on your documents).</p>
 </header>
-<div id="controlBar">
+<div id="controlBar" role="region" aria-label="Page controls">
   <div id="saveWarnBanner" class="hidden save-warn-banner" role="alert">
     <span>⚠️ Progress can't be saved on this device — you may be in private browsing mode.</span>
     <button onclick="this.closest('.save-warn-banner').classList.add('hidden')" aria-label="Dismiss save warning">✕</button>
@@ -386,11 +387,11 @@
       <div id="cbLeftGroup">
         <div id="cbPlanActions" class="ub-group">
           <button id="ubRestartBtn" class="ub-icon-btn" onclick="confirmUtilityRestart(this)" aria-label="New plan" title="New plan"><span class="ub-label" aria-hidden="true">New plan</span><span aria-hidden="true">↺</span></button>
-          <button id="ubMakeChangesBtn" class="ub-icon-btn" onclick="makeChanges()" aria-label="Make changes to answers" title="Make changes"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
+          <button id="ubMakeChangesBtn" class="ub-icon-btn" onclick="makeChanges()" aria-label="Edit plan" title="Edit plan"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
           <div class="ub-sep" aria-hidden="true"></div>
           <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">⟲</span></button>
           <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
-          <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy shareable link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
+          <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
           <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
         </div>
         <button id="cbSwitchView" class="ub-icon-btn" onclick="toggleMode()" aria-label="Switch view" title="Switch view"><span class="ub-label" aria-hidden="true">Switch view</span><span aria-hidden="true">⇄</span></button>
@@ -398,7 +399,7 @@
       <span id="controlBarProgressText" aria-hidden="true"></span>
       <div id="cbRightGroup">
         <button id="helpBtn" class="ub-icon-btn" onclick="toggleHelp()" aria-label="About this planner" aria-expanded="false" title="About this planner"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">About</span></button>
-        <button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
+        <button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
       </div>
     </div>
     <div id="controlBarProgress" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -423,6 +424,9 @@
         <p><strong>Is this legal, medical, or financial advice?</strong><br>No. This planner gives general guidance only. It helps you understand the steps and paperwork needed to update your legal documents. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
         <h3>Keyboard shortcuts</h3>
         <table class="shortcut-table" aria-label="Keyboard shortcuts">
+          <thead class="visually-hidden">
+            <tr><th scope="col">Key or action</th><th scope="col">What it does</th></tr>
+          </thead>
           <tbody>
             <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
             <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
@@ -606,7 +610,7 @@
             <span style="font-size:0.85em;">Not needed</span>
           </span>
         </div>
-        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Toolbar</strong></p>
+        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Toolbar</h3>
         <div class="legend-toolbar" aria-hidden="true">
           <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> start over completely. ⚠️ This deletes your plan.</span>
           <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers.</span>
@@ -628,10 +632,10 @@
       <div class="plan-top-body">
         <p style="margin:0 0 10px 0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
 
-        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Getting started</strong></p>
+        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Getting started</h3>
         <p style="margin:0 0 8px 0;">Click either "Answer step-by-step questions" or "Fill out a single checklist" to begin. Both produce the same plan and you can switch between them at any time.</p>
 
-        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Always available</strong></p>
+        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Always available</h3>
         <div class="legend-toolbar" aria-hidden="true">
           <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
           <span class="legend-tb-icon">?</span><span><strong>About this planner:</strong> answers common questions about what this tool does and how it keeps your information private.</span>
@@ -639,7 +643,7 @@
           <span class="legend-tb-icon">↹</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist. Visible while answering questions.</span>
         </div>
 
-        <p style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Plan toolbar</strong></p>
+        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Plan toolbar</h3>
         <div class="legend-toolbar" aria-hidden="true">
           <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
           <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
@@ -675,22 +679,22 @@
       <summary>🤝 Support, privacy, and feedback</summary>
       <div class="plan-top-body">
         <p><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
-        <span style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;">
-          <a href="https://mermaids.org.uk" target="_blank" rel="noopener noreferrer">Mermaids</a>
-          <a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a>
-          <a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual</a>
-          <a href="https://gires.org.uk" target="_blank" rel="noopener noreferrer">GIRES</a>
-          <a href="https://scottishtrans.org" target="_blank" rel="noopener noreferrer">Scottish Trans</a>
-          <a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru</a>
-          <a href="https://reddit.com/r/transgenderUK" target="_blank" rel="noopener noreferrer">r/transgenderUK</a>
-        </span>
+        <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
+          <li><a href="https://mermaids.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://gires.org.uk" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://scottishtrans.org" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://reddit.com/r/transgenderUK" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+        </ul>
         <hr>
-        <p><strong>🔒 Privacy</strong></p>
+        <h3 style="margin:0 0 8px 0;font-size:1em;">🔒 Privacy</h3>
         <p>No personal information is collected and no answers are ever sent to a server. This tool runs entirely inside your web browser.</p>
         <p>To let you return to your plan later, progress is saved on the device you are using. You can delete all saved data at any time by clicking "New plan" or by clearing your browser's site data.</p>
         <p>A security measure may be applied by Cloudflare, the hosting provider, to protect the site from automated attacks. This is not used for tracking or analytics.</p>
         <hr>
-        <p><strong>✉️ Feedback</strong></p>
+        <h3 style="margin:0 0 8px 0;font-size:1em;">✉️ Feedback</h3>
         <p>This planner is built and maintained by one person. If you notice a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
         <a href="https://github.com/be-myself-uk/planner/issues" target="_blank" rel="noopener noreferrer" class="contact-btn">Create GitHub issue <span class="visually-hidden">(opens in a new tab)</span></a>
         <p class="note" style="margin-top:8px;">Opens in a new tab. GitHub may collect analytical data.</p>
@@ -708,12 +712,12 @@
 
     <div class="footer-meta">
       <p><em>Last review: <span id="schemaDate"></span></em></p>
-      <p><a href="https://bemyself.uk" style="color:inherit;">Be myself</a> © <span id="schemaCopyYear"></span> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:inherit;">CC BY-NC-SA 4.0</a>
-        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" class="cc-icon" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
-        <a href="https://github.com/be-myself-uk" style="color:inherit;">GitHub</a></p>
+      <p><a href="https://bemyself.uk" style="color:inherit;">Be myself</a> © <span id="schemaCopyYear"></span> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:inherit;">CC BY-NC-SA 4.0<span class="visually-hidden"> (opens in a new tab)</span></a>
+        <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
+        <a href="https://github.com/be-myself-uk" style="color:inherit;">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a></p>
     </div>
 
   </div>
@@ -838,7 +842,7 @@ function updateThemeIcon() {
   const cur = document.documentElement.getAttribute('data-theme');
   const isDark = cur === 'dark' || (!cur && window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches);
   const html = `<span aria-hidden="true">${isDark ? '☀️' : '🌙'}</span><span class="ub-label" aria-hidden="true">Theme</span>`;
-  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  const label = isDark ? 'Theme: switch to light mode' : 'Theme: switch to dark mode';
   const b = gel('themeToggleBtn'); if (b) { b.innerHTML = html; b.setAttribute('aria-label', label); }
 }
 function trapFocus(e) {
@@ -1001,10 +1005,10 @@ function copyShareableLink() {
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
     if (sBtn) {
-      sBtn.setAttribute('aria-label', 'Link copied! Share only with people you trust.');
+      sBtn.setAttribute('aria-label', 'Copy link: copied! Share only with people you trust.');
       sBtn.querySelector('span:not(.ub-label)').textContent = '✓';
       setTimeout(() => {
-        sBtn.setAttribute('aria-label', 'Copy shareable link to this plan');
+        sBtn.setAttribute('aria-label', 'Copy link to this plan');
         sBtn.querySelector('span:not(.ub-label)').textContent = '🔗';
       }, 4000);
     }
