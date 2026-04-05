@@ -863,12 +863,8 @@ function toggleHelp() {
 }
 function closeHelpOnBackdrop(e) { if (e.target === gel('helpOverlay')) toggleHelp(); }
 function panicExit() {
-  try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
   document.documentElement.style.visibility = 'hidden';
-  try { window.location.replace('https://www.google.co.uk'); } catch(e) {}
-  setTimeout(() => {
-    try { window.location.href = 'https://www.google.co.uk'; } catch(e) {}
-  }, 100);
+  window.location.replace('https://www.google.co.uk');
 }
 function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
