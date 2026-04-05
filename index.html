@@ -215,10 +215,10 @@
   .badge-next { display:inline-block; background:var(--primary); color:var(--text-invert); padding:3px 8px; border-radius:4px; font-size:0.75em; font-weight:bold; text-transform:uppercase; margin-bottom:5px; }
   .focus-count-badge { display:none; font-size:0.65rem; font-weight:bold; background:var(--text); color:var(--bg); border-radius:9px; padding:1px 5px; margin-left:3px; vertical-align:middle; }
   [aria-pressed="true"] .focus-count-badge { display:inline; }
-  .next-step-highlight { outline:2px solid var(--primary); outline-offset:2px; border-radius:4px; }
+  .next-step-highlight { outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
-    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 6; }
-    @keyframes nextStepPulse { 0%,100% { outline-color:var(--primary); } 50% { outline-color:transparent; } }
+    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 2; }
+    @keyframes nextStepPulse { 0% { outline-color:transparent; outline-width:0; } 20% { outline-color:var(--primary); outline-width:2px; } 50% { outline-color:transparent; outline-width:0; } 70% { outline-color:var(--primary); outline-width:2px; } 100% { outline-color:transparent; outline-width:0; } }
   }
   .item-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold; border:1px solid; margin-right:6px; margin-bottom:4px; }
   .badge-green { background:var(--success-bg); color:var(--success); border-color:var(--success); }
@@ -271,7 +271,6 @@
   summary { padding:12px 15px; cursor:pointer; font-size:0.9em; font-weight:bold; color:var(--primary); list-style:none; user-select:none; transition:background 0.2s; }
   summary:hover { background:var(--bg-details-hover); }
   summary:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
-  summary::-webkit-details-marker { display:none; }
   summary::before { content:'▶'; display:inline-block; margin-right:10px; font-size:0.8em; transition:transform 0.2s; }
   details[open] summary::before { transform:rotate(90deg); }
   details[open] summary { border-bottom:1px solid var(--border); background:var(--bg-details-hover); }
@@ -320,7 +319,6 @@
   .legend-tb-icon { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--bg-light); border:1px solid var(--border); border-radius:6px; font-size:1.05em; flex-shrink:0; }
   .svc-detail { margin-top:14px; }
   .svc-sub-ul { margin:8px 0 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;transition:margin 0.5s ease; }
-  .svc-sub-ul:not(:has(li:not(.collapsed-svc))) { margin:0; }
   .svc-sub-li { display:flex; align-items:center; gap:6px; padding:3px 0; max-height:50px; transition:max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease, margin 0.5s ease; overflow:hidden; }
   .svc-sub-li .step-state-btn { flex-shrink:0; width:22px; height:22px; font-size:0.8em; }
   .svc-sub-label { flex:1; font-size:0.85em; }
@@ -755,7 +753,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1775375568;
+const SCHEMA_VERSION = 1774828800;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -1230,15 +1228,7 @@ function restartApp() {
   const fBtn = gel('focusToggleBtn');
   if (fBtn) { fBtn.classList.remove('focus-active'); fBtn.setAttribute('aria-pressed','false'); fBtn.setAttribute('aria-label','Focus mode: off'); }
   V.start.classList.remove('hidden');
-  try {
-    ['appState','wizardState','isWizardMode','ageConfirmed','focusMode','legendSeen'].forEach(k => localStorage.removeItem(k));
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('st_')) keys.push(k);
-    }
-    keys.forEach(k => localStorage.removeItem(k));
-  } catch(e) {}
+  try { localStorage.clear(); } catch(e) {}
   const cb = gel('ageConfirm'); if (cb) cb.checked = false;
   gel('startWizardBtn').disabled = true;
   gel('startChecklistBtn').disabled = true;
@@ -1364,14 +1354,16 @@ function updateLocks() {
     ['wrapBirthCertName', (!isScot && !isNI) || isGender],
     ['wrapNewGP',         isName || nhsChecked],
     ['wrapBornNI',        !isNI],
-  ].forEach(([id, hide]) => gel(id).classList.toggle('hidden', hide));
+  ].forEach(([id, hide]) => { const el = gel(id); if (el) el.classList.toggle('hidden', hide); });
   
   document.body.setAttribute('data-region', region);
   
   const shouldLock = !isGender && !hasDeed;
   ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
-    const wrap = gel(id), cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
+    const wrap = gel(id);
+    if (!wrap) return;
+    const cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
     if (shouldLock) {
       wrap.classList.add('locked');
       cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
@@ -2185,6 +2177,10 @@ function syncSvcParent() {
   const parentState = allSettled ? (states.includes(2) ? 2 : 3) : anyActive ? 1 : 0;
   setStepState(parentId, parentState);
   applyStepState(parentId, parentState);
+  document.querySelectorAll('.svc-sub-ul').forEach(ul => {
+    const anyVisible = Array.from(ul.querySelectorAll('li')).some(li => !li.classList.contains('collapsed-svc'));
+    ul.style.margin = anyVisible ? '' : '0';
+  });
 }
 function applySvcDetailState(trackId, state) {
   const svc = trackId.replace('trk_svc_', '');
@@ -2459,6 +2455,10 @@ function refreshPlan() {
   }
   checkAllDone();
   updateNextStep();
+  document.querySelectorAll('.svc-sub-ul').forEach(ul => {
+    const anyVisible = Array.from(ul.querySelectorAll('li')).some(li => !li.classList.contains('collapsed-svc'));
+    ul.style.margin = anyVisible ? '' : '0';
+  });
 }
 function toggleFocusMode() {
   focusMode = !focusMode;
@@ -2543,6 +2543,30 @@ window.onload = () => {
       if (ae && ae.name === 'ans' && ae.type === 'radio') { e.preventDefault(); nextWizard(); }
     }
   });
+  const checklistEl = gel('checklistView');
+  if (checklistEl) {
+    checklistEl.addEventListener('change', () => {
+      const region = document.querySelector('input[name="chkRegion"]:checked');
+      if (region) wizardState.region = region.value;
+      const goal = document.querySelector('input[name="chkGoal"]:checked');
+      if (goal) wizardState.goal = goal.value;
+      CHK_MAP.forEach(([id, prop]) => { wizardState[prop] = gel(id).checked ? S.YES : S.NO; });
+      const emp = document.querySelector('input[name="chkEmployment"]:checked');
+      if (emp) wizardState.employment = emp.value;
+      const dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
+      wizardState.driving  = dlC ? dlC.value : S.NONE;
+      const ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
+      wizardState.passport = ppC ? ppC.value : S.NONE;
+      wizardState.grc = gel('chkGRC').checked ? S.YES : S.NO;
+      const allTicked = gel('chkSvcAll').checked;
+      wizardState.services = allTicked
+        ? Object.keys(SVC_MAP)
+        : Object.entries(SVC_MAP).filter(([, id]) => gel(id).checked).map(([val]) => val);
+      updateDerivedState();
+      renderChecklist();
+      updateLocks();
+    });
+  }
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
     V.start.classList.add('hidden');
@@ -2585,31 +2609,6 @@ window.onload = () => {
     } catch(e) { console.warn('Could not restore saved app state:', e); }
   }
   V.start.classList.remove('hidden');
-
-  const checklistEl = gel('checklistView');
-  if (checklistEl) {
-    checklistEl.addEventListener('change', () => {
-      const region = document.querySelector('input[name="chkRegion"]:checked');
-      if (region) wizardState.region = region.value;
-      const goal = document.querySelector('input[name="chkGoal"]:checked');
-      if (goal) wizardState.goal = goal.value;
-      CHK_MAP.forEach(([id, prop]) => { wizardState[prop] = gel(id).checked ? S.YES : S.NO; });
-      const emp = document.querySelector('input[name="chkEmployment"]:checked');
-      if (emp) wizardState.employment = emp.value;
-      const dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
-      wizardState.driving  = dlC ? dlC.value : S.NONE;
-      const ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
-      wizardState.passport = ppC ? ppC.value : S.NONE;
-      wizardState.grc = gel('chkGRC').checked ? S.YES : S.NO;
-      const allTicked = gel('chkSvcAll').checked;
-      wizardState.services = allTicked
-        ? Object.keys(SVC_MAP)
-        : Object.entries(SVC_MAP).filter(([, id]) => gel(id).checked).map(([val]) => val);
-      updateDerivedState();
-      renderChecklist();
-      updateLocks();
-    });
-  }
 }
 Object.defineProperty(window, 'wizardState', { get: () => wizardState, set: v => { wizardState = v; }, configurable: true });
 Object.defineProperty(window, 'isWizardMode', { get: () => isWizardMode, set: v => { isWizardMode = v; }, configurable: true });
