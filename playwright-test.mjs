@@ -420,21 +420,22 @@ console.log('\n19. Keyboard Escape');
   await page.keyboard.press('Escape');
   assert(await page.isHidden('#helpOverlay'), 'Escape closes help modal');
   let navUrl = null;
-  page.on('request', req => { navUrl = req.url(); });
+  page.on('framenavigated', frame => { if (frame === page.mainFrame()) navUrl = frame.url(); });
   try { await page.keyboard.press('Escape'); } catch {}
-  await page.waitForTimeout(300).catch(() => {});
-  assert(navUrl === null || navUrl.includes('google'), 'Escape with modal closed triggers panic exit');
+  await page.waitForTimeout(500).catch(() => {});
+  assert(navUrl !== null && navUrl.includes('google'), 'Escape with modal closed navigates to google');
   await ctx.close();
 }
 
 console.log('\n20. Panic button');
 {
   const { page, ctx } = await newPage();
+  await checkAgeGate(page);
   let navUrl = null;
-  page.on('request', req => { navUrl = req.url(); });
+  page.on('framenavigated', frame => { if (frame === page.mainFrame()) navUrl = frame.url(); });
   try { await page.getByRole('button', { name: 'Quick Exit' }).click(); } catch {}
-  await page.waitForTimeout(300).catch(() => {});
-  assert(navUrl === null || navUrl.includes('google'), 'panic button triggers navigation to google');
+  await page.waitForTimeout(500).catch(() => {});
+  assert(navUrl !== null && navUrl.includes('google'), 'panic button navigates to google');
   await ctx.close();
 }
 
