@@ -217,7 +217,7 @@
   [aria-pressed="true"] .focus-count-badge { display:inline; }
   .next-step-highlight { outline:2px solid var(--primary); outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
-    .next-step-highlight { animation:nextStepPulse 2s ease-in-out infinite; }
+    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 6; }
     @keyframes nextStepPulse { 0%,100% { outline-color:var(--primary); } 50% { outline-color:transparent; } }
   }
   .item-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold; border:1px solid; margin-right:6px; margin-bottom:4px; }
@@ -1734,7 +1734,7 @@ function computePlanMeta(p) {
   const hasHealthGroup = p.needsNHS || p.newGP || p.needsDriving;
   const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student || p.dwp;
   const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
-  const hasStep3 = p.needsPassport || (p.isNonUK && !isGender && !p.visaAlreadyUpdated);
+  const hasStep3 = p.needsPassport || (p.isNonUK && !p.visaAlreadyUpdated);
   const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (isNI && p.bornInNI && !isName);
   const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
   let baseText = '';
@@ -1914,7 +1914,7 @@ function buildSharedPlan(p) {
           'The Department for Work and Pensions handles benefits across Great Britain. If you are applying for a GRC, the guidance pack that comes with it will also cover what to do about DWP.',
           `<p>If you receive any DWP benefits such as Universal Credit, Personal Independence Payment (PIP), Employment and Support Allowance (ESA), or State Pension, there are a few things worth knowing.</p>
 <p><strong>Name changes:</strong> Your National Insurance number should stay the same. HMRC will normally let DWP know about your name change, but check that your benefit letters have updated.</p>
-<p><strong>Gender marker changes:</strong> Once HMRC has processed a gender change (which requires a GRC), they will normally notify DWP automatically. A gender marker change can affect your State Pension age. The GOV.UK page below has current guidance.</p>
+${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed a gender change (which requires a GRC), they will normally notify DWP automatically. A gender marker change can affect your State Pension age. The GOV.UK page below has current guidance.</p>' : ''}
 <a href="https://www.gov.uk/browse/benefits" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Benefits</a>
 <a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a gender change</a>`
         ));
