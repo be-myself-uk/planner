@@ -167,10 +167,15 @@ console.log('\n8. Checklist locks');
   await page.getByLabel(/I have a UK visa or eVisa/).check();
   assert(await page.isVisible('#wrapVisa'), 'visa row shown when non-UK ticked');
   assert(await page.isHidden('#wrapDBS'), 'DBS hidden when employment up to date');
-  assert(await page.isHidden('#wrapDWP'), 'DWP hidden when employment up to date');
+  assert(await page.isVisible('#wrapDWP'), 'DWP always visible for name-only goal regardless of employment');
+  await page.getByLabel('Change my name and gender marker').check();
+  assert(await page.isVisible('#wrapDWP'), 'DWP always visible for both goal regardless of employment');
+  await page.getByLabel('Change my gender marker only').check();
+  assert(await page.isHidden('#wrapDWP'), 'DWP hidden for gender-only goal');
+  await page.getByLabel('Change my name only').check();
   await page.getByLabel(/No, I need to update them/).check();
   assert(await page.isVisible('#wrapDBS'), 'DBS shown when employment needs update');
-  assert(await page.isVisible('#wrapDWP'), 'DWP shown when employment needs update');
+  assert(await page.isVisible('#wrapDWP'), 'DWP still visible when employment needs update');
   await ctx.close();
 }
 
@@ -242,10 +247,10 @@ console.log('\n11. All done banner');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my gender marker only').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const btns = page.locator('.step-state-btn[data-track-id]');
   const count = await btns.count();
+  assert(count > 0, 'plan has at least one trackable step');
   for (let i = 0; i < count; i++) { const b = btns.nth(i); await b.click(); await b.click(); }
   await page.locator('#allDoneBanner').waitFor({ state: 'visible' });
   assert(true, 'all done banner appears when all steps marked done');
@@ -642,6 +647,75 @@ console.log('\n29. HMRC Yes disabled in wizard without deed poll');
   const noInput  = page.locator('input[name="ans"][value="no"]');
   assert(await yesInput.isDisabled(), 'hmrc yes is disabled when no deed poll');
   assert(!await noInput.isDisabled(), 'hmrc no is NOT disabled when no deed poll');
+  await ctx.close();
+}
+
+console.log('\n30. visaUpdated Yes enabled for gender-only users in wizard');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  await page.evaluate(() => {
+    wizardState = { goal: 'gender', region: 'ew', citizen: 'yes', deedpoll: 'no' };
+    step = questions.findIndex(q => q.id === 'visaUpdated');
+    renderWizard();
+  });
+  const yesInput = page.locator('input[name="ans"][value="yes"]');
+  assert(!await yesInput.isDisabled(), 'visaUpdated Yes is enabled for gender-only user (no deed poll needed)');
+  await ctx.close();
+}
+
+console.log('\n31. visaUpdated Yes disabled for name/both users without deed poll');
+{
+  const { page, ctx } = await newPage();
+  await openWizard(page);
+  await page.evaluate(() => {
+    wizardState = { goal: 'name', region: 'ew', citizen: 'yes', deedpoll: 'no' };
+    step = questions.findIndex(q => q.id === 'visaUpdated');
+    renderWizard();
+  });
+  const yesInput = page.locator('input[name="ans"][value="yes"]');
+  assert(await yesInput.isDisabled(), 'visaUpdated Yes is disabled for name-only user without deed poll');
+  await ctx.close();
+}
+
+console.log('\n32. Gender-only non-UK user gets visa plan step');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my gender marker only').check();
+  await page.getByLabel(/I have a UK visa or eVisa/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  assert(await page.isVisible('#planView'), 'plan shown for gender-only non-UK user');
+  const evisaStep = page.locator('.step-state-btn[data-track-id="trk_evisa"]');
+  assert(await evisaStep.count() > 0, 'eVisa plan step present for gender-only non-UK user');
+  await ctx.close();
+}
+
+console.log('\n33. plan-item class present on plan list items');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const planItems = page.locator('#planContent .plan-item');
+  assert(await planItems.count() > 0, 'plan-item class present on plan list items');
+  await ctx.close();
+}
+
+console.log('\n34. Progress bleed: st_ keys cleared when loading a share URL');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  await page.evaluate(() => cycleStepState('trk_deedpoll'));
+  assert(await page.evaluate(() => localStorage.getItem('st_trk_deedpoll') === '1'), 'progress saved before loading share URL');
+  const url = await shareUrl(page, {reg:'ew',goal:'both',nonUK:false,pid:false,emp:'no',dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:''});
+  await page.goto(url);
+  await page.waitForLoadState('domcontentloaded');
+  await page.locator('#ageConfirmShared').check();
+  await page.waitForSelector('#planView:not(.hidden)');
+  const bleed = await page.evaluate(() => localStorage.getItem('st_trk_deedpoll'));
+  assert(bleed === null, 'old st_ progress keys cleared when loading a share URL (no bleed)');
   await ctx.close();
 }
 
