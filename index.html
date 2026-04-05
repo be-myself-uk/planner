@@ -1118,7 +1118,6 @@ function makeChanges() {
     document.body.classList.add('wizard-active');
     V.toggle.style.display = 'flex';
     
-    // Jump back to the last valid question in the wizard
     if (step >= questions.length) {
       step = questions.length - 1;
       while (step > 0 && questions[step].cond && !questions[step].cond()) step--;
@@ -1274,12 +1273,11 @@ function updateDerivedState() {
   if ((!isScot && !isNI) || isGender)  wizardState.birthCertName = S.NO;
   if (!isNI)                           wizardState.bornInNI      = S.NO;
   if (!isEmployed)                     wizardState.dbs           = S.NO;
-  if (!isEmployed)                     wizardState.dwp           = S.NO;
   if (!isNonUK)                        wizardState.visaUpdated   = S.NO;
-if (shouldLock) {
+  if (shouldLock) {
     wizardState.nhs  = S.NO;
     wizardState.hmrc = S.NO;
-    if (isNonUK) wizardState.visaUpdated = S.NO;
+    if (isNonUK && !isGender) wizardState.visaUpdated = S.NO;
   }
   if (isName || wizardState.nhs === S.YES) wizardState.newGP = S.NO;
 }
@@ -1315,9 +1313,7 @@ function planParamsFromWizard() {
     isNonUK:            wizardState.citizen     === S.YES,
     visaAlreadyUpdated: wizardState.visaUpdated === S.YES,
     hasDeedPoll:        wizardState.deedpoll    === S.YES,
-    needsNHS:           wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO
-                          ? true
-                          : (wizardState.nhs === S.NO && wizardState.newGP !== S.YES),
+    needsNHS:           wizardState.goal !== S.GENDER && wizardState.nhs === S.NO && wizardState.newGP !== S.YES,
     newGP:              wizardState.newGP       === S.YES,
     needsDriving:       wizardState.driving     === S.NEEDS_UPDATE,
     needsPassport:      wizardState.passport    === S.NEEDS_UPDATE,
@@ -1353,7 +1349,7 @@ function updateLocks() {
     ['wrapDeedPoll',      isGender],
     ['wrapVisa',          !isNonUK],
     ['wrapDBS',           !isEmployed],
-    ['wrapDWP',           isGender || !isEmployed],
+    ['wrapDWP',           isGender],
     ['wrapHMRC',          isGender],
     ['wrapChkServices',   isGender],
     ['wrapVehicle',       isGender],
@@ -1424,7 +1420,7 @@ const questions = [
     [S.YES, 'Yes, I have a UK visa or eVisa']
   ]},
   { id:'visaUpdated', q:'Have you already updated your UK visa or eVisa?', cond:() => wizardState.citizen === S.YES, o:() => {
-    if (wizardState.deedpoll === S.NO)
+    if (wizardState.deedpoll === S.NO && wizardState.goal !== S.GENDER)
       return [[S.YES,'Yes',true],[S.NO,'No']];
     return [[S.YES,'Yes'],[S.NO,'No']];
   }},
