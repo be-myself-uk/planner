@@ -217,8 +217,8 @@
   [aria-pressed="true"] .focus-count-badge { display:inline; }
   .next-step-highlight { outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
-    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 2; }
-    @keyframes nextStepPulse { 0% { outline-color:transparent; outline-width:0; } 20% { outline-color:var(--primary); outline-width:2px; } 50% { outline-color:transparent; outline-width:0; } 70% { outline-color:var(--primary); outline-width:2px; } 100% { outline-color:transparent; outline-width:0; } }
+    .next-step-highlight { animation:nextStepPulse 2s ease-in-out 6; }
+    @keyframes nextStepPulse { 0%,100% { outline-color:var(--primary); } 50% { outline-color:transparent; } }
   }
   .item-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold; border:1px solid; margin-right:6px; margin-bottom:4px; }
   .badge-green { background:var(--success-bg); color:var(--success); border-color:var(--success); }
@@ -753,7 +753,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1774828800;
+const SCHEMA_VERSION = 1775375568;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
