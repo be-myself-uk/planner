@@ -719,7 +719,7 @@
   </div>
 </footer>
 <template id="tmpl-plan-item">
-  <li>
+  <li class="plan-item">
     <div class="item-inner">
       <div class="item-header">
         <button type="button" class="step-state-btn" data-state="0" aria-pressed="false" title="Click to cycle status">
@@ -895,6 +895,7 @@ function handleUrlLoad(params) {
   isWizardMode = false;
   V.wizard.classList.add('hidden');
   updateLocks();
+  try { const kw=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('st_'))kw.push(k);} kw.forEach(k=>localStorage.removeItem(k)); } catch(e) {}
   let d;
   try { d = decodeState(params.get('p') || ''); } catch(e) { d = null; }
   if (!d) {
@@ -933,6 +934,7 @@ function handleUrlLoad(params) {
   }
 }
 function handleLegacyUrl(params) {
+  try { const kw=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('st_'))kw.push(k);} kw.forEach(k=>localStorage.removeItem(k)); } catch(e) {}
   const b = k => params.get(k) === 'true';
   const legacy = {
     v: 0, reg: REGION.EW,
@@ -1613,6 +1615,7 @@ function generateWizardPlan() {
   V.plan.classList.remove('hidden');
   document.body.classList.remove('wizard-active');
   document.body.classList.add('plan-ready');
+  updateDerivedState();
   sss('appState', JSON.stringify({planGenerated:true, schemaVersion:SCHEMA_VERSION}));
   sss('wizardState', JSON.stringify(wizardState));
   sss('isWizardMode', 'true');
@@ -1622,6 +1625,7 @@ function generateWizardPlan() {
   refreshToolbarTabindex();
 }
 function generateChecklistPlan() {
+  V.welcome.classList.add('hidden');
   V.checklist.classList.add('hidden');
   V.plan.classList.remove('hidden');
   V.toggle.style.display = 'none';
@@ -2411,7 +2415,13 @@ function refreshPlan() {
           }
         }
       } else {
-        if (isSvc) li.style.display = '';
+        if (isSvc) {
+          li.style.display = '';
+          const tmp = li.style.transition;
+          li.style.transition = 'none';
+          li.offsetHeight;
+          li.style.transition = tmp;
+        }
         li.classList.remove('collapsed-step', 'collapsed-svc');
       }
     }
