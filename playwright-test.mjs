@@ -347,7 +347,7 @@ console.log('\n15. Shareable link');
       window._shareUrl = url.toString();
     };
   });
-  await page.getByRole('button', { name: 'Copy shareable link to this plan' }).click();
+  await page.getByRole('button', { name: 'Copy link to this plan' }).click();
   const clip = await page.evaluate(() => window._shareUrl);
   assert(clip && clip.includes('?p='), 'share link uses encoded p param');
   const decoded = JSON.parse(atob(new URL(clip).searchParams.get('p')));
@@ -441,7 +441,7 @@ console.log('\n20. Panic button');
 console.log('\n21. Theme toggle');
 {
   const { page, ctx } = await newPage();
-  const themeBtn = page.getByRole('button', { name: /Switch to (light|dark) mode/ });
+  const themeBtn = page.getByRole('button', { name: /Theme: switch to (light|dark) mode/ });
   await themeBtn.click();
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   assert(theme === 'dark' || theme === 'light', 'data-theme set after toggle');
@@ -720,6 +720,64 @@ console.log('\n34. Progress bleed: st_ keys cleared when loading a share URL');
   const bleed = await page2.evaluate(() => localStorage.getItem('st_trk_deedpoll'));
   assert(bleed === null, 'old st_ progress keys cleared when loading a share URL (no bleed)');
   await ctx2.close();
+}
+
+console.log('\n35. WCAG: keyboard shortcuts table has column headers');
+{
+  const { page, ctx } = await newPage();
+  await page.getByRole('button', { name: 'About this planner' }).click();
+  const table = page.locator('.shortcut-table');
+  const thead = table.locator('thead');
+  assert(await thead.count() > 0, 'shortcuts table has a thead element');
+  const ths = table.locator('th[scope="col"]');
+  assert(await ths.count() === 2, 'shortcuts table has two th[scope=col] headers');
+  await ctx.close();
+}
+
+console.log('\n36. WCAG: controlBar has region landmark role');
+{
+  const { page, ctx } = await newPage();
+  const controlBar = page.locator('#controlBar');
+  assert(await controlBar.getAttribute('role') === 'region', 'controlBar has role=region');
+  assert(await controlBar.getAttribute('aria-label') !== null, 'controlBar has aria-label');
+  await ctx.close();
+}
+
+console.log('\n37. WCAG: theme button aria-label starts with visible label text');
+{
+  const { page, ctx } = await newPage();
+  const themeBtn = page.locator('#themeToggleBtn');
+  const label = await themeBtn.getAttribute('aria-label');
+  assert(label !== null && label.startsWith('Theme'), 'theme button aria-label starts with "Theme"');
+  await ctx.close();
+}
+
+console.log('\n38. WCAG: edit plan button aria-label matches visible label');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const editBtn = page.locator('#ubMakeChangesBtn');
+  assert(await editBtn.getAttribute('aria-label') === 'Edit plan', 'edit plan button aria-label is "Edit plan"');
+  await ctx.close();
+}
+
+console.log('\n39. WCAG: support organisation links are in a list');
+{
+  const { page, ctx } = await newPage();
+  const supportList = page.locator('#footerPrivacy ul').filter({ has: page.locator('a[href*="mermaids"]') });
+  assert(await supportList.count() > 0, 'support org links are wrapped in a ul');
+  const items = supportList.locator('li');
+  assert(await items.count() === 7, 'support list has 7 list items');
+  await ctx.close();
+}
+
+console.log('\n40. WCAG: CC licence SVGs have role=img');
+{
+  const { page, ctx } = await newPage();
+  const ccSvgs = page.locator('svg.cc-icon[role="img"]');
+  assert(await ccSvgs.count() === 4, 'all 4 CC licence SVGs have role=img');
+  await ctx.close();
 }
 
 await browser.close();
