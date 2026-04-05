@@ -755,7 +755,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1775374272;
+const SCHEMA_VERSION = 1774828800;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -862,7 +862,14 @@ function toggleHelp() {
   else         { document.removeEventListener('keydown', trapFocus); gel('helpBtn').focus(); }
 }
 function closeHelpOnBackdrop(e) { if (e.target === gel('helpOverlay')) toggleHelp(); }
-function panicExit() { window.location.replace('https://www.google.co.uk'); }
+function panicExit() {
+  try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+  document.documentElement.style.visibility = 'hidden';
+  try { window.location.replace('https://www.google.co.uk'); } catch(e) {}
+  setTimeout(() => {
+    try { window.location.href = 'https://www.google.co.uk'; } catch(e) {}
+  }, 100);
+}
 function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
   const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? d.emp  : S.NO;
