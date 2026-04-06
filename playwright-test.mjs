@@ -8,12 +8,16 @@ function assert(cond, name) {
   else       { console.error(`  ✗ ${name}`); failed++; }
 }
 
-const browser = await chromium.launch(
-  process.env.PLAYWRIGHT_EXECUTABLE_PATH
-    ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
-    : {}
-);
+const launchOptions = process.env.PLAYWRIGHT_EXECUTABLE_PATH
+  ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
+  : {};
 
+let browser = await chromium.launch(launchOptions);
+
+async function relaunchBrowser() {
+  try { await browser.close(); } catch(e) {}
+  browser = await chromium.launch(launchOptions);
+}
 async function newPage() {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
@@ -846,6 +850,8 @@ console.log('\n45. Services Select all toggles to Select none');
 }
 
 await browser.close();
+
+await relaunchBrowser();
 
 console.log('\n46. PLAN_ITEMS: deed poll content renders in plan');
 {
