@@ -17,6 +17,7 @@ const browser = await chromium.launch(
 async function newPage() {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
+  page.on('pageerror', err => console.error('PAGE ERROR:', err.message));
   await page.goto(filePath);
   await page.waitForLoadState('domcontentloaded');
   return { page, ctx };
