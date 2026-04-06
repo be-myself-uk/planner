@@ -846,6 +846,138 @@ console.log('\n45. Services Select all toggles to Select none');
 
 await browser.close();
 
+console.log('\n46. PLAN_ITEMS: deed poll content renders in plan');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('Unenrolled deed poll'), 'EW deed poll title present');
+  assert(plan.includes('unenrolled deed poll is generally all you need'), 'EW deed poll summary present');
+  await ctx.close();
+}
+
+console.log('\n47. PLAN_ITEMS: Scotland deed poll variant renders correctly');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.locator('input[name="chkRegion"][value="scot"]').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('Deed poll or statutory declaration'), 'Scotland deed poll title present');
+  assert(plan.includes('National Records of Scotland'), 'Scotland NRS reference present');
+  await ctx.close();
+}
+
+console.log('\n48. PLAN_ITEMS: NHS EW name-only variant renders correctly');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name only').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByLabel('NHS record').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('NHS records'), 'NHS item title present');
+  assert(plan.includes('appointments, letters, and prescriptions'), 'name-only NHS summary present');
+  await ctx.close();
+}
+
+console.log('\n49. PLAN_ITEMS: NHS EW gender variant renders correctly');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my gender marker only').check();
+  await page.getByLabel('NHS record').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('new NHS number'), 'gender NHS detail present');
+  await ctx.close();
+}
+
+console.log('\n50. PLAN_ITEMS: DWP NI variant renders correctly');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.locator('input[name="chkRegion"][value="ni"]').check();
+  await page.getByLabel('Change my name only').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByLabel(/I have employment/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('Department for Communities'), 'NI DWP title present');
+  await ctx.close();
+}
+
+console.log('\n51. PLAN_ITEMS: HMRC content renders in plan');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name only').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByLabel('HMRC and taxes').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('HMRC and taxes'), 'HMRC item title present');
+  assert(plan.includes('Special Section D'), 'HMRC detail present');
+  await ctx.close();
+}
+
+console.log('\n52. PLAN_ITEMS: GRC items render for gender goal');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my gender marker only').check();
+  await page.getByLabel(/I would like a Gender Recognition Certificate/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('Medical proof for GRC'), 'grc_med item present');
+  assert(plan.includes('Living proof for GRC'), 'grc_life item present');
+  await ctx.close();
+}
+
+console.log('\n53. wrapBornNI hidden for name-only goal in checklist');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name only').check();
+  assert(await page.isHidden('#wrapBornNI'), 'born in NI hidden for name-only goal');
+  await page.getByLabel('Change my gender marker only').check();
+  assert(await page.isVisible('#wrapBornNI'), 'born in NI visible for gender-only goal');
+  await page.getByLabel('Change my name and gender marker').check();
+  assert(await page.isVisible('#wrapBornNI'), 'born in NI visible for both goal');
+  await ctx.close();
+}
+
+console.log('\n54. renderCost: split cost badge renders correctly in plan');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name only').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.getByLabel(/I have employment/).check();
+  await page.getByLabel(/I have qualifications/).check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = page.locator('#planContent');
+  assert(await plan.locator('.badge-split').count() > 0, 'split cost badges present in plan');
+  await ctx.close();
+}
+
+console.log('\n55. PLAN_ITEMS: driving licence NI variant (DVA) renders correctly');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.locator('input[name="chkRegion"][value="ni"]').check();
+  await page.getByLabel('Change my name only').check();
+  await page.getByLabel(/Deed poll or statutory declaration/).check();
+  await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').check();
+  await page.getByRole('button', { name: 'Show my action plan' }).click();
+  const plan = await page.locator('#planContent').textContent();
+  assert(plan.includes('Driving licence (DVA)'), 'NI driving licence shows DVA title');
+  assert(plan.includes('Driver & Vehicle Agency'), 'DVA detail text present');
+  await ctx.close();
+}
+
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`Results: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);
