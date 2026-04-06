@@ -70,6 +70,7 @@
   #cbRightGroup .ub-icon-btn:hover .ub-label, #cbRightGroup .ub-icon-btn:focus-visible .ub-label, #controlBarButtons > .panic-btn:hover .ub-label, #controlBarButtons > .panic-btn:focus-visible .ub-label { margin-left:4px; }
   .ub-icon-btn.ub-confirming { background:var(--urgent-bg); border-color:var(--urgent); color:var(--urgent); font-size:0.75rem; font-weight:bold; width:auto; padding:0 10px; white-space:nowrap; }
   .ub-icon-btn.ub-confirming .ub-label { display:none; }
+  button.secondary.ub-confirming { background:var(--urgent-bg); border-color:var(--urgent); color:var(--urgent); font-weight:bold; }
   .ub-icon-btn.focus-active { background:var(--primary); color:var(--text-invert); border-color:var(--primary); }
   .ub-icon-btn.focus-active:hover { background:var(--primary-hover); }
   #controlBar { position:sticky; top:8px; z-index:100; margin:20px auto 16px; max-width:800px; padding:0 20px; }
@@ -189,6 +190,9 @@
   button.secondary { background:var(--bg-light); color:var(--text); border:1px solid var(--border); font-size:14px; }
   button.secondary:hover { background:var(--bg-details-hover); }
   button.secondary:focus-visible { outline-color:var(--text); }
+  button.danger { background:var(--urgent); color:#fff; border:none; font-size:14px; }
+  button.danger:hover { filter:brightness(0.88); }
+  button.danger:focus-visible { outline:3px solid var(--urgent); outline-offset:3px; }
   button.large-btn { padding:18px 30px; font-size:1.1em; width:100%; max-width:350px; margin-bottom:15px; }
   button.large-btn:disabled { background:var(--disabled); color:var(--disabled-text); cursor:not-allowed; }
   button.large-btn:disabled:hover { background:var(--disabled); }
@@ -216,7 +220,7 @@
   .focus-count-badge { display:none; font-size:0.65rem; font-weight:bold; background:var(--text); color:var(--bg); border-radius:9px; padding:1px 5px; margin-left:3px; vertical-align:middle; }
   .focus-count-badge:empty { margin-left:0; padding:0; }
   [aria-pressed="true"] .focus-count-badge { display:inline; }
-  .next-step-highlight { outline-offset:2px; border-radius:4px; }
+  .next-step-highlight { outline:2px solid transparent; outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
     .next-step-highlight { animation:nextStepPulse 2s ease-in-out 2; }
     @keyframes nextStepPulse { 0%,100% { outline-color:transparent; } 20%,70% { outline-color:var(--primary); } }
@@ -433,6 +437,7 @@
             <tr><td>Right-click or long-press step</td><td>Cycle state backward</td></tr>
             <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
             <tr><td><kbd>Esc</kbd></td><td>Quick exit — leaves the page immediately</td></tr>
+            <tr><td><kbd>?</kbd></td><td>Open this help panel</td></tr>
           </tbody>
         </table>
       </div>
@@ -500,20 +505,20 @@
         <p class="chk-q">What do you want to do?</p>
         <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalBoth" value="both" checked> Change my name and gender marker</label>
         <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalName" value="name"> Change my name only</label>
-        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already correct on legal documents</em></span></label>
+        <label class="option option-sm"><input type="radio" name="chkGoal" id="chkGoalGender" value="gender"><span>Change my gender marker only<br><em class="note" style="margin-top:2px;">This option assumes your name is already legally correct on your documents</em></span></label>
       </div>
     </fieldset>
     <div id="wrapBornNI" class="hidden">
       <div class="chk-section chk-section--mb">
         <p class="chk-q">Were you born in Northern Ireland?</p>
-        <em class="note" style="display:block;margin-bottom:10px;">Under the Good Friday Agreement, anyone born in Northern Ireland can claim Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>
+        <em class="note" style="display:block;margin-bottom:10px;">This affects which legal routes are available to you. Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship, which opens an alternative route to update a gender marker on an Irish passport.</em>
         <label class="checkbox-item" style="margin:0;border:none;padding:5px;background:transparent;"><input type="checkbox" id="chkBornNI"> Yes, I was born in Northern Ireland</label>
       </div>
     </div>
-    <fieldset style="border:none;padding:0;margin:0 0 10px 0;">
+    <fieldset id="wrapSpecificChoices" style="border:none;padding:0;margin:0 0 10px 0;">
       <legend class="section-title">2. Specific choices</legend>
       <div id="wrapNewGP" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkNewGP"><span>I would like to register with a new GP<br><em class="note" style="margin-top:2px;">Registering at a new practice means your new details are on file from day one.</em></span></label></div>
-      <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-dft">I would like to update my birth certificate to show my new name<br><em class="note" style="margin-top:2px;">Scotland only, and only if your birth was registered there. This can be done without a GRC through the National Records of Scotland.</em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">This creates a public record that links your old and new names. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
+      <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-dft">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This creates a publicly accessible record that links your old and new names permanently. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
       <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a Gender Recognition Certificate (GRC).</em></span></label></div>
       <label class="checkbox-item" id="wrapGRC"><input type="checkbox" id="chkGRC"> I plan to apply for a Gender Recognition Certificate (GRC) at some point</label>
     </fieldset>
@@ -524,14 +529,14 @@
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment and volunteering status</legend>
       <div class="chk-section">
-        <p class="chk-q">Are your employer or volunteering organisation's records up to date with your name or gender?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em></p>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> Yes, they are up to date (or I'm not employed or volunteering)</label>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> No, I need to update them</label>
+        <p class="chk-q">Do you have any employment or volunteering records that need updating?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private. If you are not employed or volunteering, select no.</em></p>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> Yes, I need to update my records</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> No</label>
       </div>
     </fieldset>
-    <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role needs a Disclosure and Barring Service (DBS) check<br><em class="note" style="margin-top:2px;">A background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role needs an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
+    <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role requires a DBS check<br><em class="note" style="margin-top:2px;">A Disclosure and Barring Service check is a background check for roles working or volunteering with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role requires an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for roles working or volunteering with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
     <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span></span></label>
-    <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, or professional memberships.</em></span></label>
+    <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications or professional registrations to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA.</em></span></label>
     <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I have a vehicle registered in my name that needs updating<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van with a V5C logbook. Updating the V5C is separate from updating your driving licence.</em></span></label>
     <div id="wrapChkServices" class="hidden">
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
@@ -548,7 +553,7 @@
         <label class="option option-sm"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> Select all</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> <span id="chkSvcAllLabel">Select all</span></label>
       </div>
       </fieldset>
     </div>
@@ -561,13 +566,15 @@
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
       <p class="chk-q--flex">UK driving licence</p>
-      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs update</label>
-      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Updated or not applicable</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> Needs updating</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated" checked> Already updated</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none"> I do not have one</label>
     </div>
     <div id="wrapPassport" class="chk-section chk-section--mv">
       <p class="chk-q--flex">Passport</p>
-      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs update</label>
-      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Updated or not applicable</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> Needs updating</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated" checked> Already updated</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
     </div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
@@ -577,6 +584,8 @@
       <details id="planLegend" class="plan-top-details">
         <summary>Guide to your plan</summary>
         <div class="plan-top-body">
+        <p style="margin:0 0 12px 0;color:var(--text-muted);font-size:0.95em;">Nothing here has to be done all at once. You can complete these steps in any order unless marked otherwise. Your progress is saved on this device.</p>
+        <hr style="border:none;border-top:1px solid var(--border);margin:0 0 12px 0;">
         <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
           <span>Difficulty:</span>
           <span class="item-badge badge-green" aria-label="Easy">Easy</span>
@@ -754,7 +763,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1774828800;
+const SCHEMA_VERSION = 1775468625;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -879,8 +888,8 @@ function loadUrlParams(d) {
   wizardState.visaUpdated = d.visa  === true ? S.YES : S.NO;
   wizardState.nhs         = d.nhs   === true ? S.YES : S.NO;
   wizardState.hmrc        = d.hmrc  === true ? S.YES : S.NO;
-  wizardState.driving     = d.dl   === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
-  wizardState.passport    = d.pass === 'needs_update' ? S.NEEDS_UPDATE : S.UPDATED;
+  wizardState.driving     = d.dl   === 'needs_update' ? S.NEEDS_UPDATE : d.dl   === 'none' ? S.NONE : S.UPDATED;
+  wizardState.passport    = d.pass === 'needs_update' ? S.NEEDS_UPDATE : d.pass === 'none' ? S.NONE : S.UPDATED;
   wizardState.grc         = d.grc   === true ? S.YES : S.NO;
   wizardState.newGP       = d.newgp === true ? S.YES : S.NO;
   wizardState.dwp         = d.dwp   === true ? S.YES : S.NO;
@@ -1161,11 +1170,13 @@ function toggleMode() {
   refreshToolbarTabindex();
 }
 function confirmRestart(btn) {
-  const reset = () => { btn.dataset.confirming = 'false'; btn.innerHTML = '<span aria-hidden="true">↺</span> New plan'; btn.style.width = ''; };
+  const reset = () => { btn.dataset.confirming = 'false'; btn.classList.remove('ub-confirming'); btn.removeAttribute('aria-label'); btn.innerHTML = '<span aria-hidden="true">↺</span> New plan'; btn.style.width = ''; };
   if (btn.dataset.confirming === 'true') { reset(); restartApp(); return; }
   btn.style.width = btn.getBoundingClientRect().width + 'px';
   btn.dataset.confirming = 'true';
+  btn.classList.add('ub-confirming');
   btn.textContent = 'Confirm?';
+  btn.setAttribute('aria-label', 'Confirm: this will delete your answers and action plan');
   announce('Click again to confirm. This will delete your answers and action plan.');
   setTimeout(() => { if (btn.dataset.confirming === 'true') { reset(); announce('New plan cancelled.'); } }, 4000);
 }
@@ -1277,7 +1288,7 @@ function updateDerivedState() {
     wizardState.hmrc = S.NO;
     if (isNonUK && !isGender) wizardState.visaUpdated = S.NO;
   }
-  if (isName || wizardState.nhs === S.YES) wizardState.newGP = S.NO;
+  if (isName) wizardState.newGP = S.NO;
 }
 function renderChecklist() {
   if (wizardState.region) {
@@ -1291,8 +1302,9 @@ function renderChecklist() {
   }
   CHK_MAP.forEach(([id, prop]) => { gel(id).checked = wizardState[prop] === S.YES; });
   const docRadio = (name, state) => {
-    const v = state === S.NEEDS_UPDATE ? 'needs_update' : 'updated';
-    document.querySelector(`input[name="${name}"][value="${v}"]`).checked = true;
+    const v = state === S.NEEDS_UPDATE ? 'needs_update' : state === S.NONE ? 'none' : 'updated';
+    const el = document.querySelector(`input[name="${name}"][value="${v}"]`);
+    if (el) el.checked = true;
   };
   docRadio('chkDrivingLicenceOpt', wizardState.driving);
   docRadio('chkPassportOpt', wizardState.passport);
@@ -1339,7 +1351,6 @@ function updateLocks() {
   const empVal    = wizardState.employment || S.NO;
   const isEmployed = empVal === S.NEEDS_UPDATE;
   const hasDeed   = wizardState.deedpoll === S.YES;
-  const nhsChecked = wizardState.nhs === S.YES;
   const isScot    = region === REGION.SCOT;
   const isNI      = region === REGION.NI;
   [
@@ -1353,11 +1364,17 @@ function updateLocks() {
     ['wrapVehicle',       isGender],
     ['wrapBirthCert',     isName],
     ['wrapBirthCertName', (!isScot && !isNI) || isGender],
-    ['wrapNewGP',         isName || nhsChecked],
+    ['wrapNewGP',         false],
     ['wrapBornNI',        !isNI],
   ].forEach(([id, hide]) => { const el = gel(id); if (el) el.classList.toggle('hidden', hide); });
   
   document.body.setAttribute('data-region', region);
+  const specSection = gel('wrapSpecificChoices');
+  if (specSection) {
+    const specItems = specSection.querySelectorAll(':scope > div[id], :scope > label[id]');
+    const anyVisible = Array.from(specItems).some(el => !el.classList.contains('hidden'));
+    specSection.classList.toggle('hidden', !anyVisible);
+  }
   
   const shouldLock = !isGender && !hasDeed;
   ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
@@ -1375,13 +1392,30 @@ function updateLocks() {
       if (lock) lock.classList.add('hidden');
     }
   });
+  ['chkDrivingLicenceNeeds','chkPassportNeeds'].forEach(id => {
+    const el = gel(id);
+    if (!el) return;
+    if (shouldLock) {
+      el.disabled = true;
+      el.setAttribute('aria-describedby','lock-deed-poll-reason');
+      if (el.checked) { el.checked = false; gel(id.replace('Needs','Updated')).checked = true; }
+    } else {
+      el.disabled = false;
+      el.removeAttribute('aria-describedby');
+    }
+  });
 }
 function handleSvcAll(allBox) {
   document.querySelectorAll('.chk-service').forEach(cb => cb.checked = allBox.checked);
+  const lbl = gel('chkSvcAllLabel');
+  if (lbl) lbl.textContent = allBox.checked ? 'Select none' : 'Select all';
 }
 function handleSvcItem() {
   const all = document.querySelectorAll('.chk-service');
-  gel('chkSvcAll').checked = Array.from(all).every(cb => cb.checked);
+  const allChecked = Array.from(all).every(cb => cb.checked);
+  gel('chkSvcAll').checked = allChecked;
+  const lbl = gel('chkSvcAllLabel');
+  if (lbl) lbl.textContent = allChecked ? 'Select none' : 'Select all';
 }
 function resetChecklist() {
   wizardState = {
@@ -1405,7 +1439,7 @@ const questions = [
     [REGION.SCOT, 'Scotland'],
     [REGION.NI,   'Northern Ireland']
   ]},
-  { id:'bornInNI', q:'Were you born in Northern Ireland?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Under the Good Friday Agreement, anyone born in Northern Ireland can claim Irish citizenship. This opens up a different route to update your gender marker on an Irish passport, which has a different process from the UK GRC route.</em>',
+  { id:'bornInNI', q:'Were you born in Northern Ireland?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This affects which legal routes are available to you. Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship, which opens an alternative route to update a gender marker on an Irish passport.</em>',
     cond:() => wizardState.region === REGION.NI, o:() => [
     [S.YES,'Yes, I was born in Northern Ireland'],
     [S.NO, 'No, I was born elsewhere']
@@ -1413,17 +1447,15 @@ const questions = [
   { id:'goal', q:'What do you want to do?', o:() => [
     [S.BOTH,   'Change both my name and gender marker'],
     [S.NAME,   'Change my name only'],
-    [S.GENDER, 'Change my gender marker only (my name is already correct)']
+    [S.GENDER, 'Change my gender marker only (my name is already legally correct)']
   ]},
   { id:'citizen', q:'Do you have a UK visa or eVisa?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">An eVisa is a digital visa stored online. Updating a visa or eVisa is a separate process, and the order you do things in matters.</em>', o:() => [
-    [S.NO,  'No, I am a UK citizen or have settled/pre-settled status'],
+    [S.NO,  'No, I do not have a UK visa or eVisa'],
     [S.YES, 'Yes, I have a UK visa or eVisa']
   ]},
-  { id:'visaUpdated', q:'Have you already updated your UK visa or eVisa?', cond:() => wizardState.citizen === S.YES, o:() => {
-    if (wizardState.deedpoll === S.NO && wizardState.goal !== S.GENDER)
-      return [[S.YES,'Yes',true],[S.NO,'No']];
-    return [[S.YES,'Yes'],[S.NO,'No']];
-  }},
+  { id:'visaUpdated', q:'Does your UK visa or eVisa need updating with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">UKVI should be notified of any change to your name or gender marker. It is usually best to update your passport before your eVisa.</em>', cond:() => wizardState.citizen === S.YES, o:() => [
+    [S.YES,'Yes, it needs updating'],[S.NO,'No, it is already updated or does not need updating']
+  ]},
   { id:'deedpoll',
     q:() => wizardState.region === REGION.SCOT
       ? 'Do you have a deed poll or statutory declaration for your name change?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">In Scotland, a free unenrolled deed poll is accepted by most organisations. A statutory declaration through the National Records of Scotland is also an option. Your answer helps us work out whether getting one should be your first step.</em>'
@@ -1447,23 +1479,23 @@ const questions = [
   },
   { id:'newGP',
     q:() => wizardState.region === REGION.SCOT
-      ? 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new name and CHI number are on file from day one, with no need to update an existing record.</em>'
+      ? 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new name and CHI number are on file from day one, with no need to update an existing record. This is an alternative to, or alongside, updating your current record.</em>'
       : wizardState.region === REGION.NI
-      ? 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number may be issued.</em>'
-      : 'Would you like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new details are on file from day one, with no need to update an existing record.</em>',
-    cond:() => wizardState.goal !== S.NAME && wizardState.nhs === S.NO, o:() => [
+      ? 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number may be issued. This is an alternative to, or alongside, updating your current record.</em>'
+      : 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new details are on file from day one, with no need to update an existing record. This is an alternative to, or alongside, updating your current record.</em>',
+    o:() => [
     [S.YES,'Yes, I would like to register with a new GP'],
-    [S.NO, 'No, I will update my existing record']
+    [S.NO, 'No']
   ]},
   { id:'driving', q:'Do you have a UK driving licence?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'No, it is updated or I don\'t have one']];
-    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'Yes, it is already updated'],[S.NONE,'No, I do not have one']];
+    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'Yes, it is already updated'],[S.NONE,'No, I do not have one']];
   }},
   { id:'passport', q:'Do you have a passport?', o:() => {
     if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'No, it is updated or I don\'t have one']];
-    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'No, it is updated or I don\'t have one']];
+      return [[S.NEEDS_UPDATE,'Yes, but it shows my old name'],[S.UPDATED,'Yes, it is already updated'],[S.NONE,'No, I do not have one']];
+    return [[S.NEEDS_UPDATE,'Yes, but I need to update it'],[S.UPDATED,'Yes, it is already updated'],[S.NONE,'No, I do not have one']];
   }},
   { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => {
     if (wizardState.deedpoll === S.NO)
@@ -1476,9 +1508,9 @@ const questions = [
     cond:() => wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'employment', q:'Are your employer or volunteering organisation\'s records up to date with your name or gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private.</em>', o:() => [
-    [S.NO,           'Yes, they are up to date (or I\'m not employed or volunteering)'],
-    [S.NEEDS_UPDATE, 'No, I need to update them'],
+  { id:'employment', q:'Do you have any employment or volunteering records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check services have specific processes for trans people that keep your previous name private. If you are not employed or volunteering, select no.</em>', o:() => [
+    [S.NEEDS_UPDATE, 'Yes, I need to update my records'],
+    [S.NO,           'No'],
   ]},
   { id:'dbs', q:() => wizardState.region === REGION.NI
     ? 'Does your role require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>'
@@ -1493,21 +1525,21 @@ const questions = [
   { id:'vehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van with a V5C logbook. Updating the V5C is separate from updating your driving licence.</em>', o:() => [
     [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
   ], cond:() => wizardState.goal !== S.GENDER },
-  { id:'student', q:'Do you have qualifications to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, or professional memberships.</em>', o:() => [
+  { id:'student', q:'Do you have qualifications or professional registrations to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA.</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'birthCertName',
     q:() => wizardState.region === REGION.NI
-      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">The General Register Office for Northern Ireland can record a name change on a birth certificate. This creates a public record that links your old and new names, so most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
-      : 'Would you like to update your birth certificate to show your new name?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Scotland only, and only if your birth was registered there. This can be done without a GRC through the National Records of Scotland.</em>',
+      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">The General Register Office for Northern Ireland can record a name change on a birth certificate. ⚠️ This creates a permanently publicly accessible record that links your old and new names. Most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
+      : 'Would you like to update your Scottish birth certificate to show your new name?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em>',
     cond:() => (wizardState.region === REGION.SCOT || wizardState.region === REGION.NI) && wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
-  { id:'birthCert', q:'Would you like to update your birth certificate to show your new gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This requires a Gender Recognition Certificate (GRC). It is a long-term step and is not needed for most day-to-day purposes.</em>',
+  { id:'birthCert', q:'Would you like to update your birth certificate to show your new gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This requires a Gender Recognition Certificate (GRC), as it is not possible without one. It is a long-term step and is not needed for most day-to-day purposes. Indicating yes here means the separate GRC question is not shown.</em>',
     cond:() => wizardState.goal !== S.NAME, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
-  { id:'grc', q:'Do you plan to apply for a Gender Recognition Certificate (GRC) at some point?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A GRC allows your acquired gender to be recognised on birth, marriage, and death certificates, and affects how HMRC, DWP, and pension providers see your records.</em>',
+  { id:'grc', q:'Do you plan to apply for a Gender Recognition Certificate (GRC) at some point?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A GRC legally recognises your acquired gender in UK law. It is required to update your birth certificate and affects how HMRC, DWP, and pension providers see your records. It is not needed for most day-to-day changes. If you already indicated you want to update your birth certificate, you will not see this question.</em>',
     cond:() => wizardState.goal !== S.NAME && wizardState.birthCert !== S.YES, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]}
@@ -1534,11 +1566,13 @@ function renderWizard() {
 </label>`;
     });
     const allSvcVals = opts.map(o => o.value);
-    const noneChecked = allSvcVals.length > 0 && allSvcVals.every(v => selected.includes(v)) ? 'checked' : '';
+    const allChecked = allSvcVals.length > 0 && allSvcVals.every(v => selected.includes(v));
+    const noneChecked = allChecked ? 'checked' : '';
+    const allLabel = allChecked ? 'Select none' : 'Select all';
     html += `<div class="multi-all-sep"></div>
 <label class="option" for="multi_${q.id}_none">
   <input type="checkbox" id="multi_${q.id}_none" class="multi-all" ${noneChecked}>
-  Select all
+  ${allLabel}
 </label>`;
   } else {
     opts.forEach((o, i) => {
@@ -1561,11 +1595,15 @@ function renderWizard() {
 
   if (q.type === 'multi') {
     const noneBox = V.form.querySelector('.multi-all');
+    const noneLabel = noneBox ? noneBox.closest('label') : null;
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
+    const updateAllLabel = () => {
+      if (noneLabel) noneLabel.childNodes[noneLabel.childNodes.length - 1].textContent = optBoxes.every(b => b.checked) ? ' Select none' : ' Select all';
+    };
     optBoxes.forEach(cb => {
-      cb.addEventListener('change', () => { noneBox.checked = optBoxes.every(b => b.checked); });
+      cb.addEventListener('change', () => { noneBox.checked = optBoxes.every(b => b.checked); updateAllLabel(); });
     });
-    noneBox.addEventListener('change', () => { optBoxes.forEach(cb => cb.checked = noneBox.checked); });
+    noneBox.addEventListener('change', () => { optBoxes.forEach(cb => cb.checked = noneBox.checked); updateAllLabel(); });
   }
   const wizPct = Math.round((idx / total) * 100);
   const pFill = gel('controlBarProgressFill');
@@ -1857,8 +1895,8 @@ function buildSharedPlan(p) {
       } else {
         nhsTitle = 'NHS records';
         nhsText = (isBoth || isGender)
-          ? 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record.'
-          : 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration.';
+          ? 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record. Updating your health record ensures your medical care, screening invitations, and correspondence all reflect your correct details.'
+          : 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration. Updating your NHS record means your appointments, letters, and prescriptions all use your new name.';
         nhsDet = (isBoth || isGender)
           ? `<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, the gender marker on your existing number can be updated, though this can sometimes cause issues with how data is shared across different NHS systems.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, it is possible to request that your gender marker be recorded as I or \"Indeterminate\", which may show up as \"Not specified\" on NHS systems. Speak to your GP practice if this applies to you, as the process varies and system support is not universal.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`
           : `<p>Your GP practice can update your name once they have seen your deed poll or statutory declaration. Your NHS number stays the same for a name-only change.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`;
@@ -1929,7 +1967,7 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
     if (p.dbs && isEmployed) {
       if (isNI) {
         addStep(li('dbs', medium, cost('Free','badge-green'), 'AccessNI checks',
-          'Northern Ireland uses AccessNI rather than the DBS. There is a sensitive applications route that keeps your previous name off the certificate shown to your employer. <strong>It is important to contact AccessNI before any application is started.</strong>',
+          'Northern Ireland uses AccessNI rather than the DBS. There is a sensitive applications route that keeps your previous name off the certificate shown to your employer — setting this up in advance means your employer never sees your previous name. <strong>It is important to contact AccessNI before any application is started.</strong>',
           `<p>Northern Ireland does not use the Disclosure and Barring Service (DBS). All criminal background checks are conducted by AccessNI.</p>
 <p>AccessNI has a sensitive applications route for trans applicants. This route should be set up <strong>before</strong> any online application is submitted. If previous names are entered on the standard form, they may appear on the certificate given to the employer.</p>
 <p>You can contact the AccessNI Operations Manager privately beforehand to give your previous names in confidence. AccessNI then runs the background check and issues a certificate showing only your current name. Contact details are on the NI Direct page linked below.</p>
@@ -1937,7 +1975,7 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
         ));
       } else {
         addStep(li('dbs', medium, cost('Free','badge-green'), 'DBS checks',
-          'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. <strong>This route should be set up before any application is started.</strong>',
+          'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. Setting this up in advance means your employer never sees your previous name. <strong>This route should be set up before any application is started.</strong>',
           `<p>The DBS sensitive applications route means your previous name and gender are shared only with the DBS, not shown on the certificate given to your employer. This needs to be arranged <strong>before</strong> an application is submitted. A few days' notice is usually enough.</p><p>You can contact the DBS Sensitive Applications Team directly to set this up. Contact details are on the GOV.UK page linked below.</p><a href="https://www.gov.uk/guidance/transgender-applications" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: DBS transgender applications</a>`
         ));
       }
@@ -1957,7 +1995,7 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
   const buildCivicItems = () => {
     if (!isGender && p.needsHMRC) {
       addStep(li('hmrc', easy, cost('Free','badge-green'), 'HMRC and taxes',
-        'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. This is useful for your privacy.',
+        'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. Keeping HMRC up to date ensures your tax records, payslips, and any benefits payments use the correct name and details.',
         `<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. This is sometimes called "Special Section D" or "PD1" internally. Knowing these terms can help if you need to chase it up by phone. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> HMRC has separate requirements for updating a gender marker, which may include a Gender Recognition Certificate (GRC). The GOV.UK link below explains what is needed.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>`
       ));
     }
@@ -2543,6 +2581,10 @@ window.onload = () => {
       if (ov && !ov.classList.contains('hidden')) toggleHelp();
       else panicExit();
       return;
+    }
+    if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      const ov = gel('helpOverlay');
+      if (ov && ov.classList.contains('hidden')) { toggleHelp(); return; }
     }
     if (e.key === 'Enter' && V.wizard && !V.wizard.classList.contains('hidden')) {
       const ae = document.activeElement;
