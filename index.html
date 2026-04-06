@@ -762,7 +762,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1775468625;
+const SCHEMA_VERSION = 1775472333;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -1625,7 +1625,7 @@ function updateLocks() {
     ['wrapBirthCert',     isName],
     ['wrapBirthCertName', (!isScot && !isNI) || isGender],
     ['wrapNewGP',         false],
-    ['wrapBornNI',        isName],
+    ['wrapBornNI',        !isNI],
   ].forEach(([id, hide]) => { const el = gel(id); if (el) el.classList.toggle('hidden', hide); });
   
   document.body.setAttribute('data-region', region);
@@ -1700,7 +1700,7 @@ const questions = [
     [REGION.NI,   'Northern Ireland']
   ]},
   { id:'bornInNI', q:'Were you born in Northern Ireland?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This affects which legal routes are available to you. Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship, which opens an alternative route to update a gender marker on an Irish passport.</em>',
-    cond:() => wizardState.goal !== S.NAME, o:() => [
+    cond:() => wizardState.region === REGION.NI, o:() => [
     [S.YES,'Yes, I was born in Northern Ireland'],
     [S.NO, 'No, I was born elsewhere']
   ]},
@@ -1830,7 +1830,7 @@ function renderWizard() {
     html += `<div class="multi-all-sep"></div>
 <label class="option" for="multi_${q.id}_none">
   <input type="checkbox" id="multi_${q.id}_none" class="multi-all" ${noneChecked}>
-  <span class="multi-all-label">${allLabel}</span>
+  ${allLabel}
 </label>`;
   } else {
     opts.forEach((o, i) => {
@@ -1856,8 +1856,7 @@ function renderWizard() {
     const noneLabel = noneBox ? noneBox.closest('label') : null;
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
     const updateAllLabel = () => {
-      const span = noneLabel ? noneLabel.querySelector('.multi-all-label') : null;
-      if (span) span.textContent = optBoxes.every(b => b.checked) ? 'Select none' : 'Select all';
+      if (noneLabel) noneLabel.childNodes[noneLabel.childNodes.length - 1].textContent = optBoxes.every(b => b.checked) ? ' Select none' : ' Select all';
     };
     optBoxes.forEach(cb => {
       cb.addEventListener('change', () => { noneBox.checked = optBoxes.every(b => b.checked); updateAllLabel(); });
@@ -2088,9 +2087,46 @@ function buildSharedPlan(p) {
   const closePhase = () => { addStep('</ul></div>'); };
   const buildHealthItems = () => {
     if (p.needsNHS) {
-      const _nhsReg = planItemRegion(PLAN_ITEMS.nhs, isNI ? 'ni' : p.region === REGION.SCOT ? 'scot' : 'default');
-      const _nhsVar = planItemVariant(_nhsReg, (isBoth || isGender) ? 'gender' : 'name');
-      addStep(li('nhs', medium, renderCost(PLAN_ITEMS.nhs.cost), _nhsReg.title, _nhsVar.summary, _nhsVar.detail));
+      const isScot = p.region === REGION.SCOT;
+      let nhsTitle, nhsText, nhsDet;
+      if (isScot) {
+        nhsTitle = 'GP record and CHI number';
+        nhsText = (isBoth || isGender)
+          ? 'Your GP practice can update your gender marker. This is generally treated as a self-declaration process in Scotland, and a new CHI number may be issued.'
+          : 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration.';
+        nhsDet = (isBoth || isGender)
+          ? `<p>In Scotland, updating your gender marker on your health record is generally treated as a self-declaration process. The NHS Inform links below have the current details on what is involved.</p>
+<p>A new CHI number may be issued to protect your privacy by separating your new record from your previous one.</p>
+<p><strong>⚠️ Screening note:</strong> Your CHI number determines which NHS Scotland screening programmes you are automatically invited to. Changing your CHI gender marker may affect which invitations you receive. Ask your GP to check you are enrolled in the right programmes.</p>
+<a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform: Registering with a GP practice</a>
+<a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform: Screening for trans and non-binary people in Scotland</a>`
+          : `<p>Your GP practice can update your name once they have seen your deed poll or statutory declaration. Your CHI number stays the same for a name-only change.</p>
+<a href="https://www.nhsinform.scot/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform Scotland</a>`;
+      } else if (isNI) {
+        nhsTitle = 'HSCNI health record and Health and Care Number';
+        nhsText = (isBoth || isGender)
+          ? 'Your GP practice can update your gender marker through the Business Services Organisation (BSO). A new Health and Care Number (HCN) may be issued. Let any hospital departments you use know about a new number afterwards.'
+          : 'Your GP practice can update your name on your health record. They may ask to see a copy of your deed poll or statutory declaration.';
+        nhsDet = (isBoth || isGender)
+          ? `<p>Health and Social Care Northern Ireland (HSCNI) is administered separately from NHS England and NHS Scotland. Administrative records are managed by the Business Services Organisation (BSO).</p>
+<p>Updating a gender marker on HSCNI records is generally treated as a self-declaration process. A new Health and Care Number (HCN) may be issued, and the previous record sealed for privacy.</p>
+<p><strong>⚠️ Important:</strong> Because HSCNI records do not automatically update across all trusts, let any hospital departments you use know about a new HCN, to avoid fragmented care or delays.</p>
+<p><strong>⚠️ Screening note:</strong> HSCNI cancer screening invitations rely on the gender marker attached to your HCN. Changing your marker may affect which automated screening invitations you receive. Ask your GP to check you are enrolled in the screening programmes right for your body.</p>
+<p><strong>Non-binary gender markers:</strong> It is possible to request that your gender marker be recorded as "Indeterminate", which may show up as "Not specified" in some HSCNI systems. Speak to your GP practice if this applies to you, as support varies across trusts and systems.</p>
+<a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a>
+<a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>`
+          : `<p>For a name-only change, your GP practice contacts the Business Services Organisation (BSO) on your behalf. They may ask to see a copy of your deed poll or statutory declaration. Your Health and Care Number stays the same.</p>
+<a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a>`;
+      } else {
+        nhsTitle = 'NHS records';
+        nhsText = (isBoth || isGender)
+          ? 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record. Updating your health record ensures your medical care, screening invitations, and correspondence all reflect your correct details.'
+          : 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration. Updating your NHS record means your appointments, letters, and prescriptions all use your new name.';
+        nhsDet = (isBoth || isGender)
+          ? `<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, the gender marker on your existing number can be updated, though this can sometimes cause issues with how data is shared across different NHS systems.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, it is possible to request that your gender marker be recorded as I or \"Indeterminate\", which may show up as \"Not specified\" on NHS systems. Speak to your GP practice if this applies to you, as the process varies and system support is not universal.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`
+          : `<p>Your GP practice can update your name once they have seen your deed poll or statutory declaration. Your NHS number stays the same for a name-only change.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>`;
+      }
+      addStep(li('nhs', medium, cost('Free','badge-green'), nhsTitle, nhsText, nhsDet));
     }
     if (p.newGP) {
       const _newgp = planItemRegion(PLAN_ITEMS.newgp, isNI ? 'ni' : p.region === REGION.SCOT ? 'scot' : 'default');
@@ -2113,8 +2149,20 @@ function buildSharedPlan(p) {
       addStep(li('hr', easy, renderCost(_hr.cost), _hr.title, _hr.summary, _hr.detail));
     }
     if (p.dbs && isEmployed) {
-      const _dbs = planItemRegion(PLAN_ITEMS.dbs, isNI ? 'ni' : 'ew');
-      addStep(li('dbs', medium, renderCost(PLAN_ITEMS.dbs.cost), _dbs.title, _dbs.summary, _dbs.detail));
+      if (isNI) {
+        addStep(li('dbs', medium, cost('Free','badge-green'), 'AccessNI checks',
+          'Northern Ireland uses AccessNI rather than the DBS. There is a sensitive applications route that keeps your previous name off the certificate shown to your employer — setting this up in advance means your employer never sees your previous name. <strong>It is important to contact AccessNI before any application is started.</strong>',
+          `<p>Northern Ireland does not use the Disclosure and Barring Service (DBS). All criminal background checks are conducted by AccessNI.</p>
+<p>AccessNI has a sensitive applications route for trans applicants. This route should be set up <strong>before</strong> any online application is submitted. If previous names are entered on the standard form, they may appear on the certificate given to the employer.</p>
+<p>You can contact the AccessNI Operations Manager privately beforehand to give your previous names in confidence. AccessNI then runs the background check and issues a certificate showing only your current name. Contact details are on the NI Direct page linked below.</p>
+<a href="https://www.nidirect.gov.uk/contacts/accessni" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: AccessNI</a>`
+        ));
+      } else {
+        addStep(li('dbs', medium, cost('Free','badge-green'), 'DBS checks',
+          'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. Setting this up in advance means your employer never sees your previous name. <strong>This route should be set up before any application is started.</strong>',
+          `<p>The DBS sensitive applications route means your previous name and gender are shared only with the DBS, not shown on the certificate given to your employer. This needs to be arranged <strong>before</strong> an application is submitted. A few days' notice is usually enough.</p><p>You can contact the DBS Sensitive Applications Team directly to set this up. Contact details are on the GOV.UK page linked below.</p><a href="https://www.gov.uk/guidance/transgender-applications" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: DBS transgender applications</a>`
+        ));
+      }
     }
     if (p.student) {
       const _stu = PLAN_ITEMS.student;
@@ -2123,8 +2171,10 @@ function buildSharedPlan(p) {
   };
   const buildCivicItems = () => {
     if (!isGender && p.needsHMRC) {
-      const _hmrc = PLAN_ITEMS.hmrc;
-      addStep(li('hmrc', easy, renderCost(_hmrc.cost), _hmrc.title, _hmrc.summary, _hmrc.detail));
+      addStep(li('hmrc', easy, cost('Free','badge-green'), 'HMRC and taxes',
+        'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. Keeping HMRC up to date ensures your tax records, payslips, and any benefits payments use the correct name and details.',
+        `<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. This is sometimes called "Special Section D" or "PD1" internally. Knowing these terms can help if you need to chase it up by phone. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> HMRC has separate requirements for updating a gender marker, which may include a Gender Recognition Certificate (GRC). The GOV.UK link below explains what is needed.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>`
+      ));
     }
     if (p.birthCertName) {
       const _bcn = planItemRegion(PLAN_ITEMS.birthcertname, isNI ? 'ni' : 'default');
