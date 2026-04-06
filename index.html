@@ -216,7 +216,7 @@
   .focus-count-badge { display:none; font-size:0.65rem; font-weight:bold; background:var(--text); color:var(--bg); border-radius:9px; padding:1px 5px; margin-left:3px; vertical-align:middle; }
   .focus-count-badge:empty { margin-left:0; padding:0; }
   [aria-pressed="true"] .focus-count-badge { display:inline; }
-  .next-step-highlight { outline:2px solid transparent; outline-offset:2px; border-radius:4px; }
+  .next-step-highlight { outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
     .next-step-highlight { animation:nextStepPulse 2s ease-in-out 2; }
     @keyframes nextStepPulse { 0%,100% { outline-color:transparent; } 20%,70% { outline-color:var(--primary); } }
