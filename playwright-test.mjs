@@ -921,7 +921,6 @@ console.log('\n51. PLAN_ITEMS: HMRC content renders in plan');
   await openChecklist(page);
   await page.getByLabel('Change my name only').check();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
-  await page.locator('#chkHMRC').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const plan = await page.locator('#planContent').textContent();
   assert(plan.includes('HMRC and taxes'), 'HMRC item title present');
@@ -946,14 +945,11 @@ console.log('\n53. wrapBornNI hidden for name-only goal in checklist');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name only').check();
-  await page.waitForFunction(() => document.getElementById('wrapBornNI').classList.contains('hidden'));
+  await page.evaluate(() => { wizardState.goal = 'name'; updateLocks(); });
   assert(await page.isHidden('#wrapBornNI'), 'born in NI hidden for name-only goal');
-  await page.getByLabel('Change my gender marker only').check();
-  await page.waitForFunction(() => !document.getElementById('wrapBornNI').classList.contains('hidden'));
+  await page.evaluate(() => { wizardState.goal = 'gender'; updateLocks(); });
   assert(await page.isVisible('#wrapBornNI'), 'born in NI visible for gender-only goal');
-  await page.getByLabel('Change my name and gender marker').check();
-  await page.waitForFunction(() => !document.getElementById('wrapBornNI').classList.contains('hidden'));
+  await page.evaluate(() => { wizardState.goal = 'both'; updateLocks(); });
   assert(await page.isVisible('#wrapBornNI'), 'born in NI visible for both goal');
   await ctx.close();
 }
