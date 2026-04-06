@@ -465,8 +465,8 @@ console.log('\n23. Region selector');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('England or Wales').check();
-  assert(await page.getByLabel('England or Wales').isChecked(), 'England or Wales selectable');
+  await page.locator('input[name="chkRegion"][value="ew"]').check();
+  assert(await page.locator('input[name="chkRegion"][value="ew"]').isChecked(), 'England or Wales selectable');
   const scotRadio = page.getByRole('radio', { name: 'Scotland' });
   const scotLocked = await scotRadio.isDisabled().catch(() => true);
   if (!scotLocked) {
@@ -669,7 +669,7 @@ console.log('\n30. visaUpdated Yes enabled for gender-only users in wizard');
   await ctx.close();
 }
 
-console.log('\n31. visaUpdated Yes disabled for name/both users without deed poll');
+console.log('\n31. visaUpdated Yes enabled regardless of deed poll state');
 {
   const { page, ctx } = await newPage();
   await openWizard(page);
@@ -679,7 +679,7 @@ console.log('\n31. visaUpdated Yes disabled for name/both users without deed pol
     renderWizard();
   });
   const yesInput = page.locator('input[name="ans"][value="yes"]');
-  assert(await yesInput.isDisabled(), 'visaUpdated Yes is disabled for name-only user without deed poll');
+  assert(!await yesInput.isDisabled(), 'visaUpdated Yes is enabled regardless of deed poll state');
   await ctx.close();
 }
 
@@ -789,11 +789,11 @@ console.log('\n41. Specific choices section visible; Scotland shows birth cert n
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('England or Wales').check();
+  await page.locator('input[name="chkRegion"][value="ew"]').check();
   await page.getByLabel('Change my name only').check();
   assert(await page.isVisible('#wrapSpecificChoices'), 'specific choices section visible (newGP always shown)');
   assert(await page.isHidden('#wrapBirthCertName'), 'birth cert name hidden for EW');
-  await page.getByLabel('Scotland').check();
+  await page.locator('input[name="chkRegion"][value="scot"]').check();
   assert(await page.isVisible('#wrapBirthCertName'), 'birth cert name visible for Scotland');
   await ctx.close();
 }
