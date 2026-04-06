@@ -153,8 +153,8 @@ console.log('\n8. Checklist locks');
   await openChecklist(page);
   assert(await page.getByLabel('NHS record').isDisabled(),     'NHS locked without deed poll');
   assert(await page.getByLabel('HMRC and taxes').isDisabled(), 'HMRC locked without deed poll');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isEnabled(), 'DL needs_update enabled without deed poll');
-  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isEnabled(),       'Passport needs_update enabled without deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'DL needs_update disabled without deed poll');
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(),       'Passport needs_update disabled without deed poll');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   assert(await page.getByLabel('NHS record').isEnabled(),     'NHS unlocked after deed poll');
   assert(await page.getByLabel('HMRC and taxes').isEnabled(), 'HMRC unlocked after deed poll');
@@ -173,7 +173,7 @@ console.log('\n8. Checklist locks');
   await page.getByLabel('Change my gender marker only').check();
   assert(await page.isHidden('#wrapDWP'), 'DWP hidden for gender-only goal');
   await page.getByLabel('Change my name only').check();
-  await page.getByLabel(/No, I need to update them/).check();
+  await page.getByLabel(/Yes, I need to update my records/).check();
   assert(await page.isVisible('#wrapDBS'), 'DBS shown when employment needs update');
   assert(await page.isVisible('#wrapDWP'), 'DWP still visible when employment needs update');
   await ctx.close();
@@ -465,8 +465,8 @@ console.log('\n23. Region selector');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('England or Wales').check();
-  assert(await page.getByLabel('England or Wales').isChecked(), 'England or Wales selectable');
+  await page.locator('input[name="chkRegion"][value="ew"]').check();
+  assert(await page.locator('input[name="chkRegion"][value="ew"]').isChecked(), 'England or Wales selectable');
   const scotRadio = page.getByRole('radio', { name: 'Scotland' });
   const scotLocked = await scotRadio.isDisabled().catch(() => true);
   if (!scotLocked) {
@@ -517,20 +517,23 @@ console.log('\n24. Utility bar');
   await ctx.close();
 }
 
-console.log('\n25. DL and passport radios stay enabled regardless of deed poll');
+console.log('\n25. DL and passport needs_update disabled without deed poll; updated/none always enabled');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(),       'passport needs_update disabled without deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'DL needs_update disabled without deed poll');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isEnabled(),             'passport updated always enabled');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isEnabled(),       'DL updated always enabled');
+  assert(await page.locator('input[name="chkPassportOpt"][value="none"]').isEnabled(),                'passport none always enabled');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').isEnabled(),          'DL none always enabled');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isEnabled(),        'passport needs_update enabled after deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isEnabled(),  'DL needs_update enabled after deed poll');
   await page.locator('input[name="chkPassportOpt"][value="needs_update"]').check();
-  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isChecked(), 'passport set to needs_update');
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isChecked(), 'passport set to needs_update with deed poll');
   await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').check();
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isChecked(), 'driving licence set to needs_update');
-  await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
-  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isEnabled(), 'passport needs_update stays enabled without deed poll');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isEnabled(), 'driving licence needs_update stays enabled without deed poll');
-  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isEnabled(), 'passport updated stays enabled without deed poll');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isEnabled(), 'driving licence updated stays enabled without deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isChecked(), 'DL set to needs_update with deed poll');
   await ctx.close();
 }
 
@@ -625,6 +628,7 @@ console.log('\n28. Driving wizard options change text based on deed poll');
   const needsUpdateLabel = page.locator('label').filter({ has: needsUpdateInput });
   assert(await needsUpdateInput.isEnabled(), 'driving needs_update is enabled even without deed poll');
   assert((await needsUpdateLabel.textContent()).includes('old name'), 'driving label says old name when no deed poll');
+  assert(await page.locator('input[name="ans"][value="none"]').count() > 0, 'driving has third option (no licence)');
   await page.evaluate(() => {
     wizardState.deedpoll = 'yes';
     step = questions.findIndex(q => q.id === 'driving');
@@ -665,7 +669,7 @@ console.log('\n30. visaUpdated Yes enabled for gender-only users in wizard');
   await ctx.close();
 }
 
-console.log('\n31. visaUpdated Yes disabled for name/both users without deed poll');
+console.log('\n31. visaUpdated Yes enabled regardless of deed poll state');
 {
   const { page, ctx } = await newPage();
   await openWizard(page);
@@ -675,7 +679,7 @@ console.log('\n31. visaUpdated Yes disabled for name/both users without deed pol
     renderWizard();
   });
   const yesInput = page.locator('input[name="ans"][value="yes"]');
-  assert(await yesInput.isDisabled(), 'visaUpdated Yes is disabled for name-only user without deed poll');
+  assert(!await yesInput.isDisabled(), 'visaUpdated Yes is enabled regardless of deed poll state');
   await ctx.close();
 }
 
@@ -778,6 +782,65 @@ console.log('\n40. WCAG: CC licence SVGs have role=img');
   const { page, ctx } = await newPage();
   const ccSvgs = page.locator('svg.cc-icon[role="img"]');
   assert(await ccSvgs.count() === 4, 'all 4 CC licence SVGs have role=img');
+  await ctx.close();
+}
+
+console.log('\n41. Specific choices section visible; Scotland shows birth cert name option');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.locator('input[name="chkRegion"][value="ew"]').check();
+  await page.getByLabel('Change my name only').check();
+  assert(await page.isVisible('#wrapSpecificChoices'), 'specific choices section visible (newGP always shown)');
+  assert(await page.isHidden('#wrapBirthCertName'), 'birth cert name hidden for EW');
+  await page.locator('input[name="chkRegion"][value="scot"]').check();
+  assert(await page.isVisible('#wrapBirthCertName'), 'birth cert name visible for Scotland');
+  await ctx.close();
+}
+
+console.log('\n42. New GP visible for name-only goal');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  await page.getByLabel('Change my name only').check();
+  assert(await page.isVisible('#wrapNewGP'), 'new GP visible for name-only goal');
+  await ctx.close();
+}
+
+console.log('\n43. Driving and passport have three radio options');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').count() > 0, 'driving has needs_update option');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').count() > 0, 'driving has updated option');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').count() > 0, 'driving has none option');
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').count() > 0, 'passport has needs_update option');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').count() > 0, 'passport has updated option');
+  assert(await page.locator('input[name="chkPassportOpt"][value="none"]').count() > 0, 'passport has none option');
+  await ctx.close();
+}
+
+console.log('\n44. Employment question answer order');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  const labels = page.locator('input[name="chkEmployment"]').locator('..');
+  const first = await labels.nth(0).textContent();
+  const second = await labels.nth(1).textContent();
+  assert(first.includes('update'), 'first employment option is needs updating');
+  assert(second.trim() === 'No', 'second employment option is No');
+  await ctx.close();
+}
+
+console.log('\n45. Services Select all toggles to Select none');
+{
+  const { page, ctx } = await newPage();
+  await openChecklist(page);
+  assert(await page.locator('#chkSvcAllLabel').textContent() === 'Select all', 'label starts as Select all');
+  await page.locator('#chkSvcAll').check();
+  assert(await page.locator('#chkSvcAllLabel').textContent() === 'Select none', 'label changes to Select none when all checked');
+  await page.locator('#chkSvcAll').uncheck();
+  assert(await page.locator('#chkSvcAllLabel').textContent() === 'Select all', 'label reverts to Select all when unchecked');
   await ctx.close();
 }
 
