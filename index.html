@@ -525,7 +525,6 @@
     <fieldset style="border:none;padding:0;margin:0 0 10px 0;">
       <legend class="section-title">3. Your circumstances</legend>
     <label class="checkbox-item"><input type="checkbox" id="chkNonUK"><span>I have a UK visa or eVisa<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating a visa or eVisa is a separate process, and the order you do things in matters.</em></span></label>
-    <label class="checkbox-item"><input type="checkbox" id="chkPhotoID"><span>I have a valid photo ID<br><em class="note" style="margin-top:2px;">Even if it shows your old name. Some organisations, such as banks, may ask for updated photo ID before accepting a name change.</em></span></label>
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment and volunteering status</legend>
       <div class="chk-section">
@@ -763,7 +762,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1775472333;
+const SCHEMA_VERSION = 1775468625;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -789,6 +788,106 @@ const SERVICES_OPTIONS = [
   { value:'mortgage', label:'Mortgage or home loan lender' },
   { value:'mobile',   label:'Mobile or phone contract' },
 ];
+const SVC_DETAILS = {
+  insurance: `<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>`,
+  council:   `<div id="svc_detail_council" class="svc-detail"><p><strong>Council Tax:</strong> Contact your local council. You may need to provide a copy of your deed poll.</p></div>`,
+  utilities: `<div id="svc_detail_utilities" class="svc-detail"><p><strong>Utility bills:</strong> Contact each provider directly. Keeping these bills in your new name is also useful as evidence if you later apply for a GRC.</p></div>`,
+  electoral: `<div id="svc_detail_electoral" class="svc-detail"><p><strong>Electoral register:</strong> Contact your local council to update your details. Updating the electoral register is also important for your credit score, as credit reference agencies use it to link your records. If you are not registered to vote, you may find it harder to get a phone contract or a credit card in your new name. If you are worried about the open register, you can opt out of the public version.</p><p><strong>Anonymous registration:</strong> If you are concerned about your address being linked to your name publicly, you may be able to apply for an anonymous electoral registration. This keeps your name and address off the published register. The GOV.UK link below has further details.</p><p><strong>Credit file tip:</strong> A few months after updating your name with your bank and on the electoral register, check your credit report (for example through ClearScore or Experian) to make sure your old and new records have merged. A name change can sometimes create a "split file" that temporarily affects your credit score.</p><a href="https://www.gov.uk/register-to-vote" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Register to vote</a><a href="https://www.gov.uk/anonymous-voter-registration" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Anonymous voter registration</a></div>`,
+  landlord:  `<div id="svc_detail_landlord" class="svc-detail"><p><strong>Landlord or letting agency:</strong> Your tenancy agreement may show your old name. Ask your landlord or agency to update their records and to issue an updated agreement or letter if possible.</p></div>`,
+  pension:   `<div id="svc_detail_pension" class="svc-detail"><p><strong>Pension provider:</strong> Contact your pension provider directly with your deed poll. If your pension is through your employer, your HR team may be able to handle this as part of updating your payroll details.</p></div>`,
+  mortgage:  `<div id="svc_detail_mortgage" class="svc-detail"><p><strong>Mortgage or home loan lender:</strong> Contact your lender directly to update your name on the mortgage account. Your lender holds title deeds and account records separately from your everyday bank accounts, so updating your bank account does not automatically update your mortgage. You may need to provide your deed poll and, in some cases, updated photo ID.</p></div>`,
+  mobile:    `<div id="svc_detail_mobile" class="svc-detail"><p><strong>Mobile or phone contract:</strong> Contact your provider to update your name on the account. Many providers accept a deed poll, but some may ask for updated photo ID as well. If your contract is in credit or your credit file is checked as part of the update, an up-to-date electoral register entry in your new name can help.</p></div>`,
+};
+const PLAN_ITEMS = {
+  hr: {
+    difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
+    title: 'Work, payroll, and volunteering',
+    summary: "Your employer's HR or payroll team can update your records once they have seen your deed poll or statutory declaration.",
+    detail: '<p>Under UK data protection law, you can ask to have wrong personal data corrected. The ICO links below explain how this works at work. Sharing your deed poll or statutory declaration with the right team means your payslips, tax reporting, and official records will all use your new name.</p><p>For volunteer roles, the person who looks after volunteer records (a coordinator, HR team, or manager) can update things the same way.</p><a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/employment-practices-and-data-protection-keeping-employment-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Employment records and data protection</a><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a>',
+  },
+  hmrc: {
+    difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
+    title: 'HMRC and taxes',
+    summary: 'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. Keeping HMRC up to date ensures your tax records, payslips, and any benefits payments use the correct name and details.',
+    detail: '<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. This is sometimes called "Special Section D" or "PD1" internally. Knowing these terms can help if you need to chase it up by phone. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> HMRC has separate requirements for updating a gender marker, which may include a Gender Recognition Certificate (GRC). The GOV.UK link below explains what is needed.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>',
+  },
+  student: {
+    difficulty: 'medium', cost: { type:'split', value:'Free', value2:'££', badge:'success', badge2:'simultaneous' },
+    title: 'Qualifications and Student Loans',
+    summary: 'Universities, colleges, exam boards, and professional bodies can update qualification certificates. Processes and fees vary between organisations.',
+    detail: '<p><strong>Student Loans Company (SLC):</strong> A deed poll or certified copy is needed to update your name. They do not automatically receive updates from HMRC or your university.</p>
+<p><strong>Universities:</strong> Most offer free replacement certificates, though some charge a small admin fee.</p>
+<p><strong>Exam boards (e.g. BTEC, City &amp; Guilds):</strong> Each awarding body has its own process and fees. Some charge a significant fee per replacement certificate.</p>
+<p><strong>Professional and vocational bodies:</strong> Regulated professions such as nursing (NMC), law (SRA), and medicine (GMC) each have their own update process. Most have handled these requests before.</p>
+<a href="https://www.gov.uk/student-finance/who-qualifies" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Student finance</a>
+<a href="https://www.gov.uk/guidance/updating-your-personal-details" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Updating your student finance details</a>',
+  },
+  dbs: {
+    difficulty: 'medium', cost: { type:'fixed', value:'Free', badge:'badge-green' },
+    regions: {
+      ni: {
+        title: 'AccessNI checks',
+        summary: 'Northern Ireland uses AccessNI rather than the DBS. There is a sensitive applications route that keeps your previous name off the certificate shown to your employer — setting this up in advance means your employer never sees your previous name. <strong>It is important to contact AccessNI before any application is started.</strong>',
+        detail: '<p>Northern Ireland does not use the Disclosure and Barring Service (DBS). All criminal background checks are conducted by AccessNI.</p>
+<p>AccessNI has a sensitive applications route for trans applicants. This route should be set up <strong>before</strong> any online application is submitted. If previous names are entered on the standard form, they may appear on the certificate given to the employer.</p>
+<p>You can contact the AccessNI Operations Manager privately beforehand to give your previous names in confidence. AccessNI then runs the background check and issues a certificate showing only your current name. Contact details are on the NI Direct page linked below.</p>
+<a href="https://www.nidirect.gov.uk/contacts/accessni" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: AccessNI</a>',
+      },
+      default: {
+        title: 'DBS checks',
+        summary: 'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. Setting this up in advance means your employer never sees your previous name. <strong>This route should be set up before any application is started.</strong>',
+        detail: "<p>The DBS sensitive applications route means your previous name and gender are shared only with the DBS, not shown on the certificate given to your employer. This needs to be arranged <strong>before</strong> an application is submitted. A few days' notice is usually enough.</p><p>You can contact the DBS Sensitive Applications Team directly to set this up. Contact details are on the GOV.UK page linked below.</p><a href=\"https://www.gov.uk/guidance/transgender-applications\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"links\">🔗 GOV.UK: DBS transgender applications</a>",
+      },
+    },
+  },
+  birthcertname: {
+    difficulty: 'medium', cost: { type:'fixed', value:'££', badge:'badge-yellow' },
+    regions: {
+      ni: {
+        title: 'Birth certificate name recording (GRONI)',
+        summary: 'The General Register Office for Northern Ireland (GRONI) can record a name change on a birth certificate. The NI Direct link below has the current application details.',
+        detail: '<p>A name change can be formally recorded on a Northern Irish birth certificate through GRONI. The NI Direct link below has the current application details, including requirements, limitations, and fees.</p>
+<p><strong>⚠️ Privacy note:</strong> This creates a publicly accessible record that links your old and new names. Many people prefer a private deed poll or statutory declaration for day-to-day purposes, and only use this route if a formally recorded certificate is specifically needed.</p>
+<a href="https://www.nidirect.gov.uk/articles/recording-change-name" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Recording a change of name</a>',
+      },
+      default: {
+        title: 'Birth certificate (name change)',
+        summary: 'The National Records of Scotland (NRS) can record a new name on a birth certificate. This is only available for births registered in Scotland.',
+        detail: '<p>A new name can be added to a Scottish birth certificate through NRS. This is separate from the GRC process and covers name changes only. The NRS link below has the current details on how to apply.</p>
+<p>The new certificate will show your new name, with the original name listed alongside. This is a public record, so bear this in mind if privacy is a concern.</p>
+<a href="https://www.nrscotland.gov.uk/registration/changing-your-name/" target="_blank" rel="noopener noreferrer" class="links">🔗 NRS: Changing your name</a>',
+      },
+    },
+  },
+  newgp: {
+    difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
+    regions: {
+      ni: {
+        title: 'Register with a new GP',
+        summary: 'Register at a new HSCNI GP practice using your new name and correct gender marker from the start. A new Health and Care Number may be issued.',
+        detail: '<p>When you register at a new HSCNI practice, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, the Business Services Organisation (BSO) will issue a new Health and Care Number. Your previous record will be sealed. Because records do not automatically update across HSCNI trusts, let any hospital departments you use know about the new HCN.</p><p><strong>⚠️ Screening note:</strong> Your HCN determines which HSCNI screening programmes you are automatically invited to. Ask your new GP to check you are enrolled in the programmes right for your body.</p><a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a><a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>',
+      },
+      scot: {
+        title: 'Register with a new GP',
+        summary: 'Register at a new GP practice using your new name and correct gender marker from the start. A new CHI number may be issued.',
+        detail: '<p>When you register at a new practice in Scotland, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, NHS National Services Scotland (Practitioner Services) should then contact you to ask whether you want a new CHI number issued. This separates your new record from your previous one and protects your privacy.</p><p><strong>⚠️ Screening note:</strong> Your CHI number determines which NHS Scotland screening programmes you are automatically invited to. Ask your new GP to check you are enrolled in the programmes right for your body.</p><a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform: Registering with a GP practice</a><a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform: Screening for trans and non-binary people in Scotland</a>',
+      },
+      default: {
+        title: 'Register with a new GP',
+        summary: 'Register at a new GP practice using your new name and gender marker from the start.',
+        detail: '<p>Registering at a new practice means your new details can be on file from day one, with no need to update an existing record. You can show your deed poll or statutory declaration at registration. If you are also updating your gender marker, let the practice know so they use the correct marker and can request a new NHS number if needed. You do not need to explain why you are changing GP.</p><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: How to register with a GP surgery</a>',
+      },
+    },
+  },
+  v5c: {
+    difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
+    titleFn: (p) => `Vehicle logbook (V5C)`,
+    summaryFn: (p) => `Update your V5C with the ${p.region === 'ni' ? 'DVA' : 'DVLA'} to show your new name.`,
+    detailFn: (p) => `<p><strong>Vehicle logbook (V5C):</strong> The V5C is the document that records the registered keeper of a vehicle. You can notify the ${p.region === 'ni' ? 'Driver &amp; Vehicle Agency (DVA)' : 'DVLA'} of your name change by sending your current V5C with a covering letter, or by completing the relevant section online. There is no fee for a name change.</p><p>This is a separate process from updating your driving licence — even if your licence is already updated, the V5C is held on a different record and will need to be updated separately.</p><a href="https://www.gov.uk/change-name-v5c" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name on your vehicle log book (V5C)</a>`,
+  },
+};
+const planItemRegion = (item, region) => item.regions ? (item.regions[region] || item.regions.default) : item;
+
 let isWizardMode = true;
 let wizardState = {};
 let step = 0;
@@ -880,7 +979,6 @@ function loadUrlParams(d) {
   wizardState.region      = ['ew','scot','ni'].includes(d.reg) ? d.reg : REGION.EW;
   wizardState.goal        = validGoal;
   wizardState.citizen     = d.nonUK === true ? S.YES : S.NO;
-  wizardState.photoID     = d.pid   === true ? S.YES : S.NO;
   wizardState.employment  = validEmp;
   wizardState.dbs         = d.dbs   === true ? S.YES : S.NO;
   wizardState.student     = d.stu   === true ? S.YES : S.NO;
@@ -954,7 +1052,7 @@ function handleLegacyUrl(params) {
   const legacy = {
     v: 0, reg: REGION.EW,
     goal: params.get('goal') || S.BOTH,
-    nonUK: b('nonUK'), pid: b('pid'),
+    nonUK: b('nonUK'),
     emp: b('emp') ? 'yes' : 'no',
     dbs: b('dbs'), stu: false, dp: b('dp'),
     visa: b('visa'), nhs: b('nhs'),
@@ -984,7 +1082,6 @@ function copyShareableLink() {
     reg:   w.region || REGION.EW,
     goal:  w.goal,
     nonUK: w.citizen      === S.YES,
-    pid:   w.photoID      === S.YES,
     emp:   w.employment   || S.NO,
     dbs:   w.dbs          === S.YES,
     stu:   w.student      === S.YES,
@@ -1250,7 +1347,7 @@ function restartApp() {
   refreshToolbarTabindex();
 }
 const CHK_MAP = [
-  ['chkNonUK','citizen'], ['chkVisa','visaUpdated'], ['chkPhotoID','photoID'],
+  ['chkNonUK','citizen'], ['chkVisa','visaUpdated'],
   ['chkDBS','dbs'], ['chkDWP','dwp'], ['chkStudent','student'], ['chkVehicle','vehicle'],
   ['chkDeedPoll','deedpoll'], ['chkNHS','nhs'], ['chkNewGP','newGP'], ['chkHMRC','hmrc'],
   ['chkBirthCertName','birthCertName'], ['chkBirthCert','birthCert'], ['chkBornNI','bornInNI'],
@@ -1280,13 +1377,14 @@ function updateDerivedState() {
   }
   if (isName)                          wizardState.birthCert     = S.NO;
   if ((!isScot && !isNI) || isGender)  wizardState.birthCertName = S.NO;
-  if (!isNI)                           wizardState.bornInNI      = S.NO;
   if (!isEmployed)                     wizardState.dbs           = S.NO;
   if (!isNonUK)                        wizardState.visaUpdated   = S.NO;
   if (shouldLock) {
     wizardState.nhs  = S.NO;
     wizardState.hmrc = S.NO;
     if (isNonUK && !isGender) wizardState.visaUpdated = S.NO;
+    if (wizardState.driving  === S.NEEDS_UPDATE) wizardState.driving  = S.UPDATED;
+    if (wizardState.passport === S.NEEDS_UPDATE) wizardState.passport = S.UPDATED;
   }
   if (isName) wizardState.newGP = S.NO;
 }
@@ -1323,7 +1421,7 @@ function planParamsFromWizard() {
     isNonUK:            wizardState.citizen     === S.YES,
     visaAlreadyUpdated: wizardState.visaUpdated === S.YES,
     hasDeedPoll:        wizardState.deedpoll    === S.YES,
-    needsNHS:           wizardState.goal !== S.GENDER && wizardState.nhs === S.NO && wizardState.newGP !== S.YES,
+    needsNHS:           wizardState.nhs === S.NO && wizardState.newGP !== S.YES,
     newGP:              wizardState.newGP       === S.YES,
     needsDriving:       wizardState.driving     === S.NEEDS_UPDATE,
     needsPassport:      wizardState.passport    === S.NEEDS_UPDATE,
@@ -1336,7 +1434,6 @@ function planParamsFromWizard() {
     birthCertName:      wizardState.birthCertName === S.YES,
     birthCert:          wizardState.birthCert   === S.YES,
     wantsGRC:           wizardState.grc         === S.YES || wizardState.birthCert === S.YES,
-    photoID:            wizardState.photoID     === S.YES,
     isNI,
     bornInNI:           wizardState.bornInNI    === S.YES,
     vehicle:            wizardState.vehicle     === S.YES,
@@ -1365,7 +1462,7 @@ function updateLocks() {
     ['wrapBirthCert',     isName],
     ['wrapBirthCertName', (!isScot && !isNI) || isGender],
     ['wrapNewGP',         false],
-    ['wrapBornNI',        !isNI],
+    ['wrapBornNI',        false],
   ].forEach(([id, hide]) => { const el = gel(id); if (el) el.classList.toggle('hidden', hide); });
   
   document.body.setAttribute('data-region', region);
@@ -1421,7 +1518,7 @@ function resetChecklist() {
   wizardState = {
     region: REGION.EW, goal: S.BOTH,
     citizen: S.NO, employment: S.NO,
-    photoID: S.NO, dbs: S.NO, dwp: S.NO,
+    dbs: S.NO, dwp: S.NO,
     student: S.NO, vehicle: S.NO,
     deedpoll: S.NO, visaUpdated: S.NO,
     nhs: S.NO, newGP: S.NO, hmrc: S.NO,
@@ -1440,7 +1537,7 @@ const questions = [
     [REGION.NI,   'Northern Ireland']
   ]},
   { id:'bornInNI', q:'Were you born in Northern Ireland?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This affects which legal routes are available to you. Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship, which opens an alternative route to update a gender marker on an Irish passport.</em>',
-    cond:() => wizardState.region === REGION.NI, o:() => [
+    cond:() => wizardState.goal !== S.NAME, o:() => [
     [S.YES,'Yes, I was born in Northern Ireland'],
     [S.NO, 'No, I was born elsewhere']
   ]},
@@ -1465,9 +1562,7 @@ const questions = [
     cond:() => wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'photoID', q:'Do you have a valid photo ID?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Even if it shows your old name. Some organisations, such as banks, may ask for updated photo ID before accepting a name change.</em>', o:()  => [
-    [S.YES,'Yes'],[S.NO,'No']
-  ]},
+
   { id:'nhs',
     q:() => wizardState.region === REGION.SCOT
       ? 'Is your GP record and CHI number updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Your CHI (Community Health Index) number is Scotland\'s equivalent of the NHS number. Changing your gender marker on your health record affects which screening programmes you are automatically invited to.</em>'
@@ -1572,7 +1667,7 @@ function renderWizard() {
     html += `<div class="multi-all-sep"></div>
 <label class="option" for="multi_${q.id}_none">
   <input type="checkbox" id="multi_${q.id}_none" class="multi-all" ${noneChecked}>
-  ${allLabel}
+  <span class="multi-all-label">${allLabel}</span>
 </label>`;
   } else {
     opts.forEach((o, i) => {
@@ -1598,7 +1693,8 @@ function renderWizard() {
     const noneLabel = noneBox ? noneBox.closest('label') : null;
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
     const updateAllLabel = () => {
-      if (noneLabel) noneLabel.childNodes[noneLabel.childNodes.length - 1].textContent = optBoxes.every(b => b.checked) ? ' Select none' : ' Select all';
+      const span = noneLabel ? noneLabel.querySelector('.multi-all-label') : null;
+      if (span) span.textContent = optBoxes.every(b => b.checked) ? 'Select none' : 'Select all';
     };
     optBoxes.forEach(cb => {
       cb.addEventListener('change', () => { noneBox.checked = optBoxes.every(b => b.checked); updateAllLabel(); });
@@ -1619,7 +1715,7 @@ function nextWizard() {
   if (q.type === 'multi') {
     const noneBox = V.form.querySelector('.multi-all');
     const optBoxes = Array.from(V.form.querySelectorAll('.multi-opt'));
-    const selected = noneBox && noneBox.checked ? optBoxes.map(cb => cb.value) : optBoxes.filter(cb => cb.checked).map(cb => cb.value);
+    const selected = optBoxes.filter(cb => cb.checked).map(cb => cb.value);
     wizardState[q.id] = selected;
     step++;
     renderWizard();
@@ -1773,14 +1869,14 @@ function computePlanMeta(p) {
   const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student || p.dwp;
   const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !p.visaAlreadyUpdated);
-  const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (isNI && p.bornInNI && !isName);
+  const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (p.bornInNI && !isName);
   const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
   let baseText = '';
   if (hasStep3)      baseText = 'most steps can be completed within 3–10 weeks';
   else if (hasHealthGroup || hasWorkGroup || hasCivicGroup) baseText = 'most steps can be completed within 1–3 weeks';
   else if (!isGender && !p.hasDeedPoll) baseText = 'your first step can usually be completed quickly';
   let timeText = '';
-  if (hasStep4 && isNI && p.bornInNI) timeText = baseText ? `Based on your plan, ${baseText}. The Irish passport route requires 2 years of name-use proof but avoids the longer GRC timeline.` : 'The Irish passport gender-change route requires 2 years of proof that you use your new name.';
+  if (hasStep4 && p.bornInNI) timeText = baseText ? `Based on your plan, ${baseText}. The Irish passport route requires 2 years of name-use proof but avoids the longer GRC timeline.` : 'The Irish passport gender-change route requires 2 years of proof that you use your new name.';
   else if (hasStep4) timeText = baseText ? `Based on your plan, ${baseText}. The GRC will take 2 or more years on top of this.` : 'Based on your plan, the GRC will take 2 or more years.';
   else if (baseText) timeText = `Based on your plan, ${baseText}.`;
   return { isGender, isName, isNI, isEmployed, costs, timeText, hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle };
@@ -1904,21 +2000,9 @@ function buildSharedPlan(p) {
       addStep(li('nhs', medium, cost('Free','badge-green'), nhsTitle, nhsText, nhsDet));
     }
     if (p.newGP) {
-      const isScot = p.region === REGION.SCOT;
-      addStep(li('newgp', easy, cost('Free','badge-green'), 'Register with a new GP',
-        isNI
-          ? 'Register at a new HSCNI GP practice using your new name and correct gender marker from the start. A new Health and Care Number may be issued.'
-          : isScot
-          ? 'Register at a new GP practice using your new name and correct gender marker from the start. A new CHI number may be issued.'
-          : 'Register at a new GP practice using your new name and gender marker from the start.',
-        isNI
-          ? `<p>When you register at a new HSCNI practice, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, the Business Services Organisation (BSO) will issue a new Health and Care Number. Your previous record will be sealed. Because records do not automatically update across HSCNI trusts, let any hospital departments you use know about the new HCN.</p><p><strong>⚠️ Screening note:</strong> Your HCN determines which HSCNI screening programmes you are automatically invited to. Ask your new GP to check you are enrolled in the programmes right for your body.</p><a href="https://bso.hscni.net" target="_blank" rel="noopener noreferrer" class="links">🔗 BSO: HSCNI Business Services Organisation</a><a href="https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users" target="_blank" rel="noopener noreferrer" class="links">🔗 HSCNI: Screening for trans and non-binary people</a>`
-          : isScot
-          ? `<p>When you register at a new practice in Scotland, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, NHS National Services Scotland (Practitioner Services) should then contact you to ask whether you want a new CHI number issued. This separates your new record from your previous one and protects your privacy.</p><p><strong>⚠️ Screening note:</strong> Your CHI number determines which NHS Scotland screening programmes you are automatically invited to. Ask your new GP to check you are enrolled in the programmes right for your body.</p><a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform: Registering with a GP practice</a><a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS Inform: Screening for trans and non-binary people in Scotland</a>`
-          : `<p>Registering at a new practice means your new details can be on file from day one, with no need to update an existing record. You can show your deed poll or statutory declaration at registration. If you are also updating your gender marker, let the practice know so they use the correct marker and can request a new NHS number if needed. You do not need to explain why you are changing GP.</p><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: How to register with a GP surgery</a>`
-      ));
-    }
-    if (p.needsDriving) {
+      const _newgp = planItemRegion(PLAN_ITEMS.newgp, isNI ? 'ni' : p.region === REGION.SCOT ? 'scot' : 'default');
+      addStep(li('newgp', easy, cost(PLAN_ITEMS.newgp.cost.value, PLAN_ITEMS.newgp.cost.badge), _newgp.title, _newgp.summary, _newgp.detail));
+    }    if (p.needsDriving) {
       if (isNI) {
         addStep(li('dva', medium, splitCost('Free','£','success','simultaneous'), 'Driving licence (DVA)',
           `The Driver &amp; Vehicle Agency (DVA) handles driving licences in Northern Ireland. The DVA has its own process for updating gender markers, which differs from the DVLA in Great Britain. The NI Direct links below have the current details.`,
@@ -1959,79 +2043,29 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
       }
     }
     if (p.employment === S.NEEDS_UPDATE) {
-      addStep(li('hr', easy, cost('Free','badge-green'), 'Work, payroll, and volunteering',
-        "Your employer's HR or payroll team can update your records once they have seen your deed poll or statutory declaration.",
-        '<p>Under UK data protection law, you can ask to have wrong personal data corrected. The ICO links below explain how this works at work. Sharing your deed poll or statutory declaration with the right team means your payslips, tax reporting, and official records will all use your new name.</p><p>For volunteer roles, the person who looks after volunteer records (a coordinator, HR team, or manager) can update things the same way.</p><a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/employment-practices-and-data-protection-keeping-employment-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Employment records and data protection</a><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a>'
-      ));
+      const _hr = PLAN_ITEMS.hr;
+      addStep(li('hr', easy, cost(_hr.cost.value, _hr.cost.badge), _hr.title, _hr.summary, _hr.detail));
     }
     if (p.dbs && isEmployed) {
-      if (isNI) {
-        addStep(li('dbs', medium, cost('Free','badge-green'), 'AccessNI checks',
-          'Northern Ireland uses AccessNI rather than the DBS. There is a sensitive applications route that keeps your previous name off the certificate shown to your employer — setting this up in advance means your employer never sees your previous name. <strong>It is important to contact AccessNI before any application is started.</strong>',
-          `<p>Northern Ireland does not use the Disclosure and Barring Service (DBS). All criminal background checks are conducted by AccessNI.</p>
-<p>AccessNI has a sensitive applications route for trans applicants. This route should be set up <strong>before</strong> any online application is submitted. If previous names are entered on the standard form, they may appear on the certificate given to the employer.</p>
-<p>You can contact the AccessNI Operations Manager privately beforehand to give your previous names in confidence. AccessNI then runs the background check and issues a certificate showing only your current name. Contact details are on the NI Direct page linked below.</p>
-<a href="https://www.nidirect.gov.uk/contacts/accessni" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: AccessNI</a>`
-        ));
-      } else {
-        addStep(li('dbs', medium, cost('Free','badge-green'), 'DBS checks',
-          'There is a sensitive applications route for trans people that keeps your previous name off the certificate shown to your employer. Setting this up in advance means your employer never sees your previous name. <strong>This route should be set up before any application is started.</strong>',
-          `<p>The DBS sensitive applications route means your previous name and gender are shared only with the DBS, not shown on the certificate given to your employer. This needs to be arranged <strong>before</strong> an application is submitted. A few days' notice is usually enough.</p><p>You can contact the DBS Sensitive Applications Team directly to set this up. Contact details are on the GOV.UK page linked below.</p><a href="https://www.gov.uk/guidance/transgender-applications" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: DBS transgender applications</a>`
-        ));
-      }
+      const _dbs = planItemRegion(PLAN_ITEMS.dbs, isNI ? 'ni' : 'ew');
+      addStep(li('dbs', medium, cost(PLAN_ITEMS.dbs.cost.value, PLAN_ITEMS.dbs.cost.badge), _dbs.title, _dbs.summary, _dbs.detail));
     }
     if (p.student) {
-      addStep(li('student', medium, splitCost('Free','££','success','simultaneous'), 'Qualifications and Student Loans',
-        'Universities, colleges, exam boards, and professional bodies can update qualification certificates. Processes and fees vary between organisations.',
-        `<p><strong>Student Loans Company (SLC):</strong> A deed poll or certified copy is needed to update your name. They do not automatically receive updates from HMRC or your university.</p>
-<p><strong>Universities:</strong> Most offer free replacement certificates, though some charge a small admin fee.</p>
-<p><strong>Exam boards (e.g. BTEC, City &amp; Guilds):</strong> Each awarding body has its own process and fees. Some charge a significant fee per replacement certificate.</p>
-<p><strong>Professional and vocational bodies:</strong> Regulated professions such as nursing (NMC), law (SRA), and medicine (GMC) each have their own update process. Most have handled these requests before.</p>
-<a href="https://www.gov.uk/student-finance/who-qualifies" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Student finance</a>
-<a href="https://www.gov.uk/guidance/updating-your-personal-details" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Updating your student finance details</a>`
-      ));
+      const _stu = PLAN_ITEMS.student;
+      addStep(li('student', medium, splitCost(_stu.cost.value, _stu.cost.value2, _stu.cost.badge, _stu.cost.badge2), _stu.title, _stu.summary, _stu.detail));
     }
   };
   const buildCivicItems = () => {
     if (!isGender && p.needsHMRC) {
-      addStep(li('hmrc', easy, cost('Free','badge-green'), 'HMRC and taxes',
-        'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. Keeping HMRC up to date ensures your tax records, payslips, and any benefits payments use the correct name and details.',
-        `<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. This is sometimes called "Special Section D" or "PD1" internally. Knowing these terms can help if you need to chase it up by phone. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> HMRC has separate requirements for updating a gender marker, which may include a Gender Recognition Certificate (GRC). The GOV.UK link below explains what is needed.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>`
-      ));
+      const _hmrc = PLAN_ITEMS.hmrc;
+      addStep(li('hmrc', easy, cost(_hmrc.cost.value, _hmrc.cost.badge), _hmrc.title, _hmrc.summary, _hmrc.detail));
     }
     if (p.birthCertName) {
-      if (isNI) {
-        addStep(li('birthcertname', medium, cost('££','badge-yellow'), 'Birth certificate name recording (GRONI)',
-          'The General Register Office for Northern Ireland (GRONI) can record a name change on a birth certificate. The NI Direct link below has the current application details.',
-          `<p>A name change can be formally recorded on a Northern Irish birth certificate through GRONI. The NI Direct link below has the current application details, including requirements, limitations, and fees.</p>
-<p><strong>⚠️ Privacy note:</strong> This creates a publicly accessible record that links your old and new names. Many people prefer a private deed poll or statutory declaration for day-to-day purposes, and only use this route if a formally recorded certificate is specifically needed.</p>
-<a href="https://www.nidirect.gov.uk/articles/recording-change-name" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Recording a change of name</a>`
-        ));
-      } else {
-        addStep(li('birthcertname', medium, cost('££','badge-yellow'), 'Birth certificate (name change)',
-          'The National Records of Scotland (NRS) can record a new name on a birth certificate. This is only available for births registered in Scotland.',
-          `<p>A new name can be added to a Scottish birth certificate through NRS. This is separate from the GRC process and covers name changes only. The NRS link below has the current details on how to apply.</p>
-<p>The new certificate will show your new name, with the original name listed alongside. This is a public record, so bear this in mind if privacy is a concern.</p>
-<a href="https://www.nrscotland.gov.uk/registration/changing-your-name/" target="_blank" rel="noopener noreferrer" class="links">🔗 NRS: Changing your name</a>`
-        ));
-      }
+      const _bcn = planItemRegion(PLAN_ITEMS.birthcertname, isNI ? 'ni' : 'default');
+      addStep(li('birthcertname', medium, cost(PLAN_ITEMS.birthcertname.cost.value, PLAN_ITEMS.birthcertname.cost.badge), _bcn.title, _bcn.summary, _bcn.detail));
     }
     if (!isGender) {
-      const bankNote = !p.photoID
-        ? '<span class="note" style="display:inline;color:var(--urgent);">Because you do not have a photo ID right now, high-street banks might say no. It is often best to get your updated driving licence first.</span>'
-        : '<span class="note" style="display:inline;">If they say no, go back later when you have your updated driving licence.</span>';
       const svcLabels = Object.fromEntries(SERVICES_OPTIONS.map(o => [o.value, o.label.split(' (')[0]]));
-      const svcDetails = {
-        banks:     `<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Most banks should accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. ${!p.photoID ? '<strong>Because you do not have photo ID right now, high-street banks might say no. Getting your updated driving licence first can help.</strong>' : 'If they say no, go back later when you have your updated driving licence.'} Some digital banks allow name changes through their apps without needing updated photo ID.</p><p><strong>If you are 16 or 17:</strong> Some banks may ask for a parent or guardian to be present or to countersign, even though an unenrolled deed poll does not normally require this. If this happens, try a different branch or contact the bank directly to complain.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>`,
-        insurance: `<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>`,
-        council:   `<div id="svc_detail_council" class="svc-detail"><p><strong>Council Tax:</strong> Contact your local council. You may need to provide a copy of your deed poll.</p></div>`,
-        utilities: `<div id="svc_detail_utilities" class="svc-detail"><p><strong>Utility bills:</strong> Contact each provider directly. Keeping these bills in your new name is also useful as evidence if you later apply for a GRC.</p></div>`,
-        electoral: `<div id="svc_detail_electoral" class="svc-detail"><p><strong>Electoral register:</strong> Contact your local council to update your details. Updating the electoral register is also important for your credit score, as credit reference agencies use it to link your records. If you are not registered to vote, you may find it harder to get a phone contract or a credit card in your new name. If you are worried about the open register, you can opt out of the public version.</p><p><strong>Anonymous registration:</strong> If you are concerned about your address being linked to your name publicly, you may be able to apply for an anonymous electoral registration. This keeps your name and address off the published register. The GOV.UK link below has further details.</p><p><strong>Credit file tip:</strong> A few months after updating your name with your bank and on the electoral register, check your credit report (for example through ClearScore or Experian) to make sure your old and new records have merged. A name change can sometimes create a "split file" that temporarily affects your credit score.</p><a href="https://www.gov.uk/register-to-vote" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Register to vote</a><a href="https://www.gov.uk/anonymous-voter-registration" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Anonymous voter registration</a></div>`,
-        landlord:  `<div id="svc_detail_landlord" class="svc-detail"><p><strong>Landlord or letting agency:</strong> Your tenancy agreement may show your old name. Ask your landlord or agency to update their records and to issue an updated agreement or letter if possible.</p></div>`,
-        pension:   `<div id="svc_detail_pension" class="svc-detail"><p><strong>Pension provider:</strong> Contact your pension provider directly with your deed poll. If your pension is through your employer, your HR team may be able to handle this as part of updating your payroll details.</p></div>`,
-        mortgage:  `<div id="svc_detail_mortgage" class="svc-detail"><p><strong>Mortgage or home loan lender:</strong> Contact your lender directly to update your name on the mortgage account. Your lender holds title deeds and account records separately from your everyday bank accounts, so updating your bank account does not automatically update your mortgage. You may need to provide your deed poll and, in some cases, updated photo ID.</p></div>`,
-        mobile:    `<div id="svc_detail_mobile" class="svc-detail"><p><strong>Mobile or phone contract:</strong> Contact your provider to update your name on the account. Many providers accept a deed poll, but some may ask for updated photo ID as well. If your contract is in credit or your credit file is checked as part of the update, an up-to-date electoral register entry in your new name can help.</p></div>`,
-      };
       const allServices = p.services && p.services.length > 0 ? p.services : [];
       if (allServices.length > 0) {
         const hasMultiple = allServices.length > 1;
@@ -2040,12 +2074,12 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
           const label = svcLabels[svc] || svc;
           return `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="trk_services_all" onclick="cycleStepState('${subId}')" oncontextmenu="event.preventDefault();reverseStepState('${subId}')" aria-pressed="false" aria-label="${label}: Not started. Click to cycle forward, right-click or long-press to go back" title="Click to cycle status · Right-click or long-press to go back"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
         }).join('');
-        const expandedDetails = allServices.map(s => svcDetails[s] || '').join('') +
+        const expandedDetails = allServices.map(s => SVC_DETAILS[s] || '').join('') +
           `<p style="margin-top:12px;">Most organisations will accept your deed poll or statutory declaration as proof of your name change. Contact them directly by phone, through your online account, or in writing.</p>`;
         const hasBanks = allServices.includes('banks');
         const svcTitle = hasMultiple ? 'Services to update' : svcLabels[allServices[0]] || 'Services to update';
         const svcDesc = hasBanks
-          ? `Update your name with the services listed below. ${hasMultiple ? 'Many banks accept a deed poll but staff may ask for photo ID. ' : ''}${bankNote}`
+          ? `Update your name with the services listed below. ${hasMultiple ? 'Many banks accept a deed poll but staff may ask for photo ID. ' : ''}Getting your driving licence updated first can help if a bank asks for photo ID.`
           : 'Update your name with the services listed below. Most organisations will accept your deed poll as proof of your name change.';
         const svcDescFull = hasMultiple
           ? `${svcDesc}<ul class="svc-sub-ul" style="margin-top:10px;">${subItems}</ul>`
@@ -2056,12 +2090,9 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
       }
     }
     if (!isGender && p.vehicle) {
-      addStep(li('v5c', easy, cost('Free','badge-green'), 'Vehicle logbook (V5C)',
-        `Update your V5C with the ${isNI ? 'DVA' : 'DVLA'} to show your new name.`,
-        `<p><strong>Vehicle logbook (V5C):</strong> The V5C is the document that records the registered keeper of a vehicle. You can notify the ${isNI ? 'Driver &amp; Vehicle Agency (DVA)' : 'DVLA'} of your name change by sending your current V5C with a covering letter, or by completing the relevant section online. There is no fee for a name change.</p><p>This is a separate process from updating your driving licence — even if your licence is already updated, the V5C is held on a different record and will need to be updated separately.</p><a href="https://www.gov.uk/change-name-v5c" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name on your vehicle log book (V5C)</a>`
-      ));
-    }
-  };
+      const _v5c = PLAN_ITEMS.v5c;
+      addStep(li('v5c', easy, cost(_v5c.cost.value, _v5c.cost.badge), _v5c.titleFn(p), _v5c.summaryFn(p), _v5c.detailFn(p)));
+    }  };
   if (splitMiddle) {
     if (hasHealthGroup) {
       openPhase('health', 'Health and personal records', '1–3 weeks');
@@ -2120,10 +2151,10 @@ ${!isName ? '<p><strong>Gender marker changes:</strong> Once HMRC has processed 
     const grcIntro = isNI
       ? `<p>This step covers long-term legal gender recognition. In Northern Ireland, the legal standing of the UK Gender Recognition Certificate (GRC) when it comes to anti-discrimination laws is currently uncertain and may change. Despite this, a GRC still has practical uses for updating your birth certificate, marriage records, HMRC, and pensions.</p>
 ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have access to the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement. This is described first below as an alternative to the UK GRC.</p>' : '<p>If you were not born in Northern Ireland, the UK GRC route below is the standard path available.</p>'}`
-      : `<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not required for most daily life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If you have already changed your gender legally in another country, you may not need a GRC.</p>`;
-    const stepTitle = (isNI && p.bornInNI) ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
-    const stepTime  = (isNI && p.bornInNI) ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
-    const irishPassportItem = (isNI && p.bornInNI) ? li('irish_passport', medium, splitCost('Free','£','success','simultaneous'), 'Irish passport (Good Friday Agreement route)',
+      : `<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not required for most daily life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If you have already changed your gender legally in another country, you may not need a GRC.</p>${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below alongside the UK GRC route.</p>' : ''}`;
+    const stepTitle = (p.bornInNI) ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
+    const stepTime  = (p.bornInNI) ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
+    const irishPassportItem = (p.bornInNI) ? li('irish_passport', medium, splitCost('Free','£','success','simultaneous'), 'Irish passport (Good Friday Agreement route)',
       "As someone born in Northern Ireland, you may be able to claim Irish citizenship under the Good Friday Agreement. The Republic of Ireland has a separate process for updating a gender marker on a passport, which differs from the UK GRC route.",
       `<p>Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI links below have the current details on eligibility, requirements, and how to apply.</p>
 <p><strong>⚠️ If you do not yet have an Irish passport</strong>, the first step would be to apply for one. The gender-change update is a separate process that you can apply for once you have a passport.</p>
@@ -2206,10 +2237,12 @@ function applyStepState(id, state) {
     textDiv.style.textDecoration = state === 3 ? 'line-through' : 'none';
   }
 }
-function syncSvcParent() {
-  const subBtns = document.querySelectorAll('.step-state-btn[data-svc-parent]');
+function syncSvcParent(childId) {
+  const childBtn = gel('ssb_' + childId);
+  if (!childBtn) return;
+  const parentId = childBtn.dataset.svcParent;
+  const subBtns = document.querySelectorAll(`.step-state-btn[data-svc-parent="${parentId}"]`);
   if (!subBtns.length) return;
-  const parentId = subBtns[0].dataset.svcParent;
   const states = Array.from(subBtns).map(b => getStepState(b.dataset.trackId));
   const allSettled = states.every(s => s === 2 || s === 3);
   const anyActive  = states.some(s => s === 1);
@@ -2252,7 +2285,7 @@ function cycleStepState(id) {
   ];
   announce(messages[next]);
   if (id === 'trk_services_all') syncSvcChildren(next);
-  else if (id.startsWith('trk_svc_')) { applySvcDetailState(id, next); syncSvcParent(); }
+  else if (id.startsWith('trk_svc_')) { applySvcDetailState(id, next); syncSvcParent(id); }
   refreshPlan();
 }
 function reverseStepState(id) {
@@ -2270,7 +2303,7 @@ function reverseStepState(id) {
   ];
   announce(messages[prev]);
   if (id === 'trk_services_all') syncSvcChildren(prev);
-  else if (id.startsWith('trk_svc_')) { applySvcDetailState(id, prev); syncSvcParent(); }
+  else if (id.startsWith('trk_svc_')) { applySvcDetailState(id, prev); syncSvcParent(id); }
   refreshPlan();
 }
 function restoreTrackers() {
