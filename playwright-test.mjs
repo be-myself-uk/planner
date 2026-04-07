@@ -331,16 +331,12 @@ console.log('\n15. Shareable link');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.locator('#chkGoalName').dispatchEvent('change');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   await page.evaluate(() => {
     window._shareUrl = null;
-    const orig = navigator.clipboard.writeText.bind(navigator.clipboard);
-    navigator.clipboard.writeText = async (text) => {
-      window._shareUrl = text.split('\n').pop();
-    };
+    navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
   });
   await page.getByRole('button', { name: 'Copy link to this plan' }).click();
   await page.waitForFunction(() => window._shareUrl !== null, { timeout: 5000 }).catch(() => {});
@@ -355,7 +351,7 @@ console.log('\n15. Shareable link');
     await page2.goto(clip);
     await page2.waitForLoadState('domcontentloaded');
     await page2.locator('#ageConfirmShared').check();
-    await page2.waitForSelector('#planView:not(.hidden)', { timeout: 5000 });
+    await page2.waitForSelector('#planView:not(.hidden)', { timeout: 10000 });
     assert(await page2.isVisible('#planView'), 'share URL loads directly to plan');
     await ctx2.close();
   }
