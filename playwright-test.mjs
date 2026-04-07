@@ -54,11 +54,8 @@ async function wizardNext(page) {
     await radio.check();
   } else {
     const multiOpt = page.locator('#wizardForm .multi-opt').first();
-    if (await multiOpt.count() > 0) {
-      const noneBox = page.locator('#wizardForm .multi-none');
-      if (await noneBox.count() > 0 && !(await multiOpt.isChecked())) {
-        await multiOpt.check();
-      }
+    if (await multiOpt.count() > 0 && !(await multiOpt.isChecked())) {
+      await multiOpt.check();
     }
   }
   const nextBtn = page.getByRole('button', { name: /Continue|Show my plan/ });
@@ -353,10 +350,13 @@ console.log('\n15. Shareable link');
     assert(decoded.goal === 'both', 'share link encodes goal param');
     assert(decoded.dp === true,     'share link encodes deed poll param');
     assert(decoded.grc === true,    'share link encodes grc param');
-    await page.goto(clip);
-    await page.waitForLoadState('domcontentloaded');
-    await page.locator('#ageConfirmShared').check();
-    assert(await page.isVisible('#planView'), 'share URL loads directly to plan');
+    const { page: page2, ctx: ctx2 } = await newPage();
+    await page2.goto(clip);
+    await page2.waitForLoadState('domcontentloaded');
+    await page2.locator('#ageConfirmShared').check();
+    await page2.waitForSelector('#planView:not(.hidden)', { timeout: 5000 });
+    assert(await page2.isVisible('#planView'), 'share URL loads directly to plan');
+    await ctx2.close();
   }
   await ctx.close();
 }
