@@ -2788,7 +2788,7 @@ window.onload = () => {
       if (goalName && goalGender) wizardState.goal = S.BOTH;
       else if (goalName)          wizardState.goal = S.NAME;
       else if (goalGender)        wizardState.goal = S.GENDER;
-      else                        wizardState.goal = none;
+      else                        wizardState.goal = 'none';
       CHK_MAP.forEach(([id, prop]) => { wizardState[prop] = gel(id).checked ? S.YES : S.NO; });
       const emp = document.querySelector('input[name="chkEmployment"]:checked');
       if (emp) wizardState.employment = emp.value;
