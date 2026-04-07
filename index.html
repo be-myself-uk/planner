@@ -188,7 +188,7 @@
   .multi-all-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
   .btn-group { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
   .wizard-back-link { background:none; border:none; padding:0; color:var(--primary); text-decoration:underline; cursor:pointer; font-size:0.9em; font-family:inherit; }
-  .wizard-back-link:hover { color:var(--primary-hover); }
+  .wizard-back-link:hover, .wizard-back-link:focus-visible { background:none; color:var(--primary-hover); outline:none; }
   .wizard-btn-row { display:flex; align-items:center; margin-top:20px; gap:10px; }
   #wizardNextBtn { margin-left:auto; }
 
@@ -202,8 +202,6 @@
   button.danger:hover { filter:brightness(0.88); }
   button.danger:focus-visible { outline:3px solid var(--urgent); outline-offset:3px; }
   button.large-btn { padding:18px 30px; font-size:1.1em; width:100%; max-width:350px; margin-bottom:15px; }
-  button.large-btn:disabled { background:var(--disabled); color:var(--disabled-text); cursor:not-allowed; }
-  button.large-btn:disabled:hover { background:var(--disabled); }
   .panic-btn { background-color:#b91c1c; color:#fff; min-width:42px; height:42px; font-size:1.2rem; border-radius:8px; border:1px solid rgba(255,255,255,0.55); cursor:pointer; transition:filter 0.2s; }
   .panic-btn:hover { filter:brightness(0.85); background-color:#b91c1c; }
   .panic-btn:focus-visible { outline:3px solid var(--text); outline-offset:2px; }
@@ -217,9 +215,6 @@
   .hidden { display:none !important; }
   #startView { text-align:center; padding:20px 0 40px; }
   #startView p { font-size:1.1em; color:var(--text); margin-bottom:20px; }
-  .age-gate { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:20px; display:flex; align-items:flex-start; gap:12px; cursor:pointer; text-align:left; }
-  .age-gate input[type="checkbox"] { margin-top:2px; flex-shrink:0; }
-  .age-gate-label { font-size:0.95em; color:var(--text); }
   .start-actions { display:flex; flex-direction:column; align-items:center; gap:10px; }
   .start-checklist-link { font-size:0.95em; color:var(--primary); text-decoration:underline; cursor:pointer; }
   .start-checklist-link:hover { color:var(--primary-hover); }
@@ -331,11 +326,14 @@
   .plan-top-details[open] summary::before { transform:rotate(90deg); }
   .plan-top-details[open] summary { border-bottom:1px solid var(--border); }
   .plan-top-details .plan-top-body { padding:12px 15px; font-size:0.9em; color:var(--text-muted); }
-  .plan-top-body p, .plan-top-body ul, .plan-top-body ol, #helpModalBody p, #helpModalBody ul, #helpModalBody ol { max-width:40em; }
   .plan-top-summary { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; padding:12px 15px; font-size:0.9em; color:var(--text-muted); }
   .legend-toolbar { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; font-size:0.85em; }
   .legend-tb-icon { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--bg-light); border:1px solid var(--border); border-radius:6px; font-size:1.05em; flex-shrink:0; }
   .svc-detail { margin-top:14px; }
+  .svc-detail > p { margin:0; padding:12px 14px 0; }
+  .svc-detail > p + p { padding-top:8px; }
+  .svc-detail > p:last-of-type { padding-bottom:12px; }
+  .svc-detail > a.links { margin:4px 14px 12px; }
   .svc-sub-ul { margin:8px 0 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;transition:margin 0.5s ease; }
   .svc-sub-li { display:flex; align-items:center; gap:6px; padding:3px 0; max-height:50px; transition:max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease, margin 0.5s ease; overflow:hidden; }
   .svc-sub-li .step-state-btn { flex-shrink:0; width:30px; height:30px; font-size:0.85em; }
@@ -459,20 +457,6 @@
           </tbody>
         </table>
       </div>
-        <table class="shortcut-table" aria-label="Keyboard shortcuts">
-          <thead class="visually-hidden">
-            <tr><th scope="col">Key or action</th><th scope="col">What it does</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
-            <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
-      <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
-            <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
-            <tr><td><kbd>Esc</kbd></td><td>Quick exit: leaves the page immediately</td></tr>
-            <tr><td><kbd>?</kbd></td><td>Open this help panel</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </div>
   <div id="startView">
@@ -513,10 +497,7 @@
     <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
       <h2>Someone shared a plan with you</h2>
       <p>This looks like a new device or browser. Please confirm you are aged 16 or over to view the plan.</p>
-      <label class="age-gate" for="ageConfirmShared">
-        <input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()">
-        <span class="age-gate-label">I confirm that I am aged 16 or over, or that I have the consent of a parent or guardian. I understand that this planner provides general guidance only and is not legal, medical, or financial advice.</span>
-      </label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()"> Yes, I am aged 16 or over (or I have parental consent)</label>
     </div>
   </div>
 
@@ -548,6 +529,7 @@
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="ew" checked> England or Wales</label>
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionScot" value="scot"> Scotland</label>
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni"> Northern Ireland</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionOut" value="out"> Outside the UK</label>
       </div>
 
       <div class="chk-section chk-section--mb">
@@ -694,7 +676,7 @@
         <p style="margin:0 0 10px 0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
 
         <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Getting started</h3>
-        <p style="margin:0 0 8px 0;">Click <strong>Start now</strong> to answer questions one at a time, or <strong>Or view all questions as a single checklist</strong> to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
+        <p style="margin:0 0 8px 0;">Click <strong>Start now</strong> to answer questions one at a time, or use the checklist link beneath it to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
 
         <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Always available</h3>
         <div class="legend-toolbar" aria-hidden="true">
@@ -765,7 +747,7 @@
       <div class="plan-top-body">
         <p class="disclaimer-muted" style="margin:0 0 8px 0;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author.</p>
         <p class="disclaimer-muted" style="margin:0 0 8px 0;">This planner is for people aged 16 and over. The processes for under-16s are different and require parental or guardian consent; this planner does not cover them.</p>
-        <p class="disclaimer-muted" style="margin:0 0 8px 0;">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only — always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
+        <p class="disclaimer-muted" style="margin:0 0 8px 0;">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
         <p class="disclaimer-muted" style="margin:0;">To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner.</p>
       </div>
     </details>
@@ -847,7 +829,7 @@ const PLAN_ITEMS = {
   },
   student: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Variable cost', badge:'success', badge2:'simultaneous' },
-    title: 'Qualifications and Student Loans',
+    title: 'Qualifications and student loans',
     summary: 'Universities, colleges, exam boards, and professional bodies can update qualification certificates. Processes and fees vary between organisations.',
     detail: `<p><strong>Student Loans Company (SLC):</strong> A deed poll or certified copy is needed to update your name. They do not automatically receive updates from HMRC or your university.</p>\n<p><strong>Universities:</strong> Most offer free replacement certificates, though some charge a small admin fee.</p>\n<p><strong>Exam boards (e.g. BTEC, City &amp; Guilds):</strong> Each awarding body has its own process and fees. Some charge a significant fee per replacement certificate.</p>\n<p><strong>Professional and vocational bodies:</strong> Regulated professions such as nursing (NMC), law (SRA), and medicine (GMC) each have their own update process. Most have handled these requests before.</p>\n<a href="https://www.gov.uk/student-finance/who-qualifies" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Student finance</a>\n<a href="https://www.gov.uk/guidance/updating-your-personal-details" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Updating your student finance details</a>`,
   },
@@ -1340,6 +1322,8 @@ function backToStart() {
   V.toggle.style.display = 'none';
   document.body.classList.remove('wizard-active');
   document.getElementById('ageKickout')?.classList.add('hidden');
+  try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
+  const acb = document.getElementById('checklistAgeConfirm'); if (acb) acb.checked = false;
   V.start.classList.remove('hidden');
   refreshToolbarTabindex();
 }
@@ -1800,7 +1784,7 @@ const questions = [
   ]},
   { id:'goalParts', type:'multi', q:'What do you need to update on your documents?', o:() => ([
     { value:'name',   label:'My name' },
-    { value:'gender', label:'My gender marker (M or F)' },
+    { value:'gender', label:'My gender marker (M or F)<br><em class="note" style="font-style:italic;display:block;margin-top:2px;font-size:0.9em;">Select this if your name is already correct on your documents, or tick both if you also need a name change.</em>' },
   ])},
   { id:'citizen', q:'Do you have a UK visa or eVisa?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters.</em>', o:() => [
     [S.NO,  'No, I do not have a UK visa or eVisa'],
@@ -1838,16 +1822,12 @@ const questions = [
     [S.YES,'Yes, I would like to register with a new GP'],
     [S.NO, 'No']
   ]},
-  { id:'driving', q:'What is the status of your UK driving licence?', o:() => {
-    if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']];
-    return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']];
-  }},
-  { id:'passport', q:'What is the status of your passport?', o:() => {
-    if (wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO)
-      return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']];
-    return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']];
-  }},
+  { id:'driving', q:'What is the status of your UK driving licence?', o:() => [
+    [S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']
+  ]},
+  { id:'passport', q:'What is the status of your passport?', o:() => [
+    [S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']
+  ]},
   { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => {
     if (wizardState.deedpoll === S.NO)
       return [[S.YES,'Yes',true],[S.NO,'No']];
@@ -2020,6 +2000,9 @@ function nextWizard() {
   V.warning.classList.remove('visible');
   gel('wizardOptionsGroup')?.classList.remove('error');
   wizardState[q.id] = a.value;
+  if (q.id === 'region' && a.value === 'out') {
+    wizardState.region = REGION.EW;
+  }
   if (q.id === 'age') {
     if (a.value === S.YES) {
       sss('ageConfirmed', 'true');
@@ -2786,7 +2769,7 @@ window.onload = () => {
       if (e.target.id === 'chkGRC' && !e.target.checked) gel('chkBirthCert').checked = false;
       if (e.target.id === 'chkBirthCert' && e.target.checked) gel('chkGRC').checked = true;
       const region = document.querySelector('input[name="chkRegion"]:checked');
-      if (region) wizardState.region = region.value;
+      if (region) wizardState.region = region.value === 'out' ? REGION.EW : region.value;
       const birthReg = document.querySelector('input[name="chkBirthRegion"]:checked');
       const brVal = birthReg ? birthReg.value : REGION.EW;
       wizardState.birthOutsideUK = brVal === 'out' ? S.YES : S.NO;
