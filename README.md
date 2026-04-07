@@ -10,7 +10,7 @@ A free, private, UK-focused legal identity planner for trans and non-binary peop
 
 ### What is this?
 
-A free tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents. The planner gives general guidance based on current UK processes and is not a replacement for professional advice. It was created as a personal project and is a proof of concept.
+A free tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents. The planner gives general guidance based on current UK processes and is not a replacement for professional advice. It was created as a personal project.
 
 ### Who is it for?
 
@@ -31,12 +31,11 @@ You answer a short set of questions about your situation: what documents you alr
 
 - **Personalised action plan**
   - Covers deed polls, statutory declarations, NHS/HSCNI records, driving licences, passports, HMRC, employment, DBS/AccessNI checks, qualifications, the electoral register, banks, eVisas, DWP/DfC benefits, birth certificates, and GRC applications
-  - Difficulty and cost badges on every item (Easy/Medium/Hard, Free/£/££/£££ with split-gradient badges for ranges)
+  - Difficulty and cost badges on every item (Easy/Medium/Hard, Free/Small fee/Variable cost/Higher cost with split-gradient badges for ranges)
   - Estimated time and cost summary
 
 - **Progress tracking**
   - Four-state checkboxes: not started, in progress, done, not needed
-  - Right-click or long-press to go backwards through states
   - Parent/child sync for service sub-items
   - Service detail blocks mute and strike through as items are completed
   - Focus mode hides completed items with smooth collapse animations
@@ -47,7 +46,8 @@ You answer a short set of questions about your situation: what documents you alr
   - Expanding text labels on hover/focus (desktop)
   - Toolbar guide in the plan legend for mobile users
   - WAI-ARIA toolbar pattern with arrow key navigation and roving tabindex
-  - Rainbow progress bar (plan view) and flat progress bar with question counter (wizard)
+  - Rainbow "All done!" banner when all steps are completed
+  - Progress bar with plan completion percentage (plan view) and question counter (wizard)
 
 - **Shareable links**
   - Base64-encoded URL that captures all answers for use on other devices or with trusted people
