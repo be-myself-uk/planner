@@ -2180,8 +2180,8 @@ function computePlanMeta(p) {
   if (p.needsPassport) costs.push(isNI ? '<strong>UK passport (if applicable):</strong> A fee applies. Check GOV.UK for current prices.' : '<strong>UK passport:</strong> A fee applies. Check GOV.UK for current prices.');
   if (p.needsDriving)  costs.push(isNI ? '<strong>DVA driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.' : '<strong>Driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.');
   if (p.student)       costs.push('<strong>Replacement certificates:</strong> Costs vary. Some universities issue replacements for free, while some exam boards charge a fee per certificate.');
-  if (p.birthCertName && !isNI) costs.push('<strong>Birth certificate name change (Scotland):</strong> A fee applies. Check the NRS website for current prices.');
-  if (p.birthCertName && isNI)  costs.push('<strong>GRONI name recording:</strong> A fee applies. Check NI Direct for current prices.');
+  if (p.birthCertName && p.bornInScot) costs.push('<strong>Birth certificate name change (Scotland):</strong> A fee applies. Check the NRS website for current prices.');
+  if (p.birthCertName && p.bornInNI)  costs.push('<strong>GRONI name recording:</strong> A fee applies. Check NI Direct for current prices.');
   if (p.bornInNI && !isName)    costs.push('<strong>Irish passport (gender change route):</strong> Standard Irish passport fee applies, plus a small solicitor fee for the statutory declaration.');
   if (p.wantsGRC && !isName) {
     costs.push('<strong>UK GRC application:</strong> A small application fee applies.');
