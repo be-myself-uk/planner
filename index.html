@@ -176,7 +176,7 @@
   div.locked .option input { cursor:not-allowed; filter:grayscale(1); opacity:0.5; }
   input[type="radio"], input[type="checkbox"] { width:18px; height:18px; margin-right:12px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; }
   .lock-icon { margin-left:auto; font-size:0.9em; }
-  .warning-text { color:var(--urgent); font-weight:bold; display:none; align-items:center; gap:8px; height:24px; margin-bottom:10px; }
+  .warning-text { color:var(--urgent); font-weight:bold; display:none; align-items:center; gap:8px; margin-bottom:10px; padding:10px 12px; border:3px solid var(--urgent); border-radius:4px; background:var(--urgent-bg); }
   .warning-text.visible { display:flex; }
   #checklistStickyBar { position:sticky; bottom:0; padding:12px 0; padding-bottom:max(12px, env(safe-area-inset-bottom)); }
   #checklistStickyBar.hidden { display:none; }
@@ -187,6 +187,8 @@
   .options-group.error, #checklistAgeGate.error { border-color:var(--urgent); background:var(--urgent-bg); }
   .multi-all-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
   .btn-group { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+  .wizard-back-link { background:none; border:none; padding:0; color:var(--primary); text-decoration:underline; cursor:pointer; font-size:0.9em; font-family:inherit; }
+  .wizard-back-link:hover { color:var(--primary-hover); }
   .wizard-btn-row { display:flex; align-items:center; margin-top:20px; gap:10px; }
   #wizardNextBtn { margin-left:auto; }
 
@@ -329,6 +331,7 @@
   .plan-top-details[open] summary::before { transform:rotate(90deg); }
   .plan-top-details[open] summary { border-bottom:1px solid var(--border); }
   .plan-top-details .plan-top-body { padding:12px 15px; font-size:0.9em; color:var(--text-muted); }
+  .plan-top-body p, .plan-top-body ul, .plan-top-body ol, #helpModalBody p, #helpModalBody ul, #helpModalBody ol { max-width:40em; }
   .plan-top-summary { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; padding:12px 15px; font-size:0.9em; color:var(--text-muted); }
   .legend-toolbar { display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; font-size:0.85em; }
   .legend-tb-icon { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--bg-light); border:1px solid var(--border); border-radius:6px; font-size:1.05em; flex-shrink:0; }
@@ -519,10 +522,12 @@
 
   <div id="wizardView" class="hidden">
     <div id="wizardWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Select an answer to continue.</div>
+    <div id="wizardBackNav" style="margin-bottom:8px;">
+      <button id="wizardBackStartBtn" class="wizard-back-link" onclick="backToStart()">← Back to start</button>
+      <button id="wizardBackBtn" class="wizard-back-link hidden" onclick="prevWizard()">← Back</button>
+    </div>
     <div id="wizardForm"></div>
     <div id="wizardBtns" class="wizard-btn-row">
-      <button id="wizardBackStartBtn" class="secondary" onclick="backToStart()">← Back to start</button>
-      <button id="wizardBackBtn" class="secondary hidden" onclick="prevWizard()">← Back</button>
       <button id="wizardNextBtn" onclick="nextWizard()">Continue →</button>
     </div>
   </div>
@@ -578,7 +583,7 @@
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> No</label>
       </div>
     </fieldset>
-    <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role requires a DBS check<br><em class="note" style="margin-top:2px;">A A DBS check is a background check for roles working with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role requires an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for roles working or volunteering with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
+    <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role requires a DBS check<br><em class="note" style="margin-top:2px;">A DBS check is a background check for roles working with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role requires an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for roles working or volunteering with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
     <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span></span></label>
     <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications or professional registrations to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA.</em></span></label>
     <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I have a vehicle registered in my name that needs updating<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em></span></label>
@@ -1860,7 +1865,7 @@ const questions = [
   ]},
   { id:'dbs', q:() => wizardState.region === REGION.NI
     ? 'Does your role require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>'
-    : 'Does your role require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A A DBS check is a background check for roles working with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
+    : 'Does your role require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A DBS check is a background check for roles working with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'services', type:'multi',
@@ -1913,7 +1918,7 @@ function renderWizard() {
 </label>`;
     });
     if (q.id === 'services') {
-      const noneChecked = selected.length === 0 ? 'checked' : '';
+      const noneChecked = wizardState.svcNone === S.YES ? 'checked' : '';
       html += `<div class="multi-all-sep"></div>
 <label class="option" for="multi_${q.id}_none">
   <input type="checkbox" id="multi_${q.id}_none" class="multi-none" ${noneChecked}>
@@ -1985,6 +1990,8 @@ function nextWizard() {
         V.warning.classList.add('visible');
         gel('wizardOptionsGroup').classList.add('error');
         announce('Select at least one option to continue.');
+        V.warning.setAttribute('tabindex', '-1');
+        V.warning.focus();
         return;
       }
       wizardState.goalParts = selected;
@@ -1992,6 +1999,10 @@ function nextWizard() {
       updateDerivedState();
     } else {
       wizardState[q.id] = selected;
+      if (q.id === 'services') {
+        const noneB = V.form.querySelector('.multi-none');
+        wizardState.svcNone = (noneB && noneB.checked) ? S.YES : S.NO;
+      }
     }
     step++;
     renderWizard();
@@ -2002,6 +2013,8 @@ function nextWizard() {
     V.warning.classList.add('visible');
     gel('wizardOptionsGroup').classList.add('error');
     announce('Select an answer to continue.');
+    V.warning.setAttribute('tabindex', '-1');
+    V.warning.focus();
     return;
   }
   V.warning.classList.remove('visible');
