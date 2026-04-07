@@ -617,7 +617,7 @@ console.log('\n27. Progress restoration from share URL');
   await ctx.close();
 }
 
-console.log('\n28. Driving wizard options change text based on deed poll');
+console.log('\n28. Driving wizard options stay the same regardless of deed poll');
 {
   const { page, ctx } = await newPage();
   await openWizard(page);
@@ -629,7 +629,7 @@ console.log('\n28. Driving wizard options change text based on deed poll');
   const needsUpdateInput = page.locator('input[name="ans"][value="needs_update"]');
   const needsUpdateLabel = page.locator('label').filter({ has: needsUpdateInput });
   assert(await needsUpdateInput.isEnabled(), 'driving needs_update is enabled even without deed poll');
-  assert((await needsUpdateLabel.textContent()).includes('old name'), 'driving label says old name when no deed poll');
+  assert((await needsUpdateLabel.textContent()).includes('old details'), 'driving label says old details when no deed poll');
   assert(await page.locator('input[name="ans"][value="none"]').count() > 0, 'driving has third option (no licence)');
   await page.evaluate(() => {
     wizardState.deedpoll = 'yes';
@@ -637,7 +637,7 @@ console.log('\n28. Driving wizard options change text based on deed poll');
     renderWizard();
   });
   const updatedLabel = page.locator('label').filter({ has: page.locator('input[name="ans"][value="needs_update"]') });
-  assert((await updatedLabel.textContent()).includes('need to update'), 'driving label says need to update when deed poll present');
+  assert((await updatedLabel.textContent()).includes('old details'), 'driving label still says old details when deed poll present');
   await ctx.close();
 }
 
@@ -788,16 +788,17 @@ console.log('\n40. WCAG: CC licence SVGs have role=img');
   await ctx.close();
 }
 
-console.log('\n41. Specific choices section visible; Scotland shows birth cert name option');
+console.log('\n41. Specific choices section hidden for EW; Scotland shows birth cert name option');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.locator('input[name="chkRegion"][value="ew"]').check();
   await page.locator('#chkGoalName').check();
   await page.locator('#chkGoalGender').uncheck();
-  assert(await page.isVisible('#wrapSpecificChoices'), 'specific choices section visible (newGP always shown)');
+  assert(await page.isHidden('#wrapSpecificChoices'), 'specific choices section hidden for EW');
   assert(await page.isHidden('#wrapBirthCertName'), 'birth cert name hidden for EW');
   await page.locator('input[name="chkRegion"][value="scot"]').check();
+  assert(await page.isVisible('#wrapSpecificChoices'), 'specific choices section visible for Scotland');
   assert(await page.isVisible('#wrapBirthCertName'), 'birth cert name visible for Scotland');
   await ctx.close();
 }
