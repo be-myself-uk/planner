@@ -792,12 +792,12 @@ console.log('\n41. Specific choices section hidden for EW; Scotland shows birth 
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.locator('input[name="chkRegion"][value="ew"]').check();
+  await page.locator('input[name="chkBirthRegion"][value="ew"]').check();
   await page.locator('#chkGoalName').check();
   await page.locator('#chkGoalGender').uncheck();
   assert(await page.isHidden('#wrapSpecificChoices'), 'specific choices section hidden for EW');
   assert(await page.isHidden('#wrapBirthCertName'), 'birth cert name hidden for EW');
-  await page.locator('input[name="chkRegion"][value="scot"]').check();
+  await page.locator('input[name="chkBirthRegion"][value="scot"]').check();
   assert(await page.isVisible('#wrapSpecificChoices'), 'specific choices section visible for Scotland');
   assert(await page.isVisible('#wrapBirthCertName'), 'birth cert name visible for Scotland');
   await ctx.close();
