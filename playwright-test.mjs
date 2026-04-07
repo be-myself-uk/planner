@@ -8,6 +8,12 @@ function assert(cond, name) {
   else       { console.error(`  ✗ ${name}`); failed++; }
 }
 
+function decodeState(encoded) {
+  const bin = atob(encoded);
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
 const launchOptions = process.env.PLAYWRIGHT_EXECUTABLE_PATH
   ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
   : {};
@@ -28,17 +34,17 @@ async function newPage() {
 }
 
 async function checkAgeGate(page) {
-  await page.locator('#ageConfirm').check();
+  await page.evaluate(() => localStorage.setItem('ageConfirmed', 'true'));
 }
 
 async function openChecklist(page) {
   await checkAgeGate(page);
-  await page.getByRole('button', { name: 'Fill out a single checklist' }).click();
+  await page.locator('.start-checklist-link').click();
 }
 
 async function openWizard(page) {
   await checkAgeGate(page);
-  await page.getByRole('button', { name: 'Answer step-by-step questions' }).click();
+  await page.getByRole('button', { name: 'Start now' }).click();
 }
 
 async function wizardNext(page) {
@@ -73,20 +79,21 @@ console.log('\n1. Initial render');
   assert(await page.isHidden('#planView'),        'plan hidden');
   assert(await page.isHidden('#welcomeBackView'), 'welcome hidden');
   assert(await page.getByRole('button', { name: 'Switch view' }).isHidden(), 'mode toggle hidden');
-  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isDisabled(), 'wizard btn disabled before age gate');
-  assert(await page.getByRole('button', { name: 'Fill out a single checklist' }).isDisabled(),   'checklist btn disabled before age gate');
+  assert(await page.getByRole('button', { name: 'Start now' }).isEnabled(), 'start now button enabled');
+  assert(await page.isVisible('.start-checklist-link'), 'checklist link visible');
   await ctx.close();
 }
 
-console.log('\n2. Age gate');
+console.log('\n2. Age gate — wizard Q1');
 {
   const { page, ctx } = await newPage();
-  await checkAgeGate(page);
-  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isEnabled(), 'buttons enabled after ticking age gate');
-  assert(await page.evaluate(() => localStorage.getItem('ageConfirmed')) === 'true', 'ageConfirmed saved to localStorage');
-  await page.locator('#ageConfirm').uncheck();
-  assert(await page.evaluate(() => localStorage.getItem('ageConfirmed')) === null, 'ageConfirmed cleared from localStorage on uncheck');
-  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isDisabled(), 'buttons disabled again after unticking');
+  await page.getByRole('button', { name: 'Start now' }).click();
+  assert(await page.isVisible('#wizardView'), 'wizard shown after Start now');
+  const q = await page.locator('#wizardStepFieldset legend, #wizardStepFieldset .chk-q, #wizardOptionsGroup').first().textContent();
+  assert(q.includes('16') || q.includes('aged'), 'age question shown first');
+  await page.locator('input[name=ans][value=yes]').check();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  assert(await page.evaluate(() => localStorage.getItem('ageConfirmed')) === 'true', 'ageConfirmed saved after yes');
   await ctx.close();
 }
 
@@ -96,8 +103,8 @@ console.log('\n3. Age gate persistence');
   await checkAgeGate(page);
   await page.reload();
   await page.waitForLoadState('domcontentloaded');
-  assert(await page.locator('#ageConfirm').isChecked(), 'age gate pre-ticked after reload');
-  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isEnabled(), 'buttons enabled after reload with saved age gate');
+  assert(await page.evaluate(() => localStorage.getItem('ageConfirmed')) === 'true', 'ageConfirmed persists after reload');
+  assert(await page.getByRole('button', { name: 'Start now' }).isEnabled(), 'start button enabled after reload');
   await ctx.close();
 }
 
@@ -158,26 +165,31 @@ console.log('\n8. Checklist locks');
   await openChecklist(page);
   assert(await page.getByLabel('NHS record').isDisabled(),     'NHS locked without deed poll');
   assert(await page.getByLabel('HMRC and taxes').isDisabled(), 'HMRC locked without deed poll');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'DL needs_update disabled without deed poll');
-  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(),       'Passport needs_update disabled without deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isDisabled(),    'DL updated disabled without deed poll');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isDisabled(),          'Passport updated disabled without deed poll');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   assert(await page.getByLabel('NHS record').isEnabled(),     'NHS unlocked after deed poll');
   assert(await page.getByLabel('HMRC and taxes').isEnabled(), 'HMRC unlocked after deed poll');
-  await page.getByLabel('Change my gender marker only').check();
+  await page.locator('#chkGoalName').uncheck();
+  await page.locator('#chkGoalGender').check();
   assert(await page.isHidden('#wrapDeedPoll'), 'deed poll hidden for gender-only goal');
   assert(await page.getByLabel('NHS record').isEnabled(), 'NHS unlocked for gender-only goal');
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   assert(await page.isHidden('#wrapGRC'), 'GRC hidden for name-only goal');
   assert(await page.isHidden('#wrapVisa'), 'visa row hidden when not non-UK');
   await page.getByLabel(/I have a UK visa or eVisa/).check();
   assert(await page.isVisible('#wrapVisa'), 'visa row shown when non-UK ticked');
   assert(await page.isHidden('#wrapDBS'), 'DBS hidden when employment up to date');
   assert(await page.isVisible('#wrapDWP'), 'DWP always visible for name-only goal regardless of employment');
-  await page.getByLabel('Change my name and gender marker').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').check();
   assert(await page.isVisible('#wrapDWP'), 'DWP always visible for both goal regardless of employment');
-  await page.getByLabel('Change my gender marker only').check();
-  assert(await page.isHidden('#wrapDWP'), 'DWP hidden for gender-only goal');
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').uncheck();
+  await page.locator('#chkGoalGender').check();
+  assert(await page.isVisible('#wrapDWP'), 'DWP visible for gender-only goal');
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByLabel(/Yes, I need to update my records/).check();
   assert(await page.isVisible('#wrapDBS'), 'DBS shown when employment needs update');
   assert(await page.isVisible('#wrapDWP'), 'DWP still visible when employment needs update');
@@ -188,7 +200,8 @@ console.log('\n9. Plan content');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name and gender marker').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   assert(await page.isVisible('#planView'), 'plan shown');
   assert(await page.getByRole('heading', { name: 'Step 1: The basics' }).isVisible(), 'step 1 present when no deed poll');
@@ -197,7 +210,8 @@ console.log('\n9. Plan content');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name and gender marker').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').check();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   assert(await page.getByRole('heading', { name: 'Step 1: The basics' }).isHidden(), 'step 1 absent when deed poll already done');
@@ -206,7 +220,8 @@ console.log('\n9. Plan content');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my gender marker only').check();
+  await page.locator('#chkGoalName').uncheck();
+  await page.locator('#chkGoalGender').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   assert(await page.getByRole('heading', { name: 'Step 1: The basics' }).isHidden(), 'step 1 absent for gender-only goal');
   assert(await page.getByRole('heading', { name: /Did you know about titles/ }).isHidden(), 'titles tip absent for gender-only goal');
@@ -223,7 +238,8 @@ console.log('\n9. Plan content');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   assert(await page.getByRole('heading', { name: /The final legal step/ }).isHidden(), 'GRC step absent for name-only');
   await ctx.close();
@@ -288,8 +304,8 @@ console.log('\n13. Start again');
   assert(await page.isHidden('#planView'),   'plan hidden after restart');
   assert(!await page.evaluate(() => localStorage.getItem('appState')),     'appState cleared from localStorage');
   assert(!await page.evaluate(() => localStorage.getItem('ageConfirmed')), 'ageConfirmed cleared from localStorage on restart');
-  assert(!await page.locator('#ageConfirm').isChecked(), 'age gate checkbox unticked after restart');
-  assert(await page.getByRole('button', { name: 'Answer step-by-step questions' }).isDisabled(), 'start buttons disabled after restart');
+  assert(!await page.evaluate(() => localStorage.getItem('ageConfirmed')), 'ageConfirmed cleared after restart');
+  assert(await page.getByRole('button', { name: 'Start now' }).isEnabled(), 'start button enabled after restart');
   await ctx.close();
 }
 
@@ -311,7 +327,8 @@ console.log('\n15. Shareable link');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name and gender marker').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').check();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
@@ -345,17 +362,17 @@ console.log('\n15. Shareable link');
         dwp:   isWizardMode ? (w.dwp           === 'yes') : chk('chkDWP'),
         bcn:   isWizardMode ? (w.birthCertName === 'yes') : chk('chkBirthCertName'),
         bc:    isWizardMode ? (w.birthCert     === 'yes') : chk('chkBirthCert'),
-        bni:   isWizardMode ? (w.bornInNI      === 'yes') : chk('chkBornNI'),
+        bri:   isWizardMode ? (w.birthRegion || 'ew') : (document.querySelector('input[name="chkBirthRegion"]:checked')?.value || 'ew'),
         srv,
       };
-      url.searchParams.set('p', btoa(JSON.stringify(ps)));
+      url.searchParams.set('p', encodeState(ps));
       window._shareUrl = url.toString();
     };
   });
   await page.getByRole('button', { name: 'Copy link to this plan' }).click();
   const clip = await page.evaluate(() => window._shareUrl);
   assert(clip && clip.includes('?p='), 'share link uses encoded p param');
-  const decoded = JSON.parse(atob(new URL(clip).searchParams.get('p')));
+  const decoded = decodeState(new URL(clip).searchParams.get('p'));
   assert(decoded.goal === 'both', 'share link encodes goal param');
   assert(decoded.dp === true,     'share link encodes deed poll param');
   assert(decoded.grc === true,    'share link encodes grc param');
@@ -522,19 +539,19 @@ console.log('\n24. Utility bar');
   await ctx.close();
 }
 
-console.log('\n25. DL and passport needs_update disabled without deed poll; updated/none always enabled');
+console.log('\n25. DL and passport updated disabled without deed poll; needs_update/none always enabled');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isDisabled(),       'passport needs_update disabled without deed poll');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isDisabled(), 'DL needs_update disabled without deed poll');
-  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isEnabled(),             'passport updated always enabled');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isEnabled(),       'DL updated always enabled');
-  assert(await page.locator('input[name="chkPassportOpt"][value="none"]').isEnabled(),                'passport none always enabled');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').isEnabled(),          'DL none always enabled');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isDisabled(),           'passport updated disabled without deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isDisabled(),     'DL updated disabled without deed poll');
+  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isEnabled(),       'passport needs_update always enabled');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isEnabled(), 'DL needs_update always enabled');
+  assert(await page.locator('input[name="chkPassportOpt"][value="none"]').isEnabled(),               'passport none always enabled');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').isEnabled(),         'DL none always enabled');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
-  assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isEnabled(),        'passport needs_update enabled after deed poll');
-  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').isEnabled(),  'DL needs_update enabled after deed poll');
+  assert(await page.locator('input[name="chkPassportOpt"][value="updated"]').isEnabled(),            'passport updated enabled after deed poll');
+  assert(await page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]').isEnabled(),      'DL updated enabled after deed poll');
   await page.locator('input[name="chkPassportOpt"][value="needs_update"]').check();
   assert(await page.locator('input[name="chkPassportOpt"][value="needs_update"]').isChecked(), 'passport set to needs_update with deed poll');
   await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').check();
@@ -580,18 +597,22 @@ console.log('\n26. Share link encodes step progress (save side)');
     const pass = document.querySelector('input[name="chkPassportOpt"]:checked')?.value || 'updated';
     const srv = Object.entries(SVC_MAP).filter(([,id]) => document.getElementById(id)?.checked).map(([v]) => v).join(',');
     const ps = {
-      v: SCHEMA_VERSION, reg, goal, nonUK: chk('chkNonUK'), pid: chk('chkPhotoID'), emp,
+      v: SCHEMA_VERSION, reg, goal, nonUK: chk('chkNonUK'), emp,
       dbs: chk('chkDBS'), stu: chk('chkStudent'), dp: chk('chkDeedPoll'), visa: chk('chkVisa'),
       nhs: chk('chkNHS'), dl, hmrc: chk('chkHMRC'), pass,
       grc: chk('chkGRC'), newgp: chk('chkNewGP'), dwp: chk('chkDWP'),
-      bcn: chk('chkBirthCertName'), bc: chk('chkBirthCert'), bni: chk('chkBornNI'), srv,
+      bcn: chk('chkBirthCertName'), bc: chk('chkBirthCert'),
+      bri: (document.querySelector('input[name="chkBirthRegion"]:checked')?.value || 'ew') !== 'ew'
+             ? (document.querySelector('input[name="chkBirthRegion"]:checked')?.value)
+             : undefined,
+      srv,
     };
     if (Object.keys(prg).length) ps.prg = prg;
     const url = new URL(fp);
-    url.searchParams.set('p', btoa(JSON.stringify(ps)));
+    url.searchParams.set('p', encodeState(ps));
     return url.toString();
   }, filePath);
-  const decoded = JSON.parse(atob(new URL(shareUrl).searchParams.get('p')));
+  const decoded = decodeState(new URL(shareUrl).searchParams.get('p'));
   assert(decoded.prg && decoded.prg.hmrc === 2, 'encoded share URL contains prg with done hmrc step');
   const { page: page2, ctx: ctx2 } = await newPage();
   await page2.goto(shareUrl);
@@ -692,7 +713,8 @@ console.log('\n32. Gender-only non-UK user gets visa plan step');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my gender marker only').check();
+  await page.locator('#chkGoalName').uncheck();
+  await page.locator('#chkGoalGender').check();
   await page.getByLabel(/I have a UK visa or eVisa/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   assert(await page.isVisible('#planView'), 'plan shown for gender-only non-UK user');
@@ -795,7 +817,8 @@ console.log('\n41. Specific choices section visible; Scotland shows birth cert n
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.locator('input[name="chkRegion"][value="ew"]').check();
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   assert(await page.isVisible('#wrapSpecificChoices'), 'specific choices section visible (newGP always shown)');
   assert(await page.isHidden('#wrapBirthCertName'), 'birth cert name hidden for EW');
   await page.locator('input[name="chkRegion"][value="scot"]').check();
@@ -807,7 +830,8 @@ console.log('\n42. New GP visible for name-only goal');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   assert(await page.isVisible('#wrapNewGP'), 'new GP visible for name-only goal');
   await ctx.close();
 }
@@ -837,15 +861,18 @@ console.log('\n44. Employment question answer order');
   await ctx.close();
 }
 
-console.log('\n45. Services Select all toggles to Select none');
+console.log('\n45. Services none-of-these checkbox');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  assert(await page.locator('#chkSvcAllLabel').textContent() === 'Select all', 'label starts as Select all');
-  await page.locator('#chkSvcAll').check();
-  assert(await page.locator('#chkSvcAllLabel').textContent() === 'Select none', 'label changes to Select none when all checked');
-  await page.locator('#chkSvcAll').uncheck();
-  assert(await page.locator('#chkSvcAllLabel').textContent() === 'Select all', 'label reverts to Select all when unchecked');
+  await page.locator('#chkSvcBanks').check();
+  await page.locator('#chkSvcInsurance').check();
+  assert(await page.locator('#chkSvcBanks').isChecked(), 'service checkbox can be checked');
+  await page.locator('#chkSvcNone').check();
+  assert(await page.locator('#chkSvcBanks').isDisabled(), 'service checkboxes disabled when none ticked');
+  assert(!await page.locator('#chkSvcBanks').isChecked(), 'service checkboxes unchecked when none ticked');
+  await page.locator('#chkSvcNone').uncheck();
+  assert(!await page.locator('#chkSvcBanks').isDisabled(), 'service checkboxes re-enabled when none unticked');
   await ctx.close();
 }
 
@@ -880,7 +907,8 @@ console.log('\n48. PLAN_ITEMS: NHS EW name-only variant renders correctly');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const plan = await page.locator('#planContent').textContent();
@@ -893,7 +921,8 @@ console.log('\n49. PLAN_ITEMS: NHS EW gender variant renders correctly');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my gender marker only').check();
+  await page.locator('#chkGoalName').uncheck();
+  await page.locator('#chkGoalGender').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const plan = await page.locator('#planContent').textContent();
   assert(plan.includes('new NHS number'), 'gender NHS detail present');
@@ -905,7 +934,8 @@ console.log('\n50. PLAN_ITEMS: DWP NI variant renders correctly');
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.locator('input[name="chkRegion"][value="ni"]').check();
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/Yes, I need to update my records/).check();
   await page.locator('#chkDWP').check();
@@ -919,7 +949,8 @@ console.log('\n51. PLAN_ITEMS: HMRC content renders in plan');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const plan = await page.locator('#planContent').textContent();
@@ -932,7 +963,8 @@ console.log('\n52. PLAN_ITEMS: GRC items render for gender goal');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my gender marker only').check();
+  await page.locator('#chkGoalName').uncheck();
+  await page.locator('#chkGoalGender').check();
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   const plan = await page.locator('#planContent').textContent();
@@ -941,16 +973,15 @@ console.log('\n52. PLAN_ITEMS: GRC items render for gender goal');
   await ctx.close();
 }
 
-console.log('\n53. wrapBornNI hidden for name-only goal in checklist');
+console.log('\n53. birthRegion question always visible; options affect plan correctly');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.evaluate(() => { wizardState.goal = 'name'; updateLocks(); });
-  assert(await page.isHidden('#wrapBornNI'), 'born in NI hidden for name-only goal');
-  await page.evaluate(() => { wizardState.goal = 'gender'; updateLocks(); });
-  assert(await page.isVisible('#wrapBornNI'), 'born in NI visible for gender-only goal');
-  await page.evaluate(() => { wizardState.goal = 'both'; updateLocks(); });
-  assert(await page.isVisible('#wrapBornNI'), 'born in NI visible for both goal');
+  assert(await page.isVisible('#wrapBirthRegion'), 'birth region question always visible');
+  assert(await page.locator('input[name="chkBirthRegion"][value="ni"]').count() > 0,   'NI option present');
+  assert(await page.locator('input[name="chkBirthRegion"][value="scot"]').count() > 0, 'Scotland option present');
+  assert(await page.locator('input[name="chkBirthRegion"][value="ew"]').count() > 0,   'No option present');
+  assert(await page.locator('input[name="chkBirthRegion"][value="ew"]').isChecked(),   'No is checked by default');
   await ctx.close();
 }
 
@@ -958,7 +989,8 @@ console.log('\n54. renderCost: split cost badge renders correctly in plan');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/Yes, I need to update my records/).check();
   await page.getByLabel(/I have qualifications/).check();
@@ -973,7 +1005,8 @@ console.log('\n55. PLAN_ITEMS: driving licence NI variant (DVA) renders correctl
   const { page, ctx } = await newPage();
   await openChecklist(page);
   await page.locator('input[name="chkRegion"][value="ni"]').check();
-  await page.getByLabel('Change my name only').check();
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').uncheck();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]').check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
@@ -982,6 +1015,15 @@ console.log('\n55. PLAN_ITEMS: driving licence NI variant (DVA) renders correctl
   assert(plan.includes('Driver & Vehicle Agency'), 'DVA detail text present');
   await ctx.close();
 }
+
+
+await browser.close();
+
+const fs = await import('fs');
+const resultsDir = 'test-results';
+if (!fs.existsSync(resultsDir)) fs.mkdirSync(resultsDir, { recursive: true });
+const resultLine = `${new Date().toISOString()} — ${passed} passed, ${failed} failed\n`;
+fs.appendFileSync(`${resultsDir}/results.txt`, resultLine);
 
 console.log(`\n${'─'.repeat(50)}`);
 console.log(`Results: ${passed} passed, ${failed} failed`);
