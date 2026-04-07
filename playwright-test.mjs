@@ -40,6 +40,7 @@ async function checkAgeGate(page) {
 async function openChecklist(page) {
   await checkAgeGate(page);
   await page.locator('.start-checklist-link').click();
+  await page.locator('#checklistAgeConfirm').check();
 }
 
 async function openWizard(page) {
@@ -52,10 +53,16 @@ async function wizardNext(page) {
   if (await radio.count() > 0) {
     await radio.check();
   } else {
-    const allBox = page.locator('#wizardForm').getByLabel('Select all');
-    if (await allBox.count() > 0) await allBox.check();
+    const multiOpt = page.locator('#wizardForm .multi-opt').first();
+    if (await multiOpt.count() > 0) {
+      const noneBox = page.locator('#wizardForm .multi-none');
+      if (await noneBox.count() > 0 && !(await multiOpt.isChecked())) {
+        await multiOpt.check();
+      }
+    }
   }
-  await page.getByRole('button', { name: 'Continue →' }).click();
+  const nextBtn = page.getByRole('button', { name: /Continue|Show my plan/ });
+  await nextBtn.click();
 }
 
 async function isInputDisabled(page, label) {
