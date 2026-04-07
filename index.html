@@ -1338,6 +1338,7 @@ function handleChecklistAge(cb) {
     sss('ageConfirmed', 'true');
     const ag = gel('checklistAgeGate');
     if (ag) ag.classList.remove('error');
+    updateLocks();
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
   }
