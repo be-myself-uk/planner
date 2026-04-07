@@ -125,7 +125,7 @@ console.log('\n4. Wizard flow');
   await page.getByRole('button', { name: 'Continue →' }).click();
   assert(await page.isVisible('#wizardWarning'), 'warning shown with no answer');
   let q = 0;
-  while (await page.isVisible('#wizardView') && q < 25) { await wizardNext(page); q++; }
+  while (await page.isVisible('#wizardView') && q < 40) { await wizardNext(page); q++; }
   assert(await page.isVisible('#planView'), 'plan view shown after wizard completes');
   assert(await page.getByRole('button', { name: 'Switch view' }).isHidden(), 'mode toggle hidden on plan');
   await ctx.close();
@@ -334,58 +334,30 @@ console.log('\n15. Shareable link');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
-  await page.locator('#chkGoalName').check();
-  await page.locator('#chkGoalGender').check();
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
   await page.evaluate(() => {
     window._shareUrl = null;
-    window.copyShareableLink = function() {
-      const w = wizardState;
-      const chk = id => document.getElementById(id)?.checked;
-      const reg  = isWizardMode ? (w.region || 'ew') : document.querySelector('input[name="chkRegion"]:checked').value;
-      const goal = isWizardMode ? w.goal : document.querySelector('input[name="chkGoal"]:checked').value;
-      const emp  = isWizardMode ? (w.employment || 'no') : document.querySelector('input[name="chkEmployment"]:checked').value;
-      const SVC_MAP = {banks:'chkSvcBanks',insurance:'chkSvcInsurance',council:'chkSvcCouncil',utilities:'chkSvcUtilities',electoral:'chkSvcElectoral',landlord:'chkSvcLandlord',pension:'chkSvcPension',mortgage:'chkSvcMortgage',mobile:'chkSvcMobile'};
-      const srv = isWizardMode
-        ? (Array.isArray(w.services) ? w.services.join(',') : '')
-        : Object.entries(SVC_MAP).filter(([,id]) => document.getElementById(id)?.checked).map(([v]) => v).join(',');
-      const url = new URL(window.location.href.split('?')[0]);
-      const ps = {
-        v: SCHEMA_VERSION, reg, goal,
-        nonUK: isWizardMode ? (w.citizen       === 'yes') : chk('chkNonUK'),
-        pid:   isWizardMode ? (w.photoID       === 'yes') : chk('chkPhotoID'), emp,
-        dbs:   isWizardMode ? (w.dbs           === 'yes') : chk('chkDBS'),
-        stu:   isWizardMode ? (w.student       === 'yes') : chk('chkStudent'),
-        dp:    isWizardMode ? (w.deedpoll      === 'yes') : chk('chkDeedPoll'),
-        visa:  isWizardMode ? (w.visaUpdated   === 'yes') : chk('chkVisa'),
-        nhs:   isWizardMode ? (w.nhs           === 'yes') : chk('chkNHS'),
-        dl:    isWizardMode ? (w.driving       === 'updated') : chk('chkDrivingLicence'),
-        hmrc:  isWizardMode ? (w.hmrc          === 'yes') : chk('chkHMRC'),
-        pass:  isWizardMode ? (w.passport      === 'updated') : chk('chkPassport'),
-        grc:   isWizardMode ? (w.grc           === 'yes') : chk('chkGRC'),
-        newgp: isWizardMode ? (w.newGP         === 'yes') : chk('chkNewGP'),
-        dwp:   isWizardMode ? (w.dwp           === 'yes') : chk('chkDWP'),
-        bcn:   isWizardMode ? (w.birthCertName === 'yes') : chk('chkBirthCertName'),
-        bc:    isWizardMode ? (w.birthCert     === 'yes') : chk('chkBirthCert'),
-        bri:   isWizardMode ? (w.birthRegion || 'ew') : (document.querySelector('input[name="chkBirthRegion"]:checked')?.value || 'ew'),
-        srv,
-      };
-      url.searchParams.set('p', encodeState(ps));
-      window._shareUrl = url.toString();
+    const orig = navigator.clipboard.writeText.bind(navigator.clipboard);
+    navigator.clipboard.writeText = async (text) => {
+      window._shareUrl = text.split('\n').pop();
     };
   });
   await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+  await page.waitForFunction(() => window._shareUrl !== null, { timeout: 5000 }).catch(() => {});
   const clip = await page.evaluate(() => window._shareUrl);
   assert(clip && clip.includes('?p='), 'share link uses encoded p param');
-  const decoded = decodeState(new URL(clip).searchParams.get('p'));
-  assert(decoded.goal === 'both', 'share link encodes goal param');
-  assert(decoded.dp === true,     'share link encodes deed poll param');
-  assert(decoded.grc === true,    'share link encodes grc param');
-  await page.goto(clip);
-  await page.waitForLoadState('domcontentloaded');
-  assert(await page.isVisible('#planView'), 'share URL loads directly to plan');
+  if (clip && clip.includes('?p=')) {
+    const decoded = decodeState(new URL(clip).searchParams.get('p'));
+    assert(decoded.goal === 'both', 'share link encodes goal param');
+    assert(decoded.dp === true,     'share link encodes deed poll param');
+    assert(decoded.grc === true,    'share link encodes grc param');
+    await page.goto(clip);
+    await page.waitForLoadState('domcontentloaded');
+    await page.locator('#ageConfirmShared').check();
+    assert(await page.isVisible('#planView'), 'share URL loads directly to plan');
+  }
   await ctx.close();
 }
 
@@ -598,7 +570,7 @@ console.log('\n26. Share link encodes step progress (save side)');
     });
     const chk = id => document.getElementById(id)?.checked;
     const reg = document.querySelector('input[name="chkRegion"]:checked')?.value || 'ew';
-    const goal = document.querySelector('input[name="chkGoal"]:checked')?.value || 'both';
+    const goal = wizardState.goal || 'both';
     const emp = document.querySelector('input[name="chkEmployment"]:checked')?.value || 'no';
     const dl = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked')?.value || 'updated';
     const pass = document.querySelector('input[name="chkPassportOpt"]:checked')?.value || 'updated';
