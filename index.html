@@ -532,7 +532,7 @@
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionOut" value="out"> Outside the UK</label>
       </div>
 
-      <div class="chk-section chk-section--mb">
+      <div id="wrapBirthRegion" class="chk-section chk-section--mb">
         <p class="chk-q">Where was your birth registered?<br><em class="note" style="margin-top:2px;">This affects which legal routes are available to you.</em></p>
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionEW"   value="ew" checked> England or Wales</label>
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionScot" value="scot"> Scotland</label>
@@ -1346,6 +1346,8 @@ function handleChecklistAge(cb) {
 function checkAgeGateShared() {
   if (!gel('ageConfirmShared').checked) return;
   sss('ageConfirmed', 'true');
+  const cb = gel('checklistAgeConfirm');
+  if (cb) cb.checked = true;
   gel('welcomeNewDevice').classList.add('hidden');
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
