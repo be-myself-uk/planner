@@ -121,7 +121,7 @@
   }
   .legend-pulse { animation: legend-pulse 2s ease-in-out 6; }
   @media (prefers-reduced-motion:reduce) { #planView li, .phase, .collapsed-svc, .svc-sub-li, .svc-sub-ul { transition:none; } #controlBarProgressFill { transition:none; animation:none; background:var(--primary); } .ub-label { transition:none; } .legend-pulse { animation:none; } .next-step-highlight { outline:none; } }
-  @media (pointer:coarse) { .ub-label { display:none !important; } }
+  @media (pointer:coarse) { .ub-icon-btn:not(:focus-visible) .ub-label { display:none !important; } }
   @media (max-width:600px) {
   #controlBarButtons { flex-wrap:wrap; gap:4px; }
   #controlBarButtons > .panic-btn { order:4; }
@@ -1549,7 +1549,12 @@ function restartApp() {
   const fBtn = gel('focusToggleBtn');
   if (fBtn) { fBtn.classList.remove('focus-active'); fBtn.setAttribute('aria-pressed','false'); fBtn.setAttribute('aria-label','Focus mode: off'); }
   V.start.classList.remove('hidden');
-  try { localStorage.clear(); } catch(e) {}
+  try {
+    const keep = ['theme', 'disclaimerSeen'];
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
+    keys.forEach(k => { if (!keep.includes(k)) localStorage.removeItem(k); });
+  } catch(e) {}
   const cb = gel('checklistAgeConfirm'); if (cb) cb.checked = false;
   gel('ageKickout')?.classList.add('hidden');
   try { window.history.replaceState({}, document.title, window.location.pathname); } catch(e) {}
@@ -1578,7 +1583,7 @@ function updateDerivedState() {
   const hasDeed  = wizardState.deedpoll === S.YES;
   const isScot   = region === REGION.SCOT;
   const isNI     = region === REGION.NI;
-  const shouldLock = !isGender && !hasDeed;
+  const shouldLock = (!isGender && !hasDeed) || goal === 'none';
 
   if (wizardState.birthCert === S.YES) wizardState.grc           = S.YES;
   const isBirthScot = wizardState.birthRegion === REGION.SCOT;
@@ -1682,7 +1687,7 @@ function updateLocks() {
     specSection.classList.toggle('hidden', !anyVisible);
   }
   
-  const shouldLock = !isGender && !hasDeed;
+  const shouldLock = (!isGender && !hasDeed) || goal === 'none';
   ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
     if (!id) return;
     const wrap = gel(id);
@@ -1927,8 +1932,9 @@ function renderWizard() {
   const backBtn = gel('wizardBackBtn');
   const backStartBtn = gel('wizardBackStartBtn');
   const nextBtn = gel('wizardNextBtn');
-  if (backBtn) backBtn.classList.toggle('hidden', step === 0);
-  if (backStartBtn) backStartBtn.classList.toggle('hidden', step !== 0);
+  const firstVisibleStep = questions.findIndex(q => !q.cond || q.cond());
+  if (backBtn) backBtn.classList.toggle('hidden', step === firstVisibleStep);
+  if (backStartBtn) backStartBtn.classList.toggle('hidden', step !== firstVisibleStep);
   if (nextBtn) nextBtn.textContent = idx === total ? 'Show my plan →' : 'Continue →';
 
   if (q.type === 'multi') {
@@ -2533,7 +2539,7 @@ function launchConfetti() {
   }));
   const start = performance.now();
   function draw(now) {
-    if (!document.getElementById('confettiCanvas')) { _ro.disconnect(); return; }
+    if (!document.body.contains(canvas)) { _ro.disconnect(); return; }
     const elapsed = now - start;
     if (elapsed > DURATION) { canvas.remove(); _ro.disconnect(); return; }
     ctx.clearRect(0, 0, W, H);
@@ -2782,7 +2788,7 @@ window.onload = () => {
       if (goalName && goalGender) wizardState.goal = S.BOTH;
       else if (goalName)          wizardState.goal = S.NAME;
       else if (goalGender)        wizardState.goal = S.GENDER;
-      else                        wizardState.goal = null;
+      else                        wizardState.goal = none;
       CHK_MAP.forEach(([id, prop]) => { wizardState[prop] = gel(id).checked ? S.YES : S.NO; });
       const emp = document.querySelector('input[name="chkEmployment"]:checked');
       if (emp) wizardState.employment = emp.value;
