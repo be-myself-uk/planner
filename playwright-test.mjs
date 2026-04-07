@@ -331,6 +331,7 @@ console.log('\n15. Shareable link');
 {
   const { page, ctx } = await newPage();
   await openChecklist(page);
+  await page.locator('#chkGoalName').dispatchEvent('change');
   await page.getByLabel(/Deed poll or statutory declaration/).check();
   await page.getByLabel(/I plan to apply for a Gender Recognition Certificate/).check();
   await page.getByRole('button', { name: 'Show my action plan' }).click();
