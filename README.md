@@ -122,6 +122,7 @@ All contributions must respect these constraints:
 **Running tests**
 ```
 npm install
+npx playwright install chromium
 npm test
 ```
 
