@@ -2718,9 +2718,12 @@ function refreshToolbarTabindex() {
   requestAnimationFrame(() => {
     const btns = getToolbarButtons();
     if (!btns.length) return;
-    const hasCurrent = btns.some(b => b.getAttribute('tabindex') === '0');
-    if (!hasCurrent) {
-      btns.forEach((b, i) => b.setAttribute('tabindex', i === 0 ? '0' : '-1'));
+    const currentIdx = btns.indexOf(document.activeElement);
+    if (currentIdx >= 0) {
+      btns.forEach((b, i) => b.setAttribute('tabindex', i === currentIdx ? '0' : '-1'));
+    } else {
+      const hasCurrent = btns.some(b => b.getAttribute('tabindex') === '0');
+      if (!hasCurrent) btns.forEach((b, i) => b.setAttribute('tabindex', i === 0 ? '0' : '-1'));
     }
   });
 }
@@ -2772,9 +2775,10 @@ window.onload = () => {
       else panicExit();
       return;
     }
-    if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
       const ov = gel('helpOverlay');
-      if (ov && ov.classList.contains('hidden')) { e.preventDefault(); toggleHelp(); return; }
+      if (ov && ov.classList.contains('hidden')) { toggleHelp(); return; }
     }
     if (e.key === 'Enter' && V.wizard && !V.wizard.classList.contains('hidden')) {
       const ae = document.activeElement;
