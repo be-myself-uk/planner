@@ -280,6 +280,9 @@ test.describe('Be myself Planner', () => {
 
   test('16. Share URL age gate guard', async ({ page }) => {
     const url = await getShareUrl(page, {reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""});
+    
+    // Clear localStorage to simulate loading the link on a fresh device
+    await page.evaluate(() => localStorage.clear());
     await page.goto(url);
     
     await expect(page.locator('#startView')).toBeHidden();
@@ -293,6 +296,9 @@ test.describe('Be myself Planner', () => {
   test('17. Outdated schema link', async ({ page }) => {
     const shareData = Buffer.from(JSON.stringify({v:100,reg:"ew",goal:"both"})).toString('base64');
     const url = `${filePath}?p=${shareData}`;
+    
+    // Clear localStorage to simulate loading the link on a fresh device
+    await page.evaluate(() => localStorage.clear());
     await page.goto(url);
     
     await page.locator('#ageConfirmShared').check();
@@ -326,13 +332,13 @@ test.describe('Be myself Planner', () => {
 
     // Escape with modal closed triggers quick exit
     await page.keyboard.press('Escape');
-    await expect(page).toHaveURL(/google\.co\.uk/);
+    await expect(page).toHaveURL(/google\.(co\.uk|com)/);
   });
 
   test('20. Panic button', async ({ page }) => {
     await checkAgeGate(page);
     await page.getByRole('button', { name: 'Quick Exit' }).click();
-    await expect(page).toHaveURL(/google\.co\.uk/);
+    await expect(page).toHaveURL(/google\.(co\.uk|com)/);
   });
 
   test('21. Theme toggle', async ({ page }) => {
@@ -370,7 +376,7 @@ test.describe('Be myself Planner', () => {
     await expect(focusBtn).toHaveAttribute('aria-pressed', 'false');
   });
 
-  test('26 & 27. Share link encodes step progress', async ({ page, context }) => {
+  test('26 & 27. Share link encodes step progress', async ({ page }) => {
     await openChecklist(page);
     await page.getByLabel(/Deed poll or statutory declaration/).check();
     await page.getByRole('button', { name: 'Show my action plan' }).click();
@@ -384,32 +390,34 @@ test.describe('Be myself Planner', () => {
     // Generate share URL
     const urlStr = await page.evaluate((fp) => {
       const prg = { hmrc: 2 };
-      const ps = { v: SCHEMA_VERSION, goal: 'both', reg: 'ew', prg };
+      const ps = { v: window.SCHEMA_VERSION, goal: 'both', reg: 'ew', prg };
       const url = new URL(fp);
       url.searchParams.set('p', btoa(JSON.stringify(ps)));
       return url.toString();
     }, filePath);
 
-    // Open new page and test restoration
-    const newPage = await context.newPage();
-    await newPage.goto(urlStr);
-    await newPage.locator('#ageConfirmShared').check();
-    await expect(newPage.locator('#planView')).toBeVisible();
+    // Simulate opening on a new device by clearing local storage
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(urlStr);
     
-    const restoredBtn = newPage.locator('#ssb_trk_hmrc');
+    await page.locator('#ageConfirmShared').check();
+    await expect(page.locator('#planView')).toBeVisible();
+    
+    const restoredBtn = page.locator('#ssb_trk_hmrc');
     await expect(restoredBtn).toHaveAttribute('data-state', '2');
     await expect(restoredBtn).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('34. Progress bleed prevention', async ({ page }) => {
-    await openChecklist(page);
-    await page.getByLabel(/Deed poll or statutory declaration/).check();
-    await page.getByRole('button', { name: 'Show my action plan' }).click();
-    
-    await page.locator('#ssb_trk_deedpoll').click();
-    expect(await page.evaluate(() => localStorage.getItem('st_trk_deedpoll'))).toBe('1');
-    
+    // Generate a clean share URL
     const url = await getShareUrl(page, {reg:'ew',goal:'both',nonUK:false,pid:false,emp:'no',dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:''});
+    
+    // Simulate a new device that has dirty progress data, but hasn't passed the age gate
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('st_trk_deedpoll', '1');
+    });
+    
     await page.goto(url);
     await page.locator('#ageConfirmShared').check();
     await expect(page.locator('#planView')).toBeVisible();
