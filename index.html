@@ -86,7 +86,7 @@
   #controlBarProgress { height:3px; width:100%; background:var(--bg-light); display:none; margin-top:6px; border-radius:2px; overflow:hidden; }
   body.plan-ready #controlBarProgress, body.wizard-active #controlBarProgress { display:block; }
   body.wizard-active #controlBarProgressFill { animation:none; background:var(--primary); opacity:0.35; }
-  #controlBarProgressText { display:none; font-size:0.85em; font-weight:bold; color:var(--text-muted); text-align:center; flex:1; order:2; align-self:center; }
+#controlBarProgressText { display:none; font-size:0.85em; font-weight:bold; color:var(--text-muted); text-align:center; flex:1; align-self:center; }
   body.wizard-active #controlBarProgressText { display:block; }
   @keyframes rainbow-flow {
     0%   { background-position: 0% 50%; }
@@ -427,7 +427,7 @@
         <h2 id="helpTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
         <button class="secondary" id="helpCloseBtn" onclick="toggleHelp()" aria-label="Close help dialog" style="padding:6px 12px;font-size:0.9em;"><span aria-hidden="true">✕</span> Close</button>
       </div>
-      <div id="helpModalBody" tabindex="0">
+      <div id="helpModalBody">
         <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
         <p style="margin:0 0 10px 0;">A free, private tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents.</p>
         <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Who is it for?</h3>
@@ -795,7 +795,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1776849229;
+const SCHEMA_VERSION = 1776865184;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -2714,21 +2714,10 @@ function getToolbarButtons() {
     .filter(b => !b.disabled && b.offsetParent !== null && !b.closest('.hidden') && getComputedStyle(b).display !== 'none')
     .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
 }
-function refreshToolbarTabindex() {
-  requestAnimationFrame(() => {
-    const btns = getToolbarButtons();
-    if (!btns.length) return;
-    const hasCurrent = btns.some(b => b.getAttribute('tabindex') === '0');
-    if (!hasCurrent) {
-      btns.forEach((b, i) => b.setAttribute('tabindex', i === 0 ? '0' : '-1'));
-    }
-  });
-}
+function refreshToolbarTabindex() {}
 function initToolbarNav() {
   const card = gel('controlBarCard');
   if (!card) return;
-  const btns = getToolbarButtons();
-  btns.forEach((b, i) => b.setAttribute('tabindex', i === 0 ? '0' : '-1'));
   card.addEventListener('keydown', e => {
     const keys = ['ArrowLeft','ArrowRight','Home','End'];
     if (!keys.includes(e.key)) return;
@@ -2742,8 +2731,6 @@ function initToolbarNav() {
     else if (e.key === 'ArrowLeft') next = (idx - 1 + btns.length) % btns.length;
     else if (e.key === 'Home') next = 0;
     else next = btns.length - 1;
-    btns[idx].setAttribute('tabindex', '-1');
-    btns[next].setAttribute('tabindex', '0');
     btns[next].focus();
   });
 }
@@ -2773,8 +2760,9 @@ window.onload = () => {
       return;
     }
     if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      e.preventDefault();
       const ov = gel('helpOverlay');
-      if (ov && ov.classList.contains('hidden')) { e.preventDefault(); toggleHelp(); return; }
+      if (ov && ov.classList.contains('hidden')) { toggleHelp(); return; }
     }
     if (e.key === 'Enter' && V.wizard && !V.wizard.classList.contains('hidden')) {
       const ae = document.activeElement;
