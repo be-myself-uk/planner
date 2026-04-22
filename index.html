@@ -427,7 +427,7 @@
         <h2 id="helpTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
         <button class="secondary" id="helpCloseBtn" onclick="toggleHelp()" aria-label="Close help dialog" style="padding:6px 12px;font-size:0.9em;"><span aria-hidden="true">✕</span> Close</button>
       </div>
-      <div id="helpModalBody" tabindex="0">
+      <div id="helpModalBody">
         <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
         <p style="margin:0 0 10px 0;">A free, private tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents.</p>
         <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Who is it for?</h3>
@@ -2714,24 +2714,10 @@ function getToolbarButtons() {
     .filter(b => !b.disabled && b.offsetParent !== null && !b.closest('.hidden') && getComputedStyle(b).display !== 'none')
     .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
 }
-function refreshToolbarTabindex() {
-  requestAnimationFrame(() => {
-    const btns = getToolbarButtons();
-    if (!btns.length) return;
-    const currentIdx = btns.indexOf(document.activeElement);
-    if (currentIdx >= 0) {
-      btns.forEach((b, i) => b.setAttribute('tabindex', i === currentIdx ? '0' : '-1'));
-    } else {
-      const hasCurrent = btns.some(b => b.getAttribute('tabindex') === '0');
-      if (!hasCurrent) btns.forEach((b, i) => b.setAttribute('tabindex', i === 0 ? '0' : '-1'));
-    }
-  });
-}
+function refreshToolbarTabindex() {}
 function initToolbarNav() {
   const card = gel('controlBarCard');
   if (!card) return;
-  const btns = getToolbarButtons();
-  btns.forEach((b, i) => b.setAttribute('tabindex', i === 0 ? '0' : '-1'));
   card.addEventListener('keydown', e => {
     const keys = ['ArrowLeft','ArrowRight','Home','End'];
     if (!keys.includes(e.key)) return;
@@ -2745,8 +2731,6 @@ function initToolbarNav() {
     else if (e.key === 'ArrowLeft') next = (idx - 1 + btns.length) % btns.length;
     else if (e.key === 'Home') next = 0;
     else next = btns.length - 1;
-    btns[idx].setAttribute('tabindex', '-1');
-    btns[next].setAttribute('tabindex', '0');
     btns[next].focus();
   });
 }
@@ -2775,7 +2759,7 @@ window.onload = () => {
       else panicExit();
       return;
     }
-if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       e.preventDefault();
       const ov = gel('helpOverlay');
       if (ov && ov.classList.contains('hidden')) { toggleHelp(); return; }
