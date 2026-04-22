@@ -121,16 +121,15 @@
   .legend-pulse { animation: legend-pulse 2s ease-in-out 6; }
   @media (prefers-reduced-motion:reduce) { #planView li, .phase, .collapsed-svc, .svc-sub-li, .svc-sub-ul { transition:none; } #controlBarProgressFill { transition:none; animation:none; background:var(--primary); } .ub-label { transition:none; } .legend-pulse { animation:none; } .next-step-highlight { outline:none; } }
   @media (pointer:coarse) { .ub-icon-btn:not(:focus-visible) .ub-label { display:none !important; } }
-  @media (max-width:600px) {
+@media (max-width:600px) {
   #controlBarButtons { flex-wrap:wrap; gap:4px; }
   #controlBarProgressText { display:none !important; }
   .ub-icon-btn { min-width:38px; height:38px; font-size:1rem; padding:0 8px; }
-  #ubMakeChangesBtn .ub-label,
-  #shareBtn .ub-label { display:inline !important; max-width:10em; opacity:1; }
   .ub-label { display:none !important; }
   .ub-sep { margin:0 2px; }
   .focus-count-badge { display:none !important; }
-  }
+  #cbRightGroup { margin-left:0; }
+}
   @media (max-width:400px) {
     #controlBarCard { padding:6px 8px; }
     .ub-icon-btn { min-width:34px; height:34px; font-size:0.95rem; padding:0 6px; }
