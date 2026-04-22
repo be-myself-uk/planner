@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "test": "node playwright-test.mjs"
+    "test": "playwright test"
   },
-  "dependencies": {
-    "playwright": "^1.58.2"
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
   }
 }
