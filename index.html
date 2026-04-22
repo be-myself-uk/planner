@@ -392,7 +392,7 @@
 </header>
 <div id="controlBar" role="region" aria-label="Page controls for your plan">
   <div id="saveWarnBanner" class="hidden save-warn-banner" role="alert">
-    <span>⚠️ Progress can't be saved automatically on this device (you may be in private browsing mode). To keep your plan, use the Copy link or Print buttons before you leave this page.</span>
+    <span>⚠️ Progress cannot be saved automatically on this device (you may be in private browsing mode). To keep your plan, use the Copy link or Print buttons before you leave this page.</span>
     <button onclick="this.closest('.save-warn-banner').classList.add('hidden')" aria-label="Dismiss save warning">✕</button>
   </div>
   <div id="controlBarCard" role="toolbar" aria-label="Page controls">
@@ -723,13 +723,13 @@
       <div class="plan-top-body">
         <p style="margin:0 0 10px 0;"><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
         <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
-          <li><a href="https://mermaids.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
           <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
           <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://gires.org.uk" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://scottishtrans.org" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://wwwgires.org.uk/" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://www.scottishtrans.org/" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
           <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://reddit.com/r/transgenderUK" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
         </ul>
         <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">🔒 Privacy</h3>
         <p style="margin:0 0 8px 0;">No personal information is collected and nothing you enter is ever sent to a server. This tool runs entirely in your browser.</p>
@@ -1869,8 +1869,8 @@ const questions = [
   ]},
   { id:'birthCertName',
     q:() => wizardState.birthRegion === REGION.NI
-      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">The General Register Office for Northern Ireland can record a name change on a birth certificate. ⚠️ This creates a permanently publicly accessible record that links your old and new names. Most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
-      : 'Would you like to update your Scottish birth certificate to show your new name?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em>',
+      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth The General Register Office for Northern Ireland can record a name change on a birth certificate. ⚠️ The new certificate will show both your old and new names as a permanent public record. Most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
+      : 'Would you like to record your new name on your Scottish birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em>',
     cond:() => (wizardState.birthRegion === REGION.SCOT || wizardState.birthRegion === REGION.NI) && wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
