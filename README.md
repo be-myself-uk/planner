@@ -101,13 +101,13 @@ This project is built and maintained by one person. Contributions that improve a
 
 All contributions must respect these constraints:
 
-- **100% private** — no data is ever sent to a server; no analytics, tracking, or external calls of any kind
-- **Accessible** — all features must work with keyboard navigation and screen readers; follow WAI-ARIA patterns
-- **No vulnerabilities** — user input is never rendered as HTML; no external scripts, styles, or fonts
-- **No personal data storage** — users do not enter personal information; notes, reminders, and account features are out of scope
-- **Simple English** — write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
-- **General guidance only** — content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
-- **Single file** — the application is one self-contained HTML file with no build step, no framework, and no dependencies
+- **100% private**: no data is ever sent to a server; no analytics, tracking, or external calls of any kind
+- **Accessible**: all features must work with keyboard navigation and screen readers; follow WAI-ARIA patterns
+- **No vulnerabilities**: user input is never rendered as HTML; no external scripts, styles, or fonts
+- **No personal data storage**: users do not enter personal information; notes, reminders, and account features are out of scope
+- **Simple English**: write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
+- **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
+- **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
 
 **Useful contributions include:**
 - Corrections to UK government processes or broken links
@@ -140,12 +140,12 @@ If you are an organisation such as a registered UK charity and would like to use
 Made with love and care for the UK trans community. 🏳️‍⚧️
 
 Useful resources referenced throughout the planner:
-- [TransActual](https://transactual.org.uk)
-- [Gendered Intelligence](https://genderedintelligence.co.uk)
-- [Mermaids](https://mermaids.org.uk)
-- [GIRES](https://gires.org.uk)
-- [Scottish Trans](https://scottishtrans.org)
-- [TransAid Cymru](https://transaid.cymru)
-- [Rainbow Migration](https://www.rainbowmigration.org.uk)
-- [TENI](https://teni.ie)
-- [r/transgenderUK](https://reddit.com/r/transgenderUK)
+- [TransActual](https://transactual.org.uk/)
+- [Gendered Intelligence](https://genderedintelligence.co.uk/)
+- [Mermaids](https://mermaidsuk.org.uk/)
+- [GIRES](https://www.gires.org.uk/)
+- [Scottish Trans](https://www.scottishtrans.org/)
+- [TransAid Cymru](https://transaid.cymru/)
+- [Rainbow Migration](https://www.rainbowmigration.org.uk/)
+- [TENI](https://teni.ie/)
+- [r/transgenderUK](https://www.reddit.com/r/transgenderUK/)
