@@ -91,7 +91,7 @@ This planner gives general information about UK legal processes only. It is not 
 
 ## Reporting issues
 
-If you notice a broken link, an outdated process, or a bug, please [open an issue](../../issues).
+If you notice a broken link, an outdated process, or a bug, please [open an issue](https://github.com/be-myself-uk/planner/issues).
 
 ## Contributing
 
