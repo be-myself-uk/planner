@@ -294,7 +294,7 @@ test.describe('Be myself Planner', () => {
   });
 
   test('17. Outdated schema link', async ({ page }) => {
-    const shareData = Buffer.from(JSON.stringify({v:100,reg:"ew",goal:"both"})).toString('base64');
+    const shareData = Buffer.from(JSON.stringify({v:100,reg:"ew",goal:"both",emp:"no"})).toString('base64');
     const url = `${filePath}?p=${shareData}`;
     
     // Clear localStorage to simulate loading the link on a fresh device
@@ -390,7 +390,7 @@ test.describe('Be myself Planner', () => {
     // Generate share URL
     const urlStr = await page.evaluate((fp) => {
       const prg = { hmrc: 2 };
-      const ps = { v: window.SCHEMA_VERSION, goal: 'both', reg: 'ew', prg };
+      const ps = { v: window.SCHEMA_VERSION, goal: 'both', reg: 'ew', emp: 'no', prg };
       const url = new URL(fp);
       url.searchParams.set('p', btoa(JSON.stringify(ps)));
       return url.toString();
