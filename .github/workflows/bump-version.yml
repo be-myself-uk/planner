@@ -1,31 +1,45 @@
 name: Bump Schema Version
+
 on:
-  push:
+  pull_request:
     branches:
       - main
       - preview
+
 jobs:
   bump-version:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
+
       - name: Update SCHEMA_VERSION in index.html
         run: |
+          # Get the current Unix timestamp
           CURRENT_TIME=$(date +%s)
+          
+          # Find the exact line and replace the numbers with the new timestamp
           sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
+
       - name: Commit and push changes
         run: |
+          # Set up the GitHub Actions bot user for the commit
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
           git add index.html
+          
+          # Check if the file actually changed before trying to commit
           if ! git diff --staged --quiet; then
+            # The [skip ci] tag stops this commit from triggering another GitHub Action loop
             git commit -m "chore: bump schema version to current timestamp [skip ci]"
-            git push origin HEAD
+            git push
           else
             echo "No changes to commit."
           fi
