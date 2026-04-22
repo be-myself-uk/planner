@@ -494,7 +494,10 @@ console.log('\n24. Utility bar');
   const restartBtn = page.locator('#ubRestartBtn');
   await restartBtn.click();
   assert(await page.getByRole('button', { name: /Confirm/ }).isVisible(), 'restart btn shows confirm on first click');
-  await page.waitForTimeout(4200);
+  await page.waitForFunction(() => {
+    const btn = document.querySelector('#ubRestartBtn');
+    return btn && btn.getAttribute('aria-label') === 'New plan';
+  }, null, { timeout: 5000 }).catch(() => {});
   assert(await restartBtn.getAttribute('aria-label') === 'New plan', 'restart btn reverts after timeout');
   await restartBtn.click();
   await page.getByRole('button', { name: /Confirm/ }).click();

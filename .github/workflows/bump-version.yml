@@ -1,0 +1,31 @@
+name: Bump Schema Version
+on:
+  push:
+    branches:
+      - main
+      - preview
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update SCHEMA_VERSION in index.html
+        run: |
+          CURRENT_TIME=$(date +%s)
+          sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: bump schema version to current timestamp [skip ci]"
+            git push origin HEAD
+          else
+            echo "No changes to commit."
+          fi

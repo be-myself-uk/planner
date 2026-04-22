@@ -81,9 +81,8 @@
     overflow:hidden; flex-direction:column;
   }
   #controlBarButtons { display:flex; align-items:center; width:100%; gap:8px; }
-  #controlBarButtons > .panic-btn { order:4; }
-  #cbLeftGroup { display:flex; align-items:center; gap:8px; order:1; }
-  #cbRightGroup { display:flex; align-items:center; gap:8px; margin-left:auto; order:3; }
+  #cbLeftGroup { display:flex; align-items:center; gap:8px; }
+  #cbRightGroup { display:flex; align-items:center; gap:8px; margin-left:auto; }
   #controlBarProgress { height:3px; width:100%; background:var(--bg-light); display:none; margin-top:6px; border-radius:2px; overflow:hidden; }
   body.plan-ready #controlBarProgress, body.wizard-active #controlBarProgress { display:block; }
   body.wizard-active #controlBarProgressFill { animation:none; background:var(--primary); opacity:0.35; }
@@ -124,7 +123,6 @@
   @media (pointer:coarse) { .ub-icon-btn:not(:focus-visible) .ub-label { display:none !important; } }
   @media (max-width:600px) {
   #controlBarButtons { flex-wrap:wrap; gap:4px; }
-  #controlBarButtons > .panic-btn { order:4; }
   #controlBarProgressText { display:none !important; }
   .ub-icon-btn { min-width:38px; height:38px; font-size:1rem; padding:0 8px; }
   #ubMakeChangesBtn .ub-label,
@@ -392,12 +390,11 @@
 </header>
 <div id="controlBar" role="region" aria-label="Page controls for your plan">
   <div id="saveWarnBanner" class="hidden save-warn-banner" role="alert">
-    <span>⚠️ Progress can't be saved automatically on this device (you may be in private browsing mode). To keep your plan, use the Copy link or Print buttons before you leave this page.</span>
+    <span>⚠️ Progress cannot be saved automatically on this device (you may be in private browsing mode). To keep your plan, use the Copy link or Print buttons before you leave this page.</span>
     <button onclick="this.closest('.save-warn-banner').classList.add('hidden')" aria-label="Dismiss save warning">✕</button>
   </div>
   <div id="controlBarCard" role="toolbar" aria-label="Page controls">
     <div id="controlBarButtons">
-      <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit – leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
       <div id="cbLeftGroup">
         <div id="cbPlanActions" class="ub-group">
           <button id="ubRestartBtn" class="ub-icon-btn" onclick="confirmUtilityRestart(this)" aria-label="New plan" title="New plan"><span class="ub-label" aria-hidden="true">New plan</span><span aria-hidden="true">↺</span></button>
@@ -415,6 +412,7 @@
         <button id="helpBtn" class="ub-icon-btn" onclick="toggleHelp()" aria-label="About this planner" aria-expanded="false" title="About this planner"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">About</span></button>
         <button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
       </div>
+      <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit – leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
     </div>
     <div id="controlBarProgress" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div id="controlBarProgressFill"></div>
@@ -723,13 +721,13 @@
       <div class="plan-top-body">
         <p style="margin:0 0 10px 0;"><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
         <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
-          <li><a href="https://mermaids.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
           <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
           <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://gires.org.uk" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://scottishtrans.org" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://www.gires.org.uk/" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://www.scottishtrans.org/" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
           <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://reddit.com/r/transgenderUK" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+          <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
         </ul>
         <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">🔒 Privacy</h3>
         <p style="margin:0 0 8px 0;">No personal information is collected and nothing you enter is ever sent to a server. This tool runs entirely in your browser.</p>
@@ -797,7 +795,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1775532086;
+const SCHEMA_VERSION = 1776848054;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -908,13 +906,13 @@ const PLAN_ITEMS = {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
     title: 'Driving licence (DVA)',
     summary: 'The Driver &amp; Vehicle Agency (DVA) handles driving licences in Northern Ireland. The DVA has its own process for updating gender markers, which differs from the DVLA in Great Britain. The NI Direct links below have the current details.',
-    detail: '<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>\n<p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p>\n<a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>\n<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>',
+    detail: '<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>\n<p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p><p><strong>Cover letter</strong>A cover letter is not required, but it is often advised to include one to explain the changes your are making especially when changing your gender marker.</p>\n<a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>\n<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>',
   },
   dvla: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
     title: 'Driving licence',
     summary: 'The DVLA handles driving licence updates. Your gender marker is stored in the number on your licence and should update as part of the process. You can also use the title Mx on your driving licence.',
-    detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>',
+    detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><p><strong>Cover letter</strong>A cover letter is not required, but it is often advised to include one to explain the changes your are making especially when changing your gender marker.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>',
   },
   nhs: {
     difficulty: 'medium', cost: { type:'fixed', value:'Free', badge:'badge-green' },
@@ -967,7 +965,7 @@ const PLAN_ITEMS = {
         cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
         time: '10–30 minutes',
         summary: 'You need a document that records your name change before you can update most official records. In Scotland you have two options: a free unenrolled deed poll, or a Statutory Declaration recorded with the National Records of Scotland (NRS). If you choose a deed poll, <strong>keeping it unenrolled is strongly recommended.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.',
-        detail: '<p><strong>Option 1: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. The GOV.UK and TransActual links below have details on the current requirements and process.</p>\n<p><strong>Option 2: Statutory Declaration with NRS.</strong> A more formal route that records the name change with the National Records of Scotland. This is not required by most organisations and there is a fee involved. The NRS link below has the current details.</p>\n<p>Both options are widely accepted. Most people in Scotland use the free deed poll for day-to-day purposes and only use the NRS route if they specifically want a formal record. If using a deed poll, keeping it unenrolled is generally recommended for privacy, as enrolling puts your old name on a public government record.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>\n<a href="https://www.nrscotland.gov.uk/registration/recording-a-change-of-forename-or-surname-in-scotland" target="_blank" rel="noopener noreferrer" class="links">🔗 NRS: Recording a change of name in Scotland</a>',
+        detail: '<p><strong>Option 1: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. The GOV.UK and TransActual links below have details on the current requirements and process.</p>\n<p><strong>Option 2: Statutory Declaration with NRS.</strong> A more formal route that records the name change with the National Records of Scotland. This is not required by most organisations and there is a fee involved. The NRS link below has the current details.</p>\n<p>Both options are widely accepted. Most people in Scotland use the free deed poll for day-to-day purposes and only use the NRS route if they specifically want a formal record. If using a deed poll, keeping it unenrolled is generally recommended for privacy, as enrolling puts your old name on a public government record.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>\n<a href="https://www.nrscotland.gov.uk/registration/changing-your-name/" target="_blank" rel="noopener noreferrer" class="links">🔗 NRS: Recording a change of name in Scotland</a>',
       },
       ni: {
         title: 'Deed poll or statutory declaration',
@@ -1008,7 +1006,7 @@ const PLAN_ITEMS = {
         summary: 'HM Passport Office will need your deed poll and evidence that you are using your new name. The GOV.UK link below has the full details.',
       },
     },
-    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) stating that the change is likely to be permanent is required, unless you already have a GRC.</p><p><strong>⚠️ Travel note:</strong> It is important that the name on any travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
+    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Important medical letter rules:</strong> HMPO is currently very strict about these letters. To avoid rejection, the letter must be dated, contain a <strong>handwritten signature</strong>, explicitly state your <strong>new name and specified gender</strong>, and confirm that your gender change is "likely to be permanent".</p><p><strong>⚠️ Travel note:</strong> It is important that the name on any travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
   },
   irish_passport: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
@@ -1046,7 +1044,7 @@ const PLAN_ITEMS = {
       },
       scot: {
         summaryFn: () => 'Once you receive your GRC, the National Records of Scotland (NRS) will usually contact you automatically about updating your birth certificate.',
-        detail: '<p>In most cases, once your GRC has been issued, the National Records of Scotland (NRS) will get in touch directly about issuing a new birth certificate. There is no need to apply separately, so wait for their letter after the GRC arrives.</p>\n<p>If nothing has arrived within a few weeks, contact NRS to follow up.</p>\n<a href="https://www.nrscotland.gov.uk/registration/recording-change-of-sex-in-the-registers-of-scotland" target="_blank" rel="noopener noreferrer" class="links">🔗 NRS: Recording change of sex in the registers of Scotland</a>',
+        detail: '<p>In most cases, once your GRC has been issued, the National Records of Scotland (NRS) will get in touch directly about issuing a new birth certificate. There is no need to apply separately, so wait for their letter after the GRC arrives.</p>\n<p>If nothing has arrived within a few weeks, contact NRS to follow up.</p>\n<a href="https://www.nrscotland.gov.uk/registration/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links">🔗 NRS: Recording change of sex in the registers of Scotland</a>',
       },
       default: {
         summaryFn: () => 'Once you receive your GRC, the General Register Office (GRO) will usually contact you automatically about updating your birth certificate.',
@@ -1140,16 +1138,28 @@ function trapFocus(e) {
   if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
   else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
 }
+let _lastFocusBeforeHelp = null;
 function toggleHelp() {
   const overlay = gel('helpOverlay');
   const hidden = overlay.classList.toggle('hidden');
   const hBtn = gel('helpBtn'); if (hBtn) hBtn.setAttribute('aria-expanded', !hidden);
-  if (!hidden) { document.addEventListener('keydown', trapFocus); gel('helpCloseBtn').focus(); }
-  else         { document.removeEventListener('keydown', trapFocus); gel('helpBtn').focus(); }
+  if (!hidden) {
+    _lastFocusBeforeHelp = document.activeElement;
+    document.addEventListener('keydown', trapFocus);
+    gel('helpCloseBtn').focus();
+  } else {
+    document.removeEventListener('keydown', trapFocus);
+    if (_lastFocusBeforeHelp) {
+      _lastFocusBeforeHelp.focus();
+      _lastFocusBeforeHelp = null;
+    } else {
+      gel('helpBtn')?.focus();
+    }
+  }
 }
 function closeHelpOnBackdrop(e) { if (e.target === gel('helpOverlay')) toggleHelp(); }
 function panicExit() {
-  document.documentElement.style.visibility = 'hidden';
+  document.body.style.display = 'none';
   window.location.replace('https://www.google.co.uk');
 }
 function loadUrlParams(d) {
@@ -1869,8 +1879,8 @@ const questions = [
   ]},
   { id:'birthCertName',
     q:() => wizardState.birthRegion === REGION.NI
-      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">The General Register Office for Northern Ireland can record a name change on a birth certificate. ⚠️ This creates a permanently publicly accessible record that links your old and new names. Most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
-      : 'Would you like to update your Scottish birth certificate to show your new name?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em>',
+      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth The General Register Office for Northern Ireland can record a name change on a birth certificate. ⚠️ The new certificate will show both your old and new names as a permanent public record. Most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
+      : 'Would you like to record your new name on your Scottish birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em>',
     cond:() => (wizardState.birthRegion === REGION.SCOT || wizardState.birthRegion === REGION.NI) && wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
@@ -2020,7 +2030,7 @@ function nextWizard() {
       V.start.classList.remove('hidden');
       document.body.classList.remove('wizard-active');
       V.toggle.style.display = 'none';
-      gel('ageKickout').classList.remove('hidden');
+      gel('ageKickout')?.classList.remove('hidden');
       refreshToolbarTabindex();
       return;
     }
@@ -2764,7 +2774,7 @@ window.onload = () => {
     }
     if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       const ov = gel('helpOverlay');
-      if (ov && ov.classList.contains('hidden')) { toggleHelp(); return; }
+      if (ov && ov.classList.contains('hidden')) { e.preventDefault(); toggleHelp(); return; }
     }
     if (e.key === 'Enter' && V.wizard && !V.wizard.classList.contains('hidden')) {
       const ae = document.activeElement;
