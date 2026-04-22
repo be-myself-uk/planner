@@ -335,6 +335,14 @@ test.describe('Be myself Planner', () => {
     await expect(page).toHaveURL(/google\.(co\.uk|com)/);
   });
 
+  test('19b. Keyboard ? shortcut opens help modal', async ({ page }) => {
+  await expect(page.locator('#helpOverlay')).toBeHidden();
+  await page.keyboard.press('?');
+  await expect(page.locator('#helpOverlay')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#helpOverlay')).toBeHidden();
+});
+
   test('20. Panic button', async ({ page }) => {
     await checkAgeGate(page);
     await page.getByRole('button', { name: 'Quick Exit' }).click();
