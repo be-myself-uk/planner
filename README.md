@@ -126,7 +126,7 @@ npx playwright install chromium
 npm test
 ```
 
-Please [open an issue](../../issues) before starting significant work so we can discuss the approach.
+Please [open an issue](https://github.com/be-myself-uk/planner/issues) before starting significant work so we can discuss the approach.
 
 ## Licence
 
