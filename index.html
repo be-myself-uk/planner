@@ -145,7 +145,8 @@
   }
   .skip-link { position:absolute; top:-100%; left:0; background:var(--primary); color:var(--text-invert); padding:10px 16px; font-weight:bold; text-decoration:none; border-radius:0 0 8px 0; z-index:200; font-family:'Lexend',sans-serif; }
   .skip-link:focus { top:0; }
-  body { font-family:'Lexend',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-weight:400; background:var(--bg-card); margin:0; padding:0; color:var(--text); line-height:1.6; }
+  body { display: flex; flex-direction: column; min-height: 100vh; font-family:'Lexend',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-weight:400; background:var(--bg-card); margin:0; padding:0; color:var(--text); line-height:1.6; }
+  main {flex-grow: 1; }
   strong, b { font-weight:bold; }
   .hero { text-align:center; padding:80px 20px 40px; border-bottom:1px solid var(--border); background:var(--bg-card); }
   .hero h1 { font-size:3.5rem; font-weight:bold; color:var(--text); margin:0 0 10px 0; letter-spacing:-1px; }
@@ -190,7 +191,6 @@
   .wizard-back-link:hover, .wizard-back-link:focus-visible { background:none; color:var(--primary-hover); outline:none; }
   .wizard-btn-row { display:flex; align-items:center; margin-top:20px; gap:10px; }
   #wizardNextBtn { margin-left:auto; }
-
   button { box-sizing:border-box; font-family:'Lexend',sans-serif; background:var(--primary); color:var(--text-invert); border:none; padding:12px 20px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer; transition:background 0.3s; }
   button:hover { background:var(--primary-hover); }
   button:focus-visible { outline:3px solid var(--primary); outline-offset:3px; }
@@ -1007,7 +1007,7 @@ const PLAN_ITEMS = {
         summary: 'HM Passport Office will need your deed poll and evidence that you are using your new name. The GOV.UK link below has the full details.',
       },
     },
-    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Important medical letter rules:</strong> HMPO is currently very strict about these letters. To avoid rejection, the letter must be dated, contain a <strong>handwritten signature</strong>, explicitly state your <strong>new name and specified gender</strong>, and confirm that your gender change is "likely to be permanent".</p><p><strong>⚠️ Travel note:</strong> It is important that the name on any travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
+    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Important medical letter rules:</strong> HMPO is currently very strict about these letters. To avoid rejection, the letter must be:</p><ul><li>Written by a medical professional registered in the UK with GMC or HCPC</li><li>Contain the date</li><li>Contain a handwritten signature</li><li>State they know you well enough to make a diagnosis</li><li>State your name and specified gender</li><li>State that you use your name and gender for all purposes</li><li>Confirm that your gender change is "likely to be permanent".</li></ul><p><strong>⚠️ Travel note:</strong> It is important that the name on any travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
   },
   irish_passport: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
