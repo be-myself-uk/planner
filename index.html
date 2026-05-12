@@ -478,6 +478,13 @@
       <button class="secondary" onclick="hideAgeKickout()">Go back</button>
     </div>
   </div>
+  <div id="disclaimerKickout" class="hidden">
+    <div class="phase info" style="margin-top:0;">
+      <h2>You must read the disclaimer before using this tool</h2>
+      <p>This planner provides general guidance only. It is not legal, medical, financial, or tax advice.</p>
+      <button class="secondary" onclick="hideDisclaimerKickout()">Go back</button>
+    </div>
+  </div>
   <div id="welcomeBackView" class="hidden">
     <div id="welcomeNormal" class="phase info" style="margin-top:0;margin-bottom:25px;">
       <h2>Welcome back</h2>
@@ -497,8 +504,9 @@
     </div>
     <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
       <h2>Someone shared a plan with you</h2>
-      <p>This looks like a new device or browser. Please confirm you are aged 16 or over to view the plan.</p>
+      <p>This looks like a new device or browser. To view the plan, please confirm you are aged 16 or over and that you understand that this is not legal advice.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()"> Yes, I am aged 16 or over (or I have parental consent)</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="disclaimerConfirmShared" onchange="checkAgeGateShared()"> Yes, I understand this is not legal advice</label>
     </div>
   </div>
 
@@ -521,7 +529,12 @@
       <p style="font-size:0.9em;color:var(--text-muted);">This planner is designed for people aged 16 and over. If you are under 16, <a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids</a> and <a href="https://genderedintelligence.co.uk/" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a> offer support for young people.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistAgeConfirm" onchange="handleChecklistAge(this)"> Yes, I am aged 16 or over</label>
     </div>
-    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Select at least one option to continue.</div>
+    <div id="checklistDisclaimerGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
+      <p><strong>Do you understand this is general guidance?</strong></p>
+      <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
+    </div>
+    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You can not continue unless you are aged 16 or over and understand that this is general guidance only.</div>
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 20px 0;">
 
       <legend class="section-title">1. About you</legend>
@@ -1338,6 +1351,8 @@ function backToStart() {
   document.getElementById('ageKickout')?.classList.add('hidden');
   try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
   const acb = document.getElementById('checklistAgeConfirm'); if (acb) acb.checked = false;
+  const dcb = document.getElementById('checklistDisclaimerConfirm'); if (dcb) dcb.checked = false;
+  try { localStorage.removeItem('disclaimerConfirmed'); } catch(e) {}
   V.start.classList.remove('hidden');
   refreshToolbarTabindex();
 }
@@ -1348,20 +1363,40 @@ function hideAgeKickout() {
   if (sv) sv.classList.remove('hidden');
 }
 function handleChecklistAge(cb) {
+  const ag = gel('checklistAgeGate');
   if (cb.checked) {
     sss('ageConfirmed', 'true');
-    const ag = gel('checklistAgeGate');
     if (ag) ag.classList.remove('error');
     updateLocks();
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
+    if (ag) ag.classList.remove('error');
   }
 }
+function handleChecklistDisclaimer(cb) {
+  const dg = gel('checklistDisclaimerGate');
+  if (cb.checked) {
+    sss('disclaimerConfirmed', 'true');
+    if (dg) dg.classList.remove('error');
+  } else {
+    try { localStorage.removeItem('disclaimerConfirmed'); } catch(e) {}
+    if (dg) dg.classList.remove('error');
+  }
+}
+function hideDisclaimerKickout() {
+  const k = document.getElementById('disclaimerKickout');
+  if (k) k.classList.add('hidden');
+  const sv = document.getElementById('startView');
+  if (sv) sv.classList.remove('hidden');
+}
 function checkAgeGateShared() {
-  if (!gel('ageConfirmShared').checked) return;
+  if (!gel('ageConfirmShared').checked || !gel('disclaimerConfirmShared').checked) return;
   sss('ageConfirmed', 'true');
-  const cb = gel('checklistAgeConfirm');
-  if (cb) cb.checked = true;
+  sss('disclaimerConfirmed', 'true');
+  const cbAge = gel('checklistAgeConfirm');
+  if (cbAge) cbAge.checked = true;
+  const cbDisc = gel('checklistDisclaimerConfirm');
+  if (cbDisc) cbDisc.checked = true;
   gel('welcomeNewDevice').classList.add('hidden');
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
@@ -1572,6 +1607,8 @@ function restartApp() {
   const cb = gel('checklistAgeConfirm'); if (cb) cb.checked = false;
   gel('ageKickout')?.classList.add('hidden');
   try { window.history.replaceState({}, document.title, window.location.pathname); } catch(e) {}
+  const dcb = gel('checklistDisclaimerConfirm'); if (dcb) dcb.checked = false;
+  gel('disclaimerKickout')?.classList.add('hidden');
   const disclaimerElR = gel('footerDisclaimer');
   if (disclaimerElR) disclaimerElR.open = true;
   refreshToolbarTabindex();
@@ -1790,6 +1827,10 @@ function resetChecklist() {
 const questions = [
   { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Under-16s need parental consent and follow a different process.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes'],
+    [S.NO,  'No']
+  ]},
+  { id:'disclaimer', q:'Do you understand this is general guidance only?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</em>', cond:() => ssg('disclaimerConfirmed') !== 'true', o:() => [
+    [S.YES, 'Yes, I understand'],
     [S.NO,  'No']
   ]},
   { id:'region', q:'Where do you live?', o:() => [
@@ -2039,6 +2080,19 @@ function nextWizard() {
       return;
     }
   }
+  if (q.id === 'disclaimer') {
+    if (a.value === S.YES) {
+      sss('disclaimerConfirmed', 'true');
+    } else {
+      V.wizard.classList.add('hidden');
+      V.start.classList.remove('hidden');
+      document.body.classList.remove('wizard-active');
+      V.toggle.style.display = 'none';
+      gel('disclaimerKickout')?.classList.remove('hidden');
+      refreshToolbarTabindex();
+      return;
+    }
+  }
   if (q.id === 'birthRegion') {
     if (a.value === 'out') {
       wizardState.birthOutsideUK = S.YES;
@@ -2082,6 +2136,15 @@ function generateChecklistPlan() {
     if (ag) ag.classList.add('error');
     gel('checklistAgeGate')?.scrollIntoView({behavior:'smooth', block:'center'});
     announce('Confirm you are aged 16 or over to continue.');
+    return;
+  }
+  if (!gel('checklistDisclaimerConfirm')?.checked) {
+    const cw = gel('checklistWarning');
+    if (cw) cw.classList.add('visible');
+    const dg = gel('checklistDisclaimerGate');
+    if (dg) dg.classList.add('error');
+    gel('checklistDisclaimerGate')?.scrollIntoView({behavior:'smooth', block:'center'});
+    announce('Confirm you understand the disclaimer to continue.');
     return;
   }
   const goalName   = gel('chkGoalName')?.checked;
@@ -2751,6 +2814,10 @@ window.onload = () => {
     const cb = gel('checklistAgeConfirm');
     if (cb) cb.checked = true;
   }
+  if (ssg('disclaimerConfirmed') === 'true') {
+    const cb = gel('checklistDisclaimerConfirm');
+    if (cb) cb.checked = true;
+  }
   const disclaimerEl = gel('footerDisclaimer');
   if (disclaimerEl && ssg('disclaimerSeen') !== '1') {
     disclaimerEl.open = true;
@@ -2812,7 +2879,7 @@ window.onload = () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
     V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true') {
+    if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
       V.welcome.classList.remove('hidden');
       gel('welcomeNormal').classList.add('hidden');
       gel('welcomeNewDevice').classList.remove('hidden');
@@ -2823,7 +2890,7 @@ window.onload = () => {
   }
   if (params.has('goal')) {
     V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true') {
+    if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
       V.welcome.classList.remove('hidden');
       gel('welcomeNormal').classList.add('hidden');
       gel('welcomeNewDevice').classList.remove('hidden');
@@ -2881,7 +2948,9 @@ window.nextWizard            = nextWizard;
 window.generateChecklistPlan = generateChecklistPlan;
 window.backToStart           = backToStart;
 window.hideAgeKickout        = hideAgeKickout;
+window.hideDisclaimerKickout = hideDisclaimerKickout;
 window.handleChecklistAge    = handleChecklistAge;
+window.handleChecklistDisclaimer = handleChecklistDisclaimer;
 window.checkAgeGateShared    = checkAgeGateShared;
 window.updateLocks           = updateLocks;
 window.handleSvcItem         = handleSvcItem;
