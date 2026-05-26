@@ -183,7 +183,7 @@
   .save-warn-banner { display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--simultaneous-bg); color:var(--simultaneous); border:1px solid var(--simultaneous); border-radius:8px; padding:8px 12px; font-size:0.85em; margin-bottom:8px; }
   .save-warn-banner button { background:none; border:none; color:inherit; cursor:pointer; font-size:1rem; flex-shrink:0; padding:0; }
   .options-group { padding:4px; border:2px solid transparent; border-radius:12px; transition:border-color 0.3s,background 0.3s; margin:-6px; }
-  .options-group.error, #checklistAgeGate.error { border-color:var(--urgent); background:var(--urgent-bg); }
+  .options-group.error, #checklistAgeGate.error, #checklistDisclaimerGate.error { border-color:var(--urgent); background:var(--urgent-bg); }
   .multi-all-sep { border-top:1px solid var(--border); margin:6px 4px 2px; }
   .btn-group { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
   .wizard-back-link { background:none; border:none; padding:0; color:var(--primary); text-decoration:underline; cursor:pointer; font-size:0.9em; font-family:inherit; }
@@ -478,6 +478,13 @@
       <button class="secondary" onclick="hideAgeKickout()">Go back</button>
     </div>
   </div>
+  <div id="disclaimerKickout" class="hidden">
+    <div class="phase info" style="margin-top:0;">
+      <h2>You must read the disclaimer before using this tool</h2>
+      <p>This planner provides general guidance only. It is not legal, medical, financial, or tax advice.</p>
+      <button class="secondary" onclick="hideDisclaimerKickout()">Go back</button>
+    </div>
+  </div>
   <div id="welcomeBackView" class="hidden">
     <div id="welcomeNormal" class="phase info" style="margin-top:0;margin-bottom:25px;">
       <h2>Welcome back</h2>
@@ -497,8 +504,9 @@
     </div>
     <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
       <h2>Someone shared a plan with you</h2>
-      <p>This looks like a new device or browser. Please confirm you are aged 16 or over to view the plan.</p>
+      <p>This looks like a new device or browser. To view the plan, please confirm you are aged 16 or over and that you understand that this is not legal advice.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()"> Yes, I am aged 16 or over (or I have parental consent)</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="disclaimerConfirmShared" onchange="checkAgeGateShared()"> Yes, I understand this is not legal advice</label>
     </div>
   </div>
 
@@ -521,7 +529,12 @@
       <p style="font-size:0.9em;color:var(--text-muted);">This planner is designed for people aged 16 and over. If you are under 16, <a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids</a> and <a href="https://genderedintelligence.co.uk/" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a> offer support for young people.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistAgeConfirm" onchange="handleChecklistAge(this)"> Yes, I am aged 16 or over</label>
     </div>
-    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Select at least one option to continue.</div>
+    <div id="checklistDisclaimerGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
+      <p><strong>Do you understand that this is only general guidance?</strong></p>
+      <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
+    </div>
+    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You can not continue unless you are aged 16 or over and understand that this is general guidance only.</div>
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 20px 0;">
 
       <legend class="section-title">1. About you</legend>
@@ -557,18 +570,18 @@
     </fieldset>
     <fieldset id="wrapSectionCircumstances" data-section-label="Your circumstances" style="border:none;padding:0;margin:0 0 10px 0;">
       <legend class="section-title">4. Your circumstances</legend>
-    <label class="checkbox-item"><input type="checkbox" id="chkNonUK"><span>I have a UK visa or eVisa<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters.</em></span></label>
+    <label class="checkbox-item"><input type="checkbox" id="chkNonUK"><span>I have a UK visa or eVisa<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.</em></span></label>
     <fieldset style="border:none;padding:0;margin:10px 0;">
-      <legend class="visually-hidden">Employment and volunteering status</legend>
+      <legend class="visually-hidden">Employment, volunteering, and student placement status</legend>
       <div class="chk-section">
-        <p class="chk-q">Do you have any employment or volunteering records that need updating?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em></p>
+        <p class="chk-q">Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em></p>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> Yes, I need to update my records</label>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> No</label>
       </div>
     </fieldset>
-    <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role requires a DBS check<br><em class="note" style="margin-top:2px;">A DBS check is a background check for roles working with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span><span class="label-dbs-ni">My role requires an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for roles working or volunteering with vulnerable people. If your role does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em></span></span></label>
+    <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role or course requires a DBS check<br><em class="note" style="margin-top:2px;">A DBS check is a background check for roles and placements working with vulnerable people, including many nursing, teaching, and social work courses. If your role or course does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em></span><span class="label-dbs-ni">My role or course requires an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people. If your role or course does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em></span></span></label>
     <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em></span></span></label>
-    <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications or professional registrations to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA.</em></span></label>
+    <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications, student records, or professional registrations to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.</em></span></label>
     <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I have a vehicle registered in my name that needs updating<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em></span></label>
     <div id="wrapChkServices" class="hidden">
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
@@ -831,9 +844,9 @@ const PLAN_ITEMS = {
   },
   student: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Variable cost', badge:'success', badge2:'simultaneous' },
-    title: 'Qualifications and student loans',
-    summary: 'Universities, colleges, exam boards, and professional bodies can update qualification certificates. Processes and fees vary between organisations.',
-    detail: `<p><strong>Student Loans Company (SLC):</strong> A deed poll or certified copy is needed to update your name. They do not automatically receive updates from HMRC or your university.</p>\n<p><strong>Universities:</strong> Most offer free replacement certificates, though some charge a small admin fee.</p>\n<p><strong>Exam boards (e.g. BTEC, City &amp; Guilds):</strong> Each awarding body has its own process and fees. Some charge a significant fee per replacement certificate.</p>\n<p><strong>Professional and vocational bodies:</strong> Regulated professions such as nursing (NMC), law (SRA), and medicine (GMC) each have their own update process. Most have handled these requests before.</p>\n<a href="https://www.gov.uk/student-finance/who-qualifies" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Student finance</a>\n<a href="https://www.gov.uk/guidance/updating-your-personal-details" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Updating your student finance details</a>`,
+    title: 'Qualifications, student records, and professional registrations',
+    summary: 'Universities, colleges, exam boards, and professional bodies can update their records. If you are a current student, your institution can also update enrolment records, your student ID, and internal systems. Processes and fees vary between organisations.',
+    detail: `<p><strong>Current students:</strong> Your university or college registry can update your name on enrolment records, student ID cards, and internal systems such as timetabling and the virtual learning environment. Contact the registry or student services team directly with your deed poll. Some institutions also have a dedicated trans support contact who can coordinate this across departments.</p>\n<p><strong>Student finance:</strong> Your student finance body can update your name with a deed poll or certified copy. They do not automatically receive updates from HMRC or your university. In England this is Student Finance England, in Scotland SAAS, in Wales Student Finance Wales, and in Northern Ireland Student Finance NI.</p>\n<p><strong>Universities:</strong> Most offer free replacement certificates, though some charge a small admin fee.</p>\n<p><strong>Exam boards (e.g. BTEC, City &amp; Guilds):</strong> Each awarding body has its own process and fees. Some charge a significant fee per replacement certificate.</p>\n<p><strong>Professional and vocational bodies:</strong> Regulated professions such as nursing (NMC), law (SRA), and medicine (GMC) each have their own update process. Most have handled these requests before.</p>\n<a href="https://www.gov.uk/student-finance/who-qualifies" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Student finance</a>\n<a href="https://www.gov.uk/guidance/updating-your-personal-details" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Updating your student finance details</a>`,
   },
   dbs: {
     difficulty: 'medium', cost: { type:'fixed', value:'Free', badge:'badge-green' },
@@ -910,13 +923,13 @@ const PLAN_ITEMS = {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
     title: 'Driving licence (DVA)',
     summary: 'The Driver &amp; Vehicle Agency (DVA) handles driving licences in Northern Ireland. The DVA has its own process for updating gender markers, which differs from the DVLA in Great Britain. The NI Direct links below have the current details.',
-    detail: '<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>\n<p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p><p><strong>Cover letter</strong>A cover letter is not required, but it is often advised to include one to explain the changes your are making especially when changing your gender marker.</p>\n<a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>\n<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>',
+    detail: '<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>\n<p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p><p><strong>Cover letter:</strong> A cover letter is not required, but it is often advised to include one to explain the changes you are making, especially when changing your gender marker.</p>\n<a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>\n<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>',
   },
   dvla: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
     title: 'Driving licence',
     summary: 'The DVLA handles driving licence updates. Your gender marker is stored in the number on your licence and should update as part of the process. You can also use the title Mx on your driving licence.',
-    detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><p><strong>Cover letter</strong>A cover letter is not required, but it is often advised to include one to explain the changes your are making especially when changing your gender marker.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>',
+    detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><p><strong>Cover letter:</strong> A cover letter is not required, but it is often advised to include one to explain the changes you are making, especially when changing your gender marker.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>',
   },
   nhs: {
     difficulty: 'medium', cost: { type:'fixed', value:'Free', badge:'badge-green' },
@@ -952,7 +965,7 @@ const PLAN_ITEMS = {
         variants: {
           gender: {
             summary: 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record. Updating your health record ensures your medical care, screening invitations, and correspondence all reflect your correct details.',
-            detail: '<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, the gender marker on your existing number can be updated, though this can sometimes cause issues with how data is shared across different NHS systems.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, it is possible to request that your gender marker be recorded as I or "Indeterminate", which may show up as "Not specified" on NHS systems. Speak to your GP practice if this applies to you, as the process varies and system support is not universal.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>',
+            detail: '<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, the gender marker on your existing number can be updated, though this can sometimes cause issues with how data is shared across different NHS systems.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, it is possible to request a non-binary gender marker, though the specific code used varies across NHS systems and not all systems support it consistently. Speak to your GP practice if this applies to you.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>',
           },
           name: {
             summary: 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration. Updating your NHS record means your appointments, letters, and prescriptions all use your new name.',
@@ -982,7 +995,7 @@ const PLAN_ITEMS = {
         title: 'Unenrolled deed poll',
         cost: { type:'fixed', value:'Free', badge:'badge-green' },
         time: '10–30 minutes',
-        summary: 'A deed poll is a short legal document you sign to officially record your name change. You need one before you can update your details with UK services. It is completely free. <strong>An unenrolled deed poll is generally all you need.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.',
+        summary: 'A deed poll is a short legal document you sign to officially record your name change. You need one before you can update your details with UK services. It is free to create one yourself. <strong>An unenrolled deed poll is generally all you need.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.',
         detail: '<p>An unenrolled deed poll is a simple legal document that can be created at home at no cost. The GOV.UK and TransActual links below explain the current requirements, including who can act as a witness.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>\n<details class="svc-detail"><summary>What if an organisation refuses?</summary><p>Many organisations are expected to update their records when given valid proof of a name change. Data protection law gives you the right to ask any organisation holding inaccurate data about you to correct it. This is sometimes called the right to rectification. If an organisation refuses without a good reason, you may be able to raise a formal complaint.</p><p>If an organisation refuses: <strong>1.</strong> Ask to speak to their data controller or data protection officer. <strong>2.</strong> Put your request in writing (email is fine) and keep a copy. <strong>3.</strong> If they still refuse after a written request, you can raise a complaint with the Information Commissioner\'s Office (ICO) using the link below.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></details>',
       },
     },
@@ -1138,6 +1151,7 @@ function trapFocus(e) {
   if (!modal || e.key !== 'Tab') return;
   const focusable = Array.from(modal.querySelectorAll(FOCUSABLE));
   if (!focusable.length) return;
+  if (!modal.contains(document.activeElement)) { e.preventDefault(); focusable[0].focus(); return; }
   const first = focusable[0], last = focusable[focusable.length - 1];
   if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
   else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
@@ -1168,7 +1182,7 @@ function panicExit() {
 }
 function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
-  const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? d.emp  : S.NO;
+  const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? (d.emp === 'yes' ? 'needs_update' : d.emp)  : S.NO;
   wizardState.region      = ['ew','scot','ni'].includes(d.reg) ? d.reg : REGION.EW;
   wizardState.goal        = validGoal;
   wizardState.goalParts   = validGoal === S.BOTH ? ['name','gender'] : validGoal === S.NAME ? ['name'] : ['gender'];
@@ -1188,10 +1202,12 @@ function loadUrlParams(d) {
   wizardState.birthCertName = d.bcn === true ? S.YES : S.NO;
   wizardState.birthCert   = d.bc    === true ? S.YES : S.NO;
   wizardState.birthOutsideUK = d.bo === true ? S.YES : S.NO;
-  wizardState.birthRegion = d.bri || REGION.EW;
+  const validBirthRegions = [REGION.EW, REGION.SCOT, REGION.NI];
+  wizardState.birthRegion = validBirthRegions.includes(d.bri) ? d.bri : REGION.EW;
   if (wizardState.birthOutsideUK === S.YES) wizardState.birthRegion = REGION.EW;
   wizardState.vehicle     = d.veh   === true ? S.YES : S.NO;
-  wizardState.services    = (d.srv || '').split(',').filter(Boolean);
+  const validSvcKeys = Object.keys(SVC_MAP);
+  wizardState.services    = (d.srv || '').split(',').filter(s => validSvcKeys.includes(s));
   if (d.prg && typeof d.prg === 'object') {
     Object.entries(d.prg).forEach(([key, state]) => {
       const s = parseInt(state, 10);
@@ -1249,7 +1265,7 @@ function handleLegacyUrl(params) {
     v: 0, reg: REGION.EW,
     goal: params.get('goal') || S.BOTH,
     nonUK: b('nonUK'),
-    emp: b('emp') ? 'yes' : 'no',
+    emp: b('emp') ? 'needs_update' : 'no',
     dbs: b('dbs'), stu: false, dp: b('dp'),
     visa: b('visa'), nhs: b('nhs'),
     dl: b('dl') ? 'updated' : 'none',
@@ -1338,6 +1354,8 @@ function backToStart() {
   document.getElementById('ageKickout')?.classList.add('hidden');
   try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
   const acb = document.getElementById('checklistAgeConfirm'); if (acb) acb.checked = false;
+  const dcb = document.getElementById('checklistDisclaimerConfirm'); if (dcb) dcb.checked = false;
+  try { localStorage.removeItem('disclaimerConfirmed'); } catch(e) {}
   V.start.classList.remove('hidden');
   refreshToolbarTabindex();
 }
@@ -1348,20 +1366,38 @@ function hideAgeKickout() {
   if (sv) sv.classList.remove('hidden');
 }
 function handleChecklistAge(cb) {
+  const ag = gel('checklistAgeGate');
   if (cb.checked) {
     sss('ageConfirmed', 'true');
-    const ag = gel('checklistAgeGate');
     if (ag) ag.classList.remove('error');
     updateLocks();
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
   }
 }
+function handleChecklistDisclaimer(cb) {
+  const dg = gel('checklistDisclaimerGate');
+  if (cb.checked) {
+    sss('disclaimerConfirmed', 'true');
+    if (dg) dg.classList.remove('error');
+  } else {
+    try { localStorage.removeItem('disclaimerConfirmed'); } catch(e) {}
+  }
+}
+function hideDisclaimerKickout() {
+  const k = document.getElementById('disclaimerKickout');
+  if (k) k.classList.add('hidden');
+  const sv = document.getElementById('startView');
+  if (sv) sv.classList.remove('hidden');
+}
 function checkAgeGateShared() {
-  if (!gel('ageConfirmShared').checked) return;
+  if (!gel('ageConfirmShared').checked || !gel('disclaimerConfirmShared').checked) return;
   sss('ageConfirmed', 'true');
-  const cb = gel('checklistAgeConfirm');
-  if (cb) cb.checked = true;
+  sss('disclaimerConfirmed', 'true');
+  const cbAge = gel('checklistAgeConfirm');
+  if (cbAge) cbAge.checked = true;
+  const cbDisc = gel('checklistDisclaimerConfirm');
+  if (cbDisc) cbDisc.checked = true;
   gel('welcomeNewDevice').classList.add('hidden');
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
@@ -1572,6 +1608,8 @@ function restartApp() {
   const cb = gel('checklistAgeConfirm'); if (cb) cb.checked = false;
   gel('ageKickout')?.classList.add('hidden');
   try { window.history.replaceState({}, document.title, window.location.pathname); } catch(e) {}
+  const dcb = gel('checklistDisclaimerConfirm'); if (dcb) dcb.checked = false;
+  gel('disclaimerKickout')?.classList.add('hidden');
   const disclaimerElR = gel('footerDisclaimer');
   if (disclaimerElR) disclaimerElR.open = true;
   refreshToolbarTabindex();
@@ -1792,6 +1830,10 @@ const questions = [
     [S.YES, 'Yes'],
     [S.NO,  'No']
   ]},
+  { id:'disclaimer', q:'Do you understand that this is only general guidance?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</em>', cond:() => ssg('disclaimerConfirmed') !== 'true', o:() => [
+    [S.YES, 'Yes, I understand'],
+    [S.NO,  'No']
+  ]},
   { id:'region', q:'Where do you live?', o:() => [
     [REGION.EW,   'England or Wales'],
     [REGION.SCOT, 'Scotland'],
@@ -1861,13 +1903,13 @@ const questions = [
     o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'employment', q:'Do you have any employment or volunteering records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, and apprenticeships. Employers and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em>', o:() => [
+  { id:'employment', q:'Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em>', o:() => [
     [S.NEEDS_UPDATE, 'Yes, I need to update my records'],
     [S.NO,           'No'],
   ]},
   { id:'dbs', q:() => wizardState.region === REGION.NI
-    ? 'Does your role require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for working or volunteering with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>'
-    : 'Does your role require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A DBS check is a background check for roles working with vulnerable people. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
+    ? 'Does your role or course require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>'
+    : 'Does your role or course require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A DBS check is a background check for roles and placements working with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'services', type:'multi',
@@ -1878,7 +1920,7 @@ const questions = [
   { id:'vehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em>', o:() => [
     [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
   ], cond:() => wizardState.goal !== S.GENDER },
-  { id:'student', q:'Do you have qualifications or professional registrations to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA.</em>', o:() => [
+  { id:'student', q:'Do you have qualifications, student records, or professional registrations to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'birthCertName',
@@ -2039,6 +2081,19 @@ function nextWizard() {
       return;
     }
   }
+  if (q.id === 'disclaimer') {
+    if (a.value === S.YES) {
+      sss('disclaimerConfirmed', 'true');
+    } else {
+      V.wizard.classList.add('hidden');
+      V.start.classList.remove('hidden');
+      document.body.classList.remove('wizard-active');
+      V.toggle.style.display = 'none';
+      gel('disclaimerKickout')?.classList.remove('hidden');
+      refreshToolbarTabindex();
+      return;
+    }
+  }
   if (q.id === 'birthRegion') {
     if (a.value === 'out') {
       wizardState.birthOutsideUK = S.YES;
@@ -2082,6 +2137,15 @@ function generateChecklistPlan() {
     if (ag) ag.classList.add('error');
     gel('checklistAgeGate')?.scrollIntoView({behavior:'smooth', block:'center'});
     announce('Confirm you are aged 16 or over to continue.');
+    return;
+  }
+  if (!gel('checklistDisclaimerConfirm')?.checked) {
+    const cw = gel('checklistWarning');
+    if (cw) cw.classList.add('visible');
+    const dg = gel('checklistDisclaimerGate');
+    if (dg) dg.classList.add('error');
+    gel('checklistDisclaimerGate')?.scrollIntoView({behavior:'smooth', block:'center'});
+    announce('Confirm you understand the disclaimer to continue.');
     return;
   }
   const goalName   = gel('chkGoalName')?.checked;
@@ -2390,7 +2454,7 @@ function buildSharedPlan(p) {
     const grcIntro = isNI
       ? `<p>This step covers long-term legal gender recognition. In Northern Ireland, the legal standing of the UK Gender Recognition Certificate (GRC) when it comes to anti-discrimination laws is currently uncertain and may change. Despite this, a GRC still has practical uses for updating your birth certificate, marriage records, HMRC, and pensions.</p>
 ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have access to the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement. This is described first below as an alternative to the UK GRC.</p>' : '<p>If you were not born in Northern Ireland, the UK GRC route below is the standard path available.</p>'}`
-      : `<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not required for most daily life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If you have already changed your gender legally in another country, you may not need a GRC.</p>${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below alongside the UK GRC route.</p>' : ''}`;
+      : `<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not required for most daily life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If you have already changed your gender legally in another country, you may not need a GRC.</p><p><strong>If you are married or in a civil partnership:</strong> The GRC process requires either your spouse or civil partner's consent (a statutory declaration of consent), or that your marriage or civil partnership has already ended. If your spouse does not consent, you would need to divorce or dissolve the civil partnership before a GRC can be issued. This is a significant legal consideration and you may want to speak to a solicitor before applying.</p>${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below alongside the UK GRC route.</p>' : ''}`;
     const stepTitle = p.bornInNI ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
     const stepTime  = p.bornInNI ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
     const irishPassportItem = p.bornInNI ? li('irish_passport', medium, renderCost(_ip.cost), _ip.title, _ip.summary, _ip.detail) : '';
@@ -2512,6 +2576,7 @@ function restoreTrackers() {
     }
   });
   refreshPlan();
+  updateNextStep();
 }
 
 function fadeOutConfetti() {
@@ -2694,7 +2759,6 @@ function refreshPlan() {
     }
   }
   checkAllDone();
-  updateNextStep();
   document.querySelectorAll('.svc-sub-ul').forEach(ul => {
     const anyVisible = Array.from(ul.querySelectorAll('li')).some(li => !li.classList.contains('collapsed-svc'));
     ul.style.margin = anyVisible ? '' : '0';
@@ -2718,7 +2782,13 @@ function getToolbarButtons() {
     .filter(b => !b.disabled && b.offsetParent !== null && !b.closest('.hidden') && getComputedStyle(b).display !== 'none')
     .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
 }
-function refreshToolbarTabindex() {}
+function refreshToolbarTabindex() {
+  const btns = getToolbarButtons();
+  if (!btns.length) return;
+  const hasFocused = btns.some(b => b === document.activeElement);
+  btns.forEach((b, i) => b.setAttribute('tabindex', (i === 0 || (hasFocused && b === document.activeElement)) ? '0' : '-1'));
+  if (!hasFocused) btns[0].setAttribute('tabindex', '0');
+}
 function initToolbarNav() {
   const card = gel('controlBarCard');
   if (!card) return;
@@ -2735,6 +2805,8 @@ function initToolbarNav() {
     else if (e.key === 'ArrowLeft') next = (idx - 1 + btns.length) % btns.length;
     else if (e.key === 'Home') next = 0;
     else next = btns.length - 1;
+    btns[idx].setAttribute('tabindex', '-1');
+    btns[next].setAttribute('tabindex', '0');
     btns[next].focus();
   });
 }
@@ -2749,6 +2821,10 @@ window.onload = () => {
     window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', e => { if (!ssg('theme')) { document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); updateThemeIcon(); } });
   if (ssg('ageConfirmed') === 'true') {
     const cb = gel('checklistAgeConfirm');
+    if (cb) cb.checked = true;
+  }
+  if (ssg('disclaimerConfirmed') === 'true') {
+    const cb = gel('checklistDisclaimerConfirm');
     if (cb) cb.checked = true;
   }
   const disclaimerEl = gel('footerDisclaimer');
@@ -2812,7 +2888,7 @@ window.onload = () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has('p')) {
     V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true') {
+    if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
       V.welcome.classList.remove('hidden');
       gel('welcomeNormal').classList.add('hidden');
       gel('welcomeNewDevice').classList.remove('hidden');
@@ -2823,7 +2899,7 @@ window.onload = () => {
   }
   if (params.has('goal')) {
     V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true') {
+    if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
       V.welcome.classList.remove('hidden');
       gel('welcomeNormal').classList.add('hidden');
       gel('welcomeNewDevice').classList.remove('hidden');
@@ -2881,7 +2957,9 @@ window.nextWizard            = nextWizard;
 window.generateChecklistPlan = generateChecklistPlan;
 window.backToStart           = backToStart;
 window.hideAgeKickout        = hideAgeKickout;
+window.hideDisclaimerKickout = hideDisclaimerKickout;
 window.handleChecklistAge    = handleChecklistAge;
+window.handleChecklistDisclaimer = handleChecklistDisclaimer;
 window.checkAgeGateShared    = checkAgeGateShared;
 window.updateLocks           = updateLocks;
 window.handleSvcItem         = handleSvcItem;
