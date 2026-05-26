@@ -2576,6 +2576,7 @@ function restoreTrackers() {
     }
   });
   refreshPlan();
+  updateNextStep();
 }
 
 function fadeOutConfetti() {
@@ -2758,7 +2759,6 @@ function refreshPlan() {
     }
   }
   checkAllDone();
-  updateNextStep();
   document.querySelectorAll('.svc-sub-ul').forEach(ul => {
     const anyVisible = Array.from(ul.querySelectorAll('li')).some(li => !li.classList.contains('collapsed-svc'));
     ul.style.margin = anyVisible ? '' : '0';
