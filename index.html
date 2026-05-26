@@ -530,7 +530,7 @@
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistAgeConfirm" onchange="handleChecklistAge(this)"> Yes, I am aged 16 or over</label>
     </div>
     <div id="checklistDisclaimerGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
-      <p><strong>Do you understand this is general guidance?</strong></p>
+      <p><strong>Do you understand that this is only general guidance?</strong></p>
       <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
     </div>
@@ -923,13 +923,13 @@ const PLAN_ITEMS = {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
     title: 'Driving licence (DVA)',
     summary: 'The Driver &amp; Vehicle Agency (DVA) handles driving licences in Northern Ireland. The DVA has its own process for updating gender markers, which differs from the DVLA in Great Britain. The NI Direct links below have the current details.',
-    detail: '<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>\n<p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p><p><strong>Cover letter</strong>A cover letter is not required, but it is often advised to include one to explain the changes your are making especially when changing your gender marker.</p>\n<a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>\n<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>',
+    detail: '<p>Northern Ireland driving licences are issued by the Driver &amp; Vehicle Agency (DVA), which operates separately from the DVLA. The NI Direct links below have the current details on what is needed and how to apply.</p><p><strong>Mx title:</strong> The DVA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p>\n<p><strong>Cost note:</strong> Updating your name and/or gender marker is usually free. A photo update at the same time may carry a small fee. Check the NI Direct link below for current prices.</p><p><strong>Cover letter:</strong> A cover letter is not required, but it is often advised to include one to explain the changes you are making, especially when changing your gender marker.</p>\n<a href="https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Keeping your driving licence up to date</a>\n<a href="https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 NI Direct: Proof of identity for a driving licence</a>',
   },
   dvla: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
     title: 'Driving licence',
     summary: 'The DVLA handles driving licence updates. Your gender marker is stored in the number on your licence and should update as part of the process. You can also use the title Mx on your driving licence.',
-    detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><p><strong>Cover letter</strong>A cover letter is not required, but it is often advised to include one to explain the changes your are making especially when changing your gender marker.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>',
+    detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the current application form.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for current prices.</p><p><strong>Cover letter:</strong> A cover letter is not required, but it is often advised to include one to explain the changes you are making, especially when changing your gender marker.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change the name or gender on your driving licence</a>',
   },
   nhs: {
     difficulty: 'medium', cost: { type:'fixed', value:'Free', badge:'badge-green' },
@@ -1151,6 +1151,7 @@ function trapFocus(e) {
   if (!modal || e.key !== 'Tab') return;
   const focusable = Array.from(modal.querySelectorAll(FOCUSABLE));
   if (!focusable.length) return;
+  if (!modal.contains(document.activeElement)) { e.preventDefault(); focusable[0].focus(); return; }
   const first = focusable[0], last = focusable[focusable.length - 1];
   if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
   else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
@@ -1181,7 +1182,7 @@ function panicExit() {
 }
 function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
-  const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? d.emp  : S.NO;
+  const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? (d.emp === 'yes' ? 'needs_update' : d.emp)  : S.NO;
   wizardState.region      = ['ew','scot','ni'].includes(d.reg) ? d.reg : REGION.EW;
   wizardState.goal        = validGoal;
   wizardState.goalParts   = validGoal === S.BOTH ? ['name','gender'] : validGoal === S.NAME ? ['name'] : ['gender'];
@@ -1201,10 +1202,12 @@ function loadUrlParams(d) {
   wizardState.birthCertName = d.bcn === true ? S.YES : S.NO;
   wizardState.birthCert   = d.bc    === true ? S.YES : S.NO;
   wizardState.birthOutsideUK = d.bo === true ? S.YES : S.NO;
-  wizardState.birthRegion = d.bri || REGION.EW;
+  const validBirthRegions = [REGION.EW, REGION.SCOT, REGION.NI];
+  wizardState.birthRegion = validBirthRegions.includes(d.bri) ? d.bri : REGION.EW;
   if (wizardState.birthOutsideUK === S.YES) wizardState.birthRegion = REGION.EW;
   wizardState.vehicle     = d.veh   === true ? S.YES : S.NO;
-  wizardState.services    = (d.srv || '').split(',').filter(Boolean);
+  const validSvcKeys = Object.keys(SVC_MAP);
+  wizardState.services    = (d.srv || '').split(',').filter(s => validSvcKeys.includes(s));
   if (d.prg && typeof d.prg === 'object') {
     Object.entries(d.prg).forEach(([key, state]) => {
       const s = parseInt(state, 10);
@@ -1262,7 +1265,7 @@ function handleLegacyUrl(params) {
     v: 0, reg: REGION.EW,
     goal: params.get('goal') || S.BOTH,
     nonUK: b('nonUK'),
-    emp: b('emp') ? 'yes' : 'no',
+    emp: b('emp') ? 'needs_update' : 'no',
     dbs: b('dbs'), stu: false, dp: b('dp'),
     visa: b('visa'), nhs: b('nhs'),
     dl: b('dl') ? 'updated' : 'none',
@@ -1370,7 +1373,6 @@ function handleChecklistAge(cb) {
     updateLocks();
   } else {
     try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
-    if (ag) ag.classList.remove('error');
   }
 }
 function handleChecklistDisclaimer(cb) {
@@ -1380,7 +1382,6 @@ function handleChecklistDisclaimer(cb) {
     if (dg) dg.classList.remove('error');
   } else {
     try { localStorage.removeItem('disclaimerConfirmed'); } catch(e) {}
-    if (dg) dg.classList.remove('error');
   }
 }
 function hideDisclaimerKickout() {
@@ -1829,7 +1830,7 @@ const questions = [
     [S.YES, 'Yes'],
     [S.NO,  'No']
   ]},
-  { id:'disclaimer', q:'Do you understand this is general guidance only?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</em>', cond:() => ssg('disclaimerConfirmed') !== 'true', o:() => [
+  { id:'disclaimer', q:'Do you understand that this is only general guidance?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</em>', cond:() => ssg('disclaimerConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes, I understand'],
     [S.NO,  'No']
   ]},
@@ -2781,7 +2782,13 @@ function getToolbarButtons() {
     .filter(b => !b.disabled && b.offsetParent !== null && !b.closest('.hidden') && getComputedStyle(b).display !== 'none')
     .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
 }
-function refreshToolbarTabindex() {}
+function refreshToolbarTabindex() {
+  const btns = getToolbarButtons();
+  if (!btns.length) return;
+  const hasFocused = btns.some(b => b === document.activeElement);
+  btns.forEach((b, i) => b.setAttribute('tabindex', (i === 0 || (hasFocused && b === document.activeElement)) ? '0' : '-1'));
+  if (!hasFocused) btns[0].setAttribute('tabindex', '0');
+}
 function initToolbarNav() {
   const card = gel('controlBarCard');
   if (!card) return;
@@ -2798,6 +2805,8 @@ function initToolbarNav() {
     else if (e.key === 'ArrowLeft') next = (idx - 1 + btns.length) % btns.length;
     else if (e.key === 'Home') next = 0;
     else next = btns.length - 1;
+    btns[idx].setAttribute('tabindex', '-1');
+    btns[next].setAttribute('tabindex', '0');
     btns[next].focus();
   });
 }
