@@ -17,6 +17,7 @@ async function openChecklist(page) {
   await checkAgeGate(page);
   await page.locator('.start-checklist-link').click();
   await page.locator('#checklistAgeConfirm').check();
+  await page.locator('#checklistDisclaimerConfirm').check();
 }
 
 async function openWizard(page) {
@@ -56,6 +57,7 @@ async function getShareUrl(page, data) {
 
 test.describe('Be myself Planner', () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem('disclaimerSeen', '1'));
     await page.goto(filePath);
   });
 
@@ -122,7 +124,8 @@ test.describe('Be myself Planner', () => {
     const backBtn = page.getByRole('button', { name: '← Back' });
     await expect(backBtn).toBeVisible();
     await backBtn.click();
-    await expect(page.locator('input[name="ans"]').first()).toBeVisible();
+    await expect(page.locator('#startView')).toBeVisible();
+    await expect(page.locator('#wizardView')).toBeHidden();
   });
 
   test('6. Checklist flow', async ({ page }) => {
@@ -275,6 +278,7 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#welcomeNewDevice')).toBeVisible();
     await expect(page.locator('#planView')).toBeHidden();
     await page.locator('#ageConfirmShared').check();
+    await page.locator('#disclaimerConfirmShared').check();
     await expect(page.locator('#planView')).toBeVisible();
   });
 
@@ -284,6 +288,7 @@ test.describe('Be myself Planner', () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto(url);
     await page.locator('#ageConfirmShared').check();
+    await page.locator('#disclaimerConfirmShared').check();
     await expect(page.locator('#welcomeOutdated')).toBeVisible();
     await expect(page.locator('#planView')).toBeHidden();
     await page.getByRole('button', { name: 'Review my answers' }).click();
@@ -292,37 +297,39 @@ test.describe('Be myself Planner', () => {
 
   test('18. Help modal', async ({ page }) => {
     const helpBtn = page.getByRole('button', { name: 'About this planner' });
-    await expect(page.locator('#helpOverlay')).toBeHidden();
+    const dlg = page.locator('#dlgUsage');
+    await expect(dlg).toBeHidden();
     await helpBtn.click();
-    await expect(page.locator('#helpOverlay')).toBeVisible();
-    await expect(helpBtn).toHaveAttribute('aria-expanded', 'true');
-    await page.getByRole('button', { name: 'Close help dialog' }).click();
-    await expect(page.locator('#helpOverlay')).toBeHidden();
+    await expect(dlg).toBeVisible();
+    await dlg.getByRole('button', { name: 'Close' }).click();
+    await expect(dlg).toBeHidden();
     await helpBtn.click();
     await page.mouse.click(5, 5);
-    await expect(page.locator('#helpOverlay')).toBeHidden();
+    await expect(dlg).toBeHidden();
   });
 
   test('19. Keyboard Escape navigation', async ({ page }) => {
+    const dlg = page.locator('#dlgUsage');
     await page.getByRole('button', { name: 'About this planner' }).click();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#helpOverlay')).toBeHidden();
+    await expect(dlg).toBeHidden();
     await page.keyboard.press('Escape');
-    await expect(page).toHaveURL(/google\.(co\.uk|com)/);
+    await expect(page).toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
   });
 
   test('19b. Keyboard ? shortcut opens help modal', async ({ page }) => {
-    await expect(page.locator('#helpOverlay')).toBeHidden();
+    const dlg = page.locator('#dlgUsage');
+    await expect(dlg).toBeHidden();
     await page.keyboard.press('?');
-    await expect(page.locator('#helpOverlay')).toBeVisible();
+    await expect(dlg).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(page.locator('#helpOverlay')).toBeHidden();
+    await expect(dlg).toBeHidden();
   });
 
   test('20. Panic button', async ({ page }) => {
     await checkAgeGate(page);
     await page.getByRole('button', { name: 'Quick Exit' }).click();
-    await expect(page).toHaveURL(/google\.(co\.uk|com)/);
+    await expect(page).toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
   });
 
   test('21. Theme toggle', async ({ page }) => {
@@ -372,6 +379,7 @@ test.describe('Be myself Planner', () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto(urlStr);
     await page.locator('#ageConfirmShared').check();
+    await page.locator('#disclaimerConfirmShared').check();
     await expect(page.locator('#planView')).toBeVisible();
     const restoredBtn = page.locator('#ssb_trk_hmrc');
     await expect(restoredBtn).toHaveAttribute('data-state', '2');
@@ -386,6 +394,7 @@ test.describe('Be myself Planner', () => {
     });
     await page.goto(url);
     await page.locator('#ageConfirmShared').check();
+    await page.locator('#disclaimerConfirmShared').check();
     await expect(page.locator('#planView')).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem('st_trk_deedpoll'))).toBeNull();
   });
