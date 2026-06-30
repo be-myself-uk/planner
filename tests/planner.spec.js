@@ -400,7 +400,7 @@ test.describe('Be myself Planner', () => {
   });
 
   test('35-40. Accessibility / WCAG checks', async ({ page }) => {
-    await page.getByRole('button', { name: 'About this planner' }).click();
+    await page.getByRole('link', { name: 'Usage guide' }).click();
     const table = page.locator('.shortcut-table');
     await expect(table.locator('thead th[scope="col"]')).toHaveCount(2);
     const controlBar = page.locator('#controlBar');
