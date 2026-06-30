@@ -298,14 +298,6 @@
   .contact-btn { display:inline-block; background:var(--bg-light); color:var(--text); border:1px solid var(--border); padding:10px 15px; border-radius:8px; text-decoration:none; font-weight:bold; transition:background 0.2s; margin-top:10px; }
   .contact-btn:hover { background:var(--bg-details-hover); }
   .contact-btn:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
-  #helpOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px; }
-  #helpOverlay.hidden { display:none !important; }
-  #helpModal { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; max-width:560px; width:100%; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 8px 32px rgba(0,0,0,0.25); }
-  #helpModalHeader { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
-  #helpModalBody { padding:20px; overflow-y:auto; font-size:0.95em; color:var(--text); line-height:1.7; }
-  #helpModalBody p { margin:0 0 16px 0; }
-  #helpModalBody p:last-child { margin-bottom:0; }
-  #helpModalBody h3 { margin:16px 0 8px 0; font-size:1em; }
   .shortcut-table { border-collapse:collapse; width:100%; margin:0.5rem 0; }
   .shortcut-table td { padding:4px 8px; vertical-align:top; }
   .shortcut-table td:first-child { white-space:nowrap; padding-right:12px; }
@@ -413,7 +405,7 @@
       </div>
       <span id="controlBarProgressText" aria-hidden="true"></span>
       <div id="cbRightGroup">
-        <button id="helpBtn" class="ub-icon-btn" onclick="toggleHelp()" aria-label="About this planner" aria-expanded="false" title="About this planner"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">About</span></button>
+        <button id="helpBtn" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()" aria-label="About this planner" title="About this planner"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">About</span></button>
         <button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
       </div>
       <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit – leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
@@ -425,42 +417,6 @@
 </div>
 <main class="container" id="mainContent" tabindex="-1">
   <span id="lock-deed-poll-reason" class="visually-hidden">You need a deed poll before you can update this document.</span>
-  <div id="helpOverlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle" onclick="closeHelpOnBackdrop(event)">
-    <div id="helpModal">
-      <div id="helpModalHeader">
-        <h2 id="helpTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
-        <button class="secondary" id="helpCloseBtn" onclick="toggleHelp()" aria-label="Close help dialog" style="padding:6px 12px;font-size:0.9em;"><span aria-hidden="true">✕</span> Close</button>
-      </div>
-      <div id="helpModalBody">
-        <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
-        <p style="margin:0 0 10px 0;">A free, private tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Who is it for?</h3>
-        <p style="margin:0 0 10px 0;">Anyone in the UK aged 16 or over who wants to update their legal documents to match their gender identity. This includes people who only want a name change, only a gender marker change, or both. There is also guidance for people from outside the UK who hold a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">How does it work?</h3>
-        <p style="margin:0 0 10px 0;">You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal action plan with clear information and links to official resources.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Step-by-step or checklist?</h3>
-        <p style="margin:0 0 10px 0;">Both produce the same plan. The step-by-step wizard shows one question at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is better if you already know your situation. You can switch between them at any time.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Is my information safe?</h3>
-        <p style="margin:0 0 10px 0;">Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Is this legal advice?</h3>
-        <p style="margin:0 0 10px 0;">No. This planner gives general guidance only. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Keyboard shortcuts</h3>
-        <table class="shortcut-table" aria-label="Keyboard shortcuts">
-          <thead class="visually-hidden">
-            <tr><th scope="col">Key or action</th><th scope="col">What it does</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
-            <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
-      <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
-            <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
-            <tr><td><kbd>Esc</kbd></td><td>Quick exit: leaves the page immediately</td></tr>
-            <tr><td><kbd>?</kbd></td><td>Open this help panel</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
   <div id="startView">
     <div class="start-actions">
       <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start now</button>
@@ -524,6 +480,7 @@
   </div>
 
   <div id="checklistView" class="hidden">
+    <button id="checklistBackStartBtn" class="wizard-back-link" onclick="backToStart()">← Back to start</button>
     <p id="checklistIntroText" style="margin-top:0;">Choose the answers that apply to you, then click "Show my action plan" at the bottom.</p>
     <div id="checklistAgeGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
       <p><strong>Are you aged 16 or over?</strong></p>
@@ -703,7 +660,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Keyboard shortcuts</h3>
     <table class="shortcut-table" aria-label="Keyboard shortcuts">
       <thead class="visually-hidden">
-        <tr><th>Key or action</th><th>What it does</th></tr>
+        <tr><th scope="col">Key or action</th><th scope="col">What it does</th></tr>
       </thead>
       <tbody>
         <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
@@ -850,7 +807,6 @@ function decodeState(str) {
 const SCHEMA_VERSION = 1777713017;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 const SERVICES = [
   { key:'banks',     id:'chkSvcBanks',     label:'Banks and financial accounts',                   detail:`<div id="svc_detail_banks"><p><strong>Banks and financial accounts:</strong> Most banks should accept an unenrolled deed poll for a name change, but some branch staff may not know this and might ask for an enrolled deed poll or updated photo ID. If that happens, getting your driving licence updated first can help, or try a different branch. Some digital banks allow name changes through their apps without needing updated photo ID.</p><p><strong>If you are 16 or 17:</strong> Some banks may ask for a parent or guardian to be present or to countersign, even though an unenrolled deed poll does not normally require this. If this happens, try a different branch or contact the bank directly to complain.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></div>` },
   { key:'insurance', id:'chkSvcInsurance', label:'Insurance policies (car, home, life, health)',    detail:`<div id="svc_detail_insurance" class="svc-detail"><p><strong>Insurance policies:</strong> Contact your insurer to update your name. Some policies may require you to declare a name change. Check your policy terms to avoid any issues with future claims.</p></div>` },
@@ -1181,36 +1137,11 @@ function updateThemeIcon() {
   const label = isDark ? 'Theme: switch to light mode' : 'Theme: switch to dark mode';
   const b = gel('themeToggleBtn'); if (b) { b.innerHTML = html; b.setAttribute('aria-label', label); }
 }
-function trapFocus(e) {
-  const modal = gel('helpModal');
-  if (!modal || e.key !== 'Tab') return;
-  const focusable = Array.from(modal.querySelectorAll(FOCUSABLE));
-  if (!focusable.length) return;
-  if (!modal.contains(document.activeElement)) { e.preventDefault(); focusable[0].focus(); return; }
-  const first = focusable[0], last = focusable[focusable.length - 1];
-  if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
-  else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
-}
-let _lastFocusBeforeHelp = null;
 function toggleHelp() {
-  const overlay = gel('helpOverlay');
-  const hidden = overlay.classList.toggle('hidden');
-  const hBtn = gel('helpBtn'); if (hBtn) hBtn.setAttribute('aria-expanded', !hidden);
-  if (!hidden) {
-    _lastFocusBeforeHelp = document.activeElement;
-    document.addEventListener('keydown', trapFocus);
-    gel('helpCloseBtn').focus();
-  } else {
-    document.removeEventListener('keydown', trapFocus);
-    if (_lastFocusBeforeHelp) {
-      _lastFocusBeforeHelp.focus();
-      _lastFocusBeforeHelp = null;
-    } else {
-      gel('helpBtn')?.focus();
-    }
-  }
+  const dlg = gel('dlgUsage');
+  if (!dlg) return;
+  if (dlg.open) dlg.close(); else dlg.showModal();
 }
-function closeHelpOnBackdrop(e) { if (e.target === gel('helpOverlay')) toggleHelp(); }
 function closeDialogOnBackdrop(e) {
   const rect = e.currentTarget.getBoundingClientRect();
   if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
@@ -1390,6 +1321,7 @@ function copyShareableLink() {
 
 function backToStart() {
   V.wizard.classList.add('hidden');
+  V.checklist.classList.add('hidden');
   V.toggle.style.display = 'none';
   document.body.classList.remove('wizard-active');
   document.getElementById('ageKickout')?.classList.add('hidden');
@@ -2875,15 +2807,13 @@ window.onload = () => {
   }
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      const ov = gel('helpOverlay');
-      if (ov && !ov.classList.contains('hidden')) toggleHelp();
-      else panicExit();
+      if (document.querySelector('dialog[open]')) return;
+      panicExit();
       return;
     }
     if (e.key === '?' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       e.preventDefault();
-      const ov = gel('helpOverlay');
-      if (ov && ov.classList.contains('hidden')) { toggleHelp(); return; }
+      if (!document.querySelector('dialog[open]')) { toggleHelp(); return; }
     }
     if (e.key === 'Enter' && V.wizard && !V.wizard.classList.contains('hidden')) {
       const ae = document.activeElement;
@@ -2986,7 +2916,7 @@ window.toggleFocusMode       = toggleFocusMode;
 window.copyShareableLink     = copyShareableLink;
 window.toggleMode            = toggleMode;
 window.toggleHelp            = toggleHelp;
-window.closeHelpOnBackdrop   = closeHelpOnBackdrop;
+window.closeDialogOnBackdrop = closeDialogOnBackdrop;
 window.toggleTheme           = toggleTheme;
 window.startWizard           = startWizard;
 window.startChecklist        = startChecklist;
