@@ -296,21 +296,21 @@ test.describe('Be myself Planner', () => {
   });
 
   test('18. Help modal', async ({ page }) => {
-    const helpBtn = page.getByRole('button', { name: 'About this planner' });
+    const usageLink = page.getByRole('link', { name: 'Usage guide' });
     const dlg = page.locator('#dlgUsage');
     await expect(dlg).toBeHidden();
-    await helpBtn.click();
+    await usageLink.click();
     await expect(dlg).toBeVisible();
     await dlg.getByRole('button', { name: 'Close' }).click();
     await expect(dlg).toBeHidden();
-    await helpBtn.click();
+    await usageLink.click();
     await page.mouse.click(5, 5);
     await expect(dlg).toBeHidden();
   });
 
   test('19. Keyboard Escape navigation', async ({ page }) => {
     const dlg = page.locator('#dlgUsage');
-    await page.getByRole('button', { name: 'About this planner' }).click();
+    await page.getByRole('link', { name: 'Usage guide' }).click();
     await page.keyboard.press('Escape');
     await expect(dlg).toBeHidden();
     await page.keyboard.press('Escape');
