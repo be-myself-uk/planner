@@ -144,7 +144,7 @@
   }
   .skip-link { position:absolute; top:-100%; left:0; background:var(--primary); color:var(--text-invert); padding:10px 16px; font-weight:bold; text-decoration:none; border-radius:0 0 8px 0; z-index:200; font-family:'Lexend',sans-serif; }
   .skip-link:focus { top:0; }
-  body { display: flex; flex-direction: column; min-height: 100vh; font-family:'Lexend',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-weight:400; background:var(--bg-main); margin:0; padding:0; color:var(--text); line-height:1.6; }
+  body { display: flex; flex-direction: column; min-height: 100vh; font-family:'Lexend',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-weight:400; background:var(--bg-main); margin:0; padding:0; color:var(--text); line-height:1.7; }
   body > * { flex-shrink: 0; }
   strong, b { font-weight:bold; }
   .hero { text-align:center; padding:80px 20px 40px; border-bottom:1px solid var(--border); background:var(--bg-card); }
@@ -158,10 +158,10 @@
   h3:focus { outline:3px solid var(--primary); outline-offset:4px; border-radius:4px; }
   .section-title { font-weight:bold; margin:20px 0 10px 0; color:var(--text-muted); text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; }
   .wizard-legend { font-size:1.3em; font-weight:bold; color:var(--text); margin:0 0 15px 0; padding:0; border:none; line-height:1.4; }
-  .option, .checkbox-item { display:flex; align-items:flex-start; margin:10px 0; background:var(--bg-light); padding:15px; border-radius:8px; border:1px solid var(--border); cursor:pointer; transition:background 0.2s,border-color 0.2s; color:var(--text); }
+  .option, .checkbox-item { display:flex; align-items:flex-start; margin:10px 0; background:var(--bg-card); padding:15px; border-radius:8px; border:1px solid var(--border); cursor:pointer; transition:background 0.2s,border-color 0.2s; color:var(--text); }
   .option-sm { margin:5px 0; border:none; padding:5px; }
   .option input[type="radio"], .option input[type="checkbox"], .checkbox-item input[type="radio"], .checkbox-item input[type="checkbox"] { margin-top:3px; flex-shrink:0; }
-  .chk-section { background:var(--bg-light); padding:15px; border-radius:8px; border:1px solid var(--border); }
+  .chk-section { background:var(--bg-card); padding:15px; border-radius:8px; border:1px solid var(--border); }
   .chk-section--mb { margin-bottom:10px; }
   .chk-section--mv { margin:10px 0; }
   .chk-q { margin:0 0 8px 0; font-weight:bold; color:var(--text); }
@@ -234,14 +234,14 @@
   .badge-yellow { background:var(--simultaneous-bg); color:var(--simultaneous); border-color:var(--simultaneous); }
   .badge-red { background:var(--urgent-bg); color:var(--urgent); border-color:var(--urgent); }
   .split-badge { padding:2px 0; display:inline-flex; gap:0; }
-  .phase { margin-top:20px; padding:20px; border-left:5px solid var(--primary); background:var(--bg-light); border-radius:8px; overflow:hidden; transition:max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease, padding 0.5s ease, border-width 0.5s ease; max-height:3000px; }
+  .phase { margin-top:28px; padding:20px; border-left:5px solid var(--primary); background:var(--bg-card); border-radius:8px; overflow:hidden; transition:max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease, padding 0.5s ease, border-width 0.5s ease; max-height:3000px; }
   .urgent { border-color:var(--urgent); background:var(--urgent-bg); }
   .simul { border-color:var(--simultaneous); background:var(--simultaneous-bg); }
   .success { border-color:var(--success); background:var(--success-bg); }
-  .phase-0 { border-color:var(--phase-0); background:var(--phase-0-bg); }
-  .phase-1 { border-color:var(--phase-1); background:var(--phase-1-bg); }
-  .phase-2 { border-color:var(--phase-2); background:var(--phase-2-bg); }
-  .phase-3 { border-color:var(--phase-3); background:var(--phase-3-bg); }
+  .phase-0 { border-color:var(--phase-0); background:var(--bg-card); }
+  .phase-1 { border-color:var(--phase-1); background:var(--bg-card); }
+  .phase-2 { border-color:var(--phase-2); background:var(--bg-card); }
+  .phase-3 { border-color:var(--phase-3); background:var(--bg-card); }
   #allDoneBanner { position:relative; border-color:transparent; border-width:0; border-radius:8px; isolation:isolate; padding:20px; overflow:visible; }
   #allDoneBanner::before {
     content:''; position:absolute; inset:-3px; border-radius:11px; z-index:-1;
@@ -317,6 +317,13 @@
   .shortcut-table td:first-child { white-space:nowrap; padding-right:12px; }
   .shortcut-table tr:not(:last-child) td { border-bottom:1px solid var(--border); }
   kbd { display:inline-block; padding:1px 5px; border:1px solid var(--text); border-radius:3px; font-family:monospace; font-size:0.85em; background:var(--bg-light); }
+  dialog { border:1px solid var(--border); border-radius:12px; background:var(--bg-card); color:var(--text); max-width:580px; width:calc(100% - 40px); padding:0; box-shadow:0 8px 32px rgba(0,0,0,0.25); }
+  dialog::backdrop { background:rgba(0,0,0,0.55); }
+  .dialog-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .dialog-body { padding:20px; overflow-y:auto; max-height:70vh; font-size:0.95em; line-height:1.7; }
+  .dialog-body h3 { margin:16px 0 8px 0; font-size:1em; }
+  .dialog-body p { margin:0 0 12px 0; }
+  .dialog-body p:last-child { margin-bottom:0; }
   #liveRegion { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
   .plan-cost-item { margin:0 0 6px 16px; }
   .plan-top-details { background:var(--bg-light); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
@@ -559,8 +566,8 @@
         <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
       </div>
     </fieldset>
-    <fieldset id="wrapSpecificChoices" data-section-label="Additional options" style="border:none;padding:0;margin:0 0 10px 0;">
-      <legend class="section-title">2. Additional options</legend>
+    <fieldset id="wrapSpecificChoices" data-section-label="Long-term goals (additional)" style="border:none;padding:0;margin:0 0 10px 0;">
+      <legend class="section-title">2. Long-term goals (additional)</legend>
       <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-dft">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names as a permanent public record.</em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This creates a publicly accessible record that links your old and new names permanently. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
     </fieldset>
     <fieldset id="wrapSectionLongterm" data-section-label="Long-term legal goals" style="border:none;padding:0;margin:0 0 10px 0;">
@@ -568,8 +575,8 @@
       <label class="checkbox-item" id="wrapGRC"><input type="checkbox" id="chkGRC"> I plan to apply for a Gender Recognition Certificate (GRC) at some point</label>
       <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a Gender Recognition Certificate (GRC).</em></span></label></div>
     </fieldset>
-    <fieldset id="wrapSectionCircumstances" data-section-label="Your circumstances" style="border:none;padding:0;margin:0 0 10px 0;">
-      <legend class="section-title">4. Your circumstances</legend>
+    <fieldset id="wrapSectionCircumstances" data-section-label="Your situation" style="border:none;padding:0;margin:0 0 10px 0;">
+      <legend class="section-title">4. Your situation</legend>
     <label class="checkbox-item"><input type="checkbox" id="chkNonUK"><span>I have a UK visa or eVisa<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.</em></span></label>
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment, volunteering, and student placement status</legend>
@@ -603,8 +610,8 @@
       </fieldset>
     </div>
     </fieldset>
-    <fieldset id="wrapSectionDocuments" data-section-label="Documents already updated" style="border:none;padding:0;margin:0 0 10px 0;">
-      <legend class="section-title">5. Documents already updated</legend>
+    <fieldset id="wrapSectionDocuments" data-section-label="What needs updating" style="border:none;padding:0;margin:0 0 10px 0;">
+      <legend class="section-title">5. What needs updating</legend>
     <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span>Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span></label>
     <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
@@ -681,101 +688,110 @@
     <div id="planContent"></div>
   </div>
 </main>
+<dialog id="dlgUsage" aria-labelledby="dlgUsageTitle" onclick="closeDialogOnBackdrop(event)">
+  <div class="dialog-header">
+    <h2 id="dlgUsageTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
+    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+  </div>
+  <div class="dialog-body">
+    <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
+    <p>A free, private tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
+    <p>Anyone in the UK aged 16 or over who wants to update their legal documents to match their gender identity. This includes people who only want a name change, only a gender marker change, or both. There is also guidance for people from outside the UK who hold a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
+    <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal action plan with clear information and links to official resources.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
+    <p>Both produce the same plan. The step-by-step wizard shows one question at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is better if you already know your situation. You can switch between them at any time.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
+    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is this legal advice?</h3>
+    <p>No. This planner gives general guidance only. It is not a replacement for advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Keyboard shortcuts</h3>
+    <table class="shortcut-table" aria-label="Keyboard shortcuts">
+      <thead class="visually-hidden">
+        <tr><th>Key or action</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
+        <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
+        <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
+        <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Quick exit: leaves the page immediately</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Open this help panel</td></tr>
+      </tbody>
+    </table>
+  </div>
+</dialog>
+
+<dialog id="dlgPrivacy" aria-labelledby="dlgPrivacyTitle" onclick="closeDialogOnBackdrop(event)">
+  <div class="dialog-header">
+    <h2 id="dlgPrivacyTitle" style="margin:0;font-size:1.2em;">Privacy</h2>
+    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+  </div>
+  <div class="dialog-body">
+    <p>No personal information is collected and nothing you enter is ever sent to a server. This tool runs entirely in your browser.</p>
+    <p>To let you return to your plan later, progress is saved on the device you are using. You can delete all saved data at any time by clicking "New plan" or clearing your browser's site data.</p>
+    <p>Cloudflare, the hosting provider, may apply a security check to protect the site from automated attacks. This is not used for tracking or analytics.</p>
+  </div>
+</dialog>
+
+<dialog id="dlgSupport" aria-labelledby="dlgSupportTitle" onclick="closeDialogOnBackdrop(event)">
+  <div class="dialog-header">
+    <h2 id="dlgSupportTitle" style="margin:0;font-size:1.2em;">Support &amp; feedback</h2>
+    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+  </div>
+  <div class="dialog-body">
+    <p><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
+    <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
+      <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://www.gires.org.uk/" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://www.scottishtrans.org/" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    </ul>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Feedback</h3>
+    <p>This planner is built and maintained by one person. If you spot a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
+    <a href="https://github.com/be-myself-uk/planner/issues" target="_blank" rel="noopener noreferrer" class="contact-btn">Create GitHub issue <span class="visually-hidden">(opens in a new tab)</span></a>
+    <p class="note" style="margin-top:8px;">Opens in a new tab. GitHub may collect analytical data.</p>
+  </div>
+</dialog>
+
+<dialog id="dlgDisclaimer" aria-labelledby="dlgDisclaimerTitle" onclick="closeDialogOnBackdrop(event)">
+  <div class="dialog-header">
+    <h2 id="dlgDisclaimerTitle" style="margin:0;font-size:1.2em;">Disclaimer</h2>
+    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+  </div>
+  <div class="dialog-body">
+    <p class="disclaimer-muted">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author.</p>
+    <p class="disclaimer-muted">This planner is for people aged 16 and over. The processes for under-16s are different and require parental or guardian consent; this planner does not cover them.</p>
+    <p class="disclaimer-muted">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
+    <p class="disclaimer-muted">To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner.</p>
+  </div>
+</dialog>
+
 <footer class="footer" aria-label="Site information and resources">
   <div class="footer-inner">
 
-    <details id="footerGuide" class="plan-top-details">
-      <summary>📖 Usage guide</summary>
-      <div class="plan-top-body">
-        <p style="margin:0 0 10px 0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
-
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Getting started</h3>
-        <p style="margin:0 0 8px 0;">Click <strong>Start now</strong> to answer questions one at a time, or use the checklist link beneath it to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
-
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Always available</h3>
-        <div class="legend-toolbar" aria-hidden="true">
-          <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
-          <span class="legend-tb-icon">?</span><span><strong>About this planner:</strong> answers common questions about what this tool does and how it keeps your information private.</span>
-          <span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
-          <span class="legend-tb-icon">↹</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist. Visible while answering questions.</span>
-        </div>
-
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Plan toolbar</h3>
-        <div class="legend-toolbar" aria-hidden="true">
-          <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
-          <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
-          <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
-          <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
-          <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
-          <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
-        </div>
-
-        <p style="margin:6px 0;border-top:1px solid var(--border);padding-top:10px;"><strong>Progress:</strong> click a status button to update it.</p>
-        <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:4px;">
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button>
-            <span style="font-size:0.85em;">Not started</span>
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="1" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>🕐</span></button>
-            <span style="font-size:0.85em;">In progress</span>
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="2" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✓</span></button>
-            <span style="font-size:0.85em;">Done</span>
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="3" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✕</span></button>
-            <span style="font-size:0.85em;">Not needed</span>
-          </span>
-        </div>
-      </div>
-    </details>
-
-    <details id="footerPrivacy" class="plan-top-details">
-      <summary>🤝 Support, privacy, and feedback</summary>
-      <div class="plan-top-body">
-        <p style="margin:0 0 10px 0;"><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
-        <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
-          <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://www.gires.org.uk/" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://www.scottishtrans.org/" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-          <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-        </ul>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">🔒 Privacy</h3>
-        <p style="margin:0 0 8px 0;">No personal information is collected and nothing you enter is ever sent to a server. This tool runs entirely in your browser.</p>
-        <p style="margin:0 0 8px 0;">To let you return to your plan later, progress is saved on the device you are using. You can delete all saved data at any time by clicking "New plan" or clearing your browser's site data.</p>
-        <p style="margin:0 0 8px 0;">Cloudflare, the hosting provider, may apply a security check to protect the site from automated attacks. This is not used for tracking or analytics.</p>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">✉️ Feedback</h3>
-        <p style="margin:0 0 8px 0;">This planner is built and maintained by one person. If you spot a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
-        <a href="https://github.com/be-myself-uk/planner/issues" target="_blank" rel="noopener noreferrer" class="contact-btn">Create GitHub issue <span class="visually-hidden">(opens in a new tab)</span></a>
-        <p class="note" style="margin-top:8px;">Opens in a new tab. GitHub may collect analytical data.</p>
-      </div>
-    </details>
-
-    <details id="footerDisclaimer" class="plan-top-details">
-      <summary>⚖️ Disclaimer</summary>
-      <div class="plan-top-body">
-        <p class="disclaimer-muted" style="margin:0 0 8px 0;">This disclaimer box is intentionally expanded on your first visit.</p>
-        <p class="disclaimer-muted" style="margin:0 0 8px 0;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author.</p>
-        <p class="disclaimer-muted" style="margin:0 0 8px 0;">This planner is for people aged 16 and over. The processes for under-16s are different and require parental or guardian consent; this planner does not cover them.</p>
-        <p class="disclaimer-muted" style="margin:0 0 8px 0;">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
-        <p class="disclaimer-muted" style="margin:0;">To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner.</p>
-      </div>
-    </details>
-
+    <div class="footer-links" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
+      <a href="#" onclick="document.getElementById('dlgUsage').showModal();return false;">Usage guide</a>
+      <a href="#" onclick="document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>
+      <a href="#" onclick="document.getElementById('dlgSupport').showModal();return false;">Support &amp; feedback</a>
+      <a href="#" onclick="document.getElementById('dlgDisclaimer').showModal();return false;">Disclaimer</a>
+    </div>
     <div class="footer-meta">
-      <p><em>Last review: <span id="schemaDate"></span></em></p>
-      <p><a href="https://bemyself.uk" style="color:inherit;">Be myself</a> © <span id="schemaCopyYear"></span> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" style="color:inherit;">CC BY-NC-SA 4.0<span class="visually-hidden"> (opens in a new tab)</span></a>
+      <p>Be myself © 2026 · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="Creative Commons"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 12a36 36 0 1 0 0 72A36 36 0 0 0 48 12zm0 6a30 30 0 1 1 0 60A30 30 0 0 1 48 18zm-7 16c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C50.6 36.3 46.8 34 41 34zm20 0c-7.7 0-13 5.6-13 14s5.3 14 13 14c4.8 0 8.6-2.3 10.9-6.3l-4.5-2.6c-1.4 2.4-3.5 3.8-6.4 3.8-4.5 0-7.4-3.3-7.4-8.9s2.9-8.9 7.4-8.9c2.9 0 5 1.4 6.4 3.8l4.5-2.6C70.6 36.3 66.8 34 61 34z" fill="currentColor"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
-        <a href="https://github.com/be-myself-uk" style="color:inherit;">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a></p>
+        · <a href="https://github.com/be-myself-uk" style="color:inherit;">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a></p>
     </div>
+    <!-- Hidden disclaimer details kept for JS compatibility (first-visit auto-open) -->
+    <details id="footerDisclaimer" style="display:none;">
+      <summary>Disclaimer</summary>
+    </details>
 
   </div>
 </footer>
@@ -1176,6 +1192,7 @@ function toggleHelp() {
   }
 }
 function closeHelpOnBackdrop(e) { if (e.target === gel('helpOverlay')) toggleHelp(); }
+function closeDialogOnBackdrop(e) { if (e.target === e.currentTarget) e.currentTarget.close(); }
 function panicExit() {
   document.body.style.display = 'none';
   window.location.replace('https://www.google.co.uk');
@@ -1850,7 +1867,7 @@ const questions = [
     { value:'name',   label:'My name' },
     { value:'gender', label:'My gender marker (M or F)<br><em class="note" style="font-style:italic;display:block;margin-top:2px;font-size:0.9em;">Select this if your name is already correct on your documents, or tick both if you also need a name change.</em>' },
   ])},
-  { id:'citizen', q:'Do you have a UK visa or eVisa?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters.</em>', o:() => [
+  { id:'citizen', q:'Do you have a visa or eVisa to live in the UK?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters.</em>', o:() => [
     [S.NO,  'No, I do not have a UK visa or eVisa'],
     [S.YES, 'Yes, I have a UK visa or eVisa']
   ]},
@@ -1897,12 +1914,6 @@ const questions = [
       return [[S.YES,'Yes',true],[S.NO,'No']];
     return [[S.YES,'Yes'],[S.NO,'No']];
   }},
-  { id:'dwp', q:() => wizardState.region === REGION.NI
-    ? 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), or Employment Support Allowance. Updating your details while claiming benefits can sometimes cause delays.</em>'
-    : 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em>',
-    o:() => [
-    [S.YES,'Yes'],[S.NO,'No']
-  ]},
   { id:'employment', q:'Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em>', o:() => [
     [S.NEEDS_UPDATE, 'Yes, I need to update my records'],
     [S.NO,           'No'],
@@ -1910,6 +1921,12 @@ const questions = [
   { id:'dbs', q:() => wizardState.region === REGION.NI
     ? 'Does your role or course require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>'
     : 'Does your role or course require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A DBS check is a background check for roles and placements working with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
+    [S.YES,'Yes'],[S.NO,'No']
+  ]},
+  { id:'dwp', q:() => wizardState.region === REGION.NI
+    ? 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), or Employment Support Allowance. Updating your details while claiming benefits can sometimes cause delays.</em>'
+    : 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment Support Allowance. A change of name or gender can affect certain benefits and your State Pension age.</em>',
+    o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'services', type:'multi',
@@ -1920,7 +1937,7 @@ const questions = [
   { id:'vehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em>', o:() => [
     [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
   ], cond:() => wizardState.goal !== S.GENDER },
-  { id:'student', q:'Do you have qualifications, student records, or professional registrations to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.</em>', o:() => [
+  { id:'student', q:'Do you have educational qualifications or certificates to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or SRA. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'birthCertName',
@@ -2266,9 +2283,9 @@ function computePlanMeta(p) {
     costs.push('<strong>Medical reports for GRC:</strong> Costs vary widely. A GP letter may be low cost, but a specialist report can be expensive.');
     costs.push('<strong>Statutory declaration for GRC:</strong> The fee for swearing a statutory declaration is generally very low (usually around £5 plus £2 per exhibit). Some solicitors may try to charge much more for drafting a bespoke document, but you may only need to pay for the swearing of the oath itself.');
   }
-  const hasHealthGroup = p.needsNHS || p.newGP || p.needsDriving;
-  const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student || p.dwp;
-  const hasCivicGroup  = (!isGender && p.needsHMRC) || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
+  const hasHealthGroup = p.needsNHS || p.newGP;
+  const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student;
+  const hasCivicGroup  = (!isGender && p.needsHMRC) || p.dwp || p.needsDriving || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !p.visaAlreadyUpdated);
   const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (p.bornInNI && !isName);
   const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
@@ -2334,18 +2351,8 @@ function buildSharedPlan(p) {
       const _newgp = planItemRegion(PLAN_ITEMS.newgp, isNI ? 'ni' : p.region === REGION.SCOT ? 'scot' : 'default');
       addStep(li('newgp', easy, renderCost(PLAN_ITEMS.newgp.cost), _newgp.title, _newgp.summary, _newgp.detail));
     }
-    if (p.needsDriving) {
-      const _drv = isNI ? PLAN_ITEMS.dva : PLAN_ITEMS.dvla;
-      const _drvKey = isNI ? 'dva' : 'dvla';
-      addStep(li(_drvKey, medium, renderCost(_drv.cost), _drv.title, _drv.summary, _drv.detail));
-    }
   };
   const buildWorkItems = () => {
-    if (p.dwp) {
-      const _dwpReg = planItemRegion(PLAN_ITEMS.dwp, isNI ? 'ni' : 'default');
-      const _dwpDet = _dwpReg.detailFn ? _dwpReg.detailFn(p) : _dwpReg.detail;
-      addStep(li('dwp', easy, renderCost(PLAN_ITEMS.dwp.cost), _dwpReg.title, _dwpReg.summary, _dwpDet));
-    }
     if (p.employment === S.NEEDS_UPDATE) {
       const _hr = PLAN_ITEMS.hr;
       addStep(li('hr', easy, renderCost(_hr.cost), _hr.title, _hr.summary, _hr.detail));
@@ -2363,6 +2370,20 @@ function buildSharedPlan(p) {
     if (!isGender && p.needsHMRC) {
       const _hmrc = PLAN_ITEMS.hmrc;
       addStep(li('hmrc', easy, renderCost(_hmrc.cost), _hmrc.title, _hmrc.summary, _hmrc.detail));
+    }
+    if (p.dwp) {
+      const _dwpReg = planItemRegion(PLAN_ITEMS.dwp, isNI ? 'ni' : 'default');
+      const _dwpDet = _dwpReg.detailFn ? _dwpReg.detailFn(p) : _dwpReg.detail;
+      addStep(li('dwp', easy, renderCost(PLAN_ITEMS.dwp.cost), _dwpReg.title, _dwpReg.summary, _dwpDet));
+    }
+    if (p.needsDriving) {
+      const _drv = isNI ? PLAN_ITEMS.dva : PLAN_ITEMS.dvla;
+      const _drvKey = isNI ? 'dva' : 'dvla';
+      addStep(li(_drvKey, medium, renderCost(_drv.cost), _drv.title, _drv.summary, _drv.detail));
+    }
+    if (!isGender && p.vehicle) {
+      const _v5c = PLAN_ITEMS.v5c;
+      addStep(li('v5c', easy, renderCost(_v5c.cost), _v5c.titleFn(p), _v5c.summaryFn(p), _v5c.detailFn(p)));
     }
     if (p.birthCertName) {
       const _bcn = planItemRegion(PLAN_ITEMS.birthcertname, p.bornInNI ? 'ni' : 'default');
@@ -2394,10 +2415,6 @@ function buildSharedPlan(p) {
         ));
       }
     }
-    if (!isGender && p.vehicle) {
-      const _v5c = PLAN_ITEMS.v5c;
-      addStep(li('v5c', easy, renderCost(_v5c.cost), _v5c.titleFn(p), _v5c.summaryFn(p), _v5c.detailFn(p)));
-    }
   };
   if (splitMiddle) {
     if (hasHealthGroup) {
@@ -2411,7 +2428,7 @@ function buildSharedPlan(p) {
       closePhase();
     }
     if (hasCivicGroup) {
-      openPhase('civic', 'Civic and financial records', '1–3 weeks');
+      openPhase('civic', 'Documents and services', '1–3 weeks');
       buildCivicItems();
       closePhase();
     }
