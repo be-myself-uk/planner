@@ -405,8 +405,7 @@
       </div>
       <span id="controlBarProgressText" aria-hidden="true"></span>
       <div id="cbRightGroup">
-        <button id="helpBtn" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()" aria-label="About this planner" title="About this planner"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">About</span></button>
-        <button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
+<button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
       </div>
       <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit – leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
     </div>
@@ -668,7 +667,7 @@
         <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
         <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
         <tr><td><kbd>Esc</kbd></td><td>Quick exit: leaves the page immediately</td></tr>
-        <tr><td><kbd>?</kbd></td><td>Open this help panel</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Open this usage guide</td></tr>
       </tbody>
     </table>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Getting started</h3>
@@ -676,8 +675,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Always available</h3>
     <div class="legend-toolbar" aria-hidden="true">
       <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
-      <span class="legend-tb-icon">?</span><span><strong>About this planner:</strong> answers common questions about what this tool does and how it keeps your information private.</span>
-      <span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
+<span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
       <span class="legend-tb-icon">↹</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist. Visible while answering questions.</span>
     </div>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Plan toolbar</h3>
@@ -825,7 +823,7 @@ const PLAN_ITEMS = {
     difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
     title: 'Work, payroll, and volunteering',
     summary: "Your employer's HR or payroll team can update your records once they have seen your deed poll or statutory declaration.",
-    detail: '<p>Under UK data protection law, you can ask to have wrong personal data corrected. The ICO links below explain how this works at work. Sharing your deed poll or statutory declaration with the right team means your payslips, tax reporting, and official records will all use your new name.</p><p>For volunteer roles, the person who looks after volunteer records (a coordinator, HR team, or manager) can update things the same way.</p><a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/employment-practices-and-data-protection-keeping-employment-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Employment records and data protection</a><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a>',
+    detail: '<p>Sharing your deed poll or statutory declaration with the right team means your payslips, tax reporting, and official records will all use your new name. UK data protection law gives people a right to ask organisations to correct their personal records; the ICO links below explain how this works in an employment context.</p><p>For volunteer roles, the person who looks after volunteer records (a coordinator, HR team, or manager) can update things the same way.</p><a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/employment-practices-and-data-protection-keeping-employment-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Employment records and data protection</a><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a>',
   },
   hmrc: {
     difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
@@ -885,7 +883,7 @@ const PLAN_ITEMS = {
       default: {
         title: 'Register with a new GP',
         summary: 'Register at a new GP practice using your new name and gender marker from the start.',
-        detail: '<p>Registering at a new practice means your new details can be on file from day one, with no need to update an existing record. You can show your deed poll or statutory declaration at registration. If you are also updating your gender marker, let the practice know so they use the correct marker and can request a new NHS number if needed. You do not need to explain why you are changing GP.</p><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: How to register with a GP surgery</a>',
+        detail: '<p>Registering at a new practice means your new details can be on file from day one, with no need to update an existing record. You can show your deed poll or statutory declaration at registration. If you are also updating your gender marker, let the practice know so they use the correct marker and can request a new NHS number if needed.</p><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: How to register with a GP surgery</a>',
       },
     },
   },
@@ -987,7 +985,7 @@ const PLAN_ITEMS = {
         cost: { type:'fixed', value:'Free', badge:'badge-green' },
         time: '10–30 minutes',
         summary: 'A deed poll is a short legal document you sign to officially record your name change. You need one before you can update your details with UK services. It is free to create one yourself. <strong>An unenrolled deed poll is generally all you need.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.',
-        detail: '<p>An unenrolled deed poll is a simple legal document that can be created at home at no cost. The GOV.UK and TransActual links below explain the current requirements, including who can act as a witness.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>\n<details class="svc-detail"><summary>What if an organisation refuses?</summary><p>Many organisations are expected to update their records when given valid proof of a name change. Data protection law gives you the right to ask any organisation holding inaccurate data about you to correct it. This is sometimes called the right to rectification. If an organisation refuses without a good reason, you may be able to raise a formal complaint.</p><p>If an organisation refuses: <strong>1.</strong> Ask to speak to their data controller or data protection officer. <strong>2.</strong> Put your request in writing (email is fine) and keep a copy. <strong>3.</strong> If they still refuse after a written request, you can raise a complaint with the Information Commissioner\'s Office (ICO) using the link below.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></details>',
+        detail: '<p>An unenrolled deed poll is a simple legal document that can be created at home at no cost. The GOV.UK and TransActual links below explain the current requirements, including who can act as a witness.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links">🔗 FreeDeedPoll.org.uk Generator</a>\n<details class="svc-detail"><summary>What if an organisation refuses?</summary><p>Most organisations will update their records when given a deed poll or statutory declaration. If you run into problems, the ICO has guidance on how to ask an organisation to correct your records, including how to escalate if they refuse. The ICO link below has the current details.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a></details>',
       },
     },
   },
@@ -1014,7 +1012,7 @@ const PLAN_ITEMS = {
         summary: 'HM Passport Office will need your deed poll and evidence that you are using your new name. The GOV.UK link below has the full details.',
       },
     },
-    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Important medical letter rules:</strong> HMPO is strict about these letters. To avoid rejection, the letter must:</p><ul class="bullet-list"><li>Be written by a medical professional registered in the UK (GMC or HCPC)</li><li>Be dated</li><li>State they know you well enough to make a diagnosis</li><li>State your name and specified gender</li><li>State that you use your name and gender for all purposes</li><li>State that your gender change is "likely to be permanent".</li><li>Contain a handwritten signature</li></ul><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
+    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Medical letter:</strong> HMPO is strict about what this letter must include. According to HMPO\'s published guidance, the letter should be written by a UK-registered medical professional (GMC or HCPC), be dated, state your name and specified gender, confirm that you use your name and gender for all purposes, and state that your gender change is "likely to be permanent". The GOV.UK link below has the current full requirements.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
   },
   irish_passport: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small fee', badge:'success', badge2:'simultaneous' },
@@ -1027,8 +1025,8 @@ const PLAN_ITEMS = {
     regions: {
       ni: {
         title: 'UK Gender Recognition Certificate (GRC)',
-        summary: 'The UK GRC requires formal medical evidence. Its legal standing in Northern Ireland is currently uncertain, but it is still useful for birth certificate updates, marriage records, HMRC, and pensions.',
-        detail: '<p>The UK Gender Recognition Act 2004 is the standard route for legal gender recognition across the UK. The legal standing of the GRC in Northern Ireland when it comes to anti-discrimination laws is currently uncertain and may change. Check the latest position before applying.</p>\n<p>Despite this uncertainty, a UK GRC still has practical uses in Northern Ireland for birth certificate, marriage and civil partnership records, HMRC, DfC/DWP, and pensions.</p>\n<p>The GOV.UK link below has the current application requirements, including the medical evidence and other documents needed.</p>\n<a href="https://www.gov.uk/apply-gender-recognition-certificate" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Apply for a GRC</a>',
+        summary: 'The UK GRC requires formal medical evidence. How it interacts with Northern Ireland equality law has been the subject of ongoing legal proceedings. It is still useful for birth certificate updates, marriage records, HMRC, and pensions.',
+        detail: '<p>The UK Gender Recognition Act 2004 is the standard route for legal gender recognition across the UK. How it interacts with Northern Ireland equality law has been the subject of ongoing legal proceedings. Check the current position via the Equality Commission for Northern Ireland or a legal adviser before applying.</p>\n<p>A UK GRC still has practical uses in Northern Ireland for birth certificate, marriage and civil partnership records, HMRC, DfC/DWP, and pensions.</p>\n<p>The GOV.UK link below has the current application requirements, including the medical evidence and other documents needed.</p>\n<a href="https://www.gov.uk/apply-gender-recognition-certificate" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Apply for a GRC</a>',
       },
       default: {
         title: 'Medical proof for GRC',
