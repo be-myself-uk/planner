@@ -287,7 +287,7 @@
   .details-body .links::after, .plan-top-body .links::after { content:' (opens in a new tab)'; display:inline-block; width:1px; height:1px; overflow:hidden; white-space:nowrap; clip:rect(0,0,0,0); font-size:0; }
   .details-body .links:hover, .plan-top-body .links:hover { opacity:0.8; }
   .details-body .links:focus-visible, .plan-top-body .links:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
-  .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; }
+  .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; font-weight:normal; }
   .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px; margin-top: 0; color:var(--text-muted); font-size:0.9em; }
   .footer-inner { max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:15px; }
   .footer p { margin:0 0 10px 0; }
@@ -483,12 +483,12 @@
   <div id="checklistView" class="hidden">
     <p id="checklistIntroText" style="margin-top:0;">Choose the answers that apply to you, then click "Show my action plan" at the bottom.</p>
     <div id="checklistAgeGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
-      <p><strong>Are you aged 16 or over?</strong></p>
+      <p class="chk-q">Are you aged 16 or over?</p>
       <p style="font-size:0.9em;color:var(--text-muted);">This planner is designed for people aged 16 and over. If you are under 16, <a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids</a> and <a href="https://genderedintelligence.co.uk/" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a> offer support for young people.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistAgeConfirm" onchange="handleChecklistAge(this)"> Yes, I am aged 16 or over</label>
     </div>
     <div id="checklistDisclaimerGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
-      <p><strong>Do you understand that this is only general guidance?</strong></p>
+      <p class="chk-q">Do you understand that this is only general guidance?</p>
       <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
     </div>
