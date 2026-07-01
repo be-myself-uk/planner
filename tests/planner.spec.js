@@ -458,7 +458,7 @@ test.describe('Be myself Planner', () => {
     await expect(dlg).toBeHidden();
     await page.getByRole('link', { name: 'About' }).click();
     await expect(dlg).toBeVisible();
-    const headings = ['What is this?', 'Who is it for?', 'Is my information safe?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
+    const headings = ['What is this?', 'Who is it for?', 'Is my information safe?', 'Can I use this offline?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
     for (const h of headings) {
       await expect(dlg.getByRole('heading', { name: h })).toBeVisible();
     }
