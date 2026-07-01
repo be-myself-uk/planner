@@ -455,7 +455,7 @@
     </div>
     <div id="welcomeOutdated" class="phase simul hidden" style="margin-top:0;margin-bottom:25px;">
       <h2>Your action plan may be out of date</h2>
-      <p>This planner has been updated since your plan was created. We recommend reviewing your answers to make sure everything is still accurate.</p>
+      <p>This planner has been updated since your plan was created. Check your answers are still correct before continuing.</p>
       <div class="btn-group">
         <button onclick="reviewAnswers()">Review my answers</button>
         <button class="secondary" onclick="confirmRestart(this)"><span aria-hidden="true">↺</span> New plan</button>
@@ -604,13 +604,13 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
     <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page. For full details, see <a href="#" onclick="this.closest('dialog').close();document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
-    <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal action plan with clear information and links to official resources.</p>
+    <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner builds a step-by-step action plan with links to the relevant official pages.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
     <p>Both produce the same plan. The step-by-step wizard shows one question at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is better if you already know your situation. You can switch between them at any time.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is this legal advice?</h3>
     <p>No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How do I save or share my plan?</h3>
-    <p>Your plan is saved in your browser and will still be here the next time you visit on the same device. To access it from another device, or share it with someone, use the <strong>🔗 Copy link</strong> button on the toolbar — this copies a link that contains your full plan. You can also use <strong>🖨️ Print</strong> to save a PDF. There is no account or login needed.</p>
+    <p>Your plan is saved in your browser and will still be here the next time you visit on the same device. To access it from another device, or share it with someone, use the <strong>🔗 Copy link</strong> button on the toolbar. This copies a link that contains your full plan. You can also use <strong>🖨️ Print</strong> to save a PDF. There is no account or login needed.</p>
   </div>
 </dialog>
 
@@ -625,6 +625,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Toolbar</h3>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Always shown</p>
     <div class="legend-toolbar" aria-hidden="true" style="margin-bottom:12px;">
+      <span class="legend-tb-icon">?</span><span><strong>Usage guide:</strong> opens this dialog. Also triggered by pressing <kbd>?</kbd>.</span>
       <span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
       <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
     </div>
@@ -642,21 +643,22 @@
       <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
       <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
     </div>
-    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Difficulty and cost</h3>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Action plan</h3>
+    <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Difficulty and cost</p>
     <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
       <span style="font-size:0.9em;color:var(--text-muted);">Difficulty:</span>
       <span class="item-badge badge-green" aria-label="Easy">Easy</span>
       <span class="item-badge badge-yellow" aria-label="Medium difficulty">Medium</span>
       <span class="item-badge badge-red" aria-label="Hard">Hard</span>
     </div>
-    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
       <span style="font-size:0.9em;color:var(--text-muted);">Cost:</span>
       <span class="item-badge badge-green" aria-label="Free">Free</span>
       <span class="item-badge badge-yellow" aria-label="Small fee">Small fee</span>
       <span class="item-badge badge-yellow" aria-label="Variable cost">Variable cost</span>
       <span class="item-badge badge-red" aria-label="Higher cost">Higher cost</span>
     </div>
-    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Progress</h3>
+    <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Progress</p>
     <p style="margin:0 0 8px 0;">Click a step's status button to cycle through states.</p>
     <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:4px;">
       <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button><span style="font-size:0.85em;">Not started</span></span>
@@ -678,7 +680,7 @@
         <tr><td><kbd>?</kbd></td><td>Open usage guide</td></tr>
       </tbody>
     </table>
-    <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:8px;margin-bottom:0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
+    <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:8px;margin-bottom:0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Works with screen readers.</p>
   </div>
 </dialog>
 
@@ -813,7 +815,7 @@ const PLAN_ITEMS = {
   hmrc: {
     difficulty: 'easy', cost: { type:'fixed', value:'Free', badge:'badge-green' },
     title: 'HMRC and taxes',
-    summary: 'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. Keeping HMRC up to date ensures your tax records, payslips, and any benefits payments use the correct name and details.',
+    summary: 'Update your records with HMRC. You can ask them to protect your records so fewer people can see them. Your tax records, payslips, and benefits payments will then use the correct name and details.',
     detail: '<p><strong>Name changes:</strong> HMRC can update your name when notified. You can also ask them to restrict access to your records for privacy. This is sometimes called "Special Section D" or "PD1" internally. Knowing these terms can help if you need to chase it up by phone. The GOV.UK link below has the current details.</p><p><strong>Gender marker changes:</strong> If you have a Gender Recognition Certificate (GRC), HMRC is notified automatically and your records are moved to a restricted file; only specialist staff can access them. Without a GRC, you can still contact HMRC to ask them to place your records in a restricted gender role using your new name and details. The GOV.UK link below explains both routes.</p><a href="https://www.gov.uk/tell-hmrc-change-of-details/gender-change" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Tell HMRC about a change of details</a>',
   },
   student: {
@@ -938,7 +940,7 @@ const PLAN_ITEMS = {
         title: 'NHS records',
         variants: {
           gender: {
-            summary: 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record. Updating your health record ensures your medical care, screening invitations, and correspondence all reflect your correct details.',
+            summary: 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record. Your medical care, screening invitations, and correspondence will then use your correct details.',
             detail: '<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, your gender marker can be updated on your existing NHS number (PCSE added this option in 2025).</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, you can ask your GP to record your gender as \'indeterminate\' (shown as \'Not specified\' in most NHS systems). Ask the practice to use gender code \'I\' if they are unsure what to enter.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>',
           },
           name: {
@@ -1204,7 +1206,7 @@ function handleUrlLoad(params) {
     const outBox = gel('welcomeOutdated');
     outBox.classList.remove('hidden');
     outBox.querySelector('h2').textContent = 'Your action plan may be out of date';
-    outBox.querySelector('p').textContent = 'This planner has been updated since your plan was created. We recommend reviewing your answers to make sure everything is still accurate.';
+    outBox.querySelector('p').textContent = 'This planner has been updated since your plan was created. Check your answers are still correct before continuing.';
     loadUrlParams(d);
     renderChecklist(); updateLocks();
   } else {
@@ -1238,7 +1240,7 @@ function handleLegacyUrl(params) {
   const outBox = gel('welcomeOutdated');
   outBox.classList.remove('hidden');
   outBox.querySelector('h2').textContent = 'Your link is from an older version';
-  outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible, but please review them before generating your plan.';
+  outBox.querySelector('p').textContent = 'This planner has been updated since this link was created. Your answers have been filled in where possible. Check them before generating your plan.';
   renderChecklist(); updateLocks();
 }
 function copyShareableLink() {
