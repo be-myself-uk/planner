@@ -145,7 +145,7 @@
   .hero h1 { font-size:3.5rem; font-weight:bold; color:var(--text); margin:0 0 10px 0; letter-spacing:-1px; }
   .hero p { font-size:1.2rem; color:var(--text); max-width:600px; margin:0 auto; }
   @media (max-width:600px) { .hero { padding:40px 16px 24px; } .hero h1 { font-size:2.2rem; } }
-  .container { max-width: 800px; width: 100%; background: var(--bg-main); box-sizing: border-box; margin: auto; padding: 40px 20px; }
+  .container { max-width: 800px; width: 100%; background: var(--bg-main); box-sizing: border-box; margin: auto; padding: 16px 20px 40px; }
   main:focus { outline:none; }
   h2 { color:var(--primary); margin:0 0 15px 0; font-size:1.5em; font-weight:bold; }
   h3 { color:var(--text); margin-bottom:15px; font-weight:bold; }
@@ -303,7 +303,8 @@
   .shortcut-table td:first-child { white-space:nowrap; padding-right:12px; }
   .shortcut-table tr:not(:last-child) td { border-bottom:1px solid var(--border); }
   kbd { display:inline-block; padding:1px 5px; border:1px solid var(--text); border-radius:3px; font-family:monospace; font-size:0.85em; background:var(--bg-light); }
-  dialog { border:1px solid var(--border); border-radius:12px; background:var(--bg-card); color:var(--text); max-width:580px; width:calc(100% - 40px); padding:0; box-shadow:0 8px 32px rgba(0,0,0,0.25); }
+  dialog { border:1px solid var(--border); border-radius:12px; background:var(--bg-card); color:var(--text); max-width:580px; width:calc(100% - 40px); padding:0; box-shadow:0 8px 32px rgba(0,0,0,0.25); max-height:85vh; overflow:hidden; }
+  dialog[open] { display:flex; flex-direction:column; }
   dialog::backdrop { background:rgba(0,0,0,0.55); }
   .dialog-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0; }
   .dialog-body { padding:20px; overflow-y:auto; max-height:70vh; font-size:0.95em; line-height:1.7; }
@@ -401,6 +402,7 @@
           <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
           <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
         </div>
+        <button id="cbHomeBtn" class="ub-icon-btn" onclick="backToStart()" aria-label="Back to start" title="Back to start" style="display:none"><span class="ub-label" aria-hidden="true">Back to start</span><span aria-hidden="true">⌂</span></button>
         <button id="cbSwitchView" class="ub-icon-btn" onclick="toggleMode()" aria-label="Switch view" title="Switch view"><span class="ub-label" aria-hidden="true">Switch view</span><span aria-hidden="true">⇄</span></button>
       </div>
       <span id="controlBarProgressText" aria-hidden="true"></span>
@@ -469,8 +471,7 @@
   <div id="wizardView" class="hidden">
     <div id="wizardWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Select an answer to continue.</div>
     <div id="wizardBackNav" style="margin-bottom:8px;">
-      <button id="wizardBackStartBtn" class="wizard-back-link" onclick="backToStart()">← Back to start</button>
-      <button id="wizardBackBtn" class="wizard-back-link hidden" onclick="prevWizard()">← Back</button>
+      <button id="wizardBackBtn" class="wizard-back-link" onclick="prevWizard()">← Back</button>
     </div>
     <div id="wizardForm"></div>
     <div id="wizardBtns" class="wizard-btn-row">
@@ -479,7 +480,6 @@
   </div>
 
   <div id="checklistView" class="hidden">
-    <button id="checklistBackStartBtn" class="wizard-back-link" onclick="backToStart()">← Back to start</button>
     <p id="checklistIntroText" style="margin-top:0;">Choose the answers that apply to you, then click "Show my action plan" at the bottom.</p>
     <div id="checklistAgeGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
       <p><strong>Are you aged 16 or over?</strong></p>
@@ -1317,10 +1317,15 @@ function copyShareableLink() {
     if (fallback(text)) showSuccess(); else prompt('Copy this link manually:', url);
 }
 
+function setNavControls(display) {
+  V.toggle.style.display = display;
+  const h = gel('cbHomeBtn'); if (h) h.style.display = display;
+}
+
 function backToStart() {
   V.wizard.classList.add('hidden');
   V.checklist.classList.add('hidden');
-  V.toggle.style.display = 'none';
+  setNavControls('none');
   document.body.classList.remove('wizard-active');
   document.getElementById('ageKickout')?.classList.add('hidden');
   try { localStorage.removeItem('ageConfirmed'); } catch(e) {}
@@ -1382,7 +1387,7 @@ function startWizard() {
   V.start.classList.add('hidden');
   V.checklist.classList.add('hidden');
   V.wizard.classList.remove('hidden');
-  V.toggle.style.display = 'flex';
+  setNavControls('flex');
   document.getElementById('ageKickout')?.classList.add('hidden');
   document.body.classList.add('wizard-active');
   renderWizard();
@@ -1395,7 +1400,7 @@ function startChecklist() {
   document.getElementById('ageKickout')?.classList.add('hidden');
   V.wizard.classList.add('hidden');
   V.checklist.classList.remove('hidden');
-  V.toggle.style.display = 'flex';
+  setNavControls('flex');
   refreshToolbarTabindex();
   document.body.classList.remove('wizard-active');
   gel('checklistGenerateBtn').textContent = 'Show my action plan';
@@ -1414,7 +1419,7 @@ function nudgeLegend() {
 }
 function continuePlan() {
   V.welcome.classList.add('hidden');
-  V.toggle.style.display = 'none';
+  setNavControls('none');
   renderChecklist();
   updateLocks();
   V.plan.classList.remove('hidden');
@@ -1429,7 +1434,7 @@ function openChecklist() {
   isWizardMode = false;
   [V.welcome, V.plan].forEach(v => v.classList.add('hidden'));
   V.checklist.classList.remove('hidden');
-  V.toggle.style.display = 'flex';
+  setNavControls('flex');
   document.body.classList.remove('plan-ready','wizard-active');
   updateDerivedState();
   renderChecklist();
@@ -1452,7 +1457,7 @@ function makeChanges() {
     document.body.classList.remove('plan-ready');
     V.wizard.classList.remove('hidden');
     document.body.classList.add('wizard-active');
-    V.toggle.style.display = 'flex';
+    setNavControls('flex');
     
     if (step >= questions.length) {
       step = questions.length - 1;
@@ -1564,7 +1569,7 @@ function restartApp() {
   _saveWarnShown = false;
   const swb = gel('saveWarnBanner'); if (swb) swb.classList.add('hidden');
   [V.plan, V.wizard, V.checklist, V.welcome].forEach(v => v.classList.add('hidden'));
-  V.toggle.style.display = 'none';
+  setNavControls('none');
   document.body.classList.remove('plan-ready','wizard-active');
   focusMode = false;
   const fBtn = gel('focusToggleBtn');
@@ -1955,12 +1960,7 @@ function renderWizard() {
   }
   html += `</div></fieldset>`;
   V.form.innerHTML = html;
-  const backBtn = gel('wizardBackBtn');
-  const backStartBtn = gel('wizardBackStartBtn');
   const nextBtn = gel('wizardNextBtn');
-  const firstVisibleStep = questions.findIndex(q => !q.cond || q.cond());
-  if (backBtn) backBtn.classList.toggle('hidden', step === firstVisibleStep);
-  if (backStartBtn) backStartBtn.classList.toggle('hidden', step !== firstVisibleStep);
   if (nextBtn) nextBtn.textContent = idx === total ? 'Show my plan →' : 'Continue →';
 
   if (q.type === 'multi') {
@@ -2045,7 +2045,7 @@ function nextWizard() {
       V.wizard.classList.add('hidden');
       V.start.classList.remove('hidden');
       document.body.classList.remove('wizard-active');
-      V.toggle.style.display = 'none';
+      setNavControls('none');
       gel('ageKickout')?.classList.remove('hidden');
       refreshToolbarTabindex();
       return;
@@ -2058,7 +2058,7 @@ function nextWizard() {
       V.wizard.classList.add('hidden');
       V.start.classList.remove('hidden');
       document.body.classList.remove('wizard-active');
-      V.toggle.style.display = 'none';
+      setNavControls('none');
       gel('disclaimerKickout')?.classList.remove('hidden');
       refreshToolbarTabindex();
       return;
@@ -2086,7 +2086,7 @@ function prevWizard() {
 }
 function generateWizardPlan() {
   V.wizard.classList.add('hidden');
-  V.toggle.style.display = 'none';
+  setNavControls('none');
   V.plan.classList.remove('hidden');
   document.body.classList.remove('wizard-active');
   document.body.classList.add('plan-ready');
@@ -2130,7 +2130,7 @@ function generateChecklistPlan() {
   V.welcome.classList.add('hidden');
   V.checklist.classList.add('hidden');
   V.plan.classList.remove('hidden');
-  V.toggle.style.display = 'none';
+  setNavControls('none');
   document.body.classList.add('plan-ready');
   gel('checklistGenerateBtn').textContent = 'Show my action plan';
   const ip = gel('checklistIntroText'); if (ip) ip.textContent = 'Choose the answers that apply to you, then click \"Show my action plan\" at the bottom.';
