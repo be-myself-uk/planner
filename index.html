@@ -493,7 +493,7 @@
       <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
     </div>
-    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You can not continue unless you are aged 16 or over and understand that this is general guidance only.</div>
+    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> <span id="checklistWarningText">You can not continue unless you are aged 16 or over and understand that this is general guidance only.</span></div>
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 20px 0;">
 
       <legend class="section-title">1. About you</legend>
@@ -2091,6 +2091,8 @@ function generateWizardPlan() {
 function generateChecklistPlan() {
   if (!gel('checklistAgeConfirm')?.checked) {
     const cw = gel('checklistWarning');
+    const cwt = gel('checklistWarningText');
+    if (cwt) cwt.textContent = 'You can not continue unless you are aged 16 or over and understand that this is general guidance only.';
     if (cw) cw.classList.add('visible');
     const ag = gel('checklistAgeGate');
     if (ag) ag.classList.add('error');
@@ -2100,6 +2102,8 @@ function generateChecklistPlan() {
   }
   if (!gel('checklistDisclaimerConfirm')?.checked) {
     const cw = gel('checklistWarning');
+    const cwt = gel('checklistWarningText');
+    if (cwt) cwt.textContent = 'You can not continue unless you are aged 16 or over and understand that this is general guidance only.';
     if (cw) cw.classList.add('visible');
     const dg = gel('checklistDisclaimerGate');
     if (dg) dg.classList.add('error');
@@ -2111,6 +2115,8 @@ function generateChecklistPlan() {
   const goalGender = gel('chkGoalGender')?.checked;
   if (!goalName && !goalGender) {
     const cw = gel('checklistWarning');
+    const cwt = gel('checklistWarningText');
+    if (cwt) cwt.textContent = 'Please select at least one option for what you need to update on your documents.';
     if (cw) cw.classList.add('visible');
     announce('Please choose at least one option.');
     window.scrollTo({top:0, behavior:'smooth'});
