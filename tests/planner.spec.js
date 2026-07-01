@@ -453,4 +453,68 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#planContent .split-badge').first()).toBeVisible();
   });
 
+  test('55. About dialog', async ({ page }) => {
+    const dlg = page.locator('#dlgAbout');
+    await expect(dlg).toBeHidden();
+    await page.getByRole('link', { name: 'About' }).click();
+    await expect(dlg).toBeVisible();
+    const headings = ['What is this?', 'Who is it for?', 'Is my information safe?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
+    for (const h of headings) {
+      await expect(dlg.getByRole('heading', { name: h })).toBeVisible();
+    }
+    await page.keyboard.press('Escape');
+    await expect(dlg).toBeHidden();
+  });
+
+  test('56. Footer link order', async ({ page }) => {
+    const links = page.locator('.footer-links a');
+    await expect(links).toHaveCount(5);
+    await expect(links.nth(0)).toHaveText('About');
+    await expect(links.nth(1)).toHaveText('Privacy');
+    await expect(links.nth(2)).toHaveText('Usage guide');
+    await expect(links.nth(3)).toHaveText('Support & feedback');
+    await expect(links.nth(4)).toHaveText('Disclaimer');
+  });
+
+  test('57. Help toolbar button', async ({ page }) => {
+    const dlg = page.locator('#dlgUsage');
+    await expect(dlg).toBeHidden();
+    await page.locator('#helpBtn').click();
+    await expect(dlg).toBeVisible();
+  });
+
+  test('58. Home button shows welcome back after editing plan', async ({ page }) => {
+    await openChecklist(page);
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await page.locator('#ubMakeChangesBtn').click();
+    await expect(page.locator('#checklistView')).toBeVisible();
+    await page.getByRole('button', { name: 'Back to start' }).click();
+    await expect(page.locator('#welcomeBackView')).toBeVisible();
+    await expect(page.locator('#startView')).toBeHidden();
+  });
+
+  test('59. Age/disclaimer gate sync between wizard and checklist', async ({ page }) => {
+    await page.getByRole('button', { name: 'Start now' }).click();
+    await wizardNext(page); // age question
+    await wizardNext(page); // disclaimer question
+    await page.getByRole('button', { name: 'Switch view' }).click();
+    await expect(page.locator('#checklistAgeConfirm')).toBeChecked();
+    await expect(page.locator('#checklistDisclaimerConfirm')).toBeChecked();
+  });
+
+  test('60. Mobile toolbar layout: one row for wizard, two rows for plan view', async ({ page }) => {
+    await page.setViewportSize({ width: 412, height: 915 });
+    await openWizard(page);
+    const leftTopWizard = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
+    const rightTopWizard = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);
+    expect(Math.abs(leftTopWizard - rightTopWizard)).toBeLessThan(5);
+
+    await page.goto(filePath);
+    await openChecklist(page);
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    const leftTopPlan = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
+    const rightTopPlan = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);
+    expect(leftTopPlan).toBeGreaterThan(rightTopPlan + 5);
+  });
+
 });
