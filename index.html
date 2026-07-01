@@ -635,7 +635,7 @@
     </div>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">When creating a plan</p>
     <div class="legend-toolbar" aria-hidden="true" style="margin-bottom:12px;">
-      <span class="legend-tb-icon">⌂</span><span><strong>Back to start:</strong> returns to the start screen without losing your answers.</span>
+      <span class="legend-tb-icon">⌂</span><span><strong>Back to start:</strong> returns to the start screen. If you already have an action plan, it is kept; otherwise your current answers are cleared.</span>
       <span class="legend-tb-icon">⇄</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist.</span>
     </div>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Action plan</p>
@@ -1065,6 +1065,7 @@ const planItemVariant = (regional, goal)  => regional.variants ? (regional.varia
 let isWizardMode = true;
 let wizardState = {};
 let step = 0;
+let wizardHistory = [];
 const V = {
   start:    document.getElementById('startView'),
   welcome:  document.getElementById('welcomeBackView'),
@@ -1384,7 +1385,7 @@ function checkAgeGateShared() {
   }
 }
 function startWizard() {
-  isWizardMode = true; wizardState = {}; step = 0;
+  isWizardMode = true; wizardState = {}; step = 0; wizardHistory = [];
   V.start.classList.add('hidden');
   V.checklist.classList.add('hidden');
   V.wizard.classList.remove('hidden');
@@ -1450,11 +1451,10 @@ function makeChanges() {
     document.body.classList.add('wizard-active');
     setNavControls('flex');
     
-    if (step >= questions.length) {
-      step = questions.length - 1;
-      while (step > 0 && questions[step].cond && !questions[step].cond()) step--;
-    }
-    renderWizard();
+    if (step >= questions.length) step = questions.length - 1;
+    wizardHistory = computeHistoryUpTo(step);
+    if (wizardHistory.length) step = wizardHistory[wizardHistory.length - 1];
+    renderWizard(false);
   } else {
     openChecklist();
   }
@@ -1470,12 +1470,10 @@ function toggleMode() {
     V.wizard.classList.remove('hidden');
     document.body.classList.add('wizard-active');
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
-    if (step >= questions.length) {
-      let last = questions.length - 1;
-      while (last > 0 && questions[last].cond && !questions[last].cond()) last--;
-      step = last;
-    }
-    renderWizard();
+    if (step >= questions.length) step = questions.length - 1;
+    wizardHistory = computeHistoryUpTo(step);
+    if (wizardHistory.length) step = wizardHistory[wizardHistory.length - 1];
+    renderWizard(false);
   } else {
     V.wizard.classList.add('hidden');
     V.checklist.classList.remove('hidden');
@@ -1793,6 +1791,13 @@ function resetChecklist() {
   renderChecklist();
   updateLocks();
 }
+function computeHistoryUpTo(targetStep) {
+  const hist = [];
+  for (let s = 0; s <= targetStep && s < questions.length; s++) {
+    if (!questions[s].cond || questions[s].cond()) hist.push(s);
+  }
+  return hist;
+}
 const questions = [
   { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Under-16s need parental consent and follow a different process.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes'],
@@ -1907,10 +1912,13 @@ const questions = [
     [S.YES,'Yes'],[S.NO,'No']
   ]}
 ];
-function renderWizard() {
+function renderWizard(skipForward = true) {
   V.warning.classList.remove('visible');
-  while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
+  if (skipForward) {
+    while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
+  }
   if (step >= questions.length) { generateWizardPlan(); return; }
+  if (wizardHistory[wizardHistory.length - 1] !== step) wizardHistory.push(step);
   const q = questions[step];
   const qText = typeof q.q === 'function' ? q.q() : q.q;
   const opts = q.o();
@@ -2069,13 +2077,13 @@ function nextWizard() {
   renderWizard();
 }
 function prevWizard() {
-  if (step > 0) step--;
-  while (step > 0 && questions[step].cond && !questions[step].cond()) step--;
-  if (step === 0 && questions[0].cond && !questions[0].cond()) {
+  wizardHistory.pop();
+  if (!wizardHistory.length) {
     backToStart();
     return;
   }
-  renderWizard();
+  step = wizardHistory.pop();
+  renderWizard(false);
 }
 function generateWizardPlan() {
   V.wizard.classList.add('hidden');

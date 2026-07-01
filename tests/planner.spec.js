@@ -123,6 +123,11 @@ test.describe('Be myself Planner', () => {
     await page.getByRole('button', { name: 'Continue →' }).click();
     const backBtn = page.getByRole('button', { name: '← Back' });
     await expect(backBtn).toBeVisible();
+    // Back from the 2nd question returns to the 1st question, not the start view
+    await backBtn.click();
+    await expect(page.locator('#wizardView')).toBeVisible();
+    await expect(page.locator('#startView')).toBeHidden();
+    // Back from the 1st (visible) question returns to the start view
     await backBtn.click();
     await expect(page.locator('#startView')).toBeVisible();
     await expect(page.locator('#wizardView')).toBeHidden();
@@ -500,6 +505,27 @@ test.describe('Be myself Planner', () => {
     await page.getByRole('button', { name: 'Switch view' }).click();
     await expect(page.locator('#checklistAgeConfirm')).toBeChecked();
     await expect(page.locator('#checklistDisclaimerConfirm')).toBeChecked();
+  });
+
+  test('62. Wizard back navigation steps back one question at a time from a fresh session', async ({ page }) => {
+    await page.goto(filePath);
+    await page.getByRole('button', { name: 'Start now' }).click();
+    await page.locator('input[name="ans"]:not([disabled])').first().check();
+    await page.getByRole('button', { name: 'Continue →' }).click();
+    await page.locator('input[name="ans"]:not([disabled])').first().check();
+    await page.getByRole('button', { name: 'Continue →' }).click();
+    const backBtn = page.getByRole('button', { name: '← Back' });
+    // Currently on Q3 (region). Back should return to Q2 (disclaimer), not the start view.
+    await backBtn.click();
+    await expect(page.locator('#wizardView')).toBeVisible();
+    await expect(page.locator('.wizard-legend')).toContainText('Do you understand that this is only general guidance?');
+    // Back again should return to Q1 (age).
+    await backBtn.click();
+    await expect(page.locator('.wizard-legend')).toContainText('Are you aged 16 or over?');
+    // Back again from the first question should return to the start view.
+    await backBtn.click();
+    await expect(page.locator('#startView')).toBeVisible();
+    await expect(page.locator('#wizardView')).toBeHidden();
   });
 
   test('61. Checklist goal warning shows correct message inline under the question', async ({ page }) => {
