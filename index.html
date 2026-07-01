@@ -407,6 +407,7 @@
       </div>
       <span id="controlBarProgressText" aria-hidden="true"></span>
       <div id="cbRightGroup">
+<button id="helpBtn" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()" aria-label="Usage guide" title="Usage guide"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">Guide</span></button>
 <button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
       </div>
       <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit – leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
@@ -587,60 +588,12 @@
   </div>
   <div id="planView" class="hidden">
     <h2 id="planHeading" tabindex="-1">Your personal action plan</h2>
-      <details id="planLegend" class="plan-top-details">
-        <summary>Guide to your plan</summary>
-        <div class="plan-top-body">
-        <p style="margin:0 0 12px 0;color:var(--text-muted);font-size:0.95em;">Nothing here has to be done all at once. You can complete these steps in any order unless marked otherwise. Your progress is saved on this device.</p>
-        <hr style="border:none;border-top:1px solid var(--border);margin:0 0 12px 0;">
-        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
-          <span>Difficulty:</span>
-          <span class="item-badge badge-green" aria-label="Easy">Easy</span>
-          <span class="item-badge badge-yellow" aria-label="Medium difficulty">Medium</span>
-          <span class="item-badge badge-red" aria-label="Hard">Hard</span>
-        </div>
-        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
-          <span>Cost:</span>
-          <span class="item-badge badge-green" aria-label="Free">Free</span>
-          <span class="item-badge badge-yellow" aria-label="Small fee">Small fee</span>
-          <span class="item-badge badge-yellow" aria-label="Variable cost">Variable cost</span>
-          <span class="item-badge badge-red" aria-label="Higher cost">Higher cost</span>
-        </div>
-        <p style="margin:0 0 6px 0;"><strong>Progress:</strong> click a status button to update it.</p>
-        <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:12px;">
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button>
-            <span style="font-size:0.85em;">Not started</span>
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="1" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>🕐</span></button>
-            <span style="font-size:0.85em;">In progress</span>
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="2" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✓</span></button>
-            <span style="font-size:0.85em;">Done</span>
-          </span>
-          <span style="display:inline-flex;align-items:center;gap:4px;">
-            <button class="step-state-btn" data-state="3" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✕</span></button>
-            <span style="font-size:0.85em;">Not needed</span>
-          </span>
-        </div>
-        <h3 style="margin:0 0 6px 0;border-top:1px solid var(--border);padding-top:10px;font-size:1em;">Toolbar</h3>
-        <div class="legend-toolbar" aria-hidden="true">
-          <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> start over completely. ⚠️ This deletes your plan.</span>
-          <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers.</span>
-          <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> untick all checkboxes but keep your plan.</span>
-          <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed.</span>
-          <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan.</span>
-          <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> print your plan or save it as a PDF.</span>
-        </div>
-        </div>
-      </details>
     <div id="planContent"></div>
   </div>
 </main>
-<dialog id="dlgUsage" aria-labelledby="dlgUsageTitle" onclick="closeDialogOnBackdrop(event)">
+<dialog id="dlgAbout" aria-labelledby="dlgAboutTitle" onclick="closeDialogOnBackdrop(event)">
   <div class="dialog-header">
-    <h2 id="dlgUsageTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
+    <h2 id="dlgAboutTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
     <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
   </div>
   <div class="dialog-body">
@@ -648,14 +601,69 @@
     <p>A free, private tool that helps trans and non-binary people in the UK work out what legal steps they need to take to change their name and gender marker on official documents.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
     <p>Anyone in the UK aged 16 or over who wants to update their legal documents to match their gender identity. This includes people who only want a name change, only a gender marker change, or both. There is also guidance for people from outside the UK who hold a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
+    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page. For full details, see <a href="#" onclick="this.closest('dialog').close();document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
     <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal action plan with clear information and links to official resources.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
     <p>Both produce the same plan. The step-by-step wizard shows one question at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is better if you already know your situation. You can switch between them at any time.</p>
-    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
-    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is this legal advice?</h3>
     <p>No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">How do I save or share my plan?</h3>
+    <p>Your plan is saved in your browser and will still be here the next time you visit on the same device. To access it from another device, or share it with someone, use the <strong>🔗 Copy link</strong> button on the toolbar — this copies a link that contains your full plan. You can also use <strong>🖨️ Print</strong> to save a PDF. There is no account or login needed.</p>
+  </div>
+</dialog>
+
+<dialog id="dlgUsage" aria-labelledby="dlgUsageTitle" onclick="closeDialogOnBackdrop(event)">
+  <div class="dialog-header">
+    <h2 id="dlgUsageTitle" style="margin:0;font-size:1.2em;">Usage guide</h2>
+    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+  </div>
+  <div class="dialog-body">
+    <h3 style="margin:0 0 6px 0;font-size:1em;">Getting started</h3>
+    <p>Click <strong>Start now</strong> to answer questions one at a time, or use the checklist link beneath it to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Toolbar</h3>
+    <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Always shown</p>
+    <div class="legend-toolbar" aria-hidden="true" style="margin-bottom:12px;">
+      <span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
+      <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
+    </div>
+    <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">When creating a plan</p>
+    <div class="legend-toolbar" aria-hidden="true" style="margin-bottom:12px;">
+      <span class="legend-tb-icon">⌂</span><span><strong>Back to start:</strong> returns to the start screen without losing your answers.</span>
+      <span class="legend-tb-icon">⇄</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist.</span>
+    </div>
+    <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Action plan</p>
+    <div class="legend-toolbar" aria-hidden="true">
+      <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
+      <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
+      <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
+      <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
+      <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
+      <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
+    </div>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Difficulty and cost</h3>
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+      <span style="font-size:0.9em;color:var(--text-muted);">Difficulty:</span>
+      <span class="item-badge badge-green" aria-label="Easy">Easy</span>
+      <span class="item-badge badge-yellow" aria-label="Medium difficulty">Medium</span>
+      <span class="item-badge badge-red" aria-label="Hard">Hard</span>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+      <span style="font-size:0.9em;color:var(--text-muted);">Cost:</span>
+      <span class="item-badge badge-green" aria-label="Free">Free</span>
+      <span class="item-badge badge-yellow" aria-label="Small fee">Small fee</span>
+      <span class="item-badge badge-yellow" aria-label="Variable cost">Variable cost</span>
+      <span class="item-badge badge-red" aria-label="Higher cost">Higher cost</span>
+    </div>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Progress</h3>
+    <p style="margin:0 0 8px 0;">Click a step's status button to cycle through states.</p>
+    <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:4px;">
+      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button><span style="font-size:0.85em;">Not started</span></span>
+      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="1" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>🕐</span></button><span style="font-size:0.85em;">In progress</span></span>
+      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="2" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✓</span></button><span style="font-size:0.85em;">Done</span></span>
+      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="3" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✕</span></button><span style="font-size:0.85em;">Not needed</span></span>
+    </div>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Keyboard shortcuts</h3>
     <table class="shortcut-table" aria-label="Keyboard shortcuts">
       <thead class="visually-hidden">
@@ -665,36 +673,12 @@
         <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Navigate toolbar buttons</td></tr>
         <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
         <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
-        <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this help panel</td></tr>
+        <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this dialog</td></tr>
         <tr><td><kbd>Esc</kbd></td><td>Quick exit: leaves the page immediately</td></tr>
-        <tr><td><kbd>?</kbd></td><td>Open this usage guide</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Open usage guide</td></tr>
       </tbody>
     </table>
-    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Getting started</h3>
-    <p>Click <strong>Start now</strong> to answer questions one at a time, or use the checklist link beneath it to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
-    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Always available</h3>
-    <div class="legend-toolbar" aria-hidden="true">
-      <span class="legend-tb-icon">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and removes it from your browser history. Also triggered by pressing <kbd>Esc</kbd>.</span>
-<span class="legend-tb-icon">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
-      <span class="legend-tb-icon">↹</span><span><strong>Switch view:</strong> toggles between step-by-step questions and the single checklist. Visible while answering questions.</span>
-    </div>
-    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Plan toolbar</h3>
-    <div class="legend-toolbar" aria-hidden="true">
-      <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
-      <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
-      <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
-      <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
-      <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
-      <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
-    </div>
-    <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:0;"><strong>Progress:</strong> click a status button to update it.</p>
-    <div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:4px;">
-      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="0" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>☐</span></button><span style="font-size:0.85em;">Not started</span></span>
-      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="1" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>🕐</span></button><span style="font-size:0.85em;">In progress</span></span>
-      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="2" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✓</span></button><span style="font-size:0.85em;">Done</span></span>
-      <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="3" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✕</span></button><span style="font-size:0.85em;">Not needed</span></span>
-    </div>
-    <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:8px;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
+    <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:8px;margin-bottom:0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Screen readers are supported throughout.</p>
   </div>
 </dialog>
 
@@ -751,8 +735,9 @@
   <div class="footer-inner">
 
     <div class="footer-links" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
-      <a href="#" onclick="document.getElementById('dlgUsage').showModal();return false;">Usage guide</a>
+      <a href="#" onclick="document.getElementById('dlgAbout').showModal();return false;">About</a>
       <a href="#" onclick="document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>
+      <a href="#" onclick="document.getElementById('dlgUsage').showModal();return false;">Usage guide</a>
       <a href="#" onclick="document.getElementById('dlgSupport').showModal();return false;">Support &amp; feedback</a>
       <a href="#" onclick="document.getElementById('dlgDisclaimer').showModal();return false;">Disclaimer</a>
     </div>
@@ -1332,6 +1317,16 @@ function backToStart() {
   const acb = document.getElementById('checklistAgeConfirm'); if (acb) acb.checked = false;
   const dcb = document.getElementById('checklistDisclaimerConfirm'); if (dcb) dcb.checked = false;
   try { localStorage.removeItem('disclaimerConfirmed'); } catch(e) {}
+  try {
+    const savedApp = ssg('appState');
+    if (savedApp && JSON.parse(savedApp).planGenerated) {
+      gel('welcomeNormal').classList.remove('hidden');
+      gel('welcomeOutdated').classList.add('hidden');
+      V.welcome.classList.remove('hidden');
+      refreshToolbarTabindex();
+      return;
+    }
+  } catch(e) {}
   V.start.classList.remove('hidden');
   refreshToolbarTabindex();
 }
