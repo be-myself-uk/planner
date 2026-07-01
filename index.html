@@ -290,7 +290,7 @@
   .details-body .links:focus-visible, .plan-top-body .links:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
   .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; font-weight:normal; }
   .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px; margin-top: 0; color:var(--text-muted); font-size:0.9em; }
-  .footer-inner { max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:15px; }
+  .footer-inner { max-width:800px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:15px; text-align:center; }
   .footer p { margin:0 0 10px 0; }
   .footer-inner a { color:var(--primary); }
   .footer-meta { margin-top:10px; font-size:0.8em; color:var(--text-muted); }
@@ -493,7 +493,7 @@
       <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
     </div>
-    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> <span id="checklistWarningText">You can not continue unless you are aged 16 or over and understand that this is general guidance only.</span></div>
+    <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You can not continue unless you are aged 16 or over and understand that this is general guidance only.</div>
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 20px 0;">
 
       <legend class="section-title">1. About you</legend>
@@ -516,6 +516,7 @@
         <p class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em></p>
         <label class="option option-sm"><input type="checkbox" id="chkGoalName" checked> My name</label>
         <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
+        <div id="checklistGoalWarning" class="warning-text" style="margin:10px 0 0 0;" role="alert"><span aria-hidden="true">⚠️</span> Please select at least one option for what you need to update on your documents.</div>
       </div>
     </fieldset>
     <fieldset id="wrapSpecificChoices" data-section-label="Long-term goals (additional)" style="border:none;padding:0;margin:0 0 10px 0;">
@@ -588,7 +589,7 @@
     </div>
   </div>
   <div id="planView" class="hidden">
-    <h2 id="planHeading" tabindex="-1">Your personal action plan</h2>
+    <h2 id="planHeading" tabindex="-1" style="text-align:center;">Your personal action plan</h2>
     <div id="planContent"></div>
   </div>
 </main>
@@ -737,7 +738,7 @@
 <footer class="footer" aria-label="Site information and resources">
   <div class="footer-inner">
 
-    <div class="footer-links" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
+    <div class="footer-links" style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:16px;">
       <a href="#" onclick="document.getElementById('dlgAbout').showModal();return false;">About</a>
       <a href="#" onclick="document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>
       <a href="#" onclick="document.getElementById('dlgUsage').showModal();return false;">Usage guide</a>
@@ -2091,8 +2092,6 @@ function generateWizardPlan() {
 function generateChecklistPlan() {
   if (!gel('checklistAgeConfirm')?.checked) {
     const cw = gel('checklistWarning');
-    const cwt = gel('checklistWarningText');
-    if (cwt) cwt.textContent = 'You can not continue unless you are aged 16 or over and understand that this is general guidance only.';
     if (cw) cw.classList.add('visible');
     const ag = gel('checklistAgeGate');
     if (ag) ag.classList.add('error');
@@ -2102,8 +2101,6 @@ function generateChecklistPlan() {
   }
   if (!gel('checklistDisclaimerConfirm')?.checked) {
     const cw = gel('checklistWarning');
-    const cwt = gel('checklistWarningText');
-    if (cwt) cwt.textContent = 'You can not continue unless you are aged 16 or over and understand that this is general guidance only.';
     if (cw) cw.classList.add('visible');
     const dg = gel('checklistDisclaimerGate');
     if (dg) dg.classList.add('error');
@@ -2114,12 +2111,10 @@ function generateChecklistPlan() {
   const goalName   = gel('chkGoalName')?.checked;
   const goalGender = gel('chkGoalGender')?.checked;
   if (!goalName && !goalGender) {
-    const cw = gel('checklistWarning');
-    const cwt = gel('checklistWarningText');
-    if (cwt) cwt.textContent = 'Please select at least one option for what you need to update on your documents.';
-    if (cw) cw.classList.add('visible');
+    const gw = gel('checklistGoalWarning');
+    if (gw) gw.classList.add('visible');
+    gw?.scrollIntoView({behavior:'smooth', block:'center'});
     announce('Please choose at least one option.');
-    window.scrollTo({top:0, behavior:'smooth'});
     return;
   }
   V.welcome.classList.add('hidden');
@@ -2826,6 +2821,7 @@ window.onload = () => {
   if (checklistEl) {
     checklistEl.addEventListener('change', (e) => {
       const cw = gel('checklistWarning'); if (cw) cw.classList.remove('visible');
+      const gw = gel('checklistGoalWarning'); if (gw) gw.classList.remove('visible');
       if (e.target.id === 'chkGRC' && !e.target.checked) gel('chkBirthCert').checked = false;
       if (e.target.id === 'chkBirthCert' && e.target.checked) gel('chkGRC').checked = true;
       const region = document.querySelector('input[name="chkRegion"]:checked');

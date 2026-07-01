@@ -502,14 +502,14 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#checklistDisclaimerConfirm')).toBeChecked();
   });
 
-  test('61. Checklist goal warning shows correct message', async ({ page }) => {
+  test('61. Checklist goal warning shows correct message inline under the question', async ({ page }) => {
     await openChecklist(page);
     await page.locator('#chkGoalName').uncheck();
     await page.locator('#chkGoalGender').uncheck();
     await page.getByRole('button', { name: 'Show my action plan' }).click();
-    await expect(page.locator('#checklistWarning')).toBeVisible();
-    await expect(page.locator('#checklistWarningText')).toHaveText('Please select at least one option for what you need to update on your documents.');
-    await expect(page.locator('#checklistWarningText')).not.toContainText('aged 16');
+    await expect(page.locator('#checklistGoalWarning')).toBeVisible();
+    await expect(page.locator('#checklistGoalWarning')).toContainText('Please select at least one option for what you need to update on your documents.');
+    await expect(page.locator('#checklistWarning')).toBeHidden();
   });
 
   test('60. Mobile toolbar layout: one row for wizard, two rows for plan view', async ({ page }) => {
