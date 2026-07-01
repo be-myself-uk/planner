@@ -512,7 +512,7 @@
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionOut"  value="out"> Outside the UK</label>
       </div>
       <div class="chk-section">
-        <p class="chk-q">What do you need to update on your documents?</p>
+        <p class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em></p>
         <label class="option option-sm"><input type="checkbox" id="chkGoalName" checked> My name</label>
         <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
       </div>
@@ -1487,6 +1487,8 @@ function toggleMode() {
     updateDerivedState();
     renderChecklist();
     updateLocks();
+    const ageCb = gel('checklistAgeConfirm'); if (ageCb) ageCb.checked = ssg('ageConfirmed') === 'true';
+    const discCb = gel('checklistDisclaimerConfirm'); if (discCb) discCb.checked = ssg('disclaimerConfirmed') === 'true';
     const savedApp = ssg('appState');
     const planExists = savedApp && (() => { try { return JSON.parse(savedApp).planGenerated; } catch(e) { return false; } })();
     gel('checklistGenerateBtn').textContent = planExists ? 'Update my action plan' : 'Show my action plan';
@@ -1816,9 +1818,9 @@ const questions = [
     [REGION.NI,   'Northern Ireland'],
     ['out',       'Outside the UK']
   ]},
-  { id:'goalParts', type:'multi', q:'What do you need to update on your documents?', o:() => ([
+  { id:'goalParts', type:'multi', q:'What do you need to update on your documents?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em>', o:() => ([
     { value:'name',   label:'My name' },
-    { value:'gender', label:'My gender marker (M or F)<br><em class="note" style="font-style:italic;display:block;margin-top:2px;font-size:0.9em;">Select this if your name is already correct on your documents, or tick both if you also need a name change.</em>' },
+    { value:'gender', label:'My gender marker (M or F)' },
   ])},
   { id:'citizen', q:'Do you have a visa or eVisa to live in the UK?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters.</em>', o:() => [
     [S.NO,  'No, I do not have a UK visa or eVisa'],
@@ -2724,6 +2726,7 @@ function refreshPlan() {
     }
   }
   checkAllDone();
+  updateNextStep();
   document.querySelectorAll('.svc-sub-ul').forEach(ul => {
     const anyVisible = Array.from(ul.querySelectorAll('li')).some(li => !li.classList.contains('collapsed-svc'));
     ul.style.margin = anyVisible ? '' : '0';
