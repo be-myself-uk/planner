@@ -942,7 +942,7 @@ const PLAN_ITEMS = {
         variants: {
           gender: {
             summary: 'Your GP practice can request a new NHS number with the correct gender marker, or update your existing record. Your medical care, screening invitations, and correspondence will then use your correct details.',
-            detail: '<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, your gender marker can be updated on your existing NHS number (PCSE added this option in 2025).</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, you can ask your GP to record your gender as \'indeterminate\' (shown as \'Not specified\' in most NHS systems). Ask the practice to use gender code \'I\' if they are unsure what to enter.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>',
+            detail: '<p>For gender marker updates there are two options. A new NHS number protects your privacy and stops your old name appearing on future letters. Alternatively, your gender marker can be updated on your existing NHS number.</p><p><strong>⚠️ Screening note:</strong> Changing your gender marker may stop automatic NHS screening invitations, for example for cervical or breast screening. Ask your GP to check you are enrolled in the screening programmes right for your body.</p><p><strong>Non-binary gender markers:</strong> In England, you can ask your GP to record your gender as \'indeterminate\' (shown as \'Not specified\' in most NHS systems). Ask the practice to use gender code \'I\' if they are unsure what to enter.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating medical records</a><a href="https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment" target="_blank" rel="noopener noreferrer" class="links">🔗 PCSE: Gender reassignment and NHS records</a><a href="https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: NHS screening guidance for trans and non-binary people</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links">🔗 NHS: Register with a GP surgery</a>',
           },
           name: {
             summary: 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration. Updating your NHS record means your appointments, letters, and prescriptions all use your new name.',
@@ -1406,15 +1406,6 @@ function startChecklist() {
   const stickyBar = gel('checklistStickyBar');
   if (stickyBar) { stickyBar.classList.add('hidden'); stickyBar.setAttribute('aria-hidden', 'true'); }
 }
-function nudgeLegend() {
-  const el = gel('planLegend');
-  if (!el || ssg('legendSeen') === '1') return;
-  sss('legendSeen', '1');
-  el.classList.add('legend-pulse');
-  const stop = () => el.classList.remove('legend-pulse');
-  el.addEventListener('toggle', stop, { once: true });
-  el.addEventListener('animationend', stop, { once: true });
-}
 function continuePlan() {
   V.welcome.classList.add('hidden');
   setNavControls('none');
@@ -1423,7 +1414,6 @@ function continuePlan() {
   V.plan.classList.remove('hidden');
   document.body.classList.add('plan-ready');
   buildSharedPlan(planParamsFromWizard());
-  nudgeLegend();
   focusPlan();
   refreshToolbarTabindex();
 }
@@ -2095,7 +2085,6 @@ function generateWizardPlan() {
   sss('wizardState', JSON.stringify(wizardState));
   sss('isWizardMode', 'true');
   buildSharedPlan(planParamsFromWizard());
-  nudgeLegend();
   focusPlan();
   refreshToolbarTabindex();
 }
@@ -2138,7 +2127,6 @@ function generateChecklistPlan() {
   sss('wizardState', JSON.stringify(wizardState));
   sss('isWizardMode', 'false');
   buildSharedPlan(planParamsFromWizard());
-  nudgeLegend();
   focusPlan();
   refreshToolbarTabindex();
 }
@@ -2634,10 +2622,11 @@ function checkAllDone() {
   }
 }
 
+let lastPulsedStepId = null;
+let nextStepPulseTimeout = null;
 function updateNextStep() {
   const phases = document.querySelectorAll('.phase');
   if (!phases.length) return;
-  document.querySelectorAll('.next-step-highlight').forEach(el => el.classList.remove('next-step-highlight'));
   let announcedLabel = '', firstIncompleteBtn = null;
   phases.forEach(phase => {
     const btns = Array.from(phase.querySelectorAll('.step-state-btn[data-track-id]'));
@@ -2658,13 +2647,21 @@ function updateNextStep() {
     }
     if (!firstIncompleteBtn && incompleteBtn) firstIncompleteBtn = incompleteBtn;
   });
-  if (firstIncompleteBtn) {
-    const planItem = firstIncompleteBtn.closest('.plan-item');
-    if (planItem && !planItem.classList.contains('collapsed-step')) {
-      planItem.classList.add('next-step-highlight');
-      planItem.addEventListener('animationend', () => planItem.classList.remove('next-step-highlight'), { once: true });
+  clearTimeout(nextStepPulseTimeout);
+  nextStepPulseTimeout = setTimeout(() => {
+    const targetId = firstIncompleteBtn ? firstIncompleteBtn.dataset.trackId : null;
+    if (targetId !== lastPulsedStepId) {
+      document.querySelectorAll('.next-step-highlight').forEach(el => el.classList.remove('next-step-highlight'));
+      if (firstIncompleteBtn) {
+        const planItem = firstIncompleteBtn.closest('.plan-item');
+        if (planItem && !planItem.classList.contains('collapsed-step')) {
+          planItem.classList.add('next-step-highlight');
+          planItem.addEventListener('animationend', () => planItem.classList.remove('next-step-highlight'), { once: true });
+        }
+      }
+      lastPulsedStepId = targetId;
     }
-  }
+  }, 1500);
   if (announcedLabel) announce(`Your next step is: ${announcedLabel}`);
 }
 function refreshPlan() {
