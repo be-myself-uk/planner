@@ -1139,7 +1139,12 @@ function closeDialogOnBackdrop(e) {
 }
 function panicExit() {
   document.body.style.display = 'none';
-  window.location.replace('https://www.google.co.uk');
+  // Escape has a native browser meaning of "stop/cancel the current action"
+  // (the same key that aborts a page load). Calling location.replace()
+  // synchronously inside the Escape keydown handler can race with that
+  // native behaviour and get cancelled, leaving a blank page. Deferring by
+  // one tick lets the browser finish handling the keypress first.
+  setTimeout(() => window.location.replace('https://www.google.co.uk'), 0);
 }
 function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
