@@ -51,7 +51,7 @@ Your plan is saved in your browser and will still be there the next time you vis
 
 - **Personalised action plan**
   - Covers deed polls, statutory declarations, NHS/HSCNI records, driving licences, passports, HMRC, employment, DBS/AccessNI checks, qualifications, the electoral register, banks, eVisas, DWP/DfC benefits, birth certificates, and GRC applications
-  - Difficulty and cost badges on every item (Easy/Medium/Hard, Free/Small fee/Variable cost/Higher cost with split-gradient badges for ranges)
+  - Difficulty and cost badges on every item (Easy/Medium/Hard, Free/Small cost/Medium cost/Higher cost with split-gradient badges for ranges)
   - Estimated time and cost summary
 
 - **Progress tracking**
