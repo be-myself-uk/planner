@@ -792,7 +792,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1782981311;
+const SCHEMA_VERSION = 1782987894;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const SERVICES = [
@@ -1139,7 +1139,12 @@ function closeDialogOnBackdrop(e) {
 }
 function panicExit() {
   document.body.style.display = 'none';
-  window.location.replace('https://www.google.co.uk');
+  // Escape has a native browser meaning of "stop/cancel the current action"
+  // (the same key that aborts a page load). Calling location.replace()
+  // synchronously inside the Escape keydown handler can race with that
+  // native behaviour and get cancelled, leaving a blank page. Deferring by
+  // one tick lets the browser finish handling the keypress first.
+  setTimeout(() => window.location.replace('https://www.google.co.uk'), 0);
 }
 function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
@@ -1283,7 +1288,7 @@ function copyShareableLink() {
   if (Object.keys(prg).length) ps.prg = prg;
   if (focusMode) ps.fm = 1;
   url.searchParams.set('p', encodeState(ps));
-  const text = `Action Plan Link:\n${url}`;
+  const text = url.toString();
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
     if (sBtn) {
@@ -2789,6 +2794,13 @@ function initToolbarNav() {
   });
 }
 window.onload = () => {
+  // If this HTML file was saved to disk while a plan was on screen, the
+  // saved copy's DOM can already have "hidden" removed from the wizard,
+  // checklist, or plan view. Force those closed before routing decides
+  // which one (if any) to show, otherwise a gate and the plan can both
+  // render at once when the saved file is later used to open a shared link.
+  [V.wizard, V.checklist, V.plan].forEach(v => v?.classList.add('hidden'));
+  document.body.classList.remove('plan-ready', 'wizard-active');
   initToolbarNav();
   updateThemeIcon();
   const _d = new Date(SCHEMA_VERSION * 1000);
