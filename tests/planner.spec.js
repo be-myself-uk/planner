@@ -288,6 +288,20 @@ test.describe('Be myself Planner', () => {
     expect(decoded.grc).toBe(true);
   });
 
+  test('63. Shared link gate replaces a plan baked into a saved file', async ({ page }) => {
+    // Simulates opening a saved-to-disk copy of the page whose HTML was
+    // captured while a plan was on screen (planView's "hidden" class
+    // already removed in the saved markup), then using that saved file to
+    // open someone else's shared plan link.
+    await page.evaluate(() => { document.getElementById('planView').classList.remove('hidden'); });
+    const shareUrl = await getShareUrl(page, {reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""});
+    const qs = new URL(shareUrl).search;
+    await page.evaluate((qs) => history.replaceState(null, '', qs), qs);
+    await page.evaluate(() => window.onload());
+    await expect(page.locator('#welcomeNewDevice')).toBeVisible();
+    await expect(page.locator('#planView')).toBeHidden();
+  });
+
   test('16. Share URL age gate guard', async ({ page }) => {
     const url = await getShareUrl(page, {reg:"ew",goal:"both",nonUK:false,pid:false,emp:"no",dbs:false,stu:false,dp:false,visa:false,nhs:false,dl:false,hmrc:false,pass:false,grc:false,newgp:false,dwp:false,bcn:false,bc:false,bni:false,srv:""});
     await page.evaluate(() => localStorage.clear());

@@ -606,7 +606,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
     <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page. For full details, see <a href="#" onclick="this.closest('dialog').close();document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Can I use this offline?</h3>
-    <p>Yes. This is a single web page with no external files, so you can save it to your device (usually Ctrl+S or File &gt; Save page as) and open it later without an internet connection. If you already have a saved plan link from the 🔗 Copy link button, keep the saved file in the same location afterwards, since the link points to that file's location and will need its path edited to match if you move the file.</p>
+    <p>Yes. This is a single web page with no external files, so you can save it to your device (usually Ctrl+S or File &gt; Save page as) and open it later without an internet connection. If you already have an action plan, use the 🔗 Copy link button to preserve it for use offline. When you open your offline copy of the website, you'll need to edit the URL (everything from "?p=" onwards).</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
     <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner builds a step-by-step action plan with links to the relevant official pages.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
@@ -1288,7 +1288,7 @@ function copyShareableLink() {
   if (Object.keys(prg).length) ps.prg = prg;
   if (focusMode) ps.fm = 1;
   url.searchParams.set('p', encodeState(ps));
-  const text = `Action Plan Link:\n${url}`;
+  const text = url.toString();
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
     if (sBtn) {
@@ -2794,6 +2794,13 @@ function initToolbarNav() {
   });
 }
 window.onload = () => {
+  // If this HTML file was saved to disk while a plan was on screen, the
+  // saved copy's DOM can already have "hidden" removed from the wizard,
+  // checklist, or plan view. Force those closed before routing decides
+  // which one (if any) to show, otherwise a gate and the plan can both
+  // render at once when the saved file is later used to open a shared link.
+  [V.wizard, V.checklist, V.plan].forEach(v => v?.classList.add('hidden'));
+  document.body.classList.remove('plan-ready', 'wizard-active');
   initToolbarNav();
   updateThemeIcon();
   const _d = new Date(SCHEMA_VERSION * 1000);
