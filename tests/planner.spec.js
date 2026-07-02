@@ -39,6 +39,19 @@ async function wizardNext(page) {
   await nextBtn.click();
 }
 
+// Chromium's localStorage backend for file:// origins occasionally hasn't
+// finished committing a write before a reload's navigation tears down the
+// old document, especially under back-to-back automated test load (this
+// doesn't happen in normal browser use). Retry the reload a few times so
+// tests aren't flaky on this environment quirk.
+async function reloadUntil(page, conditionFn, attempts = 8) {
+  for (let i = 0; i < attempts; i++) {
+    if (i > 0) await page.waitForTimeout(50);
+    await page.reload();
+    if (await conditionFn()) return;
+  }
+}
+
 function decodeState(encoded) {
   const bin = Buffer.from(encoded, 'base64').toString('binary');
   const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
@@ -96,7 +109,7 @@ test.describe('Be myself Planner', () => {
 
   test('3. Age gate persistence', async ({ page }) => {
     await checkAgeGate(page);
-    await page.reload();
+    await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('ageConfirmed') === 'true'));
     expect(await page.evaluate(() => localStorage.getItem('ageConfirmed'))).toBe('true');
     await expect(page.getByRole('button', { name: 'Start now' })).toBeEnabled();
   });
@@ -249,7 +262,7 @@ test.describe('Be myself Planner', () => {
   test('14. Welcome back', async ({ page }) => {
     await openChecklist(page);
     await page.getByRole('button', { name: 'Show my action plan' }).click();
-    await page.reload();
+    await reloadUntil(page, () => page.locator('#welcomeBackView').isVisible());
     await expect(page.locator('#welcomeBackView')).toBeVisible();
     await expect(page.locator('#startView')).toBeHidden();
     await page.getByRole('button', { name: 'Continue my plan' }).click();
