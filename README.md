@@ -16,9 +16,29 @@ A free tool that helps trans and non-binary people in the UK work out what legal
 
 Anyone living in the UK aged 16 or over who wants to update their legal documents to match their gender identity. This includes people who only want a name change, only a gender marker change, or both. There is also guidance for people from outside the UK who hold a visa or eVisa, and for people born in Northern Ireland who may be eligible for the Irish passport gender recognition route. The legal processes for those under 16 require parental consent and follow different steps, which this planner does not cover.
 
+### Is my information safe?
+
+Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. See [Privacy](#privacy) below for full details.
+
+### Can I use this offline?
+
+Yes. It's a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you have a saved plan link, keep the saved file in the same location, since the link points to that file's location.
+
 ### How does it work?
 
 You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner then creates a personal step-by-step action plan with clear instructions and links to official resources.
+
+### Step-by-step or checklist?
+
+Both produce the same plan. The step-by-step wizard shows one question at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is better if you already know your situation. You can switch between them at any time.
+
+### Is this legal advice?
+
+No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.
+
+### How do I save or share my plan?
+
+Your plan is saved in your browser and will still be there the next time you visit on the same device. To access it from another device, or share it with someone, use the Copy link button on the toolbar. You can also print to save a PDF. There is no account or login needed.
 
 ## Features
 
@@ -42,9 +62,9 @@ You answer a short set of questions about your situation: what documents you alr
   - All progress saved to localStorage
 
 - **Sticky toolbar**
-  - New plan, edit plan, reset progress, focus mode, copy link, print, switch view, about, theme, and quick exit buttons
-  - Expanding text labels on hover/focus (desktop)
-  - Toolbar guide in the plan legend for mobile users
+  - New plan, edit plan, reset progress, focus mode, copy link, print, back to start, switch view, usage guide, theme, and quick exit buttons
+  - Expanding text labels on hover/focus (desktop); labels hidden on small screens, with buttons wrapping onto a second row on the action plan view so nothing is cropped
+  - Full toolbar and progress-badge reference in the in-app Usage guide dialog
   - WAI-ARIA toolbar pattern with arrow key navigation and roving tabindex
   - Rainbow "All done!" banner when all steps are completed
   - Progress bar with plan completion percentage (plan view) and question counter (wizard)
@@ -66,15 +86,18 @@ You answer a short set of questions about your situation: what documents you alr
 - **Accessible**
   - Keyboard navigable with arrow keys in toolbar, tab through all controls
   - Screen reader support: ARIA live region for announcements, aria-pressed/aria-expanded/aria-label on all interactive elements, visually hidden descriptions for locked items
-  - Skip link, focus management, focus trap in help modal
+  - Skip link, focus management, focus trap in all dialogs
   - Reduced motion support: all animations and transitions disabled
   - Responsive: hero, toolbar, and content adapt from 400px to desktop widths
 
 - **Light and dark mode**
   - Follows system preference with a manual toggle; persisted to localStorage
 
+- **Footer reference dialogs**
+  - About (what the tool is, who it's for, offline use, safety, how it works), Privacy, Usage guide, Support & feedback, and Disclaimer, each opened from footer links
+
 - **No dependencies**
-  - Single self-contained HTML file with embedded font, no external JavaScript libraries, no build step
+  - Single self-contained HTML file using the system font stack, no external JavaScript libraries, no build step
 
 ## Privacy
 
