@@ -1178,6 +1178,8 @@ function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
   const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? (d.emp === 'yes' ? 'needs_update' : d.emp)  : S.NO;
   wizardState.region      = ['ew','scot','ni'].includes(d.reg) ? d.reg : REGION.EW;
+  wizardState.regionOutsideUK = d.ro === true ? S.YES : S.NO;
+  if (wizardState.regionOutsideUK === S.YES) wizardState.region = REGION.EW;
   wizardState.goal        = validGoal;
   wizardState.goalParts   = validGoal === S.BOTH ? ['name','gender'] : validGoal === S.NAME ? ['name'] : ['gender'];
   wizardState.citizen     = d.nonUK === true ? S.YES : S.NO;
@@ -1286,6 +1288,7 @@ function copyShareableLink() {
   const ps = {
     v: SCHEMA_VERSION,
     reg:   w.region || REGION.EW,
+    ro:    w.regionOutsideUK === S.YES,
     goal:  w.goal,
     nonUK: w.citizen      === S.YES,
     emp:   w.employment   || S.NO,
@@ -1418,6 +1421,7 @@ function checkAgeGateShared() {
 }
 function startWizard() {
   isWizardMode = true; wizardState = {}; step = 0; wizardHistory = [];
+  gel('wizardEditTip')?.classList.add('hidden');
   V.start.classList.add('hidden');
   V.checklist.classList.add('hidden');
   V.wizard.classList.remove('hidden');
@@ -1659,10 +1663,9 @@ function updateDerivedState() {
   }
 }
 function renderChecklist() {
-  if (wizardState.region) {
-    const r = document.querySelector(`input[name="chkRegion"][value="${wizardState.region}"]`);
-    if (r) r.checked = true;
-  }
+  const rv = (wizardState.regionOutsideUK === S.YES) ? 'out' : (wizardState.region || REGION.EW);
+  const r = document.querySelector(`input[name="chkRegion"][value="${rv}"]`);
+  if (r) r.checked = true;
   const brv = (wizardState.birthOutsideUK === S.YES) ? 'out' : (wizardState.birthRegion || REGION.EW);
   const br = document.querySelector(`input[name="chkBirthRegion"][value="${brv}"]`);
   if (br) br.checked = true;
@@ -1825,6 +1828,7 @@ function resetChecklist() {
     grc: S.NO, birthCertName: S.NO,
     birthCert: S.NO, birthRegion: REGION.EW,
     birthOutsideUK: S.NO,
+    regionOutsideUK: S.NO,
     goalParts: ['name','gender'],
     services: [],
     svcNone:  S.NO,
@@ -1992,7 +1996,8 @@ function renderWizard(skipForward = true) {
     opts.forEach((o, i) => {
       const disabled = o[2] ? 'disabled' : '';
       const rawVal = wizardState[q.id];
-      const displayVal = (q.id === 'birthRegion' && wizardState.birthOutsideUK === S.YES) ? 'out' : rawVal;
+      const displayVal = (q.id === 'birthRegion' && wizardState.birthOutsideUK === S.YES) ? 'out'
+        : (q.id === 'region' && wizardState.regionOutsideUK === S.YES) ? 'out' : rawVal;
       const checked  = !o[2] && displayVal === o[0] ? 'checked' : '';
       const locked   = o[2] ? 'locked' : '';
       const note     = o[2] ? '<span class="visually-hidden"> – not yet available</span>' : '';
@@ -2079,8 +2084,13 @@ function nextWizard() {
   V.warning.classList.remove('visible');
   gel('wizardOptionsGroup')?.classList.remove('error');
   wizardState[q.id] = a.value;
-  if (q.id === 'region' && a.value === 'out') {
-    wizardState.region = REGION.EW;
+  if (q.id === 'region') {
+    if (a.value === 'out') {
+      wizardState.regionOutsideUK = S.YES;
+      wizardState.region = REGION.EW;
+    } else {
+      wizardState.regionOutsideUK = S.NO;
+    }
   }
   if (q.id === 'age') {
     if (a.value === S.YES) {
@@ -2891,7 +2901,10 @@ window.onload = () => {
       if (e.target.id === 'chkGRC' && !e.target.checked) gel('chkBirthCert').checked = false;
       if (e.target.id === 'chkBirthCert' && e.target.checked) gel('chkGRC').checked = true;
       const region = document.querySelector('input[name="chkRegion"]:checked');
-      if (region) wizardState.region = region.value === 'out' ? REGION.EW : region.value;
+      if (region) {
+        wizardState.regionOutsideUK = region.value === 'out' ? S.YES : S.NO;
+        wizardState.region = region.value === 'out' ? REGION.EW : region.value;
+      }
       const birthReg = document.querySelector('input[name="chkBirthRegion"]:checked');
       const brVal = birthReg ? birthReg.value : REGION.EW;
       wizardState.birthOutsideUK = brVal === 'out' ? S.YES : S.NO;
