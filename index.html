@@ -127,7 +127,6 @@
   .ub-icon-btn { min-width:38px; height:38px; font-size:1rem; padding:0 8px; }
   .ub-label { display:none !important; }
   .ub-sep { margin:0 2px; }
-  .focus-count-badge { display:none !important; }
   body.plan-ready #cbRightGroup { order:1; }
   body.plan-ready #panicBtn { order:2; }
   body.plan-ready #cbLeftGroup { order:3; flex-basis:100%; flex-wrap:wrap; justify-content:center; margin-top:4px; }
@@ -217,9 +216,8 @@
   .phase-header h3 { margin:0; }
   .badge-time { display:inline-flex; align-items:center; gap:5px; background:var(--badge-bg); color:var(--text); padding:4px 10px; border-radius:12px; font-size:0.8em; font-weight:bold; border:1px solid var(--badge-border); }
   .badge-next { display:inline-block; background:var(--primary); color:var(--text-invert); padding:3px 8px; border-radius:4px; font-size:0.75em; font-weight:bold; text-transform:uppercase; margin-bottom:5px; }
-  .focus-count-badge { display:none; font-size:0.65rem; font-weight:bold; background:var(--text); color:var(--bg); border-radius:9px; padding:1px 5px; margin-left:3px; vertical-align:middle; }
-  .focus-count-badge:empty { margin-left:0; padding:0; }
-  [aria-pressed="true"] .focus-count-badge { display:inline; }
+  .focus-count-badge { display:none !important; }
+  #focusToggleBtn .ub-label { display:none !important; }
   .next-step-highlight { outline:2px solid transparent; outline-offset:2px; border-radius:4px; }
   @media (prefers-reduced-motion: no-preference) {
     .next-step-highlight { animation:nextStepPulse 2s ease-in-out 2; }
