@@ -131,6 +131,7 @@
   body.plan-ready #cbRightGroup { order:1; }
   body.plan-ready #panicBtn { order:2; }
   body.plan-ready #cbLeftGroup { order:3; flex-basis:100%; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+  .footer { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
   }
   @media (max-width:400px) {
     #controlBarCard { padding:6px 8px; }
@@ -400,7 +401,7 @@
           <button id="ubRestartBtn" class="ub-icon-btn" onclick="confirmUtilityRestart(this)" aria-label="New plan" title="New plan"><span class="ub-label" aria-hidden="true">New plan</span><span aria-hidden="true">↺</span></button>
           <button id="ubMakeChangesBtn" class="ub-icon-btn" onclick="makeChanges()" aria-label="Edit plan" title="Edit plan"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
           <div class="ub-sep" aria-hidden="true"></div>
-          <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">⟲</span></button>
+          <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">🧹</span></button>
           <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
           <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
           <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
@@ -651,7 +652,7 @@
     <div class="legend-toolbar" aria-hidden="true">
       <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
       <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
-      <span class="legend-tb-icon">⟲</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
+      <span class="legend-tb-icon">🧹</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
       <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
       <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
       <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
@@ -1567,7 +1568,7 @@ function confirmResetProgress(btn) {
   const reset = () => {
     btn.dataset.confirming = 'false';
     btn.classList.remove('ub-confirming');
-    btn.innerHTML = '<span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">⟲</span>';
+    btn.innerHTML = '<span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">🧹</span>';
     btn.setAttribute('aria-label', 'Reset progress');
   };
   if (btn.dataset.confirming === 'true') { reset(); resetProgress(); return; }
