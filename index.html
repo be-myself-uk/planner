@@ -130,7 +130,11 @@
   body.plan-ready #cbRightGroup { order:1; }
   body.plan-ready #panicBtn { order:2; }
   body.plan-ready #cbLeftGroup { order:3; flex-basis:100%; flex-wrap:wrap; justify-content:center; margin-top:4px; }
-  .footer { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .footer { padding: 20px 20px calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .footer-inner { gap:8px; }
+  .footer-links { margin-bottom:8px !important; gap:10px !important; }
+  .footer-meta { margin-top:4px; }
+  .footer-meta p { margin:2px 0; }
   }
   @media (max-width:400px) {
     #controlBarCard { padding:6px 8px; }
