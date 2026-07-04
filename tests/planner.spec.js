@@ -466,6 +466,24 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#chkSvcBanks')).toBeEnabled();
   });
 
+  test('64. Credit reference agencies service item', async ({ page }) => {
+    await openChecklist(page);
+    await expect(page.locator('#chkSvcCRA')).toBeVisible();
+    await page.locator('#chkSvcCRA').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.getByText('Credit reference agencies', { exact: true })).toBeVisible();
+    await expect(page.locator('#planContent')).toContainText('Experian, Equifax, and TransUnion');
+    await page.evaluate(() => {
+      window._shareUrl = null;
+      navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+    });
+    await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+    await page.waitForFunction(() => window._shareUrl !== null);
+    const clip = await page.evaluate(() => window._shareUrl);
+    const decoded = decodeState(new URL(clip).searchParams.get('p'));
+    expect(decoded.srv.split(',')).toContain('cra');
+  });
+
   test('46-52. PLAN_ITEMS rendering tests', async ({ page }) => {
     await openChecklist(page);
     await page.locator('input[name="chkRegion"][value="scot"]').check();
