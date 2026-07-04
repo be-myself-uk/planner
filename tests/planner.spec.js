@@ -484,6 +484,37 @@ test.describe('Be myself Planner', () => {
     expect(decoded.srv.split(',')).toContain('cra');
   });
 
+  test('66. GRC medical and living-proof sub-checklists', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkGRC').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    const medBtns = page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]');
+    const lifeBtns = page.locator('.step-state-btn[data-svc-parent="trk_grc_life"]');
+    await expect(medBtns).toHaveCount(2);
+    await expect(lifeBtns).toHaveCount(8);
+    // Complete all medical sub-items; medical parent should be done, living-proof parent untouched
+    for (let i = 0; i < 2; i++) {
+      await medBtns.nth(i).click();
+      await medBtns.nth(i).click();
+    }
+    await expect(page.locator('[data-track-id="trk_grc_med"]')).toHaveAttribute('data-state', '2');
+    await expect(page.locator('[data-track-id="trk_grc_life"]')).toHaveAttribute('data-state', '0');
+    // Copy-link round trip preserves sub-item progress
+    await page.evaluate(() => {
+      window._shareUrl = null;
+      navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+    });
+    await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+    await page.waitForFunction(() => window._shareUrl !== null);
+    const clip = await page.evaluate(() => window._shareUrl);
+    await page.goto(clip);
+    const ageCb = page.locator('#ageConfirmShared');
+    if (await ageCb.isVisible()) await ageCb.check();
+    const discCb = page.locator('#disclaimerConfirmShared');
+    if (await discCb.isVisible()) await discCb.check();
+    await expect(page.locator('[data-track-id="trk_grcmed_r1"]')).toHaveAttribute('data-state', '2');
+  });
+
   test('46-52. PLAN_ITEMS rendering tests', async ({ page }) => {
     await openChecklist(page);
     await page.locator('input[name="chkRegion"][value="scot"]').check();

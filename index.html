@@ -2462,8 +2462,13 @@ ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have 
     const stepTitle = p.bornInNI ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
     const stepTime  = p.bornInNI ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
     const irishPassportItem = p.bornInNI ? li('irish_passport', medium, renderCost(_ip.cost), _ip.title, _ip.summary, _ip.detail) : '';
-    const grcMedItem   = (p.wantsGRC || p.birthCert) ? li('grc_med',  hard, renderCost(PLAN_ITEMS.grc_med.cost), _gm.title, _gm.summary, _gm.detail) : '';
-    const grcLifeItem  = (p.wantsGRC || p.birthCert) ? li('grc_life', hard, renderCost(_gl.cost), _gl.title, _gl.summary, _gl.detail) : '';
+    const subItem = (subId, parentId, label) => `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="${parentId}" onclick="cycleStepState('${subId}')" aria-pressed="false" aria-label="${label}: Not started. Click to cycle status" title="Click to cycle status"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
+    const grcMedSubItems = ['Report 1: diagnosis from a gender dysphoria specialist', 'Report 2: from any doctor or clinical psychologist']
+      .map((label, i) => subItem(`trk_grcmed_r${i + 1}`, 'trk_grc_med', label)).join('');
+    const grcLifeSubItems = Array.from({ length: 8 }, (_, i) => i + 1)
+      .map(n => subItem(`trk_grclife_p${n}`, 'trk_grc_life', n === 8 ? 'Evidence period 8 of 8 (most recent)' : `Evidence period ${n} of 8`)).join('');
+    const grcMedItem   = (p.wantsGRC || p.birthCert) ? li('grc_med',  hard, renderCost(PLAN_ITEMS.grc_med.cost), _gm.title, `${_gm.summary}<ul class="svc-sub-ul" style="margin-top:10px;">${grcMedSubItems}</ul>`, _gm.detail) : '';
+    const grcLifeItem  = (p.wantsGRC || p.birthCert) ? li('grc_life', hard, renderCost(_gl.cost), _gl.title, `${_gl.summary} Roughly one piece of evidence per period, with something recent for the last one.<ul class="svc-sub-ul" style="margin-top:10px;">${grcLifeSubItems}</ul>`, _gl.detail) : '';
     const birthCertItem = p.birthCert ? li('birthcert', hard, renderCost(PLAN_ITEMS.birthcert.cost), 'Update your birth certificate', _bc.summaryFn(), _bc.detail) : '';
     addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
@@ -2534,8 +2539,8 @@ function applySvcDetailState(trackId, state) {
   detail.style.opacity = muted ? '0.4' : '1';
   detail.style.textDecoration = muted ? 'line-through' : 'none';
 }
-function syncSvcChildren(parentState) {
-  document.querySelectorAll('.step-state-btn[data-svc-parent]').forEach(btn => {
+function syncSvcChildren(parentState, parentId) {
+  document.querySelectorAll(`.step-state-btn[data-svc-parent="${parentId}"]`).forEach(btn => {
     const childId = btn.dataset.trackId;
     setStepState(childId, parentState);
     applyStepState(childId, parentState);
@@ -2556,8 +2561,8 @@ function cycleStepState(id) {
     `${label} marked as not needed.`
   ];
   announce(messages[next]);
-  if (id === 'trk_services_all') syncSvcChildren(next);
-  else if (id.startsWith('trk_svc_')) { applySvcDetailState(id, next); syncSvcParent(id); }
+  if (document.querySelector(`.step-state-btn[data-svc-parent="${id}"]`)) syncSvcChildren(next, id);
+  else if (btn && btn.dataset.svcParent) { applySvcDetailState(id, next); syncSvcParent(id); }
   refreshPlan();
 }
 
