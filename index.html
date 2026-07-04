@@ -289,7 +289,7 @@
   .details-body .links:hover, .plan-top-body .links:hover { opacity:0.8; }
   .details-body .links:focus-visible, .plan-top-body .links:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
   .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; font-weight:normal; }
-  .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px; margin-top: 0; color:var(--text-muted); font-size:0.9em; }
+  .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px calc(40px + env(safe-area-inset-bottom, 0px)); margin-top: 0; color:var(--text-muted); font-size:0.9em; }
   .footer-inner { max-width:800px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:15px; text-align:center; }
   .footer p { margin:0 0 10px 0; }
   .footer-inner a { color:var(--primary); }
@@ -471,6 +471,10 @@
   </div>
 
   <div id="wizardView" class="hidden">
+    <div id="wizardEditTip" class="phase info hidden" style="margin:0 0 16px 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;" role="status">
+      <span>💡 Editing? Switch to the <strong>⇄ checklist view</strong> to see and change all your answers on one page, instead of stepping through questions.</span>
+      <button onclick="dismissWizardEditTip()" aria-label="Dismiss tip">✕</button>
+    </div>
     <div id="wizardWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Select an answer to continue.</div>
     <div id="wizardBackNav" style="margin-bottom:8px;">
       <button id="wizardBackBtn" class="wizard-back-link" onclick="prevWizard()">← Back</button>
@@ -710,19 +714,26 @@
   </div>
   <div class="dialog-body">
     <p><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px;">General trans support</h3>
     <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
-      <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://www.gires.org.uk/" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    </ul>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px;">Nation-specific</h3>
+    <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
       <li><a href="https://www.scottishtrans.org/" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://teni.ie/" target="_blank" rel="noopener noreferrer">TENI (Ireland)<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    </ul>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px;">Specialist support</h3>
+    <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
       <li><a href="https://www.rainbowmigration.org.uk/" target="_blank" rel="noopener noreferrer">Rainbow Migration<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://teni.ie/" target="_blank" rel="noopener noreferrer">TENI<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://cliniq.org.uk/" target="_blank" rel="noopener noreferrer">CliniQ<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://switchboard.lgbt/" target="_blank" rel="noopener noreferrer">Switchboard<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://lgbt.foundation/" target="_blank" rel="noopener noreferrer">LGBT Foundation<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://cliniq.org.uk/" target="_blank" rel="noopener noreferrer">CliniQ<span class="visually-hidden"> (opens in a new tab)</span></a></li>
     </ul>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Feedback</h3>
     <p>This planner is built and maintained by one person. If you spot a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
@@ -800,7 +811,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1783163129;
+const SCHEMA_VERSION = 1783199752;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const SERVICES = [
@@ -1457,6 +1468,12 @@ function openChecklist() {
 }
 function reviewAnswers() { openChecklist(); }
 
+function dismissWizardEditTip() {
+  const tip = gel('wizardEditTip');
+  if (tip) tip.classList.add('hidden');
+  sss('editTipSeen', '1');
+}
+
 function makeChanges() {
   fadeOutConfetti();
   if (isWizardMode) {
@@ -1465,7 +1482,10 @@ function makeChanges() {
     V.wizard.classList.remove('hidden');
     document.body.classList.add('wizard-active');
     setNavControls('flex');
-    
+    if (ssg('editTipSeen') !== '1') {
+      const tip = gel('wizardEditTip');
+      if (tip) tip.classList.remove('hidden');
+    }
     if (step >= questions.length) step = questions.length - 1;
     wizardHistory = computeHistoryUpTo(step);
     if (wizardHistory.length) step = wizardHistory[wizardHistory.length - 1];
@@ -2442,8 +2462,13 @@ ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have 
     const stepTitle = p.bornInNI ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
     const stepTime  = p.bornInNI ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
     const irishPassportItem = p.bornInNI ? li('irish_passport', medium, renderCost(_ip.cost), _ip.title, _ip.summary, _ip.detail) : '';
-    const grcMedItem   = (p.wantsGRC || p.birthCert) ? li('grc_med',  hard, renderCost(PLAN_ITEMS.grc_med.cost), _gm.title, _gm.summary, _gm.detail) : '';
-    const grcLifeItem  = (p.wantsGRC || p.birthCert) ? li('grc_life', hard, renderCost(_gl.cost), _gl.title, _gl.summary, _gl.detail) : '';
+    const subItem = (subId, parentId, label) => `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="${parentId}" onclick="cycleStepState('${subId}')" aria-pressed="false" aria-label="${label}: Not started. Click to cycle status" title="Click to cycle status"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
+    const grcMedSubItems = ['Report 1: diagnosis from a gender dysphoria specialist', 'Report 2: from any doctor or clinical psychologist']
+      .map((label, i) => subItem(`trk_grcmed_r${i + 1}`, 'trk_grc_med', label)).join('');
+    const grcLifeSubItems = Array.from({ length: 8 }, (_, i) => i + 1)
+      .map(n => subItem(`trk_grclife_p${n}`, 'trk_grc_life', n === 8 ? 'Evidence period 8 of 8 (most recent)' : `Evidence period ${n} of 8`)).join('');
+    const grcMedItem   = (p.wantsGRC || p.birthCert) ? li('grc_med',  hard, renderCost(PLAN_ITEMS.grc_med.cost), _gm.title, `${_gm.summary}<ul class="svc-sub-ul" style="margin-top:10px;">${grcMedSubItems}</ul>`, _gm.detail) : '';
+    const grcLifeItem  = (p.wantsGRC || p.birthCert) ? li('grc_life', hard, renderCost(_gl.cost), _gl.title, `${_gl.summary} Roughly one piece of evidence per period, with something recent for the last one.<ul class="svc-sub-ul" style="margin-top:10px;">${grcLifeSubItems}</ul>`, _gl.detail) : '';
     const birthCertItem = p.birthCert ? li('birthcert', hard, renderCost(PLAN_ITEMS.birthcert.cost), 'Update your birth certificate', _bc.summaryFn(), _bc.detail) : '';
     addStep(`<div class="phase ${nextPhaseColour()}" aria-labelledby="phase_s${sn}">
   ${nb(`phase_s${sn}`)}
@@ -2514,8 +2539,8 @@ function applySvcDetailState(trackId, state) {
   detail.style.opacity = muted ? '0.4' : '1';
   detail.style.textDecoration = muted ? 'line-through' : 'none';
 }
-function syncSvcChildren(parentState) {
-  document.querySelectorAll('.step-state-btn[data-svc-parent]').forEach(btn => {
+function syncSvcChildren(parentState, parentId) {
+  document.querySelectorAll(`.step-state-btn[data-svc-parent="${parentId}"]`).forEach(btn => {
     const childId = btn.dataset.trackId;
     setStepState(childId, parentState);
     applyStepState(childId, parentState);
@@ -2536,8 +2561,8 @@ function cycleStepState(id) {
     `${label} marked as not needed.`
   ];
   announce(messages[next]);
-  if (id === 'trk_services_all') syncSvcChildren(next);
-  else if (id.startsWith('trk_svc_')) { applySvcDetailState(id, next); syncSvcParent(id); }
+  if (document.querySelector(`.step-state-btn[data-svc-parent="${id}"]`)) syncSvcChildren(next, id);
+  else if (btn && btn.dataset.svcParent) { applySvcDetailState(id, next); syncSvcParent(id); }
   refreshPlan();
 }
 
@@ -2941,6 +2966,7 @@ window.renderWizard   = renderWizard;
 window.panicExit             = panicExit;
 window.confirmUtilityRestart = confirmUtilityRestart;
 window.makeChanges           = makeChanges;
+window.dismissWizardEditTip  = dismissWizardEditTip;
 window.confirmResetProgress  = confirmResetProgress;
 window.toggleFocusMode       = toggleFocusMode;
 window.copyShareableLink     = copyShareableLink;
