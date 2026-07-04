@@ -686,4 +686,18 @@ test.describe('Be myself Planner', () => {
     await expect(tip).toBeHidden();
   });
 
+  test('69. Checklist warning banners do not leak across a fresh checklist entry', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkGoalName').uncheck();
+    await page.locator('#chkGoalGender').uncheck();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#checklistGoalWarning')).toBeVisible();
+    // Leave via Home without ever touching a field again (so the change handler never fires),
+    // then re-enter the checklist fresh.
+    await page.locator('#cbHomeBtn').click();
+    await expect(page.locator('#startView')).toBeVisible();
+    await page.locator('.start-checklist-link').click();
+    await expect(page.locator('#checklistGoalWarning')).toBeHidden();
+  });
+
 });

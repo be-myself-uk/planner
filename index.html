@@ -1443,6 +1443,8 @@ function startChecklist() {
   document.body.classList.remove('wizard-active');
   gel('checklistGenerateBtn').textContent = 'Show my action plan';
   gel('checklistGenerateBtn').classList.remove('hidden');
+  gel('checklistWarning')?.classList.remove('visible');
+  gel('checklistGoalWarning')?.classList.remove('visible');
   const stickyBar = gel('checklistStickyBar');
   if (stickyBar) { stickyBar.classList.add('hidden'); stickyBar.setAttribute('aria-hidden', 'true'); }
 }
@@ -1467,6 +1469,8 @@ function openChecklist() {
   updateDerivedState();
   renderChecklist();
   updateLocks();
+  gel('checklistWarning')?.classList.remove('visible');
+  gel('checklistGoalWarning')?.classList.remove('visible');
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
   gel('checklistGenerateBtn').classList.add('hidden');
   const stickyBar = gel('checklistStickyBar');
@@ -2860,7 +2864,6 @@ window.onload = () => {
   updateThemeIcon();
   const _d = new Date(SCHEMA_VERSION * 1000);
     const _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const _sd = gel('schemaDate'); if (_sd) _sd.textContent = _d.getUTCDate() + ' ' + _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _lr = gel('footerLastReviewed'); if (_lr) _lr.textContent = _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _cy = gel('schemaCopyYear'); if (_cy) _cy.textContent = _d.getUTCFullYear();
   if (window.matchMedia)
