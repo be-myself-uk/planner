@@ -543,6 +543,30 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#startView')).toBeHidden();
   });
 
+  test('65. Wizard edit tip shows once and stays dismissed', async ({ page }) => {
+    await openWizard(page);
+    let q = 0;
+    while (await page.locator('#wizardView').isVisible() && q < 40) {
+      await wizardNext(page);
+      q++;
+    }
+    await expect(page.locator('#planView')).toBeVisible();
+    const tip = page.locator('#wizardEditTip');
+    await expect(tip).toBeHidden();
+    await page.locator('#ubMakeChangesBtn').click();
+    await expect(page.locator('#wizardView')).toBeVisible();
+    await expect(tip).toBeVisible();
+    await tip.getByRole('button', { name: 'Dismiss tip' }).click();
+    await expect(tip).toBeHidden();
+    expect(await page.evaluate(() => localStorage.getItem('editTipSeen'))).toBe('1');
+    // Generate the plan again and re-enter edit mode: tip stays dismissed
+    await page.getByRole('button', { name: /Continue|Show my plan/ }).click();
+    await expect(page.locator('#planView')).toBeVisible();
+    await page.locator('#ubMakeChangesBtn').click();
+    await expect(page.locator('#wizardView')).toBeVisible();
+    await expect(tip).toBeHidden();
+  });
+
   test('59. Age/disclaimer gate sync between wizard and checklist', async ({ page }) => {
     await page.getByRole('button', { name: 'Start now' }).click();
     await wizardNext(page); // age question
