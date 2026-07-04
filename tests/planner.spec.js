@@ -472,7 +472,7 @@ test.describe('Be myself Planner', () => {
     await page.locator('#chkSvcCRA').check();
     await page.getByRole('button', { name: 'Show my action plan' }).click();
     await expect(page.getByText('Credit reference agencies', { exact: true })).toBeVisible();
-    await expect(page.locator('#planContent')).toContainText('Experian, Equifax, and TransUnion');
+    await expect(page.locator('#planContent')).toContainText('Experian, Equifax, or TransUnion');
     await page.evaluate(() => {
       window._shareUrl = null;
       navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
