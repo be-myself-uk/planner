@@ -22,7 +22,7 @@ Yes. Nothing you enter is ever sent to a server or stored outside your own devic
 
 ### Can I use this offline?
 
-Yes. It's a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you have a saved plan link, keep the saved file in the same location, since the link points to that file's location.
+Yes. It's a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you'll need to edit the URL (everything from "?p=" onwards).
 
 ### How does it work?
 
@@ -179,3 +179,6 @@ Useful resources referenced throughout the planner:
 - [Rainbow Migration](https://www.rainbowmigration.org.uk/)
 - [TENI](https://teni.ie/)
 - [r/transgenderUK](https://www.reddit.com/r/transgenderUK/)
+- [Switchboard](https://switchboard.lgbt/)
+- [LGBT Foundation](https://lgbt.foundation/)
+- [CliniQ](https://cliniq.org.uk/)
