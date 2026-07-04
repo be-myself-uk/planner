@@ -289,7 +289,7 @@
   .details-body .links:hover, .plan-top-body .links:hover { opacity:0.8; }
   .details-body .links:focus-visible, .plan-top-body .links:focus-visible { outline:3px solid var(--primary); outline-offset:2px; }
   .note { font-size:0.85em; color:var(--text-muted); font-style:italic; display:block; margin-top:4px; font-weight:normal; }
-  .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px; margin-top: 0; color:var(--text-muted); font-size:0.9em; }
+  .footer { background:var(--bg-card); border-top:1px solid var(--border); padding:40px 20px calc(40px + env(safe-area-inset-bottom, 0px)); margin-top: 0; color:var(--text-muted); font-size:0.9em; }
   .footer-inner { max-width:800px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:15px; text-align:center; }
   .footer p { margin:0 0 10px 0; }
   .footer-inner a { color:var(--primary); }
@@ -710,19 +710,26 @@
   </div>
   <div class="dialog-body">
     <p><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px;">General trans support</h3>
     <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
-      <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer">TransActual<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://genderedintelligence.co.uk" target="_blank" rel="noopener noreferrer">Gendered Intelligence<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://www.gires.org.uk/" target="_blank" rel="noopener noreferrer">GIRES<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://mermaidsuk.org.uk" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    </ul>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px;">Nation-specific</h3>
+    <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
       <li><a href="https://www.scottishtrans.org/" target="_blank" rel="noopener noreferrer">Scottish Trans<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://transaid.cymru/" target="_blank" rel="noopener noreferrer">TransAid Cymru<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://teni.ie/" target="_blank" rel="noopener noreferrer">TENI (Ireland)<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    </ul>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:6px;">Specialist support</h3>
+    <ul style="display:flex;flex-wrap:wrap;gap:12px;margin:4px 0 14px;padding:0;list-style:none;">
       <li><a href="https://www.rainbowmigration.org.uk/" target="_blank" rel="noopener noreferrer">Rainbow Migration<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://teni.ie/" target="_blank" rel="noopener noreferrer">TENI<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://www.reddit.com/r/transgenderUK/" target="_blank" rel="noopener noreferrer">r/transgenderUK<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+      <li><a href="https://cliniq.org.uk/" target="_blank" rel="noopener noreferrer">CliniQ<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://switchboard.lgbt/" target="_blank" rel="noopener noreferrer">Switchboard<span class="visually-hidden"> (opens in a new tab)</span></a></li>
       <li><a href="https://lgbt.foundation/" target="_blank" rel="noopener noreferrer">LGBT Foundation<span class="visually-hidden"> (opens in a new tab)</span></a></li>
-      <li><a href="https://cliniq.org.uk/" target="_blank" rel="noopener noreferrer">CliniQ<span class="visually-hidden"> (opens in a new tab)</span></a></li>
     </ul>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Feedback</h3>
     <p>This planner is built and maintained by one person. If you spot a broken link, a change in UK government processes, or have a suggestion, please get in touch.</p>
