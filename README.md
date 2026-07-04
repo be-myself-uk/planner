@@ -149,6 +149,12 @@ npx playwright install chromium
 npm test
 ```
 
+**Deployment and infrastructure:**
+
+This project deploys automatically through Cloudflare Pages watching this repository. GitHub Actions runs tests and checks only; it does not deploy the site. Caching, TLS, and several security headers are configured at the Cloudflare edge rather than in this repository.
+
+**Do you want to contribute?**
+
 Please [open an issue](https://github.com/be-myself-uk/planner/issues) before starting significant work so we can discuss the approach.
 
 ## Licence
@@ -157,7 +163,7 @@ Please [open an issue](https://github.com/be-myself-uk/planner/issues) before st
 
 You are free to share and adapt this project for non-commercial purposes, as long as you give appropriate credit and distribute any adaptations under the same licence.
 
-If you are an organisation such as a registered UK charity and would like to use this project for commercial purposes, please [send an email](mailto:hello@bemyself.uk).
+If you are an organisation such as a registered UK charity and would like to use this project for commercial purposes, please [open a GitHub issue](https://github.com/be-myself-uk/planner/issues) to discuss.
 
 ## Acknowledgements
 
