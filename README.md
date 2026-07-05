@@ -81,7 +81,7 @@ Your plan is saved in your browser and will still be there the next time you vis
   - Shareable links contain sensitive information and should only be shared with trusted people
 
 - **Quick exit**
-  - Red ⚠️ button or Esc key instantly navigates to google.co.uk and removes the page from browser history
+  - Red ⚠️ button or Esc key instantly leaves this page and clears it from your browser history
 
 - **Accessible**
   - Keyboard navigable with arrow keys in toolbar, tab through all controls
