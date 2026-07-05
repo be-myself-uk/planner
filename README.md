@@ -120,42 +120,9 @@ If you notice a broken link, an outdated process, or a bug, please [open an issu
 
 This project is built and maintained by one person. Contributions that improve accuracy, accessibility, or coverage are welcome.
 
-**Project principles**
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the project principles, tech stack, how to run the tests, and a full map of how this repository (and `index.html` itself) is put together.
 
-All contributions must respect these constraints:
-
-- **100% private**: no data is ever sent to a server; no analytics, tracking, or external calls of any kind
-- **Accessible**: all features must work with keyboard navigation and screen readers; follow WAI-ARIA patterns
-- **No vulnerabilities**: user input is never rendered as HTML; no external scripts, styles, or fonts
-- **No personal data storage**: users do not enter personal information; notes, reminders, and account features are out of scope
-- **Simple English**: write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
-- **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
-- **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
-
-**Useful contributions include:**
-- Corrections to UK government processes or broken links
-- Accessibility improvements
-- Welsh language support
-
-**Tech stack**
-- HTML, CSS, JS. No dependencies or external calls.
-- Single file application.
-- End-to-end tests using Playwright.
-
-**Running tests**
-```
-npm install
-npx playwright install chromium
-npm test
-```
-
-**Deployment and infrastructure:**
-
-This project deploys automatically through Cloudflare Pages watching this repository. GitHub Actions runs tests and checks only; it does not deploy the site. Caching, TLS, and several security headers are configured at the Cloudflare edge rather than in this repository.
-
-**Do you want to contribute?**
-
-Please [open an issue](https://github.com/be-myself-uk/planner/issues) before starting significant work so we can discuss the approach.
+See [CHANGELOG.md](CHANGELOG.md) for a plain-English history of what has changed on the site.
 
 ## Licence
 

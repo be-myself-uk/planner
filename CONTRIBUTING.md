@@ -1,14 +1,33 @@
-# Architecture
+# Contributing
 
-A guided map of this repository: what every file is for, how the site is deployed, and how `index.html` — the entire application — is put together internally. Written for anyone who wants to fork this, run their own version, or take over maintaining it.
+This project is built and maintained by one person. Contributions that improve accuracy, accessibility, or coverage are welcome.
 
-If you only read one section, read [How index.html is structured](#how-indexhtml-is-structured) — everything else in the repo exists to test, deploy, or document that one file.
+Please [open an issue](https://github.com/be-myself-uk/planner/issues) before starting significant work, so the approach can be discussed first.
+
+---
+
+## Project principles
+
+All contributions must respect these constraints:
+
+- **100% private**: no data is ever sent to a server; no analytics, tracking, or external calls of any kind
+- **Accessible**: all features must work with keyboard navigation and screen readers; follow WAI-ARIA patterns
+- **No vulnerabilities**: user input is never rendered as HTML; no external scripts, styles, or fonts
+- **No personal data storage**: users do not enter personal information; notes, reminders, and account features are out of scope
+- **Simple English**: write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
+- **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
+- **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
+
+**Useful contributions include:**
+- Corrections to UK government processes or broken links
+- Accessibility improvements
+- Welsh language support
 
 ---
 
 ## The core idea
 
-This is a **single self-contained HTML file** (`index.html`). There is no build step, no framework, no bundler, and no external JavaScript or CSS libraries. Everything — markup, styling, and logic — lives in one file that a browser can open directly, including from local disk (`file://`) with no internet connection at all. This is a deliberate project constraint (see `README.md`'s "Project principles"), not an accident of scale.
+This is a **single self-contained HTML file** (`index.html`). There is no build step, no framework, no bundler, and no external JavaScript or CSS libraries. Everything — markup, styling, and logic — lives in one file that a browser can open directly, including from local disk (`file://`) with no internet connection at all. This is a deliberate project constraint, not an accident of scale.
 
 Everything else in the repo — GitHub Actions, the test suite, the README — exists to support that one file: testing it, deploying it, checking its links, and documenting it. There is no server-side code anywhere in this project.
 
@@ -19,9 +38,9 @@ Everything else in the repo — GitHub Actions, the test suite, the README — e
 ```
 .
 ├── index.html                     — the entire application (see below)
-├── README.md                      — project overview, principles, contribution guide
+├── README.md                      — project overview, features, privacy, licence
+├── CONTRIBUTING.md                — this file: how to contribute and how the repo is put together
 ├── CHANGELOG.md                   — plain-English history of changes to the site
-├── ARCHITECTURE.md                — this file
 ├── LICENCE                        — CC BY-NC-SA 4.0
 ├── package.json / package-lock.json — the only dependency is @playwright/test (dev-only, for testing)
 ├── playwright.config.js           — Playwright test runner configuration
@@ -65,7 +84,7 @@ npx playwright install chromium
 npm test
 ```
 
-Tests default to `--workers=1` in practice (see any recent commit messages referencing "flaky tests") because running against a `file://` URL means multiple parallel workers can race on `localStorage` commits. CI uses `BEMYSELF_URL` to point at the checked-out file directly.
+Tests default to `--workers=1` in practice because running against a `file://` URL means multiple parallel workers can race on `localStorage` commits. CI uses `BEMYSELF_URL` to point at the checked-out file directly.
 
 ---
 
@@ -139,7 +158,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 
 ## If you want to fork or maintain this
 
-- Read `README.md`'s "Project principles" first — they're constraints (no server calls, no personal data storage, single file, no build step) that shape every decision in `index.html`, not just style preferences.
+- The project principles above are constraints (no server calls, no personal data storage, single file, no build step) that shape every decision in `index.html`, not just style preferences.
 - `SERVICES` and `PLAN_ITEMS` are where almost all day-to-day maintenance happens (correcting guidance, adding a new step) — you rarely need to touch the rendering logic itself.
 - Any change to a checklist input needs both a `renderChecklist()` line (state → DOM) and a line in the `checklistEl` change handler (DOM → state). Any one-time UI element (a dismissible tip, a warning banner) needs to be explicitly reset by every "fresh start" entry point (`startWizard()`, `startChecklist()`, `openChecklist()`, `restartApp()`), not just the one place that shows it.
 - Run the Playwright suite before and after any change — it's the only safety net given there's no type system or build step to catch mistakes.
