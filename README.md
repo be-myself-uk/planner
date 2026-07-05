@@ -44,7 +44,7 @@ Your plan is saved in your browser and will still be there the next time you vis
 
 - **Tailored to where you live**: England and Wales, Scotland, and Northern Ireland each get region-specific guidance, including the Irish passport gender recognition route for those born in Northern Ireland
 - **Your way of working through it**: a step-by-step wizard, or a single checklist if you already know your situation; switch between them any time
-- **A personalised action plan**: covering everything from deed polls and driving licences to the NHS, HMRC, DBS checks, benefits, birth certificates, and GRC applications, each with an estimated cost, difficulty, and time
+- **A personalised action plan**: covering everything from deed polls and driving licences to health records, HMRC, criminal record checks, benefits, birth certificates, and GRC applications, each with an estimated cost, difficulty, and time
 - **Track your progress**: mark each step as not started, in progress, done, or not needed; a Focus mode hides what is finished so you can see what is left
 - **Save, share, or print**: your plan is saved on your device automatically; copy a link to continue on another device (or hand to someone you trust), or print it to keep a paper/PDF copy
 - **Private by design**: nothing is ever sent to a server; everything stays in your browser, and a quick-exit button is there if you need to leave the page in a hurry

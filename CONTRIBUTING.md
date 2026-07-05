@@ -19,7 +19,7 @@ All contributions must respect these constraints:
 - **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
 
 **Useful contributions include:**
-- Corrections to UK government processes or broken links
+- Corrections to UK government or health service processes, or broken links
 - Accessibility improvements
 - Welsh language support
 
@@ -121,7 +121,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 - `S`: an enum-like object for answer states (`YES`, `NO`, `UPDATED`, `NEEDS_UPDATE`, `NONE`, `BOTH`, `NAME`, `GENDER`).
 - `REGION`: `{ EW, SCOT, NI }`. Note that "outside the UK" is not a fourth region value. It is tracked as a separate boolean flag (for example, `regionOutsideUK`, `birthOutsideUK`) alongside a region that falls back to `EW`, because most of the app's regional logic only needs to distinguish EW/Scotland/NI.
 - **`SERVICES`**: the single source of truth for the "services to update" checklist item (banks, insurance, DBS/Disclosure Scotland/AccessNI, credit reference agencies, and so on). Each entry is `{ key, id, label, detail }`. The wizard's services question, the checklist's checkboxes, and the generated plan's service list all derive from this one array. Adding a new service means adding a checkbox in `#wrapChkServices` plus one entry here.
-- **`PLAN_ITEMS`**: the content for every possible plan step (NHS, driving licence, passport, GRC, and so on). Many entries have a `regions: { ni, scot, default }` object (resolved by the `planItemRegion()` helper, which falls back to `default` if a specific region is not present) and/or a `variants` object keyed by goal (`name`/`gender`/`both`, resolved by `planItemVariant()`, falling back to the `gender` variant). This is where almost all of the site's actual guidance text lives.
+- **`PLAN_ITEMS`**: the content for every possible plan step (health records, driving licence, passport, GRC, and so on). Many entries have a `regions: { ni, scot, default }` object (resolved by the `planItemRegion()` helper, which falls back to `default` if a specific region is not present) and/or a `variants` object keyed by goal (`name`/`gender`/`both`, resolved by `planItemVariant()`, falling back to the `gender` variant). This is where almost all of the site's actual guidance text lives.
 
 **Application state**
 - `wizardState`: one plain object holding every answer, used by both the wizard and the checklist. They are two different UIs over the same underlying state, kept in sync in both directions (wizard-answer-driven and checklist-DOM-driven).
