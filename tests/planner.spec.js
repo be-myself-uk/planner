@@ -653,4 +653,51 @@ test.describe('Be myself Planner', () => {
     expect(leftTopPlan).toBeGreaterThan(rightTopPlan + 5);
   });
 
+  test('67. Checklist "Outside the UK" region can be selected and survives regeneration', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkRegionOut').check();
+    await expect(page.locator('#chkRegionOut')).toBeChecked();
+    // Trigger another change event elsewhere, which re-renders the checklist from wizardState
+    await page.locator('#chkGoalGender').uncheck();
+    await page.locator('#chkGoalGender').check();
+    await expect(page.locator('#chkRegionOut')).toBeChecked();
+  });
+
+  test('68. Wizard edit tip does not resurface after New plan then Start now', async ({ page }) => {
+    await openWizard(page);
+    let q = 0;
+    while (await page.locator('#wizardView').isVisible() && q < 40) {
+      await wizardNext(page);
+      q++;
+    }
+    await expect(page.locator('#planView')).toBeVisible();
+    await page.locator('#ubMakeChangesBtn').click();
+    const tip = page.locator('#wizardEditTip');
+    await expect(tip).toBeVisible();
+    // Leave the tip undismissed, go home, and start a brand new plan
+    await page.locator('#cbHomeBtn').click();
+    await expect(page.locator('#welcomeBackView')).toBeVisible();
+    const restartBtn = page.locator('#welcomeNormal button.secondary');
+    await restartBtn.click();
+    await restartBtn.click();
+    await page.locator('#dlgDisclaimer').getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Start now' }).click();
+    await expect(page.locator('#wizardView')).toBeVisible();
+    await expect(tip).toBeHidden();
+  });
+
+  test('69. Checklist warning banners do not leak across a fresh checklist entry', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkGoalName').uncheck();
+    await page.locator('#chkGoalGender').uncheck();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#checklistGoalWarning')).toBeVisible();
+    // Leave via Home without ever touching a field again (so the change handler never fires),
+    // then re-enter the checklist fresh.
+    await page.locator('#cbHomeBtn').click();
+    await expect(page.locator('#startView')).toBeVisible();
+    await page.locator('.start-checklist-link').click();
+    await expect(page.locator('#checklistGoalWarning')).toBeHidden();
+  });
+
 });

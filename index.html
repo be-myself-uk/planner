@@ -130,7 +130,11 @@
   body.plan-ready #cbRightGroup { order:1; }
   body.plan-ready #panicBtn { order:2; }
   body.plan-ready #cbLeftGroup { order:3; flex-basis:100%; flex-wrap:wrap; justify-content:center; margin-top:4px; }
-  .footer { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  .footer { padding: 20px 20px calc(60px + env(safe-area-inset-bottom, 0px)); }
+  .footer-inner { gap:8px; }
+  .footer-links { margin-bottom:8px !important; gap:10px !important; }
+  .footer-meta { margin-top:4px; }
+  .footer-meta p { margin:2px 0; }
   }
   @media (max-width:400px) {
     #controlBarCard { padding:6px 8px; }
@@ -812,7 +816,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1783206591;
+const SCHEMA_VERSION = 1783209646;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const SERVICES = [
@@ -1178,6 +1182,8 @@ function loadUrlParams(d) {
   const validGoal = [S.BOTH, S.NAME, S.GENDER].includes(d.goal) ? d.goal : S.BOTH;
   const validEmp  = ['yes','needs_update','no'].includes(d.emp)  ? (d.emp === 'yes' ? 'needs_update' : d.emp)  : S.NO;
   wizardState.region      = ['ew','scot','ni'].includes(d.reg) ? d.reg : REGION.EW;
+  wizardState.regionOutsideUK = d.ro === true ? S.YES : S.NO;
+  if (wizardState.regionOutsideUK === S.YES) wizardState.region = REGION.EW;
   wizardState.goal        = validGoal;
   wizardState.goalParts   = validGoal === S.BOTH ? ['name','gender'] : validGoal === S.NAME ? ['name'] : ['gender'];
   wizardState.citizen     = d.nonUK === true ? S.YES : S.NO;
@@ -1286,6 +1292,7 @@ function copyShareableLink() {
   const ps = {
     v: SCHEMA_VERSION,
     reg:   w.region || REGION.EW,
+    ro:    w.regionOutsideUK === S.YES,
     goal:  w.goal,
     nonUK: w.citizen      === S.YES,
     emp:   w.employment   || S.NO,
@@ -1418,6 +1425,7 @@ function checkAgeGateShared() {
 }
 function startWizard() {
   isWizardMode = true; wizardState = {}; step = 0; wizardHistory = [];
+  gel('wizardEditTip')?.classList.add('hidden');
   V.start.classList.add('hidden');
   V.checklist.classList.add('hidden');
   V.wizard.classList.remove('hidden');
@@ -1439,6 +1447,8 @@ function startChecklist() {
   document.body.classList.remove('wizard-active');
   gel('checklistGenerateBtn').textContent = 'Show my action plan';
   gel('checklistGenerateBtn').classList.remove('hidden');
+  gel('checklistWarning')?.classList.remove('visible');
+  gel('checklistGoalWarning')?.classList.remove('visible');
   const stickyBar = gel('checklistStickyBar');
   if (stickyBar) { stickyBar.classList.add('hidden'); stickyBar.setAttribute('aria-hidden', 'true'); }
 }
@@ -1463,6 +1473,8 @@ function openChecklist() {
   updateDerivedState();
   renderChecklist();
   updateLocks();
+  gel('checklistWarning')?.classList.remove('visible');
+  gel('checklistGoalWarning')?.classList.remove('visible');
   gel('checklistGenerateBtn').textContent = 'Update my action plan';
   gel('checklistGenerateBtn').classList.add('hidden');
   const stickyBar = gel('checklistStickyBar');
@@ -1659,10 +1671,9 @@ function updateDerivedState() {
   }
 }
 function renderChecklist() {
-  if (wizardState.region) {
-    const r = document.querySelector(`input[name="chkRegion"][value="${wizardState.region}"]`);
-    if (r) r.checked = true;
-  }
+  const rv = (wizardState.regionOutsideUK === S.YES) ? 'out' : (wizardState.region || REGION.EW);
+  const r = document.querySelector(`input[name="chkRegion"][value="${rv}"]`);
+  if (r) r.checked = true;
   const brv = (wizardState.birthOutsideUK === S.YES) ? 'out' : (wizardState.birthRegion || REGION.EW);
   const br = document.querySelector(`input[name="chkBirthRegion"][value="${brv}"]`);
   if (br) br.checked = true;
@@ -1825,6 +1836,7 @@ function resetChecklist() {
     grc: S.NO, birthCertName: S.NO,
     birthCert: S.NO, birthRegion: REGION.EW,
     birthOutsideUK: S.NO,
+    regionOutsideUK: S.NO,
     goalParts: ['name','gender'],
     services: [],
     svcNone:  S.NO,
@@ -1992,7 +2004,8 @@ function renderWizard(skipForward = true) {
     opts.forEach((o, i) => {
       const disabled = o[2] ? 'disabled' : '';
       const rawVal = wizardState[q.id];
-      const displayVal = (q.id === 'birthRegion' && wizardState.birthOutsideUK === S.YES) ? 'out' : rawVal;
+      const displayVal = (q.id === 'birthRegion' && wizardState.birthOutsideUK === S.YES) ? 'out'
+        : (q.id === 'region' && wizardState.regionOutsideUK === S.YES) ? 'out' : rawVal;
       const checked  = !o[2] && displayVal === o[0] ? 'checked' : '';
       const locked   = o[2] ? 'locked' : '';
       const note     = o[2] ? '<span class="visually-hidden"> – not yet available</span>' : '';
@@ -2079,8 +2092,13 @@ function nextWizard() {
   V.warning.classList.remove('visible');
   gel('wizardOptionsGroup')?.classList.remove('error');
   wizardState[q.id] = a.value;
-  if (q.id === 'region' && a.value === 'out') {
-    wizardState.region = REGION.EW;
+  if (q.id === 'region') {
+    if (a.value === 'out') {
+      wizardState.regionOutsideUK = S.YES;
+      wizardState.region = REGION.EW;
+    } else {
+      wizardState.regionOutsideUK = S.NO;
+    }
   }
   if (q.id === 'age') {
     if (a.value === S.YES) {
@@ -2850,7 +2868,6 @@ window.onload = () => {
   updateThemeIcon();
   const _d = new Date(SCHEMA_VERSION * 1000);
     const _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const _sd = gel('schemaDate'); if (_sd) _sd.textContent = _d.getUTCDate() + ' ' + _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _lr = gel('footerLastReviewed'); if (_lr) _lr.textContent = _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _cy = gel('schemaCopyYear'); if (_cy) _cy.textContent = _d.getUTCFullYear();
   if (window.matchMedia)
@@ -2891,7 +2908,10 @@ window.onload = () => {
       if (e.target.id === 'chkGRC' && !e.target.checked) gel('chkBirthCert').checked = false;
       if (e.target.id === 'chkBirthCert' && e.target.checked) gel('chkGRC').checked = true;
       const region = document.querySelector('input[name="chkRegion"]:checked');
-      if (region) wizardState.region = region.value === 'out' ? REGION.EW : region.value;
+      if (region) {
+        wizardState.regionOutsideUK = region.value === 'out' ? S.YES : S.NO;
+        wizardState.region = region.value === 'out' ? REGION.EW : region.value;
+      }
       const birthReg = document.querySelector('input[name="chkBirthRegion"]:checked');
       const brVal = birthReg ? birthReg.value : REGION.EW;
       wizardState.birthOutsideUK = brVal === 'out' ? S.YES : S.NO;
