@@ -22,7 +22,7 @@ Yes. Nothing you enter is ever sent to a server or stored outside your own devic
 
 ### Can I use this offline?
 
-Yes. It's a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you'll need to edit the URL (everything from "?p=" onwards).
+Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you'll need to edit the URL (paste everything from "?p=" onwards on the end).
 
 ### How does it work?
 
@@ -42,62 +42,14 @@ Your plan is saved in your browser and will still be there the next time you vis
 
 ## Features
 
-- **Regional support**
-  - England and Wales, Scotland, and Northern Ireland each have tailored guidance, covering region-specific agencies (DVLA/DVA, DBS/AccessNI, DWP/DfC, NHS/HSCNI, GRO/GRONI/NRS) and processes
-  - Northern Ireland includes the Irish passport gender recognition route for those born there
-
-- **Two input modes**
-  - Step-by-step wizard or a single checklist, with a shared progress bar; switch between them at any time
-
-- **Personalised action plan**
-  - Covers deed polls, statutory declarations, NHS/HSCNI records, driving licences, passports, HMRC, employment, DBS/AccessNI checks, qualifications, the electoral register, banks, eVisas, DWP/DfC benefits, birth certificates, and GRC applications
-  - Difficulty and cost badges on every item (Easy/Medium/Hard, Free/Small cost/Medium cost/Higher cost with split-gradient badges for ranges)
-  - Estimated time and cost summary
-
-- **Progress tracking**
-  - Four-state checkboxes: not started, in progress, done, not needed
-  - Parent/child sync for service sub-items
-  - Service detail blocks mute and strike through as items are completed
-  - Focus mode hides completed items with smooth collapse animations
-  - All progress saved to localStorage
-
-- **Sticky toolbar**
-  - New plan, edit plan, reset progress, focus mode, copy link, print, back to start, switch view, usage guide, theme, and quick exit buttons
-  - Expanding text labels on hover/focus (desktop); labels hidden on small screens, with buttons wrapping onto a second row on the action plan view so nothing is cropped
-  - Full toolbar and progress-badge reference in the in-app Usage guide dialog
-  - WAI-ARIA toolbar pattern with arrow key navigation and roving tabindex
-  - Rainbow "All done!" banner when all steps are completed
-  - Progress bar with plan completion percentage (plan view) and question counter (wizard)
-
-- **Shareable links**
-  - Base64-encoded URL that captures all answers for use on other devices or with trusted people
-
-- **Print and PDF export**
-  - Print stylesheet shows all expanded content, plan-top headings, and current progress states
-
-- **Privacy-first**
-  - No data is ever sent to a server; everything runs in the browser
-  - localStorage only; clearable by clicking "New plan" or clearing browser history
-  - Shareable links contain sensitive information and should only be shared with trusted people
-
-- **Quick exit**
-  - Red ⚠️ button or Esc key instantly navigates to google.co.uk and removes the page from browser history
-
-- **Accessible**
-  - Keyboard navigable with arrow keys in toolbar, tab through all controls
-  - Screen reader support: ARIA live region for announcements, aria-pressed/aria-expanded/aria-label on all interactive elements, visually hidden descriptions for locked items
-  - Skip link, focus management, focus trap in all dialogs
-  - Reduced motion support: all animations and transitions disabled
-  - Responsive: hero, toolbar, and content adapt from 400px to desktop widths
-
-- **Light and dark mode**
-  - Follows system preference with a manual toggle; persisted to localStorage
-
-- **Footer reference dialogs**
-  - About (what the tool is, who it's for, offline use, safety, how it works), Privacy, Usage guide, Support & feedback, and Disclaimer, each opened from footer links
-
-- **No dependencies**
-  - Single self-contained HTML file using the system font stack, no external JavaScript libraries, no build step
+- **Tailored to where you live**: England and Wales, Scotland, and Northern Ireland each get region-specific guidance, including the Irish passport gender recognition route for those born in Northern Ireland
+- **Your way of working through it**: a step-by-step wizard, or a single checklist if you already know your situation; switch between them any time
+- **A personalised action plan**: covering everything from deed polls and driving licences to health records, HMRC, criminal record checks, benefits, birth certificates, and GRC applications, each with an estimated cost, difficulty, and time
+- **Track your progress**: mark each step as not started, in progress, done, or not needed; a Focus mode hides what is finished so you can see what is left
+- **Save, share, or print**: your plan is saved on your device automatically; copy a link to continue on another device (or hand to someone you trust), or print it to keep a paper/PDF copy
+- **Private by design**: nothing is ever sent to a server; everything stays in your browser, and a quick-exit button is there if you need to leave the page in a hurry
+- **Built to be usable by everyone**: full keyboard and screen reader support, light and dark mode, and works on anything from a small phone to a desktop
+- **No strings attached**: free, no account or login, and works offline as a single downloadable page
 
 ## Privacy
 
@@ -118,44 +70,11 @@ If you notice a broken link, an outdated process, or a bug, please [open an issu
 
 ## Contributing
 
-This project is built and maintained by one person. Contributions that improve accuracy, accessibility, or coverage are welcome.
+This is an independent, community-supported project. Contributions that improve accuracy, accessibility, or coverage are welcome.
 
-**Project principles**
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the project principles, tech stack, how to run the tests, and a full map of how this repository (and `index.html` itself) is put together.
 
-All contributions must respect these constraints:
-
-- **100% private**: no data is ever sent to a server; no analytics, tracking, or external calls of any kind
-- **Accessible**: all features must work with keyboard navigation and screen readers; follow WAI-ARIA patterns
-- **No vulnerabilities**: user input is never rendered as HTML; no external scripts, styles, or fonts
-- **No personal data storage**: users do not enter personal information; notes, reminders, and account features are out of scope
-- **Simple English**: write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
-- **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
-- **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
-
-**Useful contributions include:**
-- Corrections to UK government processes or broken links
-- Accessibility improvements
-- Welsh language support
-
-**Tech stack**
-- HTML, CSS, JS. No dependencies or external calls.
-- Single file application.
-- End-to-end tests using Playwright.
-
-**Running tests**
-```
-npm install
-npx playwright install chromium
-npm test
-```
-
-**Deployment and infrastructure:**
-
-This project deploys automatically through Cloudflare Pages watching this repository. GitHub Actions runs tests and checks only; it does not deploy the site. Caching, TLS, and several security headers are configured at the Cloudflare edge rather than in this repository.
-
-**Do you want to contribute?**
-
-Please [open an issue](https://github.com/be-myself-uk/planner/issues) before starting significant work so we can discuss the approach.
+See [CHANGELOG.md](CHANGELOG.md) for a plain-English history of what has changed on the site.
 
 ## Licence
 
