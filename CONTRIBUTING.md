@@ -1,6 +1,6 @@
 # Contributing
 
-This project is built and maintained by one person. Contributions that improve accuracy, accessibility, or coverage are welcome.
+This is an independent, community-supported project. Contributions that improve accuracy, accessibility, or coverage are welcome.
 
 Please [open an issue](https://github.com/be-myself-uk/planner/issues) before starting significant work, so the approach can be discussed first.
 
