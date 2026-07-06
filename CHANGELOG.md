@@ -22,6 +22,15 @@ Each entry sits under one of these categories:
 
 Nothing queued for the next update yet. Changes land here as they are made, then move under a dated heading once they reach `main`.
 
+## [6 July 2026]
+
+- **Code**
+  - Fixed the age check on shared plan links so it matches the age check everywhere else on the site.
+  - Added a short note to the printed or saved PDF version of a plan, including the date it was made, since printed copies did not show this before.
+- **Wording**
+  - Reorganised the Disclaimer page into clearer sections, and tidied up the wording throughout.
+  - Updated the README to match.
+
 ## [5 July 2026]
 
 - **Layout**
