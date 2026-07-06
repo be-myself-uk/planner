@@ -706,9 +706,11 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#planView')).toBeVisible();
     const footer = page.locator('#planPrintFooter');
     await expect(footer).toBeHidden();
-    const today = new Date();
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const expectedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+    const expectedDate = await page.evaluate(() => {
+      const now = new Date();
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      return `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    });
     await expect(page.locator('#planGeneratedDate')).toHaveText(expectedDate);
     await page.emulateMedia({ media: 'print' });
     await expect(footer).toBeVisible();
