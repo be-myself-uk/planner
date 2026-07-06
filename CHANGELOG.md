@@ -25,12 +25,11 @@ Nothing queued for the next update yet. Changes land here as they are made, then
 ## [6 July 2026]
 
 - **Code**
-  - Fixed the shared-plan age/disclaimer gate, which previously let someone through with "or I have parental consent", the one place the site's own wording admitted an out-of-scope under-16 user.
-  - Added a print-only disclaimer footer to the generated plan, with the date it was generated, since printed or PDF copies previously carried no disclaimer at all.
+  - Fixed the age check on shared plan links so it matches the age check everywhere else on the site.
+  - Added a short note to the printed or saved PDF version of a plan, including the date it was made, since printed copies did not show this before.
 - **Wording**
-  - Rewrote and regrouped the Disclaimer dialog by theme (what this is, using this planner, legal terms), clarifying that the action plan is general information rather than personalised advice, and that it also covers the Irish passport gender recognition route.
-  - Added external-links and severability sentences to the disclaimer; removed a governing-law line that named no single UK jurisdiction and so was legally meaningless as drafted.
-  - Synced `README.md`'s Disclaimer section with the same wording.
+  - Reorganised the Disclaimer page into clearer sections, and tidied up the wording throughout.
+  - Updated the README to match.
 
 ## [5 July 2026]
 
