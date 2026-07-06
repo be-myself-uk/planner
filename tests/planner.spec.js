@@ -700,4 +700,22 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#checklistGoalWarning')).toBeHidden();
   });
 
+  test('70. Print-only disclaimer footer shows on the plan, hidden on screen', async ({ page }) => {
+    await openChecklist(page);
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planView')).toBeVisible();
+    const footer = page.locator('#planPrintFooter');
+    await expect(footer).toBeHidden();
+    const today = new Date();
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const expectedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+    await expect(page.locator('#planGeneratedDate')).toHaveText(expectedDate);
+    await page.emulateMedia({ media: 'print' });
+    await expect(footer).toBeVisible();
+    await expect(footer).toContainText('General guidance only, not legal advice.');
+    await expect(footer).toContainText(expectedDate);
+    await page.emulateMedia({ media: 'screen' });
+    await expect(footer).toBeHidden();
+  });
+
 });

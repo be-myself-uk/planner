@@ -70,7 +70,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `playwright.yml` | Push or PR to `main`/`preview` | Installs dependencies, runs the full Playwright suite (`tests/planner.spec.js`) against the raw `index.html` file via a `file://` URL, uploads the HTML test report as an artifact. This is CI only; it does not deploy anything. |
-| `bump-version.yml` | PR opened/updated targeting `main`/`preview` | Rewrites the `SCHEMA_VERSION` constant near the top of `index.html`'s script to the current Unix timestamp, then commits and pushes that change back to the PR branch with `[skip ci]` (so it does not re-trigger itself). This timestamp drives the "Last reviewed" date shown in the site's footer. It is a proxy for "content was touched recently," not a precise changelog. |
+| `bump-version.yml` | PR opened/updated targeting `main`/`preview` | Rewrites the `SCHEMA_VERSION` constant near the top of `index.html`'s script to the current Unix timestamp, then commits and pushes that change back to the PR branch with `[skip ci]` (so it does not re-trigger itself). This timestamp drives the "Last updated" date shown in the site's footer. It is a proxy for "content was touched recently," not a precise changelog. |
 | `check-links.yml` | Scheduled (1st and 15th of each month) or manual | Runs the [Lychee](https://github.com/lycheeverse/lychee-action) link checker (configured via `lychee.toml`) against `index.html` and `README.md`. If it finds a broken link and there is not already an open `broken-links`-labelled issue, it opens one automatically with the details. |
 
 ### Tests
@@ -117,7 +117,7 @@ Alongside the views are five `<dialog>` elements (native HTML `<dialog>`, opened
 This is the entire application logic. Key pieces, roughly in the order they appear:
 
 **Constants and content data**
-- `SCHEMA_VERSION`: a Unix timestamp, auto-bumped by the `bump-version.yml` workflow on every merge; drives the footer's "Last reviewed" date.
+- `SCHEMA_VERSION`: a Unix timestamp, auto-bumped by the `bump-version.yml` workflow on every merge; drives the footer's "Last updated" date.
 - `S`: an enum-like object for answer states (`YES`, `NO`, `UPDATED`, `NEEDS_UPDATE`, `NONE`, `BOTH`, `NAME`, `GENDER`).
 - `REGION`: `{ EW, SCOT, NI }`. Note that "outside the UK" is not a fourth region value. It is tracked as a separate boolean flag (for example, `regionOutsideUK`, `birthOutsideUK`) alongside a region that falls back to `EW`, because most of the app's regional logic only needs to distinguish EW/Scotland/NI.
 - **`SERVICES`**: the single source of truth for the "services to update" checklist item (banks, insurance, DBS/Disclosure Scotland/AccessNI, credit reference agencies, and so on). Each entry is `{ key, id, label, detail }`. The wizard's services question, the checklist's checkboxes, and the generated plan's service list all derive from this one array. Adding a new service means adding a checkbox in `#wrapChkServices` plus one entry here.

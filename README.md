@@ -62,7 +62,7 @@ Your plan is saved in your browser and will still be there the next time you vis
 
 ## Disclaimer
 
-This planner gives general information about UK legal processes only. It is not legal, medical, financial, or tax advice, and no professional relationship is created by using it. Government rules, processes, and fees can change without notice. Always check important steps against official sources, especially GOV.UK, before submitting any applications.
+This planner gives general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice, and no professional relationship is created by using it. Government rules, processes, and fees can change without notice. Always check important steps against official sources, especially GOV.UK, before submitting any applications.
 
 ## Reporting issues
 
