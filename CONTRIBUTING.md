@@ -15,7 +15,7 @@ All contributions must respect these constraints:
 - **No vulnerabilities**: user input is never rendered as HTML; no external scripts, styles, or fonts
 - **No personal data storage**: users do not enter personal information; notes, reminders, and account features are out of scope
 - **Simple English**: write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
-- **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not link to specific forms or templates, or describe how to fill them in
+- **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not reproduce forms or templates, or give step-by-step instructions for filling them in; linking to official forms and established community tools is fine
 - **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
 
 **Useful contributions include:**

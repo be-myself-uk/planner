@@ -22,7 +22,7 @@ Yes. Nothing you enter is ever sent to a server or stored outside your own devic
 
 ### Can I use this offline?
 
-Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you'll need to edit the URL (paste everything from "?p=" onwards on the end).
+Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you will need to edit the URL (paste everything from "?p=" onwards on the end).
 
 ### How does it work?
 
@@ -34,7 +34,7 @@ Both produce the same plan. The step-by-step wizard shows one question at a time
 
 ### Is this legal advice?
 
-No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.
+No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official government pages before submitting any applications.
 
 ### How do I save or share my plan?
 

@@ -44,12 +44,13 @@ async function wizardNext(page) {
 // old document, especially under back-to-back automated test load (this
 // doesn't happen in normal browser use). Retry the reload a few times so
 // tests aren't flaky on this environment quirk.
-async function reloadUntil(page, conditionFn, attempts = 8) {
+async function reloadUntil(page, conditionFn, attempts = 12) {
   for (let i = 0; i < attempts; i++) {
-    if (i > 0) await page.waitForTimeout(50);
+    await page.waitForTimeout(100);
     await page.reload();
     if (await conditionFn()) return;
   }
+  throw new Error(`reloadUntil: condition still false after ${attempts} reloads`);
 }
 
 function decodeState(encoded) {
@@ -718,6 +719,23 @@ test.describe('Be myself Planner', () => {
     await expect(footer).toContainText(expectedDate);
     await page.emulateMedia({ media: 'screen' });
     await expect(footer).toBeHidden();
+  });
+
+  test('71. GRC step shows the minimum age note', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkGRC').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planContent')).toContainText('You must be 18 or over to apply for a UK GRC.');
+  });
+
+  test('72. Land title register service covers all three nations', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkSvcLandReg').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.getByText('Land title register', { exact: true })).toBeVisible();
+    await expect(page.locator('#planContent')).toContainText('HM Land Registry');
+    await expect(page.locator('#planContent')).toContainText('Registers of Scotland');
+    await expect(page.locator('#planContent')).toContainText('Land & Property Services');
   });
 
 });
