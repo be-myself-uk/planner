@@ -54,15 +54,13 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 │   │   ├── bump-version.yml       : auto-updates the "last reviewed" date on every merge
 │   │   └── check-links.yml        : scheduled broken-link scan, opens an issue if links break
 │   └── ISSUE_TEMPLATE/            : bug report / feature request / question templates
-└── .claude/                       : local Claude Code session config (not part of the shipped site)
 ```
 
 ---
 
 ## Deployment and infrastructure
 
-- **Hosting**: [Cloudflare Pages](https://pages.cloudflare.com/) watches this GitHub repository directly and deploys automatically on every push to `main` (production, `bemyself.uk`) and `preview` (a separate preview URL used for reviewing changes before they reach `main`). There is no deploy step in this repo's own GitHub Actions; Cloudflare's own integration handles it entirely outside of GitHub.
-- **Caching, TLS, and security headers** (for example, `Content-Security-Policy` beyond what is set in `index.html`'s own `<meta>` tag) are configured at the Cloudflare edge, not in this repository. If you fork this project onto different hosting, you will need to configure equivalents yourself.
+- **Caching, TLS, and security headers** (for example, `Content-Security-Policy` beyond what is set in `index.html`'s own `<meta>` tag) are configured at the hosting providers edge, not in this repository. If you fork this project onto different hosting, you will need to configure equivalents yourself.
 - **No backend, no database, no server-side code.** Every "feature" (saved progress, shareable links, theme preference) is implemented client-side using `localStorage` and URL query parameters. Nothing is ever sent to a server (see `README.md`'s Privacy section).
 
 ### GitHub Actions workflows
@@ -117,7 +115,7 @@ Alongside the views are five `<dialog>` elements (native HTML `<dialog>`, opened
 This is the entire application logic. Key pieces, roughly in the order they appear:
 
 **Constants and content data**
-- `SCHEMA_VERSION`: a Unix timestamp, auto-bumped by the `bump-version.yml` workflow on every merge; drives the footer's "Last reviewed" date.
+- `SCHEMA_VERSION`: a Unix timestamp, auto-bumped by the `bump-version.yml` workflow on every merge affecting `index.html`.
 - `S`: an enum-like object for answer states (`YES`, `NO`, `UPDATED`, `NEEDS_UPDATE`, `NONE`, `BOTH`, `NAME`, `GENDER`).
 - `REGION`: `{ EW, SCOT, NI }`. Note that "outside the UK" is not a fourth region value. It is tracked as a separate boolean flag (for example, `regionOutsideUK`, `birthOutsideUK`) alongside a region that falls back to `EW`, because most of the app's regional logic only needs to distinguish EW/Scotland/NI.
 - **`SERVICES`**: the single source of truth for the "services to update" checklist item (banks, insurance, DBS/Disclosure Scotland/AccessNI, credit reference agencies, and so on). Each entry is `{ key, id, label, detail }`. The wizard's services question, the checklist's checkboxes, and the generated plan's service list all derive from this one array. Adding a new service means adding a checkbox in `#wrapChkServices` plus one entry here.
