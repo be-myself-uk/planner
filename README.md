@@ -4,7 +4,7 @@ A free, private tool that helps trans and non-binary people in the UK plan a nam
 
 **Live site:** [bemyself.uk](https://bemyself.uk/)
 
-[Changelog](CHANGELOG.md) - [Contribute to the planner](CONTRIBUTION.md)
+[Changelog](CHANGELOG.md) - [Contribute to the planner](CONTRIBUTING.md)
 
 ---
 
