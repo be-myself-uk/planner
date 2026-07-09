@@ -22,7 +22,7 @@ Yes. Nothing you enter is ever sent to a server or stored outside your own devic
 
 ### Can I use this offline?
 
-Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you'll need to edit the URL (paste everything from "?p=" onwards on the end).
+Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button to preserve it for use offline. When you open your offline copy of the website, you will need to edit the URL (paste everything from "?p=" onwards on the end).
 
 ### How does it work?
 
@@ -34,7 +34,7 @@ Both produce the same plan. The step-by-step wizard shows one question at a time
 
 ### Is this legal advice?
 
-No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.
+No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official government pages before submitting any applications.
 
 ### How do I save or share my plan?
 
@@ -62,7 +62,9 @@ Your plan is saved in your browser and will still be there the next time you vis
 
 ## Disclaimer
 
-This planner gives general information about UK legal processes only. It is not legal, medical, financial, or tax advice, and no professional relationship is created by using it. Government rules, processes, and fees can change without notice. Always check important steps against official sources, especially GOV.UK, before submitting any applications.
+This planner gives general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice, and no professional relationship is created by using it. Your action plan is assembled from general information based on your answers and does not take account of your full personal circumstances.
+
+Government rules, processes, and fees can change without notice. Always check important steps against official sources, especially GOV.UK, before submitting any applications. Links to external websites are provided for convenience; the author is not responsible for their content. To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner, and nothing in this disclaimer excludes any liability that cannot lawfully be excluded.
 
 ## Reporting issues
 

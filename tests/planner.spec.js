@@ -44,12 +44,13 @@ async function wizardNext(page) {
 // old document, especially under back-to-back automated test load (this
 // doesn't happen in normal browser use). Retry the reload a few times so
 // tests aren't flaky on this environment quirk.
-async function reloadUntil(page, conditionFn, attempts = 8) {
+async function reloadUntil(page, conditionFn, attempts = 12) {
   for (let i = 0; i < attempts; i++) {
-    if (i > 0) await page.waitForTimeout(50);
+    await page.waitForTimeout(100);
     await page.reload();
     if (await conditionFn()) return;
   }
+  throw new Error(`reloadUntil: condition still false after ${attempts} reloads`);
 }
 
 function decodeState(encoded) {
@@ -698,6 +699,43 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#startView')).toBeVisible();
     await page.locator('.start-checklist-link').click();
     await expect(page.locator('#checklistGoalWarning')).toBeHidden();
+  });
+
+  test('70. Print-only disclaimer footer shows on the plan, hidden on screen', async ({ page }) => {
+    await openChecklist(page);
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planView')).toBeVisible();
+    const footer = page.locator('#planPrintFooter');
+    await expect(footer).toBeHidden();
+    const expectedDate = await page.evaluate(() => {
+      const now = new Date();
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      return `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    });
+    await expect(page.locator('#planGeneratedDate')).toHaveText(expectedDate);
+    await page.emulateMedia({ media: 'print' });
+    await expect(footer).toBeVisible();
+    await expect(footer).toContainText('General guidance only, not legal advice.');
+    await expect(footer).toContainText(expectedDate);
+    await page.emulateMedia({ media: 'screen' });
+    await expect(footer).toBeHidden();
+  });
+
+  test('71. GRC step shows the minimum age note', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkGRC').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planContent')).toContainText('You must be 18 or over to apply for a UK GRC.');
+  });
+
+  test('72. Land title register service covers all three nations', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkSvcLandReg').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.getByText('Land title register', { exact: true })).toBeVisible();
+    await expect(page.locator('#planContent')).toContainText('HM Land Registry');
+    await expect(page.locator('#planContent')).toContainText('Registers of Scotland');
+    await expect(page.locator('#planContent')).toContainText('Land & Property Services');
   });
 
 });

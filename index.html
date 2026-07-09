@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self';">
 <title>Be myself - UK legal identity planner</title>
-<meta name="description" content="A free, private tool that helps trans and non-binary people in the UK update their legal documents.">
+<meta name="description" content="A free, private tool that helps trans and non-binary people in the UK plan a name and gender marker change across their legal documents.">
 <link rel="canonical" href="https://bemyself.uk/">
 <meta property="og:title" content="Be myself - UK legal identity planner">
-<meta property="og:description" content="A free, private tool that helps trans and non-binary people in the UK update their legal documents.">
+<meta property="og:description" content="A free, private tool that helps trans and non-binary people in the UK plan a name and gender marker change across their legal documents.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bemyself.uk/">
 <meta property="og:site_name" content="Be myself">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Be myself - UK legal identity planner">
-<meta name="twitter:description" content="A free, private tool that helps trans and non-binary people in the UK update their legal documents.">
+<meta name="twitter:description" content="A free, private tool that helps trans and non-binary people in the UK plan a name and gender marker change across their legal documents.">
 <meta name="theme-color" content="#5bcefa">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Be myself","url":"https://bemyself.uk/","description":"A free, private tool that helps trans and non-binary people in the UK update their legal documents.","applicationCategory":"LegalApplication","operatingSystem":"Web browser","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"}}
+{"@context":"https://schema.org","@type":"WebApplication","name":"Be myself","url":"https://bemyself.uk/","description":"A free, private tool that helps trans and non-binary people in the UK plan a name and gender marker change across their legal documents.","applicationCategory":"LegalApplication","operatingSystem":"Web browser","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"}}
 </script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><defs><clipPath id=%22l%22><polygon points=%220,0 32,0 0,32%22/></clipPath><clipPath id=%22r%22><polygon points=%2232,0 32,32 0,32%22/></clipPath></defs><g clip-path=%22url(%23l)%22><rect y=%220%22 width=%2232%22 height=%226.4%22 fill=%22%235bcefa%22/><rect y=%226.4%22 width=%2232%22 height=%226.4%22 fill=%22%23f5a9b8%22/><rect y=%2212.8%22 width=%2232%22 height=%226.4%22 fill=%22%23fff%22/><rect y=%2219.2%22 width=%2232%22 height=%226.4%22 fill=%22%23f5a9b8%22/><rect y=%2225.6%22 width=%2232%22 height=%226.4%22 fill=%22%235bcefa%22/></g><g clip-path=%22url(%23r)%22><rect y=%220%22 width=%2232%22 height=%228%22 fill=%22%23fcf434%22/><rect y=%228%22 width=%2232%22 height=%228%22 fill=%22%23fff%22/><rect y=%2216%22 width=%2232%22 height=%228%22 fill=%22%239c59d1%22/><rect y=%2224%22 width=%2232%22 height=%228%22 fill=%22%232c2c2c%22/></g></svg>">
 <script>
@@ -352,6 +352,7 @@
   [data-birth-region="ni"] .label-bcn-dft   { display:none; }
   [data-birth-region="ni"] .label-bcn-ni    { display:inline; }
   .label-dbs-ni,.label-dbs-scot,.label-dwp-ni,.label-nhs-ni,.label-nhs-scot,.label-bcn-ni { display:none; }
+  .plan-print-footer { display:none; }
   @media print {
     body { background:white; color:black; }
     .hero { border-bottom:2px solid black; padding:20px; background:white; }
@@ -363,6 +364,7 @@
     h2, h3, .section-title { color:black; }
     body.plan-ready #startView, body.plan-ready #welcomeBackView, body.plan-ready #wizardView, body.plan-ready #checklistView, body.plan-ready .btn-group, body.plan-ready .footer { display:none !important; }
     body.plan-ready #planView { display:block !important; }
+    .plan-print-footer { display:block !important; margin-top:20px; padding-top:10px; border-top:1px solid #000; font-size:0.85em; color:#333; }
     .plan-top-details { border:1px solid #ccc; background:transparent; }
     .plan-top-details summary { color:black; background:transparent; }
     .plan-top-details .plan-top-body { color:#333; }
@@ -469,9 +471,9 @@
     </div>
     <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
       <h2>Someone shared a plan with you</h2>
-      <p>This looks like a new device or browser. To view the plan, please confirm you are aged 16 or over and that you understand that this is not legal advice.</p>
-      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()"> Yes, I am aged 16 or over (or I have parental consent)</label>
-      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="disclaimerConfirmShared" onchange="checkAgeGateShared()"> Yes, I understand this is not legal advice</label>
+      <p>This looks like a new device or browser. To view the plan, please confirm you are aged 16 or over and that you understand this is general guidance only.</p>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()"> Yes, I am aged 16 or over</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="disclaimerConfirmShared" onchange="checkAgeGateShared()"> Yes, I understand this is general guidance only, not legal or other professional advice</label>
     </div>
   </div>
 
@@ -499,7 +501,7 @@
     </div>
     <div id="checklistDisclaimerGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
       <p class="chk-q">Do you understand that this is only general guidance?</p>
-      <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
+      <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
     </div>
     <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You can not continue unless you are aged 16 or over and understand that this is general guidance only.</div>
@@ -568,7 +570,7 @@
         <label class="option option-sm"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcProfBody" class="chk-service" onchange="handleSvcItem()"> Professional body or regulator</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcLandReg" class="chk-service" onchange="handleSvcItem()"> HM Land Registry (property title)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcLandReg" class="chk-service" onchange="handleSvcItem()"> Land title register (property)</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
         <label class="option option-sm"><input type="checkbox" id="chkSvcNone" onchange="handleSvcNone(this)"> I do not need to update any of these</label>
       </div>
@@ -603,6 +605,7 @@
   <div id="planView" class="hidden">
     <h2 id="planHeading" tabindex="-1" style="text-align:center;">Your personal action plan</h2>
     <div id="planContent"></div>
+    <div id="planPrintFooter" class="plan-print-footer">General guidance only, not legal advice. Rules and fees change; check official government guidance before applying. Generated on <span id="planGeneratedDate"></span>.</div>
   </div>
 </main>
 <dialog id="dlgAbout" aria-labelledby="dlgAboutTitle" onclick="closeDialogOnBackdrop(event)">
@@ -624,7 +627,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
     <p>Both produce the same plan. The step-by-step wizard shows one question at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is better if you already know your situation. You can switch between them at any time.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is this legal advice?</h3>
-    <p>No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official GOV.UK pages before submitting any applications.</p>
+    <p>No. This planner gives general guidance only. It does not replace advice from a qualified professional. Always check important steps on official government pages before submitting any applications.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How do I save or share my plan?</h3>
     <p>Your plan is saved in your browser and will still be here the next time you visit on the same device. To access it from another device, or share it with someone, use the <strong>🔗 Copy link</strong> button on the toolbar. This copies a link that contains your full plan. You can also use <strong>🖨️ Print</strong> to save a PDF. There is no account or login needed.</p>
   </div>
@@ -755,10 +758,14 @@
   </div>
   <div class="dialog-body">
     <p class="disclaimer-muted">This disclaimer opens automatically on your first visit or if starting a new action plan.</p>
-    <p class="disclaimer-muted">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author.</p>
+    <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">What this is</p>
+    <p class="disclaimer-muted">This planner provides general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author. Your action plan is assembled from general information based on your answers and does not take account of your full personal circumstances.</p>
     <p class="disclaimer-muted">This planner is for people aged 16 and over. The processes for under-16s are different and require parental or guardian consent; this planner does not cover them.</p>
+    <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">Using this planner</p>
     <p class="disclaimer-muted">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
-    <p class="disclaimer-muted">To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner.</p>
+    <p class="disclaimer-muted">Links to external websites are provided for convenience. The author is not responsible for their content.</p>
+    <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">Legal terms</p>
+    <p class="disclaimer-muted">To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner. Nothing in this disclaimer excludes any liability that cannot lawfully be excluded.</p>
   </div>
 </dialog>
 
@@ -778,7 +785,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="Attribution"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm0 12a8 8 0 1 1 0 16A8 8 0 0 1 48 30zm0 52a32 32 0 0 1-20-7v-3c0-6.6 5.4-12 12-12h16c6.6 0 12 5.4 12 12v3a32 32 0 0 1-20 7z" fill="currentColor"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="NonCommercial"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm4 9v6c5.5.8 9.4 4 9.4 8.5 0 1-.2 2-.5 2.9l-5.3-1.5c.2-.5.3-1 .3-1.4 0-2-1.7-3.5-4-3.8V47l1.5.4c5.2 1.4 8.1 4.3 8.1 8.6 0 4.8-3.8 8.3-9.6 9.1V71h-4v-5.8c-6-.8-10.1-4.3-10.1-9.2 0-1.1.2-2.2.6-3.2l5.4 1.5c-.2.6-.3 1.1-.3 1.7 0 2.3 1.9 4 4.4 4.5V50l-1.4-.4C41 48.2 38 45.4 38 41c0-4.6 3.6-8 10-8.9V27h4z" fill="currentColor"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" role="img" class="cc-icon" viewBox="0 0 96 96" aria-label="ShareAlike"><circle cx="48" cy="48" r="47" fill="currentColor" opacity=".15"/><path d="M48 18a30 30 0 1 0 0 60A30 30 0 0 0 48 18zm13.5 18L72 48 61.5 60V53c-9.2 0-15.6 3-20 9.5 1.5-9.8 7.3-19.5 20-21.5v-5z" fill="currentColor"/></svg>
-        <span style="white-space:nowrap;">Last reviewed: <span id="footerLastReviewed"></span></span>
+        <span style="white-space:nowrap;">Last updated: <span id="footerLastReviewed"></span></span>
     </div>
 
 
@@ -817,7 +824,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1783267986;
+const SCHEMA_VERSION = 1783592987;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const SERVICES = [
@@ -832,7 +839,7 @@ const SERVICES = [
   { key:'mortgage',  id:'chkSvcMortgage',  label:'Mortgage or home loan lender',                    detail:`<div id="svc_detail_mortgage" class="svc-detail"><p><strong>Mortgage or home loan lender:</strong> Contact your lender directly to update your name on the mortgage account. Your lender holds title deeds and account records separately from your everyday bank accounts, so updating your bank account does not automatically update your mortgage. You may need to provide your deed poll and, in some cases, updated photo ID.</p></div>` },
   { key:'mobile',    id:'chkSvcMobile',    label:'Mobile or phone contract',                        detail:`<div id="svc_detail_mobile" class="svc-detail"><p><strong>Mobile or phone contract:</strong> Contact your provider to update your name on the account. Many providers accept a deed poll, but some may ask for updated photo ID as well. If your contract involves a credit check, see the credit reference agencies item below.</p></div>` },
   { key:'profbody',  id:'chkSvcProfBody',  label:'Professional body or regulator',                  detail:`<div id="svc_detail_profbody" class="svc-detail"><p><strong>Professional body or regulator:</strong> If you belong to a professional body or regulator (for example nursing, medical, teaching, or legal bodies) and have not already covered this under qualifications and professional registrations, you will usually need to notify them separately to update your registered name. Processes vary a lot between professions, so check your regulator's own website for their specific evidence requirements.</p><a href="https://transactual.org.uk/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Support and guidance</a></div>` },
-  { key:'landreg',   id:'chkSvcLandReg',   label:'HM Land Registry (property title)',               detail:`<div id="svc_detail_landreg" class="svc-detail"><p><strong>HM Land Registry:</strong> If you own property, your name is on the title register held by HM Land Registry. There is a specific form (CNG) for transgender and non-binary people to update this confidentially, and there is no fee.</p><a href="https://www.gov.uk/government/publications/change-of-gender-cng" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change of name (transgender and non-binary, form CNG)</a></div>` },
+  { key:'landreg',   id:'chkSvcLandReg',   label:'Land title register (property)',               detail:`<div id="svc_detail_landreg" class="svc-detail"><p><strong>England and Wales:</strong> If you own property, your name is on the title register held by HM Land Registry. There is a specific form (CNG) for transgender and non-binary people to update this confidentially, and there is no fee.</p><a href="https://www.gov.uk/government/publications/change-of-gender-cng" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change of name (transgender and non-binary, form CNG)</a><p><strong>Scotland:</strong> Your title register is held by Registers of Scotland, not HM Land Registry. They can update your name confidentially and free of charge; mark your request "confidential" and it goes to a dedicated team.</p><a href="https://kb.ros.gov.uk/rci/managing-an-entry/managing-a-recorded-persons-details" target="_blank" rel="noopener noreferrer" class="links">🔗 Registers of Scotland: Managing a recorded person's details</a><p><strong>Northern Ireland:</strong> Your title register is held by Land & Property Services, not HM Land Registry. You can apply directly to update your name, though a solicitor may need to sign parts of the application.</p><a href="https://www.nidirect.gov.uk/articles/personal-applications-land-registers" target="_blank" rel="noopener noreferrer" class="links">🔗 nidirect: Personal applications to land registers</a></div>` },
 ];
 const SVC_MAP = Object.fromEntries(SERVICES.map(s => [s.key, s.id]));
 
@@ -1041,7 +1048,7 @@ const PLAN_ITEMS = {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small cost', badge:'success', badge2:'simultaneous' },
     title: 'Irish passport (Good Friday Agreement route)',
     summary: 'As someone born in Northern Ireland, you may be able to claim Irish citizenship under the Good Friday Agreement. The Republic of Ireland has a separate process for updating a gender marker on a passport, which differs from the UK GRC route.',
-    detail: '<p>Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI links below have the current details on eligibility, requirements, and how to apply.</p>\n<p><strong>⚠️ If you do not yet have an Irish passport</strong>, the first step would be to apply for one. The gender-change update is a separate process that you can apply for once you have a passport.</p>\n<p><strong>Note on the Irish GRC:</strong> The passport office does not issue a gender-change update directly. You first need an Irish Gender Recognition Certificate from the Department of Social Protection, a separate application with its own rules, before the Department of Foreign Affairs can register the change against your citizenship record. The TENI link below explains the process.</p>\n<a href="https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/" target="_blank" rel="noopener noreferrer" class="links">🔗 Irish Passports: Documentary requirements</a>\n<a href="https://www.ireland.ie/en/dfa/citizenship/born-abroad/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links">🔗 Department of Foreign Affairs: Gender recognition and citizenship</a>\n<a href="https://teni.ie/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links">🔗 TENI: Gender recognition in Ireland</a>',
+    detail: '<p>Under the Good Friday Agreement, people born in Northern Ireland can claim Irish citizenship. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI links below have the current details on eligibility, requirements, and how to apply.</p>\n<p><strong>⚠️ If you do not yet have an Irish passport</strong>, the first step would be to apply for one. The gender-change update is a separate process that you can apply for once you have a passport.</p>\n<p><strong>⚠️ If you are 16 or 17:</strong> a parent or guardian will need to get a Circuit Family Court exemption order before you can apply for an Irish GRC.</p>\n<p><strong>Note on the Irish GRC:</strong> The passport office does not issue a gender-change update directly. You first need an Irish Gender Recognition Certificate from the Department of Social Protection, a separate application with its own rules, before the Department of Foreign Affairs can register the change against your citizenship record. The TENI link below explains the process.</p>\n<a href="https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/" target="_blank" rel="noopener noreferrer" class="links">🔗 Irish Passports: Documentary requirements</a>\n<a href="https://www.ireland.ie/en/dfa/citizenship/born-abroad/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links">🔗 Department of Foreign Affairs: Gender recognition and citizenship</a>\n<a href="https://teni.ie/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links">🔗 TENI: Gender recognition in Ireland</a>',
   },
   grc_med: {
     difficulty: 'hard', cost: { type:'split', value:'Small cost', value2:'Higher cost', badge:'simultaneous', badge2:'urgent' },
@@ -1210,9 +1217,9 @@ function loadUrlParams(d) {
   const validSvcKeys = Object.keys(SVC_MAP);
   wizardState.services    = (d.srv || '').split(',').filter(s => validSvcKeys.includes(s));
   if (d.prg && typeof d.prg === 'object') {
-    Object.entries(d.prg).forEach(([key, state]) => {
+    Object.entries(d.prg).slice(0, 200).forEach(([key, state]) => {
       const s = parseInt(state, 10);
-      if (s >= 1 && s <= 3) sss('st_trk_' + key, s);
+      if (/^[a-z0-9_]{1,40}$/i.test(key) && s >= 1 && s <= 3) sss('st_trk_' + key, s);
     });
   }
   if (d.fm === 1) sss('focusMode', '1');
@@ -1857,7 +1864,7 @@ const questions = [
     [S.YES, 'Yes'],
     [S.NO,  'No']
   ]},
-  { id:'disclaimer', q:'Do you understand that this is only general guidance?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner provides general information about UK legal processes only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</em>', cond:() => ssg('disclaimerConfirmed') !== 'true', o:() => [
+  { id:'disclaimer', q:'Do you understand that this is only general guidance?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner provides general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</em>', cond:() => ssg('disclaimerConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes, I understand'],
     [S.NO,  'No']
   ]},
@@ -1963,7 +1970,7 @@ const questions = [
     cond:() => wizardState.goal !== S.NAME, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
-  { id:'grc', q:'Do you plan to apply for a Gender Recognition Certificate (GRC) at some point?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A GRC legally recognises your acquired gender in UK law. It is required to update your birth certificate and affects how HMRC, DWP, and pension providers see your records. It is not needed for most day-to-day changes. If you already indicated you want to update your birth certificate, you will not see this question.</em>',
+  { id:'grc', q:'Do you plan to apply for a Gender Recognition Certificate (GRC) at some point?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A GRC legally recognises your acquired gender in UK law. It is required to update your birth certificate and affects how HMRC, DWP, and pension providers see your records. It is not needed for most day-to-day changes. You must be 18 or over to apply. If you already indicated you want to update your birth certificate, you will not see this question.</em>',
     cond:() => wizardState.goal !== S.NAME && wizardState.birthCert !== S.YES, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]}
@@ -2315,6 +2322,8 @@ function computePlanMeta(p) {
 }
 function buildSharedPlan(p) {
   try {
+  const gd = gel('planGeneratedDate');
+  if (gd) { const now = new Date(); gd.textContent = `${now.getDate()} ${['January','February','March','April','May','June','July','August','September','October','November','December'][now.getMonth()]} ${now.getFullYear()}`; }
   const { isGender, isName, isNI, isEmployed, costs, timeText,
           hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle } = computePlanMeta(p);
   const isBoth   = p.goal === S.BOTH;
@@ -2482,10 +2491,11 @@ function buildSharedPlan(p) {
     const _gm  = planItemRegion(PLAN_ITEMS.grc_med, isNI ? 'ni' : 'default');
     const _gl  = PLAN_ITEMS.grc_life;
     const _bc  = planItemRegion(PLAN_ITEMS.birthcert, isNI ? 'ni' : isScotland ? 'scot' : 'default');
-    const grcIntro = isNI
+    const grcAgeNote = '<p><strong>⚠️ Minimum age:</strong> You must be 18 or over to apply for a UK GRC. If you are 16 or 17, you can still start gathering the living-proof evidence now, since it needs to cover two years.</p>';
+    const grcIntro = (isNI
       ? `<p>This step covers long-term legal gender recognition. In Northern Ireland, the legal standing of the UK Gender Recognition Certificate (GRC) when it comes to anti-discrimination laws is currently uncertain and may change. Despite this, a GRC still has practical uses for updating your birth certificate, marriage records, HMRC, and pensions.</p>
 ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have access to the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement. This is described first below as an alternative to the UK GRC.</p>' : '<p>If you were not born in Northern Ireland, the UK GRC route below is the standard path available.</p>'}`
-      : `<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not typically required for day to day life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If you have already changed your gender legally in another country, you may not need a GRC.</p><p><strong>If you are married or in a civil partnership:</strong> The GRC process requires either your spouse or civil partner's consent (a statutory declaration of consent), or that your marriage or civil partnership has already ended. If your spouse does not consent, you would need to divorce or dissolve the civil partnership before a GRC can be issued. This is a significant legal consideration and you may want to speak to a solicitor before applying.</p>${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below alongside the UK GRC route.</p>' : ''}`;
+      : `<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not typically required for day to day life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If you have already changed your gender legally in another country, you may not need a GRC.</p><p><strong>If you are married or in a civil partnership:</strong> The GRC process requires either your spouse or civil partner's consent (a statutory declaration of consent), or that your marriage or civil partnership has already ended. If your spouse does not consent, you would need to divorce or dissolve the civil partnership before a GRC can be issued. This is a significant legal consideration and you may want to speak to a solicitor before applying.</p>${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below alongside the UK GRC route.</p>' : ''}`) + grcAgeNote;
     const stepTitle = p.bornInNI ? 'The final legal step (Irish passport and GRC)' : 'The final legal step (GRC)';
     const stepTime  = p.bornInNI ? 'Irish passport: 2+ years of name-use proof · UK GRC: 2+ years' : 'Long-term (2+ years)';
     const irishPassportItem = p.bornInNI ? li('irish_passport', medium, renderCost(_ip.cost), _ip.title, _ip.summary, _ip.detail) : '';
