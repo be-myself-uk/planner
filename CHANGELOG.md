@@ -35,7 +35,7 @@ Nothing queued for the next update yet. Changes land here as they are made, then
   - Added a note regarding NHS England not providing under 18s with new NHS numbers or changing the gender marker.
   - Corrected England and Wales content: NHS gender marker options and the non-GRC route through HMRC.
   - Corrected Scotland deed poll content: a statutory declaration is not a National Records of Scotland process.
-  - Created this changelog and a contribution page.
+  - Created this changelog and a [CONTRIBUTING.md](CONTRIBUTING.md) page (for devs, not donations).
 - **Wording**
   - Reorganised the Disclaimer page into clearer sections, and tidied up the wording throughout.
   - Updated the README to match.
