@@ -941,6 +941,20 @@ test.describe('Be myself Planner', () => {
       await page.emulateMedia({ media: 'screen' });
       await expect(footer).toBeHidden();
     });
+
+    test('84. A phase with many expanded services is not clipped by its collapse-animation max-height', async ({ page }) => {
+      await openChecklist(page);
+      for (const id of ['#chkSvcBanks','#chkSvcInsurance','#chkSvcCouncil','#chkSvcUtilities','#chkSvcElectoral','#chkSvcCRA','#chkSvcLandlord','#chkSvcPension','#chkSvcMortgage','#chkSvcMobile','#chkSvcProfBody','#chkSvcLandReg']) {
+        await page.locator(id).check();
+      }
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const summary = page.getByText('More information about: Services to update');
+      await summary.click();
+      await expect(page.locator('#svc_detail_landreg')).toBeAttached();
+      const phase = page.locator('#svc_detail_landreg').locator('xpath=ancestor::div[contains(@class,"phase")]');
+      const [scrollHeight, clientHeight] = await phase.evaluate(el => [el.scrollHeight, el.clientHeight]);
+      expect(scrollHeight).toBeLessThanOrEqual(clientHeight + 1);
+    });
   });
 
 });
