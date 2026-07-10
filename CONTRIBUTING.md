@@ -73,7 +73,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently up to the high 60s; numbers were assigned as tests were added and some were removed or merged along the way, so they are not perfectly sequential). It covers: the wizard and checklist flows, shareable links, progress tracking, dialogs, accessibility (ARIA, keyboard nav), region-specific content branching, and mobile layout behaviour.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently up to the low 80s; numbers were assigned as tests were added and some were removed or merged along the way, so they are not perfectly sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, accessibility/layout), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 Run locally with:
 ```
