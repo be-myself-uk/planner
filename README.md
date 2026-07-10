@@ -57,7 +57,7 @@ Your plan is saved in your browser and will still be there the next time you vis
 
 - No personal data is collected or sent anywhere
 - Answers and progress are stored only in your browser's localStorage
-- You can delete all data at any time by clicking "New plan" or clearing your browser history
+- You can delete all data at any time by clicking "New plan" or clearing your browser's site data (clearing browser history alone does not clear localStorage)
 - A Cloudflare security cookie may be set by the hosting provider to protect against automated attacks; this is not used for tracking
 
 > ⚠️ The shareable link feature encodes sensitive information (including immigration status, employment situation, and GRC intentions) into the URL. Only share it with people you fully trust.

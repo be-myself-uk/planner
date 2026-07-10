@@ -200,7 +200,7 @@ test.describe('Be myself Planner', () => {
     await page.getByLabel(/Yes, I need to update my records/).check();
     await expect(page.locator('#wrapDBS')).toBeVisible();
     await expect(page.locator('#wrapDWP')).toBeVisible();
-    // eVisa keeps its own lock (name changes still need evidence first), but with accurate reasoning.
+    // eVisa lock follows passport status, matching its stated reasoning.
     await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
     await expect(page.locator('#chkVisa')).toBeDisabled();
     await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
@@ -778,6 +778,141 @@ test.describe('Be myself Planner', () => {
 
     await page.evaluate(() => { step = questions.findIndex(q => q.id === 'driving'); renderWizard(false); });
     await expect(page.locator('input[name="ans"][value="updated"]')).toBeEnabled();
+  });
+
+  test('74. Wizard eVisa answer maps correctly, locks on passport, and produces the eVisa step', async ({ page }) => {
+    await openWizard(page);
+    await page.evaluate(() => {
+      Object.assign(wizardState, { region:'ew', birthRegion:'ew', goal:'both', goalParts:['name','gender'], citizen:'yes', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
+      step = questions.findIndex(q => q.id === 'visaUpdated');
+      renderWizard(false);
+    });
+    await expect(page.locator('input[name="ans"][value="yes"]')).toBeDisabled();
+    await expect(page.locator('input[name="ans"][value="no"]')).toBeEnabled();
+    await page.evaluate(() => { wizardState.passport = 'updated'; renderWizard(false); });
+    await expect(page.locator('input[name="ans"][value="yes"]')).toBeEnabled();
+    await page.evaluate(() => {
+      wizardState.passport = 'needs_update';
+      wizardState.visaUpdated = 'no';
+      step = questions.findIndex(q => q.id === 'grc');
+      renderWizard(false);
+    });
+    await page.locator('input[name="ans"][value="no"]').check();
+    await page.getByRole('button', { name: 'Show my plan →' }).click();
+    await expect(page.locator('#planContent')).toContainText('UK eVisa and UKVI');
+    await expect(page.locator('#planContent')).toContainText('Home country passport');
+    await expect(page.locator('#planContent')).not.toContainText('UK passport:');
+  });
+
+  test('75. Checklist eVisa lock releases on passport status, not the deed poll', async ({ page }) => {
+    await openChecklist(page);
+    await page.getByLabel(/I have a UK visa or eVisa/).check();
+    await expect(page.locator('#chkVisa')).toBeDisabled();
+    await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
+    await page.getByLabel(/Deed poll or statutory declaration/).check();
+    await expect(page.locator('#chkVisa')).toBeDisabled();
+    await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
+    await expect(page.locator('#chkVisa')).toBeEnabled();
+  });
+
+  test('76. HMRC plan item varies by goal; titles tip shows on gender-only plans', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkGoalName').uncheck();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planContent')).toContainText('Gender marker changes');
+    await expect(page.locator('#planContent')).not.toContainText('Name changes:');
+    await expect(page.locator('#planContent')).toContainText('Did you know about titles?');
+    await page.getByRole('button', { name: 'Edit plan' }).click();
+    await page.locator('#chkGoalName').check();
+    await page.locator('#chkGoalGender').uncheck();
+    await page.locator('#checklistStickyBar button').click();
+    await expect(page.locator('#planContent')).toContainText('Name changes:');
+    await expect(page.locator('#planContent')).not.toContainText('Gender marker changes');
+  });
+
+  test('77. Services details are grouped only when more than one service is selected', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkSvcBanks').check();
+    await page.locator('#chkSvcCouncil').check();
+    await page.locator('#chkSvcPension').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planContent .svc-group')).toHaveCount(3);
+    await page.getByRole('button', { name: 'Edit plan' }).click();
+    await page.locator('#chkSvcCouncil').uncheck();
+    await page.locator('#chkSvcPension').uncheck();
+    await page.locator('#checklistStickyBar button').click();
+    await expect(page.locator('#planContent .svc-group')).toHaveCount(0);
+    await expect(page.locator('#svc_detail_banks')).toBeAttached();
+  });
+
+  test('78. Northern Ireland service items are not conflated with Great Britain processes', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('input[name="chkRegion"][value="ni"]').check();
+    await page.locator('#chkSvcCouncil').check();
+    await page.locator('#chkSvcElectoral').check();
+    await page.getByLabel(/I have a vehicle registered in my name/).check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#svc_detail_council')).toContainText('Land & Property Services');
+    await expect(page.locator('#svc_detail_electoral')).toContainText('Electoral Office for Northern Ireland');
+    await expect(page.locator('#svc_detail_electoral')).not.toContainText('open register');
+    await expect(page.locator('#planContent')).toContainText('handled centrally by the DVLA');
+  });
+
+  test('79. NI-born users who decline a GRC get an Irish-passport-only final step', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.locator('#planContent')).toContainText('The final legal step (Irish passport)');
+    await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
+    await expect(page.locator('#planContent')).toContainText('You have not included a UK Gender Recognition Certificate');
+  });
+
+  test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
+    await openChecklist(page);
+    await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]')).toBeChecked();
+    await expect(page.locator('input[name="chkPassportOpt"][value="needs_update"]')).toBeChecked();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await expect(page.getByRole('heading', { name: /Identity documents/ })).toBeVisible();
+    await expect(page.locator('#planContent')).toContainText('Driving licence');
+  });
+
+  test('81. Share link round-trips the none-of-these services answer', async ({ page }) => {
+    await openChecklist(page);
+    await page.locator('#chkSvcNone').check();
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    await page.evaluate(() => {
+      window._shareUrl = null;
+      navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+    });
+    await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+    await page.waitForFunction(() => window._shareUrl !== null);
+    const clip = await page.evaluate(() => window._shareUrl);
+    const decoded = decodeState(new URL(clip).searchParams.get('p'));
+    expect(decoded.svn).toBe(true);
+    await page.goto(clip);
+    expect(await page.evaluate(() => wizardState.svcNone)).toBe('yes');
+  });
+
+  test('82. A malformed shared link does not destroy saved progress', async ({ page }) => {
+    await openChecklist(page);
+    await page.getByRole('button', { name: 'Show my action plan' }).click();
+    const firstBtn = page.locator('.step-state-btn[data-track-id]').first();
+    const trackId = await firstBtn.getAttribute('data-track-id');
+    await firstBtn.click();
+    await expect(firstBtn).toHaveAttribute('data-state', '1');
+    await page.waitForTimeout(200);
+    await page.goto(filePath + '?p=%%%notvalid%%%');
+    await expect(page.locator('#welcomeOutdated')).toBeVisible();
+    expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
+  });
+
+  test('83. Legacy links map an un-updated licence and passport to needing an update', async ({ page }) => {
+    await page.goto(filePath + '?goal=both&dl=false&pass=false');
+    await checkAgeGateShared(page);
+    await expect(page.locator('#welcomeOutdated')).toBeVisible();
+    await page.getByRole('button', { name: 'Review my answers' }).click();
+    await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]')).toBeChecked();
+    await expect(page.locator('input[name="chkPassportOpt"][value="needs_update"]')).toBeChecked();
   });
 
 });
