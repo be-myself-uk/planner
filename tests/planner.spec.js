@@ -177,16 +177,18 @@ test.describe('Be myself Planner', () => {
 
   test('8. Checklist locks', async ({ page }) => {
     await openChecklist(page);
-    await expect(page.getByLabel('NHS record')).toBeDisabled();
-    await expect(page.getByLabel('HMRC and taxes')).toBeDisabled();
-    await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeDisabled();
-    await page.getByLabel(/Deed poll or statutory declaration/).check();
+    // NHS and HMRC never require a deed poll in practice, so they are never locked.
     await expect(page.getByLabel('NHS record')).toBeEnabled();
     await expect(page.getByLabel('HMRC and taxes')).toBeEnabled();
+    await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeDisabled();
+    await page.getByLabel(/Deed poll or statutory declaration/).check();
+    await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeEnabled();
     await page.locator('#chkGoalName').uncheck();
     await page.locator('#chkGoalGender').check();
     await expect(page.locator('#wrapDeedPoll')).toBeHidden();
     await expect(page.getByLabel('NHS record')).toBeEnabled();
+    // HMRC is relevant to a gender-only change too (a no-GRC restricted-record route exists).
+    await expect(page.getByLabel('HMRC and taxes')).toBeVisible();
     await page.locator('#chkGoalName').check();
     await page.locator('#chkGoalGender').uncheck();
     await expect(page.locator('#wrapGRC')).toBeHidden();
@@ -198,6 +200,10 @@ test.describe('Be myself Planner', () => {
     await page.getByLabel(/Yes, I need to update my records/).check();
     await expect(page.locator('#wrapDBS')).toBeVisible();
     await expect(page.locator('#wrapDWP')).toBeVisible();
+    // eVisa keeps its own lock (name changes still need evidence first), but with accurate reasoning.
+    await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
+    await expect(page.locator('#chkVisa')).toBeDisabled();
+    await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
   });
 
   test('9. Plan content conditions', async ({ page }) => {
@@ -736,6 +742,42 @@ test.describe('Be myself Planner', () => {
     await expect(page.locator('#planContent')).toContainText('HM Land Registry');
     await expect(page.locator('#planContent')).toContainText('Registers of Scotland');
     await expect(page.locator('#planContent')).toContainText('Land & Property Services');
+  });
+
+  test('73. Wizard: NHS/HMRC never skipped or locked; driving licence locks instead of silently discarding; newGP and HMRC shown for gender-only', async ({ page }) => {
+    await openWizard(page);
+    await page.evaluate(() => {
+      wizardState.region = 'ew';
+      wizardState.birthRegion = 'ew';
+      wizardState.goal = 'name';
+      wizardState.deedpoll = 'no';
+      step = questions.findIndex(q => q.id === 'nhs');
+      renderWizard(false);
+    });
+    await expect(page.locator('#wizardStepFieldset legend')).toContainText('NHS');
+    await expect(page.locator('input[name="ans"]')).toHaveCount(2);
+    await expect(page.locator('input[name="ans"]:disabled')).toHaveCount(0);
+
+    await page.evaluate(() => { step = questions.findIndex(q => q.id === 'hmrc'); renderWizard(false); });
+    await expect(page.locator('#wizardStepFieldset legend')).toContainText('HMRC');
+    await expect(page.locator('input[name="ans"]:disabled')).toHaveCount(0);
+
+    await page.evaluate(() => { step = questions.findIndex(q => q.id === 'driving'); renderWizard(false); });
+    await expect(page.locator('input[name="ans"][value="updated"]')).toBeDisabled();
+
+    await page.evaluate(() => {
+      wizardState.goal = 'gender';
+      step = questions.findIndex(q => q.id === 'newGP');
+      renderWizard(false);
+    });
+    await expect(page.locator('#wizardStepFieldset legend')).toContainText('GP');
+
+    await page.evaluate(() => { step = questions.findIndex(q => q.id === 'hmrc'); renderWizard(false); });
+    await expect(page.locator('#wizardStepFieldset legend')).toContainText('HMRC');
+    await expect(page.locator('input[name="ans"]:disabled')).toHaveCount(0);
+
+    await page.evaluate(() => { step = questions.findIndex(q => q.id === 'driving'); renderWizard(false); });
+    await expect(page.locator('input[name="ans"][value="updated"]')).toBeEnabled();
   });
 
 });

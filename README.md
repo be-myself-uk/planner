@@ -1,8 +1,10 @@
 # 🏳️‍⚧️ Be myself
 
-A free, private, UK-focused legal identity planner for trans and non-binary people.
+A free, private tool that helps trans and non-binary people in the UK plan a name and gender marker change across their legal documents.
 
 **Live site:** [bemyself.uk](https://bemyself.uk/)
+
+[Changelog](CHANGELOG.md) - [Contribute to the planner](CONTRIBUTING.md)
 
 ---
 
