@@ -13,6 +13,20 @@ Each entry sits under one of these categories:
 
 ---
 
+## [July 2026 Update (Part two)]
+
+- - **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
+ 
+- **Layout**
+  - Reordered HMRC question for a more sensible flow.
+  - NHS and HMRC questions are no longer contextually locked.
+  - Driving licence and Passport questions remain locked but behave differently.
+  - New GP and HMRC questions now no longer incorrectly skipped for users in certain states.
+- **Wording**
+  - eVisa question reasoning text has been updated for accuracy.
+- **Infrastructure**
+  - Playwright test suite updated.
+
 ## [July 2026 Update]
 
 - **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
