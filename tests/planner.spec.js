@@ -321,6 +321,9 @@ test.describe('Be myself Planner', () => {
       // NHS and HMRC never require a deed poll in practice, so they are never locked.
       await expect(page.getByLabel('NHS record')).toBeEnabled();
       await expect(page.getByLabel('HMRC and taxes')).toBeEnabled();
+      // Checking these means "already updated", not just "I have one" - the note should say so.
+      await expect(page.locator('#wrapNHS .note')).toContainText('already updated');
+      await expect(page.locator('#wrapHMRC .note')).toContainText('already updated');
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeDisabled();
       await page.getByLabel(/Deed poll or statutory declaration/).check();
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeEnabled();
@@ -336,6 +339,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wrapVisa')).toBeHidden();
       await page.getByLabel(/I have a UK visa or eVisa/).check();
       await expect(page.locator('#wrapVisa')).toBeVisible();
+      await expect(page.locator('#wrapVisa .note')).toContainText('already updated');
       await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
       await page.getByLabel(/Yes, I need to update my records/).check();
@@ -936,6 +940,20 @@ test.describe('Be myself Planner', () => {
       await expect(footer).toContainText(expectedDate);
       await page.emulateMedia({ media: 'screen' });
       await expect(footer).toBeHidden();
+    });
+
+    test('84. A phase with many expanded services is not clipped by its collapse-animation max-height', async ({ page }) => {
+      await openChecklist(page);
+      for (const id of ['#chkSvcBanks','#chkSvcInsurance','#chkSvcCouncil','#chkSvcUtilities','#chkSvcElectoral','#chkSvcCRA','#chkSvcLandlord','#chkSvcPension','#chkSvcMortgage','#chkSvcMobile','#chkSvcProfBody','#chkSvcLandReg']) {
+        await page.locator(id).check();
+      }
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const summary = page.getByText('More information about: Services to update');
+      await summary.click();
+      await expect(page.locator('#svc_detail_landreg')).toBeAttached();
+      const phase = page.locator('#svc_detail_landreg').locator('xpath=ancestor::div[contains(@class,"phase")]');
+      const [scrollHeight, clientHeight] = await phase.evaluate(el => [el.scrollHeight, el.clientHeight]);
+      expect(scrollHeight).toBeLessThanOrEqual(clientHeight + 1);
     });
   });
 

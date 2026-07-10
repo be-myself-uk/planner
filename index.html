@@ -232,7 +232,7 @@
   .badge-yellow { background:var(--simultaneous-bg); color:var(--simultaneous); border-color:var(--simultaneous); }
   .badge-red { background:var(--urgent-bg); color:var(--urgent); border-color:var(--urgent); }
   .split-badge { padding:2px 0; display:inline-flex; gap:0; }
-  .phase { margin-top:28px; padding:20px; border-left:5px solid var(--primary); background:var(--bg-card); border-radius:8px; overflow:hidden; transition:max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease, padding 0.5s ease, border-width 0.5s ease; max-height:3000px; }
+  .phase { margin-top:28px; padding:20px; border-left:5px solid var(--primary); background:var(--bg-card); border-radius:8px; overflow:hidden; transition:max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease, padding 0.5s ease, border-width 0.5s ease; max-height:30000px; }
   .urgent { border-color:var(--urgent); background:var(--urgent-bg); }
   .simul { border-color:var(--simultaneous); background:var(--simultaneous-bg); }
   .success { border-color:var(--success); background:var(--success-bg); }
@@ -583,9 +583,9 @@
     <fieldset id="wrapSectionDocuments" data-section-label="Your current documents" style="border:none;padding:0;margin:0 0 28px 0;">
       <legend class="section-title">5. Your current documents</legend>
     <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span>Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span></label>
-    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span></label>
+    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span><br><em class="note" style="margin-top:2px;">Tick this once it is already updated with your new details, not just because you already have one.</em></span></label>
     <div id="wrapNewGP" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkNewGP"><span>I would like to register with a new GP<br><em class="note" style="margin-top:2px;">Registering at a new practice means your new details are on file from day one.</em></span></label></div>
-    <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes</label>
+    <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"><span>HMRC and taxes<br><em class="note" style="margin-top:2px;">Tick this once you have already updated your HMRC and tax records, not just because you pay tax.</em></span></label>
     <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
       <p class="chk-q--flex">What is the status of your UK driving licence?</p>
       <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update" checked> It has my old details</label>
@@ -598,7 +598,7 @@
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> It is already updated</label>
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
     </div>
-    <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
+    <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"><span>UK visa or eVisa<br><em class="note" style="margin-top:2px;">Tick this once your visa or eVisa is already updated with your new details — this is different from the earlier question about whether you have one.</em></span><span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
     <div id="checklistStickyBar" class="hidden" aria-hidden="true">
@@ -827,7 +827,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1783722214;
+const SCHEMA_VERSION = 1783724508;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const SERVICES = [
