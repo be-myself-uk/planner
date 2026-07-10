@@ -427,6 +427,7 @@
 </div>
 <main class="container" id="mainContent" tabindex="-1">
   <span id="lock-deed-poll-reason" class="visually-hidden">You need a deed poll before you can update this document.</span>
+  <span id="lock-visa-reason" class="visually-hidden">You usually need to update your home country passport first, as UKVI generally needs that as evidence before your eVisa can be changed.</span>
   <div id="startView">
     <div class="start-actions">
       <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start now</button>
@@ -581,9 +582,9 @@
       <legend class="section-title">5. Your current documents</legend>
     <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span>Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span></label>
     <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"> UK visa or eVisa <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
-    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span> <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
+    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span></span></label>
     <div id="wrapNewGP" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkNewGP"><span>I would like to register with a new GP<br><em class="note" style="margin-top:2px;">Registering at a new practice means your new details are on file from day one.</em></span></label></div>
-    <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes <span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
+    <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"> HMRC and taxes</label>
     <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
       <p class="chk-q--flex">What is the status of your UK driving licence?</p>
       <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> It has my old details</label>
@@ -1671,8 +1672,6 @@ function updateDerivedState() {
   if (!isEmployed)                     wizardState.dbs           = S.NO;
   if (!isNonUK)                        wizardState.visaUpdated   = S.NO;
   if (shouldLock) {
-    wizardState.nhs  = S.NO;
-    wizardState.hmrc = S.NO;
     if (isNonUK && !isGender) wizardState.visaUpdated = S.NO;
     if (wizardState.driving  === S.UPDATED) wizardState.driving  = S.NEEDS_UPDATE;
     if (wizardState.passport === S.UPDATED) wizardState.passport = S.NEEDS_UPDATE;
@@ -1749,7 +1748,7 @@ function updateLocks() {
     ['wrapVisa',          !isNonUK],
     ['wrapDBS',           !isEmployed],
     ['wrapDWP',           false],
-    ['wrapHMRC',          isGender],
+    ['wrapHMRC',          false],
     ['wrapChkServices',   isGender],
     ['wrapVehicle',       isGender],
     ['wrapBirthCert',     isName],
@@ -1766,21 +1765,21 @@ function updateLocks() {
   }
   
   const shouldLock = (!isGender && !hasDeed) || goal === 'none';
-  ['wrapNHS','wrapHMRC', isNonUK ? 'wrapVisa' : null].forEach(id => {
-    if (!id) return;
-    const wrap = gel(id);
-    if (!wrap) return;
-    const cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
-    if (shouldLock) {
-      wrap.classList.add('locked');
-      cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-deed-poll-reason'); });
-      if (lock) lock.classList.remove('hidden');
-    } else {
-      wrap.classList.remove('locked');
-      cbs.forEach(cb => { cb.disabled = false; cb.removeAttribute('aria-describedby'); });
-      if (lock) lock.classList.add('hidden');
+  if (isNonUK) {
+    const wrap = gel('wrapVisa');
+    if (wrap) {
+      const cbs = wrap.querySelectorAll('input'), lock = wrap.querySelector('.lock-icon');
+      if (shouldLock) {
+        wrap.classList.add('locked');
+        cbs.forEach(cb => { cb.disabled = true; cb.setAttribute('aria-describedby','lock-visa-reason'); });
+        if (lock) lock.classList.remove('hidden');
+      } else {
+        wrap.classList.remove('locked');
+        cbs.forEach(cb => { cb.disabled = false; cb.removeAttribute('aria-describedby'); });
+        if (lock) lock.classList.add('hidden');
+      }
     }
-  });
+  }
   ['chkDrivingLicenceUpdated','chkPassportUpdated'].forEach(id => {
     const el = gel(id);
     if (!el) return;
@@ -1907,7 +1906,6 @@ const questions = [
       : wizardState.region === REGION.NI
       ? 'Is your HSCNI health record updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Health and Social Care Northern Ireland uses a Health and Care Number (HCN) instead of an NHS number. A gender marker update triggers a new HCN and affects automated cancer screening invitations.</em>'
       : 'Is your NHS (health) record updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:6px;color:var(--text-muted);">Changing your gender marker on your NHS record affects which screening programmes you are automatically invited to, and the process differs from a name-only change.</em>',
-    cond:() => !(wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO),
     o:() => [[S.YES,'Yes'],[S.NO,'No']]
   },
   { id:'newGP',
@@ -1916,20 +1914,19 @@ const questions = [
       : wizardState.region === REGION.NI
       ? 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number may be issued. This is an alternative to updating your current record.</em>'
       : 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new details are on file from day one, with no need to update an existing record. This is an alternative to updating your current record.</em>',
-    cond:() => wizardState.goal !== S.GENDER, o:() => [
+    o:() => [
     [S.YES,'Yes, I would like to register with a new GP'],
     [S.NO, 'No']
   ]},
-  { id:'driving', q:'What is the status of your UK driving licence?', o:() => [
-    [S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']
-  ]},
-  { id:'passport', q:'What is the status of your passport?', o:() => [
-    [S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated'],[S.NONE,'I do not have one']
-  ]},
-  { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', cond:() => wizardState.goal !== S.GENDER, o:() => {
-    if (wizardState.deedpoll === S.NO)
-      return [[S.YES,'Yes',true],[S.NO,'No']];
-    return [[S.YES,'Yes'],[S.NO,'No']];
+  { id:'hmrc', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', o:() => [[S.YES,'Yes'],[S.NO,'No']]
+  },
+  { id:'driving', q:'What is the status of your UK driving licence?', o:() => {
+    const locked = wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO;
+    return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated', locked],[S.NONE,'I do not have one']];
+  }},
+  { id:'passport', q:'What is the status of your passport?', o:() => {
+    const locked = wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO;
+    return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated', locked],[S.NONE,'I do not have one']];
   }},
   { id:'employment', q:'Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em>', o:() => [
     [S.NEEDS_UPDATE, 'Yes, I need to update my records'],
@@ -2306,7 +2303,7 @@ function computePlanMeta(p) {
   }
   const hasHealthGroup = p.needsNHS || p.newGP;
   const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || (p.dbs && isEmployed) || p.student;
-  const hasCivicGroup  = (!isGender && p.needsHMRC) || p.dwp || p.needsDriving || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
+  const hasCivicGroup  = p.needsHMRC || p.dwp || p.needsDriving || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !p.visaAlreadyUpdated);
   const hasStep4 = ((p.wantsGRC || p.birthCert) && !isName) || (p.bornInNI && !isName);
   const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
@@ -2390,7 +2387,7 @@ function buildSharedPlan(p) {
     }
   };
   const buildCivicItems = () => {
-    if (!isGender && p.needsHMRC) {
+    if (p.needsHMRC) {
       const _hmrc = PLAN_ITEMS.hmrc;
       addStep(li('hmrc', easy, renderCost(_hmrc.cost), _hmrc.title, _hmrc.summary, _hmrc.detail));
     }
