@@ -24,6 +24,7 @@ Each entry sits under one of these categories:
 - **Wording**
   - Softened the "Quick exit" description to accurately describe what it does (replaces the page in your tab's history) rather than overstating it as removing all browser history.
   - Corrected a line about deleting your data: clearing your browser history alone does not remove saved answers, since those are stored separately.
+  - Added short notes to the NHS, HMRC, and UK visa/eVisa checklist items clarifying that ticking them means the record is already updated, not just that you have one.
 - **Code**
   - The step-by-step wizard now always asks about the NHS record, registering with a new GP, and HMRC, so people only changing their gender marker see the same questions as the checklist. The HMRC question now appears earlier, before the driving licence and passport questions, matching the order steps appear in the plan.
   - The driving licence and passport wizard questions now grey out "It is already updated" when it is not possible, instead of silently changing the answer afterwards.

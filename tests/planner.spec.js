@@ -321,6 +321,9 @@ test.describe('Be myself Planner', () => {
       // NHS and HMRC never require a deed poll in practice, so they are never locked.
       await expect(page.getByLabel('NHS record')).toBeEnabled();
       await expect(page.getByLabel('HMRC and taxes')).toBeEnabled();
+      // Checking these means "already updated", not just "I have one" - the note should say so.
+      await expect(page.locator('#wrapNHS .note')).toContainText('already updated');
+      await expect(page.locator('#wrapHMRC .note')).toContainText('already updated');
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeDisabled();
       await page.getByLabel(/Deed poll or statutory declaration/).check();
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeEnabled();
@@ -336,6 +339,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wrapVisa')).toBeHidden();
       await page.getByLabel(/I have a UK visa or eVisa/).check();
       await expect(page.locator('#wrapVisa')).toBeVisible();
+      await expect(page.locator('#wrapVisa .note')).toContainText('already updated');
       await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
       await page.getByLabel(/Yes, I need to update my records/).check();
