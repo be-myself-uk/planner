@@ -17,15 +17,24 @@ Each entry sits under one of these categories:
 
 - - **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
  
-- **Layout**
-  - Reordered HMRC question for a more sensible flow.
-  - NHS and HMRC questions are no longer contextually locked.
-  - Driving licence and Passport questions remain locked but behave differently.
-  - New GP and HMRC questions now no longer incorrectly skipped for users in certain states.
+- **Information**
+  - Corrected the NHS and HMRC document checklist items: neither actually requires a deed poll or statutory declaration, so both are no longer locked behind one.
+  - Corrected Northern Ireland service guidance: domestic rates are handled through Land & Property Services rather than Council Tax, electoral registration is through the Electoral Office for Northern Ireland rather than the local council, and vehicle logbook (V5C) updates go through the DVLA rather than the DVA.
+  - Corrected the HMRC guidance shown to people only changing their gender marker, so it no longer includes name-change-only wording.
 - **Wording**
-  - eVisa question reasoning text has been updated for accuracy.
-- **Infrastructure**
-  - Playwright test suite updated.
+  - Softened the "Quick exit" description to accurately describe what it does (replaces the page in your tab's history) rather than overstating it as removing all browser history.
+  - Corrected a line about deleting your data: clearing your browser history alone does not remove saved answers, since those are stored separately.
+- **Code**
+  - The step-by-step wizard now always asks about the NHS record, registering with a new GP, and HMRC, so people only changing their gender marker see the same questions as the checklist. The HMRC question now appears earlier, before the driving licence and passport questions, matching the order steps appear in the plan.
+  - The driving licence and passport wizard questions now grey out "It is already updated" when it is not possible, instead of silently changing the answer afterwards.
+  - Fixed the eVisa question in the step-by-step wizard giving the opposite answer to the one selected.
+  - The eVisa question now unlocks based on passport status rather than the deed poll, matching its own explanation.
+  - The driving licence and passport checklist questions now default to "It has my old details" instead of "It is already updated", so a generated plan cannot accidentally miss a step.
+  - Shared links now remember the "I do not need to update any of these" services answer.
+  - Opening a broken or incomplete shared link no longer clears saved progress.
+  - Older shared links now correctly mark an un-updated driving licence or passport as needing an update, instead of as not having one at all.
+- **Layout**
+  - Each selected service now has its own bordered block in the plan's expanded details when more than one is selected, making it clearer where one service's information ends and the next begins.
 
 ## [July 2026 Update]
 
@@ -58,7 +67,7 @@ Each entry sits under one of these categories:
   - Updated README.md to be in sync with the website.
   - Created this [changelog](CHANGELOG.md) and a [contributing](CONTRIBUTING.md) page (for development, not donations).
   - Updated the build command so robots.txt is accurately deployed.
-  
+
 ## [26 May 2026]
 
 - **Code**

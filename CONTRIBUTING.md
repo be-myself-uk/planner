@@ -73,7 +73,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently up to the high 60s; numbers were assigned as tests were added and some were removed or merged along the way, so they are not perfectly sequential). It covers: the wizard and checklist flows, shareable links, progress tracking, dialogs, accessibility (ARIA, keyboard nav), region-specific content branching, and mobile layout behaviour.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently up to the low 80s; numbers were assigned as tests were added and some were removed or merged along the way, so they are not perfectly sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, accessibility/layout), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 Run locally with:
 ```
@@ -118,7 +118,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 - `SCHEMA_VERSION`: a Unix timestamp, auto-bumped by the `bump-version.yml` workflow on every merge affecting `index.html`.
 - `S`: an enum-like object for answer states (`YES`, `NO`, `UPDATED`, `NEEDS_UPDATE`, `NONE`, `BOTH`, `NAME`, `GENDER`).
 - `REGION`: `{ EW, SCOT, NI }`. Note that "outside the UK" is not a fourth region value. It is tracked as a separate boolean flag (for example, `regionOutsideUK`, `birthOutsideUK`) alongside a region that falls back to `EW`, because most of the app's regional logic only needs to distinguish EW/Scotland/NI.
-- **`SERVICES`**: the single source of truth for the "services to update" checklist item (banks, insurance, DBS/Disclosure Scotland/AccessNI, credit reference agencies, and so on). Each entry is `{ key, id, label, detail }`. The wizard's services question, the checklist's checkboxes, and the generated plan's service list all derive from this one array. Adding a new service means adding a checkbox in `#wrapChkServices` plus one entry here.
+- **`SERVICES`**: the single source of truth for the "services to update" checklist item (banks, insurance, DBS/Disclosure Scotland/AccessNI, credit reference agencies, and so on). Each entry is `{ key, id, label, detail }`, or `{ key, id, label, detailFn(p) }` when the guidance differs by region (see the Council Tax, electoral register, and V5C entries for examples). The wizard's services question, the checklist's checkboxes, and the generated plan's service list all derive from this one array. Adding a new service means adding a checkbox in `#wrapChkServices` plus one entry here.
 - **`PLAN_ITEMS`**: the content for every possible plan step (health records, driving licence, passport, GRC, and so on). Many entries have a `regions: { ni, scot, default }` object (resolved by the `planItemRegion()` helper, which falls back to `default` if a specific region is not present) and/or a `variants` object keyed by goal (`name`/`gender`/`both`, resolved by `planItemVariant()`, falling back to the `gender` variant). This is where almost all of the site's actual guidance text lives.
 
 **Application state**
