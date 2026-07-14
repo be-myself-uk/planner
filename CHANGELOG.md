@@ -69,6 +69,7 @@ Each entry sits under one of these categories:
   - Updated README.md to be in sync with the website.
   - Created this [changelog](CHANGELOG.md) and a [contributing](CONTRIBUTING.md) page (for development, not donations).
   - Created [SOURCES.md](SOURCES.md), which is a non-exhaustive list of official sources for the planner's content, with documented deviations for realistic practice and community-advice differences.
+  - The repo has been restructured.
   - Updated the build command so robots.txt is accurately deployed.
 
 ## [26 May 2026]
