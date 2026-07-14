@@ -41,18 +41,22 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 ├── README.md                      : project overview, features, privacy, licence
 ├── CONTRIBUTING.md                : this file, how to contribute and how the repo is put together
 ├── CHANGELOG.md                   : plain-English history of changes to the site
+├── SOURCES.md                     : canonical list of official sources behind planner content, with review-trigger automation
 ├── LICENCE                        : CC BY-NC-SA 4.0
 ├── package.json / package-lock.json : the only dependency is @playwright/test (dev-only, for testing)
 ├── playwright.config.js           : Playwright test runner configuration
 ├── lychee.toml                    : configuration for the automated broken-link checker
-├── .gitignore                     : excludes node_modules/, test-results/, playwright-report/, blob-report/
+├── .gitignore                     : excludes node_modules/, test-results/, playwright-report/, blob-report/, __pycache__/, source-watch-report.md
 ├── tests/
 │   └── planner.spec.js            : the entire end-to-end test suite (Playwright)
 ├── .github/
+│   ├── scripts/
+│   │   └── check_source_updates.py : checks GOV.UK sources in SOURCES.md against their own Last verified date
 │   ├── workflows/
 │   │   ├── playwright.yml         : runs the test suite on every push/PR to main or preview
 │   │   ├── bump-version.yml       : auto-updates the "last reviewed" date on every merge
-│   │   └── check-links.yml        : scheduled broken-link scan, opens an issue if links break
+│   │   ├── check-links.yml        : scheduled broken-link scan, opens an issue if links break
+│   │   └── check-source-updates.yml : scheduled GOV.UK source-change scan, opens an issue if a source outpaces its Last verified date
 │   └── ISSUE_TEMPLATE/            : bug report / feature request / question templates
 ```
 
@@ -69,7 +73,8 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 |---|---|---|
 | `playwright.yml` | Push or PR to `main`/`preview` | Installs dependencies, runs the full Playwright suite (`tests/planner.spec.js`) against the raw `index.html` file via a `file://` URL, uploads the HTML test report as an artifact. This is CI only; it does not deploy anything. |
 | `bump-version.yml` | PR opened/updated targeting `main`/`preview` | Rewrites the `SCHEMA_VERSION` constant near the top of `index.html`'s script to the current Unix timestamp, then commits and pushes that change back to the PR branch with `[skip ci]` (so it does not re-trigger itself). This timestamp drives the "Last reviewed" date shown in the site's footer. It is a proxy for "content was touched recently," not a precise changelog. |
-| `check-links.yml` | Scheduled (1st and 15th of each month) or manual | Runs the [Lychee](https://github.com/lycheeverse/lychee-action) link checker (configured via `lychee.toml`) against `index.html` and `README.md`. If it finds a broken link and there is not already an open `broken-links`-labelled issue, it opens one automatically with the details. |
+| `check-links.yml` | Scheduled (1st and 15th of each month) or manual | Runs the [Lychee](https://github.com/lycheeverse/lychee-action) link checker (configured via `lychee.toml`) against `index.html`, `README.md`, `CHANGELOG.md`, and `SOURCES.md`. If it finds a broken link and there is not already an open `broken-links`-labelled issue, it opens one automatically with the details. |
+| `check-source-updates.yml` | Scheduled (1st and 15th of each month, offset by an hour from `check-links.yml`) or manual | Runs `.github/scripts/check_source_updates.py`, which checks every GOV.UK source in `SOURCES.md` via the [GOV.UK Content API](https://www.gov.uk/api/content) and compares its `public_updated_at` against that entry's own `Last verified` date. Sources still marked `pending`, and all non-GOV.UK sources, are skipped (manual review only). If a source appears to have changed and there is not already an open `source-changed`-labelled issue, it opens one automatically. This is a trigger for review, not a verdict that `index.html` needs to change. |
 
 ### Tests
 
