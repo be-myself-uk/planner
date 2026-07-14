@@ -55,8 +55,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 │   ├── workflows/
 │   │   ├── playwright.yml         : runs the test suite on every push/PR to main or preview
 │   │   ├── bump-version.yml       : auto-updates the "last reviewed" date on every merge
-│   │   ├── check-links.yml        : scheduled broken-link scan, opens an issue if links break
-│   │   └── check-source-updates.yml : scheduled GOV.UK source-change scan, opens an issue if a source outpaces its Last verified date
+│   │   └── check-content.yml      : scheduled broken-link scan and GOV.UK source-change scan (two independent jobs), opens an issue per finding
 │   └── ISSUE_TEMPLATE/            : bug report / feature request / question templates
 ```
 
@@ -73,8 +72,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 |---|---|---|
 | `playwright.yml` | Push or PR to `main`/`preview` | Installs dependencies, runs the full Playwright suite (`tests/planner.spec.js`) against the raw `index.html` file via a `file://` URL, uploads the HTML test report as an artifact. This is CI only; it does not deploy anything. |
 | `bump-version.yml` | PR opened/updated targeting `main`/`preview` | Rewrites the `SCHEMA_VERSION` constant near the top of `index.html`'s script to the current Unix timestamp, then commits and pushes that change back to the PR branch with `[skip ci]` (so it does not re-trigger itself). This timestamp drives the "Last reviewed" date shown in the site's footer. It is a proxy for "content was touched recently," not a precise changelog. |
-| `check-links.yml` | Scheduled (1st and 15th of each month) or manual | Runs the [Lychee](https://github.com/lycheeverse/lychee-action) link checker (configured via `lychee.toml`) against `index.html`, `README.md`, `CHANGELOG.md`, and `SOURCES.md`. If it finds a broken link and there is not already an open `broken-links`-labelled issue, it opens one automatically with the details. |
-| `check-source-updates.yml` | Scheduled (1st and 15th of each month, offset by an hour from `check-links.yml`) or manual | Runs `.github/scripts/check_source_updates.py`, which checks every GOV.UK source in `SOURCES.md` via the [GOV.UK Content API](https://www.gov.uk/api/content) and compares its `public_updated_at` against that entry's own `Last verified` date. Sources still marked `pending`, and all non-GOV.UK sources, are skipped (manual review only). If a source appears to have changed and there is not already an open `source-changed`-labelled issue, it opens one automatically. This is a trigger for review, not a verdict that `index.html` needs to change. |
+| `check-content.yml` | Scheduled (1st and 15th of each month) or manual | Two independent jobs on a shared schedule. **`link-checker`** runs the [Lychee](https://github.com/lycheeverse/lychee-action) link checker (configured via `lychee.toml`) against `index.html`, `README.md`, `CHANGELOG.md`, and `SOURCES.md`; if it finds a broken link and there is not already an open `broken-links`-labelled issue, it opens one. **`source-watch`** runs `.github/scripts/check_source_updates.py`, which checks every GOV.UK source in `SOURCES.md` via the [GOV.UK Content API](https://www.gov.uk/api/content) and compares its `public_updated_at` against that entry's own `Last verified` date; sources still marked `pending`, and all non-GOV.UK sources, are skipped (manual review only); if a source appears to have changed and there is not already an open `source-changed`-labelled issue, it opens one. Neither job's output is a verdict that `index.html` needs to change — both are triggers for review. Run `python3 .github/scripts/check_source_updates.py --selftest` after changing SOURCES.md's structure, to check the parser against both known entry formats before a scheduled run does. |
 
 ### Tests
 
