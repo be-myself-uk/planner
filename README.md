@@ -4,7 +4,7 @@ A free, private tool that helps trans and non-binary people in the UK plan a nam
 
 **Live site:** [bemyself.uk](https://bemyself.uk/)
 
-[Changelog](CHANGELOG.md) - [Contribute to the planner](CONTRIBUTING.md)
+[Changelog](CHANGELOG.md) - [Sources](SOURCES.md) - [Contribute to the planner](CONTRIBUTING.md)
 
 ---
 
@@ -78,6 +78,8 @@ This is an independent, community-supported project. Contributions that improve 
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the project principles, tech stack, how to run the tests, and a full map of how this repository (and `index.html` itself) is put together.
 
+See [SOURCES.md](SOURCES.md) for the official sources behind the planner's guidance.
+
 See [CHANGELOG.md](CHANGELOG.md) for a plain-English history of what has changed on the site.
 
 ## Licence
@@ -94,6 +96,7 @@ Made with love and care for the UK trans community. 🏳️‍⚧️
 
 Useful resources referenced throughout the planner:
 - [TransActual](https://transactual.org.uk/)
+- [FreeDeedPoll.org.uk](https://freedeedpoll.org.uk/)
 - [Gendered Intelligence](https://genderedintelligence.co.uk/)
 - [Mermaids](https://mermaidsuk.org.uk/)
 - [GIRES](https://www.gires.org.uk/)

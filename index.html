@@ -598,7 +598,7 @@
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> It is already updated</label>
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
     </div>
-    <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"><span>UK visa or eVisa<br><em class="note" style="margin-top:2px;">Tick this once your visa or eVisa is already updated with your new details — this is different from the earlier question about whether you have one.</em></span><span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
+    <label class="checkbox-item hidden" id="wrapVisa"><input type="checkbox" id="chkVisa"><span>UK visa or eVisa<br><em class="note" style="margin-top:2px;">Tick this once your visa or eVisa is already updated with your new details. This is different from the earlier question about whether you have one.</em></span><span class="lock-icon hidden" role="img" aria-label="Locked">🔒</span></label>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
     <div id="checklistStickyBar" class="hidden" aria-hidden="true">
@@ -827,7 +827,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1783724533;
+const SCHEMA_VERSION = 1784004097;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { EW:'ew', SCOT:'scot', NI:'ni' };
 const SERVICES = [
