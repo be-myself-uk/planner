@@ -211,9 +211,10 @@
   .step-state-btn[data-state="3"] { border-color:var(--border); color:var(--urgent); background:var(--disabled); }
   .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
   .hidden { display:none !important; }
-  #startView { text-align:center; padding:0 0 40px; }
+  #startView { text-align:center; padding:20px 0 40px; }
   #startView p { font-size:1.1em; color:var(--text); margin-bottom:20px; }
-  .start-info-actions { display:flex; justify-content:center; align-items:center; gap:8px; margin:8px 0 24px; }
+  .start-info-actions { display:flex; justify-content:center; align-items:center; gap:8px; max-width:800px; margin:8px auto 0; padding:0 20px; box-sizing:border-box; }
+  .start-info-actions button { font-size:0.72rem; font-weight:bold; }
   .start-actions { display:flex; flex-direction:column; align-items:center; gap:10px; }
   .start-checklist-link { font-size:0.95em; color:var(--primary); text-decoration:underline; cursor:pointer; }
   .start-checklist-link:hover { color:var(--primary-hover); }
@@ -365,7 +366,7 @@
     body:not(.plan-ready)::after { content:"Please finish answering the questions to generate your action plan before printing."; display:block; padding:40px 20px; text-align:center; font-size:1.2em; font-weight:bold; }
     body.plan-ready .container { box-shadow:none; border:none; padding:0; margin:20px auto; background:white; }
     h2, h3, .section-title { color:black; }
-    body.plan-ready #startView, body.plan-ready #welcomeBackView, body.plan-ready #wizardView, body.plan-ready #checklistView, body.plan-ready .btn-group, body.plan-ready .footer { display:none !important; }
+    body.plan-ready #startView, body.plan-ready #startInfoActions, body.plan-ready #welcomeBackView, body.plan-ready #wizardView, body.plan-ready #checklistView, body.plan-ready .btn-group, body.plan-ready .footer { display:none !important; }
     body.plan-ready #planView { display:block !important; }
     .plan-print-footer { display:block !important; margin-top:20px; padding-top:10px; border-top:1px solid #000; font-size:0.85em; color:#333; }
     .plan-top-details { border:1px solid #ccc; background:transparent; }
@@ -428,14 +429,14 @@
     </div>
   </div>
 </div>
+<div id="startInfoActions" class="start-info-actions hidden">
+  <button type="button" class="ub-icon-btn" onclick="document.getElementById('dlgAbout').showModal()">What is this?</button>
+  <button type="button" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()">How do I use it?</button>
+</div>
 <main class="container" id="mainContent" tabindex="-1">
   <span id="lock-deed-poll-reason" class="visually-hidden">You need a deed poll or statutory declaration before you can update this document.</span>
   <span id="lock-visa-reason" class="visually-hidden">You usually need to update your home country passport first, as UKVI generally needs that as evidence before your eVisa can be changed.</span>
   <div id="startView">
-    <div class="start-info-actions">
-      <button type="button" class="ub-icon-btn" onclick="document.getElementById('dlgAbout').showModal()">What is this?</button>
-      <button type="button" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()">How do I use it?</button>
-    </div>
     <div class="start-actions">
       <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start now</button>
       <a class="start-checklist-link" id="startChecklistLink" href="#" onclick="startChecklist();return false;">Or view all questions as a single checklist</a>
@@ -1145,6 +1146,13 @@ const V = {
   warning:  document.getElementById('wizardWarning'),
   toggle:   document.getElementById('cbSwitchView')
 };
+(() => {
+  const info = document.getElementById('startInfoActions');
+  if (!info) return;
+  const sync = () => info.classList.toggle('hidden', V.start.classList.contains('hidden'));
+  sync();
+  new MutationObserver(sync).observe(V.start, { attributes: true, attributeFilter: ['class'] });
+})();
 let focusMode = false;
 const STATE_ICONS  = ['☐', '🕐', '✓', '✕'];
 const STATE_LABELS = ['Mark as in progress', 'Mark as done', 'Mark as not needed', 'Clear status'];
