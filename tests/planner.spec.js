@@ -89,6 +89,23 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('.start-checklist-link')).toBeVisible();
     });
 
+    test('85. Start view info buttons open the About and Usage guide dialogs', async ({ page }) => {
+      const aboutBtn = page.locator('.start-info-actions button', { hasText: 'What is this?' });
+      const usageBtn = page.locator('.start-info-actions button', { hasText: 'How do I use it?' });
+      await expect(aboutBtn).toBeVisible();
+      await expect(usageBtn).toBeVisible();
+
+      await aboutBtn.click();
+      await expect(page.locator('#dlgAbout')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#dlgAbout')).toBeHidden();
+
+      await usageBtn.click();
+      await expect(page.locator('#dlgUsage')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#dlgUsage')).toBeHidden();
+    });
+
     test('2. Age gate — wizard Q1', async ({ page }) => {
       await page.getByRole('button', { name: 'Start now' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();

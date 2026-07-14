@@ -51,6 +51,7 @@ Each entry sits under one of these categories:
 - **Layout**
   - Each selected service now has its own bordered block in the plan's expanded details when more than one is selected, making it clearer where one service's information ends and the next begins.
   - Fixed a plan step's "more information" text being cut off partway through when many services were selected, caused by an animation height limit that was too low for that much content.
+  - Added "What is this?" and "How do I use it?" buttons to the start screen, below the toolbar, giving quick access to the About and Usage guide dialogs before starting.
 
 ## [July 2026 Update]
 

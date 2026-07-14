@@ -211,8 +211,9 @@
   .step-state-btn[data-state="3"] { border-color:var(--border); color:var(--urgent); background:var(--disabled); }
   .visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
   .hidden { display:none !important; }
-  #startView { text-align:center; padding:20px 0 40px; }
+  #startView { text-align:center; padding:0 0 40px; }
   #startView p { font-size:1.1em; color:var(--text); margin-bottom:20px; }
+  .start-info-actions { display:flex; justify-content:center; align-items:center; gap:8px; margin:8px 0 24px; }
   .start-actions { display:flex; flex-direction:column; align-items:center; gap:10px; }
   .start-checklist-link { font-size:0.95em; color:var(--primary); text-decoration:underline; cursor:pointer; }
   .start-checklist-link:hover { color:var(--primary-hover); }
@@ -431,6 +432,10 @@
   <span id="lock-deed-poll-reason" class="visually-hidden">You need a deed poll or statutory declaration before you can update this document.</span>
   <span id="lock-visa-reason" class="visually-hidden">You usually need to update your home country passport first, as UKVI generally needs that as evidence before your eVisa can be changed.</span>
   <div id="startView">
+    <div class="start-info-actions">
+      <button type="button" class="ub-icon-btn" onclick="document.getElementById('dlgAbout').showModal()">What is this?</button>
+      <button type="button" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()">How do I use it?</button>
+    </div>
     <div class="start-actions">
       <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start now</button>
       <a class="start-checklist-link" id="startChecklistLink" href="#" onclick="startChecklist();return false;">Or view all questions as a single checklist</a>
