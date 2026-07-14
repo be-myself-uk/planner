@@ -214,7 +214,7 @@
   #startView { text-align:center; padding:20px 0 40px; }
   #startView p { font-size:1.1em; color:var(--text); margin-bottom:20px; }
   .start-info-actions { display:flex; justify-content:center; align-items:center; gap:8px; max-width:800px; margin:8px auto 0; padding:0 20px; box-sizing:border-box; }
-  .start-info-actions button { font-size:0.72rem; font-weight:bold; }
+  .start-info-actions button { height:auto; min-width:auto; padding:18px 30px; font-size:1.1em; }
   .start-actions { display:flex; flex-direction:column; align-items:center; gap:10px; }
   .start-checklist-link { font-size:0.95em; color:var(--primary); text-decoration:underline; cursor:pointer; }
   .start-checklist-link:hover { color:var(--primary-hover); }
@@ -366,7 +366,7 @@
     body:not(.plan-ready)::after { content:"Please finish answering the questions to generate your action plan before printing."; display:block; padding:40px 20px; text-align:center; font-size:1.2em; font-weight:bold; }
     body.plan-ready .container { box-shadow:none; border:none; padding:0; margin:20px auto; background:white; }
     h2, h3, .section-title { color:black; }
-    body.plan-ready #startView, body.plan-ready #startInfoActions, body.plan-ready #welcomeBackView, body.plan-ready #wizardView, body.plan-ready #checklistView, body.plan-ready .btn-group, body.plan-ready .footer { display:none !important; }
+    body.plan-ready #startView, body.plan-ready #welcomeBackView, body.plan-ready #wizardView, body.plan-ready #checklistView, body.plan-ready .btn-group, body.plan-ready .footer { display:none !important; }
     body.plan-ready #planView { display:block !important; }
     .plan-print-footer { display:block !important; margin-top:20px; padding-top:10px; border-top:1px solid #000; font-size:0.85em; color:#333; }
     .plan-top-details { border:1px solid #ccc; background:transparent; }
@@ -395,7 +395,6 @@
 <div id="liveRegion" aria-live="polite" aria-atomic="true"></div>
 <header class="hero">
   <h1>Be myself</h1>
-  <p>A free, private tool that helps trans and non-binary people in the UK plan a name and gender marker change across their legal documents.</p>
 </header>
 <div id="controlBar" role="region" aria-label="Page controls for your plan">
   <div id="saveWarnBanner" class="hidden save-warn-banner" role="alert">
@@ -438,7 +437,7 @@
   <span id="lock-visa-reason" class="visually-hidden">You usually need to update your home country passport first, as UKVI generally needs that as evidence before your eVisa can be changed.</span>
   <div id="startView">
     <div class="start-actions">
-      <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start now</button>
+      <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start here</button>
       <a class="start-checklist-link" id="startChecklistLink" href="#" onclick="startChecklist();return false;">Or view all questions as a single checklist</a>
     </div>
   </div>
@@ -649,7 +648,7 @@
   </div>
   <div class="dialog-body">
     <h3 style="margin:0 0 6px 0;font-size:1em;">Getting started</h3>
-    <p>Click <strong>Start now</strong> to answer questions one at a time, or use the checklist link beneath it to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
+    <p>Click <strong>Start here</strong> to answer questions one at a time, or use the checklist link beneath it to see everything at once. Both produce the same plan and you can switch between them at any time.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Toolbar</h3>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Always shown</p>
     <div class="legend-toolbar" aria-hidden="true" style="margin-bottom:12px;">

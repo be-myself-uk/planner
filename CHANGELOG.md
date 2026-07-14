@@ -39,6 +39,7 @@ Each entry sits under one of these categories:
   - Softened the "Quick exit" description to accurately describe what it does (replaces the page in your tab's history) rather than overstating it as removing all browser history.
   - Corrected a line about deleting your data: clearing your browser history alone does not remove saved answers, since those are stored separately.
   - Added short notes to the NHS, HMRC, and UK visa/eVisa checklist items clarifying that ticking them means the record is already updated, not just that you have one.
+  - Renamed the "Start now" button to "Start here".
 - **Code**
   - The step-by-step wizard now always asks about the NHS record, registering with a new GP, and HMRC, so people only changing their gender marker see the same questions as the checklist. The HMRC question now appears earlier, before the driving licence and passport questions, matching the order steps appear in the plan.
   - The driving licence and passport wizard questions now grey out "It is already updated" when it is not possible, instead of silently changing the answer afterwards.
@@ -52,6 +53,7 @@ Each entry sits under one of these categories:
   - Each selected service now has its own bordered block in the plan's expanded details when more than one is selected, making it clearer where one service's information ends and the next begins.
   - Fixed a plan step's "more information" text being cut off partway through when many services were selected, caused by an animation height limit that was too low for that much content.
   - Added "What is this?" and "How do I use it?" buttons to the start screen, below the toolbar, giving quick access to the About and Usage guide dialogs before starting.
+  - Sized the new start screen buttons to match the main "Start here" button, and removed the hero tagline underneath the site title.
 
 ## [July 2026 Update]
 

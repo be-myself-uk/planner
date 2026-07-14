@@ -22,7 +22,7 @@ async function openChecklist(page) {
 
 async function openWizard(page) {
   await checkAgeGate(page);
-  await page.getByRole('button', { name: 'Start now' }).click();
+  await page.getByRole('button', { name: 'Start here' }).click();
 }
 
 async function wizardNext(page) {
@@ -85,7 +85,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planView')).toBeHidden();
       await expect(page.locator('#welcomeBackView')).toBeHidden();
       await expect(page.getByRole('button', { name: 'Switch view' })).toBeHidden();
-      await expect(page.getByRole('button', { name: 'Start now' })).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Start here' })).toBeEnabled();
       await expect(page.locator('.start-checklist-link')).toBeVisible();
     });
 
@@ -107,7 +107,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('2. Age gate — wizard Q1', async ({ page }) => {
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
       const qText = await page.locator('#wizardStepFieldset legend, #wizardStepFieldset .chk-q, #wizardOptionsGroup').first().textContent();
       expect(qText).toMatch(/16|aged/);
@@ -117,7 +117,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('2b. Disclaimer gate — wizard Q2', async ({ page }) => {
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await page.locator('input[name=ans][value=yes]').check();
       await page.getByRole('button', { name: 'Continue' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
@@ -132,7 +132,7 @@ test.describe('Be myself Planner', () => {
       await checkAgeGate(page);
       await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('ageConfirmed') === 'true'));
       expect(await page.evaluate(() => localStorage.getItem('ageConfirmed'))).toBe('true');
-      await expect(page.getByRole('button', { name: 'Start now' })).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Start here' })).toBeEnabled();
     });
 
     test('4. Wizard flow', async ({ page }) => {
@@ -239,7 +239,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('59. Age/disclaimer gate sync between wizard and checklist', async ({ page }) => {
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await wizardNext(page); // age question
       await wizardNext(page); // disclaimer question
       await page.getByRole('button', { name: 'Switch view' }).click();
@@ -249,7 +249,7 @@ test.describe('Be myself Planner', () => {
 
     test('62. Wizard back navigation steps back one question at a time from a fresh session', async ({ page }) => {
       await page.goto(filePath);
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await page.locator('input[name="ans"]:not([disabled])').first().check();
       await page.getByRole('button', { name: 'Continue →' }).click();
       await page.locator('input[name="ans"]:not([disabled])').first().check();
@@ -292,7 +292,7 @@ test.describe('Be myself Planner', () => {
       await expect(tip).toBeHidden();
     });
 
-    test('68. Wizard edit tip does not resurface after New plan then Start now', async ({ page }) => {
+    test('68. Wizard edit tip does not resurface after New plan then Start here', async ({ page }) => {
       await openWizard(page);
       let q = 0;
       while (await page.locator('#wizardView').isVisible() && q < 40) {
@@ -310,7 +310,7 @@ test.describe('Be myself Planner', () => {
       await restartBtn.click();
       await restartBtn.click();
       await page.locator('#dlgDisclaimer').getByRole('button', { name: 'Close' }).click();
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
       await expect(tip).toBeHidden();
     });
