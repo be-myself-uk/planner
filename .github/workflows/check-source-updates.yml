@@ -1,0 +1,42 @@
+name: Check Source Updates
+
+on:
+  schedule:
+    - cron: "0 1 1,15 * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  source-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check GOV.UK sources against their Last verified date
+        id: check
+        run: python3 .github/scripts/check_source_updates.py | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check for existing open issue
+        if: steps.check.outputs.changes_detected == 'true'
+        id: existing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'source-changed',
+              state: 'open'
+            });
+            core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+
+      - name: Create issue if a source may have changed
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'false'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "📄 Possible source changes in SOURCES.md"
+          content-filepath: ./source-watch-report.md
+          labels: source-changed
