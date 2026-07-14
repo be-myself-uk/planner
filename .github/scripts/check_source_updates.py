@@ -201,5 +201,79 @@ def write_report(stale, errors, skipped_pending, skipped_non_govuk):
     REPORT_FILE.write_text("\n".join(lines) + "\n")
 
 
+SELFTEST_FIXTURE = """\
+## Section One
+
+- **Old flat format entry**
+  <https://www.gov.uk/old-flat-format>
+  Status: Linked in the planner
+  Last verified: pending
+
+### Section One A
+
+- **New nested format entry**
+  - <https://www.gov.uk/new-nested-format>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-01-15
+
+- **Duplicate URL, first occurrence**
+  - <https://www.gov.uk/shared-url>
+  - Status: Linked in the planner
+  - Last verified: pending
+
+## Section Two
+
+- **Duplicate URL, second occurrence**
+  <https://www.gov.uk/shared-url>
+  Status: Consulted, not linked in the planner
+  Last verified: 2025-06-01
+
+- **Non-GOV.UK entry**
+  - <https://www.nidirect.gov.uk/example>
+  - Status: Linked in the planner
+  - Last verified: pending
+"""
+
+
+def run_selftest():
+    """Parses a small fixture covering both known SOURCES.md formats and
+    asserts the parser handles each field correctly. Run by hand after
+    changing SOURCES.md's structure: `python3 check_source_updates.py --selftest`.
+    Not run automatically in CI, to keep the scheduled workflow fast; this
+    exists so a format change can be checked before it reaches a scheduled run.
+    """
+    entries = parse_sources(SELFTEST_FIXTURE)
+    assert len(entries) == 5, f"expected 5 entries, got {len(entries)}"
+
+    by_name = {e["name"]: e for e in entries}
+
+    e = by_name["Old flat format entry"]
+    assert e["url"] == "https://www.gov.uk/old-flat-format"
+    assert e["section"] == "Section One"
+    assert e["status"] == "Linked in the planner"
+    assert e["last_verified"] == "pending"
+
+    e = by_name["New nested format entry"]
+    assert e["url"] == "https://www.gov.uk/new-nested-format"
+    assert e["section"] == "Section One A"
+    assert e["status"] == "Consulted, not linked in the planner"
+    assert e["last_verified"] == "2026-01-15"
+
+    first = by_name["Duplicate URL, first occurrence"]
+    second = by_name["Duplicate URL, second occurrence"]
+    assert first["url"] == second["url"] == "https://www.gov.uk/shared-url"
+    assert first["section"] == "Section One A" and second["section"] == "Section Two"
+    assert first["last_verified"] == "pending" and second["last_verified"] == "2025-06-01"
+
+    e = by_name["Non-GOV.UK entry"]
+    parsed = urlparse(e["url"])
+    assert parsed.netloc not in ("www.gov.uk", "gov.uk")
+
+    print("selftest passed: 5/5 entries parsed correctly across both formats")
+
+
 if __name__ == "__main__":
+    if "--selftest" in sys.argv:
+        run_selftest()
+        sys.exit(0)
     main()
