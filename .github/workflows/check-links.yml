@@ -19,7 +19,7 @@ jobs:
         id: lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          args: "--verbose --no-progress './index.html' './README.md' './CHANGELOG.md'"
+          args: "--verbose --no-progress './index.html' './README.md' './CHANGELOG.md' './SOURCES.md'"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -44,4 +44,3 @@ jobs:
           title: "🚨 Broken links detected in the planner"
           content-filepath: ./lychee/out.md
           labels: bug, broken-links
-          
