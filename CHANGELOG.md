@@ -21,6 +21,17 @@ Each entry sits under one of these categories:
   - Corrected the NHS and HMRC document checklist items: neither actually requires a deed poll or statutory declaration, so both are no longer locked behind one.
   - Corrected Northern Ireland service guidance: domestic rates are handled through Land & Property Services rather than Council Tax, electoral registration is through the Electoral Office for Northern Ireland rather than the local council, and vehicle logbook (V5C) updates go through the DVLA rather than the DVA.
   - Corrected the HMRC guidance shown to people only changing their gender marker, so it no longer includes name-change-only wording.
+  - Corrected the V5C (vehicle log book) step: there is no online option for a name change, it is postal only.
+  - Fixed the AccessNI link, which pointed to a generic contacts page instead of the page describing the transgender applications route.
+  - Added a note that requesting a new NHS number can mean losing your place on NHS waiting lists.
+  - Added a note that a previous name can still appear on older HM Land Registry documents even after using the CNG form, plus the cost of hiding those documents from public inspection.
+  - Added a note that Student Finance England can update a title or gender marker by phone, live chat, or letter with no supporting evidence.
+  - Added a note that the Disclosure Scotland application form only offers Male or Female, even for non-binary applicants.
+  - Added payroll guidance to the work/HR step: name and gender changes should be reported to HMRC as separate submissions, and gender changes can affect National Insurance category letters.
+  - Added the GRC's most basic rule, that it only recognises male or female, to the GRC steps directly instead of leaving it implied.
+  - Added a note that a non-consenting spouse does not block a GRC application outright, since an interim certificate can be used instead.
+  - Added a note that DVLA/DVA and vehicle keepers can be fined up to £1,000 for not reporting a name change.
+  - Added a note to check with your home country's embassy or consulate in the UK as a first step for a home country passport update.
 - **Wording**
   - Softened the "Quick exit" description to accurately describe what it does (replaces the page in your tab's history) rather than overstating it as removing all browser history.
   - Corrected a line about deleting your data: clearing your browser history alone does not remove saved answers, since those are stored separately.
