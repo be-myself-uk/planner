@@ -30,9 +30,12 @@ Each entry sits under one of these categories:
   - Added payroll guidance to the work/HR step: name and gender changes should be reported to HMRC as separate submissions, and gender changes can affect National Insurance category letters.
   - Added the GRC's most basic rule, that it only recognises male or female, to the GRC steps directly instead of leaving it implied.
   - Added a note that a non-consenting spouse does not block a GRC application outright, since an interim certificate can be used instead.
-  - Added a note that DVLA/DVA and vehicle keepers can be fined up to £1,000 for not reporting a name change.
+  - Added a note that DVLA/DVA and vehicle keepers can face a large fine for not reporting a name change.
   - Added a note to check with your home country's embassy or consulate in the UK as a first step for a home country passport update.
+  - Split the land title register service item by region, so it only shows the guidance relevant to where you live instead of all three nations at once.
 - **Wording**
+  - Simplified the deed poll "What if an organisation refuses?" note into a plain paragraph instead of a collapsible sub-section, matching how other services show their extra information.
+  - Removed specific fee and fine amounts in favour of the same cost-tier wording used elsewhere (Free / Small cost / Medium cost / Higher cost, or "a large fine"), since exact figures can go out of date.
   - Softened the "Quick exit" description to accurately describe what it does (replaces the page in your tab's history) rather than overstating it as removing all browser history.
   - Corrected a line about deleting your data: clearing your browser history alone does not remove saved answers, since those are stored separately.
   - Added short notes to the NHS, HMRC, and UK visa/eVisa checklist items clarifying that ticking them means the record is already updated, not just that you have one.

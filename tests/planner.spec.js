@@ -740,14 +740,31 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).toContainText('You must be 18 or over to apply for a UK GRC.');
     });
 
-    test('72. Land title register service covers all three nations', async ({ page }) => {
+    test('72. Land title register service shows England and Wales guidance by default', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkSvcLandReg').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.getByText('Land title register', { exact: true })).toBeVisible();
-      await expect(page.locator('#planContent')).toContainText('HM Land Registry');
-      await expect(page.locator('#planContent')).toContainText('Registers of Scotland');
-      await expect(page.locator('#planContent')).toContainText('Land & Property Services');
+      await expect(page.locator('#svc_detail_landreg')).toContainText('HM Land Registry');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Registers of Scotland');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Land & Property Services');
+    });
+
+    test('72b. Land title register service switches guidance for Scotland and Northern Ireland', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkRegion"][value="scot"]').check();
+      await page.locator('#chkSvcLandReg').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#svc_detail_landreg')).toContainText('Registers of Scotland');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('form (CNG)');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Land & Property Services');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('input[name="chkRegion"][value="ni"]').check();
+      await page.getByRole('button', { name: 'Update my action plan' }).click();
+      await expect(page.locator('#svc_detail_landreg')).toContainText('Land & Property Services');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('form (CNG)');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Registers of Scotland');
     });
 
     test('76. HMRC plan item varies by goal; titles tip shows on gender-only plans', async ({ page }) => {
