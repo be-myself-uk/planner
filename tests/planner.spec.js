@@ -89,9 +89,9 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('.start-checklist-link')).toBeVisible();
     });
 
-    test('85. Start view info buttons open the About and Usage guide dialogs', async ({ page }) => {
-      const aboutBtn = page.locator('.start-info-actions button', { hasText: 'What is this?' });
-      const usageBtn = page.locator('.start-info-actions button', { hasText: 'How do I use it?' });
+    test('85. Toolbar About/Usage buttons only show on the start view and open their dialogs', async ({ page }) => {
+      const aboutBtn = page.locator('#cbAboutBtn');
+      const usageBtn = page.locator('#cbUsageBtn');
       await expect(aboutBtn).toBeVisible();
       await expect(usageBtn).toBeVisible();
 
@@ -104,6 +104,10 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#dlgUsage')).toBeVisible();
       await page.keyboard.press('Escape');
       await expect(page.locator('#dlgUsage')).toBeHidden();
+
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await expect(aboutBtn).toBeHidden();
+      await expect(usageBtn).toBeHidden();
     });
 
     test('2. Age gate — wizard Q1', async ({ page }) => {
@@ -941,8 +945,16 @@ test.describe('Be myself Planner', () => {
       await expect(dlg).toBeVisible();
     });
 
-    test('60. Mobile toolbar layout: one row for wizard, two rows for plan view', async ({ page }) => {
+    test('60. Mobile toolbar layout: one row for wizard, two rows for plan and start views', async ({ page }) => {
       await page.setViewportSize({ width: 412, height: 915 });
+
+      const leftTopStart = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
+      const rightTopStart = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);
+      expect(leftTopStart).toBeGreaterThan(rightTopStart + 5);
+      const leftBoxStart = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect());
+      const aboutBoxStart = await page.locator('#cbAboutBtn').evaluate(el => el.getBoundingClientRect());
+      expect(aboutBoxStart.left).toBeGreaterThan(leftBoxStart.left + 5);
+
       await openWizard(page);
       const leftTopWizard = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
       const rightTopWizard = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);
