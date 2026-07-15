@@ -835,7 +835,7 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await expect(page.locator('#planContent')).toContainText('The final legal step (Irish passport)');
+      await expect(page.locator('#planContent')).toContainText('The final step (Irish passport)');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
       await expect(page.locator('#planContent')).toContainText('You have not included a UK Gender Recognition Certificate');
     });
