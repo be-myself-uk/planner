@@ -52,7 +52,7 @@ Each entry sits under one of these categories:
 - **Layout**
   - Each selected service now has its own bordered block in the plan's expanded details when more than one is selected, making it clearer where one service's information ends and the next begins.
   - Fixed a plan step's "more information" text being cut off partway through when many services were selected, caused by an animation height limit that was too low for that much content.
-  - Added About and Usage guide buttons to the toolbar itself, visible only on the start screen, giving quick access to those dialogs before starting. They match the toolbar's existing button style exactly and wrap onto their own centred row on small screens, the same way the plan view's toolbar buttons do.
+  - Added "What is this?" and "How do I use it?" buttons to the toolbar itself, visible only on the start screen, giving quick access to the About and Usage guide dialogs before starting. They match the toolbar's size and colour, and wrap onto their own row on small screens, the same way the plan view's toolbar buttons do.
   - Removed the hero tagline underneath the site title.
   - The site title and footer are now boxed cards matching the toolbar's style and width, instead of full-width bars, for a more consistent look. Unlike the toolbar, they scroll normally rather than staying fixed in place.
   - Tightened the padding inside those boxes and the gaps around them, giving the main content more of the screen.
