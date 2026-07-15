@@ -106,8 +106,6 @@ def fetch(url):
 
 def govuk_public_updated_at(url):
     parsed = urlparse(url)
-    if parsed.netloc not in ("www.gov.uk", "gov.uk"):
-        return None, "not a gov.uk URL"
     api_url = f"https://www.gov.uk/api/content{parsed.path}"
     try:
         body = fetch(api_url)
@@ -177,8 +175,8 @@ def write_report(stale, errors, skipped_pending, skipped_non_govuk):
     lines.append(
         "Automated check against the GOV.UK Content API. A listing here means the "
         "source's `public_updated_at` is newer than the `Last verified` date recorded "
-        "for it in `SOURCES.md`. Review the source against its `Supports` note, then "
-        "update `Last verified` in `SOURCES.md` regardless of outcome.\n"
+        "for it in `SOURCES.md`. Review the source, then update `Last verified` in "
+        "`SOURCES.md` regardless of outcome.\n"
     )
     lines.append(
         f"_{skipped_pending} GOV.UK source(s) skipped because they have no verified date "
