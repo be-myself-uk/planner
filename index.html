@@ -57,7 +57,7 @@
           <button id="ubMakeChangesBtn" class="ub-icon-btn" onclick="makeChanges()" aria-label="Edit plan" title="Edit plan"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
           <div class="ub-sep" aria-hidden="true"></div>
           <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">🧹</span></button>
-          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
+          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus mode</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
           <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
           <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
         </div>
@@ -2009,18 +2009,10 @@ function buildSharedPlan(p) {
   const renderCost = (c) => c.type === 'split' ? splitCost(c.value, c.value2, c.badge, c.badge2) : cost(c.value, c.badge);
   let stepNum = 0;
   const nextStep = () => ++stepNum;
-  let html = '';
-  if (costs.length || timeText) {
-    let inner = '';
-    if (timeText) inner += `<p><strong>⏳ Estimated time:</strong> ${timeText}</p>`;
-    if (costs.length) inner += `<p><strong>💰 Approximate costs:</strong></p>${costs.map(c => `<p class="plan-cost-item">${c}</p>`).join('')}`;
-    html += `<div class="plan-top-summary">${inner}</div>`;
-  }
   let stepsHtml = '';
   const addStep = chunk => { stepsHtml += chunk; };
   let phaseIdx = 0;
   const nextPhaseColour = () => 'phase-' + (phaseIdx++ % 4);
-  html += PLAN_ITEMS.titles_info.html;
   if (!isGender && !p.hasDeedPoll) {
     const isScot = p.region === REGION.SCOT;
     const sn = nextStep();
@@ -2202,10 +2194,21 @@ ${p.bornInNI ? '<p>Because you were born in Northern Ireland, you may also have 
 </div>`);
   };
   if (hasStep4) buildFinalStep();
-  if (!stepsHtml) stepsHtml = `<div class="phase success" role="status">
+  let html = '';
+  if (stepsHtml) {
+    if (costs.length || timeText) {
+      let inner = '';
+      if (timeText) inner += `<p><strong>⏳ Estimated time:</strong> ${timeText}</p>`;
+      if (costs.length) inner += `<p><strong>💰 Approximate costs:</strong></p>${costs.map(c => `<p class="plan-cost-item">${c}</p>`).join('')}`;
+      html += `<div class="plan-top-summary">${inner}</div>`;
+    }
+    html += PLAN_ITEMS.titles_info.html;
+  } else {
+    stepsHtml = `<div class="phase success" role="status">
   <h2>🎉 Nothing left to do!</h2>
   <p>Based on your answers, all of your main legal documents and records are already up to date. You should be proud of yourself. Take some time to celebrate!</p>
 </div>`;
+  }
   gel('planContent').innerHTML = html + stepsHtml;
   restoreTrackers();
   } catch(e) {
@@ -2379,16 +2382,22 @@ function checkAllDone() {
     return s === 2 || s === 3;
   });
   const banner = gel('allDoneBanner');
+  const topSummary = document.querySelector('.plan-top-summary');
+  const topDetails = document.querySelector('.plan-top-details');
   if (done && !banner) {
     const b = document.createElement('div');
     b.id = 'allDoneBanner'; b.className = 'phase success'; b.setAttribute('role','status'); b.style.marginTop = '25px';
     b.innerHTML = '<h3>🎉 All done!</h3><p>You have completed all the steps on your action plan.</p><p>You should be proud of yourself. Take some time to celebrate!</p>';
     gel('planContent').appendChild(b);
+    if (topSummary) topSummary.classList.add('hidden');
+    if (topDetails) topDetails.classList.add('hidden');
     announce('Congratulations! You have completed all the steps in your plan.');
     launchConfetti();
   } else if (!done && banner) {
     banner.remove();
     fadeOutConfetti();
+    if (topSummary) topSummary.classList.remove('hidden');
+    if (topDetails) topDetails.classList.remove('hidden');
   }
 }
 
