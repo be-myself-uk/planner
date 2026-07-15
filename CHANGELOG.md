@@ -55,6 +55,7 @@ Each entry sits under one of these categories:
   - Added "What is this?" and "How do I use it?" buttons to the start screen, below the toolbar, giving quick access to the About and Usage guide dialogs before starting.
   - Sized the new start screen buttons to match the main "Start here" button, and removed the hero tagline underneath the site title.
   - The site title and footer are now boxed cards matching the toolbar's style and width, instead of full-width bars, for a more consistent look. Unlike the toolbar, they scroll normally rather than staying fixed in place.
+  - Tightened the padding inside those boxes and the gaps around them, giving the main content more of the screen.
 
 ## [July 2026 Update]
 
