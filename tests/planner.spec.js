@@ -53,6 +53,15 @@ async function reloadUntil(page, conditionFn, attempts = 12) {
   throw new Error(`reloadUntil: condition still false after ${attempts} reloads`);
 }
 
+async function gotoUntil(page, url, conditionFn, attempts = 12) {
+  for (let i = 0; i < attempts; i++) {
+    await page.goto(url);
+    if (await conditionFn()) return;
+    await page.waitForTimeout(100);
+  }
+  throw new Error(`gotoUntil: condition still false after ${attempts} navigations`);
+}
+
 function decodeState(encoded) {
   const bin = Buffer.from(encoded, 'base64').toString('binary');
   const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
@@ -687,7 +696,7 @@ test.describe('Be myself Planner', () => {
       const clip = await page.evaluate(() => window._shareUrl);
       const decoded = decodeState(new URL(clip).searchParams.get('p'));
       expect(decoded.svn).toBe(true);
-      await page.goto(clip);
+      await gotoUntil(page, clip, () => page.evaluate(() => wizardState.svcNone === 'yes'));
       expect(await page.evaluate(() => wizardState.svcNone)).toBe('yes');
     });
 
@@ -828,7 +837,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#svc_detail_council')).toContainText('Land & Property Services');
       await expect(page.locator('#svc_detail_electoral')).toContainText('Electoral Office for Northern Ireland');
       await expect(page.locator('#svc_detail_electoral')).not.toContainText('open register');
-      await expect(page.locator('#planContent')).toContainText('handled centrally by the DVLA');
+      await expect(page.locator('#planContent')).toContainText('Update your V5C with the DVLA to show your new name.');
     });
 
     test('79. NI-born users who decline a GRC get an Irish-passport-only final step', async ({ page }) => {
