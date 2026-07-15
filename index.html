@@ -716,7 +716,7 @@ const PLAN_ITEMS = {
         summary: 'HM Passport Office will need your deed poll and evidence that you are using your new name. The GOV.UK link below has the full details.',
       },
     },
-    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Medical letter:</strong> HMPO is strict about what this letter must include. According to HMPO\'s published guidance, it should:</p><ul class="bullet-list"><li>Be written by either a UK-registered medical professional (GMC or HCPC) or a non-UK registered medical professional that can evidence their qualifications and experience</li><li>Be dated</li><li>State your name and specified gender</li><li>Confirm you use your name and gender for all purposes</li><li>State that your gender change is "likely to be permanent"</li></ul><p>The GOV.UK link below has the full requirements.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><p><strong>⚠️ Non-binary marker:</strong> UK passports currently only offer M or F: there is no X or non-binary option. You can still note your identity in the additional information section of your application, but the passport itself will show M or F. This is a known gap that campaigners are pushing to change.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
+    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change, a letter from a medical professional (such as your GP or a gender specialist) is required, unless you already have a GRC.</p><p><strong>⚠️ Medical letter:</strong> HMPO is strict about what this letter must include. According to HMPO\'s published guidance, it should:</p><ul class="bullet-list"><li>Be written by either a UK-registered medical professional (GMC or HCPC) or a non-UK registered medical professional that can evidence their qualifications and experience</li><li>Be dated</li><li>State your name and specified gender</li><li>Confirm you use your name and gender for all purposes</li><li>State that your gender change is "likely to be permanent"</li></ul><p>The GOV.UK link below has the full requirements.</p><p><strong>⚠️ If you are 16 or 17:</strong> unlike a name-only change, a gender marker change needs the signed consent of everyone with parental responsibility for you. HM Passport Office can apply an exception if you cannot get that consent because of safeguarding concerns; contact them directly if this applies to you.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><p><strong>⚠️ Non-binary marker:</strong> UK passports currently only offer M or F: there is no X or non-binary option. You can still note your identity in the additional information section of your application, but the passport itself will show M or F. This is a known gap that campaigners are pushing to change.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Change your name or gender on your passport</a>',
   },
   irish_passport: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small cost', badge:'success', badge2:'simultaneous' },
@@ -759,6 +759,10 @@ const PLAN_ITEMS = {
       default: {
         summaryFn: () => 'Once you receive your GRC, the General Register Office (GRO) will usually contact you automatically about updating your birth certificate.',
         detail: '<p>In most cases, once your GRC has been issued, the General Register Office (GRO) will get in touch directly about issuing a new birth certificate. There is no need to apply separately, so wait for their letter after the GRC arrives.</p>\n<p>If nothing has arrived within a few weeks, contact the GRO to follow up.</p>\n<a href="https://www.gov.uk/apply-gender-recognition-certificate" target="_blank" rel="noopener noreferrer" class="links">🔗 GOV.UK: Apply for a GRC</a>',
+      },
+      out: {
+        summaryFn: () => 'Your birth was registered outside the UK, so this step is not covered by this planner — check with the registration authority in the country where your birth was registered.',
+        detail: '<p>This planner\'s birth-certificate guidance only covers births registered in the UK (England and Wales, Scotland, or Northern Ireland), where a UK Gender Recognition Certificate (GRC) triggers an automatic update from the General Register Office or its equivalent.</p><p>Since your birth was registered outside the UK, there is no UK-held birth record for a GRC to update, and this planner does not cover the process for updating a birth certificate issued by another country. Check with that country\'s registration authority directly.</p>',
       },
     },
   },
@@ -1384,24 +1388,27 @@ function renderChecklist() {
 }
 function planParamsFromWizard() {
   const isNI = wizardState.region === REGION.NI;
+  const isOutsideUK = wizardState.regionOutsideUK === S.YES;
   return {
     region:             wizardState.region || REGION.EW,
     goal:               wizardState.goal,
     isNonUK:            wizardState.citizen     === S.YES,
     visaAlreadyUpdated: wizardState.visaUpdated === S.YES,
     hasDeedPoll:        wizardState.deedpoll    === S.YES,
-    needsNHS:           wizardState.nhs === S.NO && wizardState.newGP !== S.YES,
-    newGP:              wizardState.newGP       === S.YES,
+    needsNHS:           !isOutsideUK && wizardState.nhs === S.NO && wizardState.newGP !== S.YES,
+    newGP:              !isOutsideUK && wizardState.newGP === S.YES,
     needsDriving:       wizardState.driving     === S.NEEDS_UPDATE,
     needsPassport:      wizardState.passport    === S.NEEDS_UPDATE,
     needsHMRC:          wizardState.hmrc        !== S.YES,
-    dwp:                wizardState.dwp         === S.YES,
+    dwp:                !isOutsideUK && wizardState.dwp === S.YES,
     employment:         wizardState.employment,
-    dbs:                wizardState.dbs         === S.YES,
-    services:           Array.isArray(wizardState.services) ? wizardState.services : [],
+    dbs:                !isOutsideUK && wizardState.dbs === S.YES,
+    services:           (Array.isArray(wizardState.services) ? wizardState.services : [])
+                           .filter(s => !isOutsideUK || (s !== 'council' && s !== 'electoral')),
     student:            wizardState.student     === S.YES,
     birthCertName:      wizardState.birthCertName === S.YES,
     birthCert:          wizardState.birthCert   === S.YES,
+    birthOutsideUK:     wizardState.birthOutsideUK === S.YES,
     wantsGRC:           wizardState.grc         === S.YES || wizardState.birthCert === S.YES,
     isNI,
     bornInNI:           wizardState.birthRegion === REGION.NI,
@@ -1420,20 +1427,26 @@ function updateLocks() {
   const hasDeed   = wizardState.deedpoll === S.YES;
   const isScot    = region === REGION.SCOT;
   const isNI      = region === REGION.NI;
+  const isOutsideUK = wizardState.regionOutsideUK === S.YES;
   [
     ['wrapGRC',           isName],
     ['wrapDeedPoll',      isGender],
     ['wrapVisa',          !isNonUK],
-    ['wrapDBS',           !isEmployed],
-    ['wrapDWP',           false],
+    ['wrapNHS',           isOutsideUK],
+    ['wrapDBS',           !isEmployed || isOutsideUK],
+    ['wrapDWP',           isOutsideUK],
     ['wrapHMRC',          false],
     ['wrapChkServices',   isGender],
     ['wrapVehicle',       isGender],
     ['wrapBirthCert',     isName],
     ['wrapBirthCertName', (wizardState.birthRegion !== REGION.SCOT && wizardState.birthRegion !== REGION.NI) || isGender],
-    ['wrapNewGP',         false],
+    ['wrapNewGP',         isOutsideUK],
   ].forEach(([id, hide]) => { const el = gel(id); if (el) el.classList.toggle('hidden', hide); });
-  
+  ['chkSvcCouncil', 'chkSvcElectoral'].forEach(id => {
+    const label = gel(id)?.closest('label');
+    if (label) label.classList.toggle('hidden', isOutsideUK);
+  });
+
   document.body.setAttribute('data-region', region);
   document.body.setAttribute('data-birth-region', wizardState.birthRegion || REGION.EW);
   const specSection = gel('wrapSpecificChoices');  if (specSection) {
@@ -1582,7 +1595,7 @@ const questions = [
       : wizardState.region === REGION.NI
       ? 'Is your HSCNI health record updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Health and Social Care Northern Ireland uses a Health and Care Number (HCN) instead of an NHS number. A gender marker update triggers a new HCN and affects automated cancer screening invitations.</em>'
       : 'Is your NHS (health) record updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:6px;color:var(--text-muted);">Changing your gender marker on your NHS record affects which screening programmes you are automatically invited to, and the process differs from a name-only change.</em>',
-    o:() => [[S.YES,'Yes'],[S.NO,'No']]
+    cond:() => wizardState.regionOutsideUK !== S.YES, o:() => [[S.YES,'Yes'],[S.NO,'No']]
   },
   { id:'newGP',
     q:() => wizardState.region === REGION.SCOT
@@ -1590,7 +1603,7 @@ const questions = [
       : wizardState.region === REGION.NI
       ? 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number may be issued. This is an alternative to updating your current record.</em>'
       : 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new details are on file from day one, with no need to update an existing record. This is an alternative to updating your current record.</em>',
-    o:() => [
+    cond:() => wizardState.regionOutsideUK !== S.YES, o:() => [
     [S.YES,'Yes, I would like to register with a new GP'],
     [S.NO, 'No']
   ]},
@@ -1616,19 +1629,19 @@ const questions = [
     ? 'Does your role or course require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>'
     : wizardState.region === REGION.SCOT
     ? 'Does your role or course require a Disclosure Scotland check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Disclosure Scotland is Scotland\'s equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people, including many nursing, teaching, and social work courses. There is a specific process for trans people that keeps your previous name off the certificate shown to your employer or university.</em>'
-    : 'Does your role or course require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A DBS check is a background check for roles and placements working with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE, o:() => [
+    : 'Does your role or course require a DBS check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A DBS check is a background check for roles and placements working with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>', cond:() => wizardState.employment === S.NEEDS_UPDATE && wizardState.regionOutsideUK !== S.YES, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'dwp', q:() => wizardState.region === REGION.NI
     ? 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), or Employment Support Allowance. Updating your details while claiming benefits can sometimes cause delays.</em>'
     : 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.</em>',
-    o:() => [
+    cond:() => wizardState.regionOutsideUK !== S.YES, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'services', type:'multi',
     q:'Do you need to update any of these services?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Select all that apply.</em>',
     cond:() => wizardState.goal !== S.GENDER,
-    o:() => SERVICES.map(s => ({ value:s.key, label:s.label }))
+    o:() => SERVICES.filter(s => wizardState.regionOutsideUK !== S.YES || (s.key !== 'council' && s.key !== 'electoral')).map(s => ({ value:s.key, label:s.label }))
   },
   { id:'vehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em>', o:() => [
     [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
@@ -1852,6 +1865,7 @@ function generateChecklistPlan() {
     const ag = gel('checklistAgeGate');
     if (ag) ag.classList.add('error');
     gel('checklistAgeGate')?.scrollIntoView({behavior:'smooth', block:'center'});
+    gel('checklistAgeConfirm')?.focus({preventScroll:true});
     announce('Confirm you are aged 16 or over to continue.');
     return;
   }
@@ -1861,6 +1875,7 @@ function generateChecklistPlan() {
     const dg = gel('checklistDisclaimerGate');
     if (dg) dg.classList.add('error');
     gel('checklistDisclaimerGate')?.scrollIntoView({behavior:'smooth', block:'center'});
+    gel('checklistDisclaimerConfirm')?.focus({preventScroll:true});
     announce('Confirm you understand the disclaimer to continue.');
     return;
   }
@@ -2160,7 +2175,7 @@ function buildSharedPlan(p) {
     const _ip  = PLAN_ITEMS.irish_passport;
     const _gm  = planItemRegion(PLAN_ITEMS.grc_med, isNI ? 'ni' : 'default');
     const _gl  = PLAN_ITEMS.grc_life;
-    const _bc  = planItemRegion(PLAN_ITEMS.birthcert, isNI ? 'ni' : isScotland ? 'scot' : 'default');
+    const _bc  = planItemRegion(PLAN_ITEMS.birthcert, p.birthOutsideUK ? 'out' : isNI ? 'ni' : isScotland ? 'scot' : 'default');
     const grcAgeNote = '<p><strong>⚠️ Minimum age:</strong> You must be 18 or over to apply for a UK GRC. If you are 16 or 17, you can still start gathering the living-proof evidence now, since it needs to cover two years.</p>';
     const wantsUkGrc = p.wantsGRC || p.birthCert;
     const grcIntro = !wantsUkGrc
