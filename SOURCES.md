@@ -43,7 +43,7 @@ For items with no official source, the links in the general data protection sect
 ### Scotland
 
 - **National Records of Scotland: Changing your name**
-  - <https://www.nrscotland.gov.uk/registration/changing-your-name/>
+  - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
@@ -61,7 +61,7 @@ For items with no official source, the links in the general data protection sect
 ### Scotland
 
 - **National Records of Scotland: Changing your name**
-  - <https://www.nrscotland.gov.uk/registration/changing-your-name/>
+  - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
@@ -255,6 +255,12 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible>
   - Status: Consulted, not linked in the planner
   - Last verified: 2026-07-13
+
+- **HM Passport Office caseworker guidance: Authorisation and consent needed to issue a passport**
+  - <https://www.gov.uk/government/publications/authorisation-and-consent-needed-to-issue-a-passport/authorisation-and-consent-needed-to-issue-a-passport-accessible#when-we-need-additional-consent>
+  - Status: Consulted, not linked in the planner
+  - Note: "Consent to change the gender on the passport" confirms a gender marker change for someone under 18 needs signed consent from everyone with parental responsibility, with a safeguarding-concerns exception for 16 and 17 year olds; "Consent to change a young adult's name" confirms 16 and 17 year olds can consent to a name-only change themselves.
+  - Last verified: 2026-07-15
 
 ## Immigration, eVisa, and home country passport (evisa, homepass)
 
