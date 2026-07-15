@@ -353,9 +353,14 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
+- **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
+  - <https://www.electoralcommission.org.uk/voting-and-elections/register-vote/register-vote-anonymously>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
 - **GOV.UK: Register to vote anonymously (paper form)**
   - <https://www.gov.uk/government/publications/register-to-vote-anonymously-paper-form>
-  - Status: Linked in the planner
+  - Status: Consulted, not linked in the planner
   - Last verified: 2026-07-13
 
 - **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
@@ -395,13 +400,13 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 
 #### England and Wales
 
-- **GOV.UK: Change of gender (form CNG)**
-  - <https://www.gov.uk/government/publications/change-of-gender-cng>
+- **HM Land Registry: Update or correct the register**
+  - <https://www.gov.uk/registering-land-or-property-with-land-registry/update-or-correct-the-register>
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
-- **HM Land Registry: Update or correct the register**
-  - <https://www.gov.uk/registering-land-or-property-with-land-registry/update-or-correct-the-register>
+- **GOV.UK: Change of gender (form CNG)**
+  - <https://www.gov.uk/government/publications/change-of-gender-cng>
   - Status: Consulted, not linked in the planner
   - Last verified: 2026-07-13
 
