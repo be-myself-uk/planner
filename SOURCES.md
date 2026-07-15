@@ -358,11 +358,6 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
-- **GOV.UK: Register to vote anonymously (paper form)**
-  - <https://www.gov.uk/government/publications/register-to-vote-anonymously-paper-form>
-  - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
-
 - **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
   - <https://www.electoralcommission.org.uk/running-electoral-registration-england/special-category-electors/anonymous-registration/how-should-application-anonymous-registration-be-processed>
   - Status: Consulted, not linked in the planner
