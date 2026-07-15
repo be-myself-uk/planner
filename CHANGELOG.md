@@ -13,6 +13,17 @@ Each entry sits under one of these categories:
 
 ---
 
+## [July 2026 Update (Part three)]
+
+- **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
+
+- **Information**
+  - People living outside the UK are no longer asked about their NHS/GP record, DBS/AccessNI/Disclosure Scotland check, or DWP benefits, and Council Tax and the electoral register no longer appear in the services list, since none of these apply outside the UK. Previously, selecting "Outside the UK" silently reused England and Wales guidance for all of these.
+  - People whose birth was registered outside the UK now see a note on the birth certificate step explaining that this planner does not cover updating a birth certificate issued by another country, instead of being shown England and Wales-specific General Register Office guidance that doesn't apply to them.
+  - Added a note that a passport gender marker change for a 16 or 17 year old needs the signed consent of everyone with parental responsibility, unlike a name-only change which they can consent to themselves.
+- **Code**
+  - Confirming you are aged 16 or over or that you understand the disclaimer in the checklist view now moves screen reader focus directly to the checkbox that needs attention, instead of just scrolling it into view.
+
 ## [July 2026 Update (Part two)]
 
 - **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
