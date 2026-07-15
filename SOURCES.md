@@ -43,7 +43,7 @@ For items with no official source, the links in the general data protection sect
 ### Scotland
 
 - **National Records of Scotland: Changing your name**
-  - <https://www.nrscotland.gov.uk/registration/changing-your-name/>
+  - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
@@ -61,7 +61,7 @@ For items with no official source, the links in the general data protection sect
 ### Scotland
 
 - **National Records of Scotland: Changing your name**
-  - <https://www.nrscotland.gov.uk/registration/changing-your-name/>
+  - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
   - Status: Linked in the planner
   - Last verified: 2026-07-13
 
