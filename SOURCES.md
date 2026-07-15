@@ -76,8 +76,8 @@ For items with no official source, the links in the general data protection sect
 
 - **GOV.UK: What to do if an employee changes gender**
   - <https://www.gov.uk/employee-changes-gender>
-  - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Status: Linked in the planner
+  - Last verified: 2026-07-14
 
 ## HMRC and taxes (hmrc)
 
@@ -157,10 +157,11 @@ For items with no official source, the links in the general data protection sect
 
 ### Northern Ireland
 
-- **NI Direct: AccessNI**
-  - <https://www.nidirect.gov.uk/contacts/accessni>
+- **NI Direct: Using a criminal record check**
+  - <https://www.nidirect.gov.uk/articles/using-criminal-record-check>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-07-14
+  - Note: previously linked to the generic `/contacts/accessni` page, which does not document the transgender sensitive-applications route or the Operations Manager contact; this page does.
 
 ## Driving licence (dvla, dva)
 

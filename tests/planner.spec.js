@@ -22,7 +22,7 @@ async function openChecklist(page) {
 
 async function openWizard(page) {
   await checkAgeGate(page);
-  await page.getByRole('button', { name: 'Start now' }).click();
+  await page.getByRole('button', { name: 'Start here' }).click();
 }
 
 async function wizardNext(page) {
@@ -85,12 +85,33 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planView')).toBeHidden();
       await expect(page.locator('#welcomeBackView')).toBeHidden();
       await expect(page.getByRole('button', { name: 'Switch view' })).toBeHidden();
-      await expect(page.getByRole('button', { name: 'Start now' })).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Start here' })).toBeEnabled();
       await expect(page.locator('.start-checklist-link')).toBeVisible();
     });
 
+    test('85. Toolbar About/Usage buttons only show on the start view and open their dialogs', async ({ page }) => {
+      const aboutBtn = page.locator('#cbAboutBtn');
+      const usageBtn = page.locator('#cbUsageBtn');
+      await expect(aboutBtn).toBeVisible();
+      await expect(usageBtn).toBeVisible();
+
+      await aboutBtn.click();
+      await expect(page.locator('#dlgAbout')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#dlgAbout')).toBeHidden();
+
+      await usageBtn.click();
+      await expect(page.locator('#dlgUsage')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(page.locator('#dlgUsage')).toBeHidden();
+
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await expect(aboutBtn).toBeHidden();
+      await expect(usageBtn).toBeHidden();
+    });
+
     test('2. Age gate — wizard Q1', async ({ page }) => {
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
       const qText = await page.locator('#wizardStepFieldset legend, #wizardStepFieldset .chk-q, #wizardOptionsGroup').first().textContent();
       expect(qText).toMatch(/16|aged/);
@@ -100,7 +121,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('2b. Disclaimer gate — wizard Q2', async ({ page }) => {
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await page.locator('input[name=ans][value=yes]').check();
       await page.getByRole('button', { name: 'Continue' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
@@ -115,7 +136,7 @@ test.describe('Be myself Planner', () => {
       await checkAgeGate(page);
       await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('ageConfirmed') === 'true'));
       expect(await page.evaluate(() => localStorage.getItem('ageConfirmed'))).toBe('true');
-      await expect(page.getByRole('button', { name: 'Start now' })).toBeEnabled();
+      await expect(page.getByRole('button', { name: 'Start here' })).toBeEnabled();
     });
 
     test('4. Wizard flow', async ({ page }) => {
@@ -222,7 +243,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('59. Age/disclaimer gate sync between wizard and checklist', async ({ page }) => {
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await wizardNext(page); // age question
       await wizardNext(page); // disclaimer question
       await page.getByRole('button', { name: 'Switch view' }).click();
@@ -232,7 +253,7 @@ test.describe('Be myself Planner', () => {
 
     test('62. Wizard back navigation steps back one question at a time from a fresh session', async ({ page }) => {
       await page.goto(filePath);
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await page.locator('input[name="ans"]:not([disabled])').first().check();
       await page.getByRole('button', { name: 'Continue →' }).click();
       await page.locator('input[name="ans"]:not([disabled])').first().check();
@@ -275,7 +296,7 @@ test.describe('Be myself Planner', () => {
       await expect(tip).toBeHidden();
     });
 
-    test('68. Wizard edit tip does not resurface after New plan then Start now', async ({ page }) => {
+    test('68. Wizard edit tip does not resurface after New plan then Start here', async ({ page }) => {
       await openWizard(page);
       let q = 0;
       while (await page.locator('#wizardView').isVisible() && q < 40) {
@@ -293,7 +314,7 @@ test.describe('Be myself Planner', () => {
       await restartBtn.click();
       await restartBtn.click();
       await page.locator('#dlgDisclaimer').getByRole('button', { name: 'Close' }).click();
-      await page.getByRole('button', { name: 'Start now' }).click();
+      await page.getByRole('button', { name: 'Start here' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
       await expect(tip).toBeHidden();
     });
@@ -740,14 +761,31 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).toContainText('You must be 18 or over to apply for a UK GRC.');
     });
 
-    test('72. Land title register service covers all three nations', async ({ page }) => {
+    test('72. Land title register service shows England and Wales guidance by default', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkSvcLandReg').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.getByText('Land title register', { exact: true })).toBeVisible();
-      await expect(page.locator('#planContent')).toContainText('HM Land Registry');
-      await expect(page.locator('#planContent')).toContainText('Registers of Scotland');
-      await expect(page.locator('#planContent')).toContainText('Land & Property Services');
+      await expect(page.locator('#svc_detail_landreg')).toContainText('HM Land Registry');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Registers of Scotland');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Land & Property Services');
+    });
+
+    test('72b. Land title register service switches guidance for Scotland and Northern Ireland', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkRegion"][value="scot"]').check();
+      await page.locator('#chkSvcLandReg').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#svc_detail_landreg')).toContainText('Registers of Scotland');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('form (CNG)');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Land & Property Services');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('input[name="chkRegion"][value="ni"]').check();
+      await page.getByRole('button', { name: 'Update my action plan' }).click();
+      await expect(page.locator('#svc_detail_landreg')).toContainText('Land & Property Services');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('form (CNG)');
+      await expect(page.locator('#svc_detail_landreg')).not.toContainText('Registers of Scotland');
     });
 
     test('76. HMRC plan item varies by goal; titles tip shows on gender-only plans', async ({ page }) => {
@@ -797,7 +835,7 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await expect(page.locator('#planContent')).toContainText('The final legal step (Irish passport)');
+      await expect(page.locator('#planContent')).toContainText('The final step (Irish passport)');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
       await expect(page.locator('#planContent')).toContainText('You have not included a UK Gender Recognition Certificate');
     });
@@ -907,8 +945,16 @@ test.describe('Be myself Planner', () => {
       await expect(dlg).toBeVisible();
     });
 
-    test('60. Mobile toolbar layout: one row for wizard, two rows for plan view', async ({ page }) => {
+    test('60. Mobile toolbar layout: one row for wizard, two rows for plan and start views', async ({ page }) => {
       await page.setViewportSize({ width: 412, height: 915 });
+
+      const leftTopStart = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
+      const rightTopStart = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);
+      expect(leftTopStart).toBeGreaterThan(rightTopStart + 5);
+      const leftBoxStart = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect());
+      const aboutBoxStart = await page.locator('#cbAboutBtn').evaluate(el => el.getBoundingClientRect());
+      expect(aboutBoxStart.left).toBeGreaterThan(leftBoxStart.left + 5);
+
       await openWizard(page);
       const leftTopWizard = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
       const rightTopWizard = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);

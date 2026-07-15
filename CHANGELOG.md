@@ -21,10 +21,25 @@ Each entry sits under one of these categories:
   - Corrected the NHS and HMRC document checklist items: neither actually requires a deed poll or statutory declaration, so both are no longer locked behind one.
   - Corrected Northern Ireland service guidance: domestic rates are handled through Land & Property Services rather than Council Tax, electoral registration is through the Electoral Office for Northern Ireland rather than the local council, and vehicle logbook (V5C) updates go through the DVLA rather than the DVA.
   - Corrected the HMRC guidance shown to people only changing their gender marker, so it no longer includes name-change-only wording.
+  - Corrected the V5C (vehicle log book) step: there is no online option for a name change, it is postal only.
+  - Fixed the AccessNI link, which pointed to a generic contacts page instead of the page describing the transgender applications route.
+  - Added a note that requesting a new NHS number can mean losing your place on NHS waiting lists.
+  - Added a note that a previous name can still appear on older HM Land Registry documents even after using the CNG form, plus the cost of hiding those documents from public inspection.
+  - Added a note that Student Finance England can update a title or gender marker by phone, live chat, or letter with no supporting evidence.
+  - Added a note that the Disclosure Scotland application form only offers Male or Female, even for non-binary applicants.
+  - Added payroll guidance to the work/HR step: name and gender changes should be reported to HMRC as separate submissions, and gender changes can affect National Insurance category letters.
+  - Added the GRC's most basic rule, that it only recognises male or female, to the GRC steps directly instead of leaving it implied.
+  - Added a note that a non-consenting spouse does not block a GRC application outright, since an interim certificate can be used instead.
+  - Added a note that DVLA/DVA and vehicle keepers can face a large fine for not reporting a name change.
+  - Added a note to check with your home country's embassy or consulate in the UK as a first step for a home country passport update.
+  - Split the land title register service item by region, so it only shows the guidance relevant to where you live instead of all three nations at once.
 - **Wording**
+  - Simplified the deed poll "What if an organisation refuses?" note into a plain paragraph instead of a collapsible sub-section, matching how other services show their extra information.
+  - Removed specific fee and fine amounts in favour of the same cost-tier wording used elsewhere (Free / Small cost / Medium cost / Higher cost, or "a large fine"), since exact figures can go out of date.
   - Softened the "Quick exit" description to accurately describe what it does (replaces the page in your tab's history) rather than overstating it as removing all browser history.
   - Corrected a line about deleting your data: clearing your browser history alone does not remove saved answers, since those are stored separately.
   - Added short notes to the NHS, HMRC, and UK visa/eVisa checklist items clarifying that ticking them means the record is already updated, not just that you have one.
+  - Renamed the "Start now" button to "Start here".
 - **Code**
   - The step-by-step wizard now always asks about the NHS record, registering with a new GP, and HMRC, so people only changing their gender marker see the same questions as the checklist. The HMRC question now appears earlier, before the driving licence and passport questions, matching the order steps appear in the plan.
   - The driving licence and passport wizard questions now grey out "It is already updated" when it is not possible, instead of silently changing the answer afterwards.
@@ -37,6 +52,11 @@ Each entry sits under one of these categories:
 - **Layout**
   - Each selected service now has its own bordered block in the plan's expanded details when more than one is selected, making it clearer where one service's information ends and the next begins.
   - Fixed a plan step's "more information" text being cut off partway through when many services were selected, caused by an animation height limit that was too low for that much content.
+  - Added "What is this?" and "How do I use it?" buttons to the toolbar itself, visible only on the start screen, giving quick access to the About and Usage guide dialogs before starting. They match the toolbar's size and colour, and wrap onto their own row on small screens, the same way the plan view's toolbar buttons do.
+  - Removed the hero tagline underneath the site title.
+  - The site title and footer are now boxed cards matching the toolbar's style and width, instead of full-width bars, for a more consistent look. Unlike the toolbar, they scroll normally rather than staying fixed in place.
+  - Tightened the padding inside those boxes and the gaps around them, giving the main content more of the screen.
+  - Removed the "Your personal action plan" heading from the plan view to give the plan itself more room (it remains in the page for screen readers, since it's still used to move focus to the plan once it's generated).
 
 ## [July 2026 Update]
 
