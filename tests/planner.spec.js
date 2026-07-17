@@ -840,6 +840,19 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).toContainText('Update your V5C with the DVLA to show your new name.');
     });
 
+    test('87. Community advice markers are shown in the plan and explained in the usage guide', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkRegion"][value="ni"]').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const marker = page.locator('#planContent .community-note').first();
+      await expect(marker).toBeVisible();
+      await expect(marker).toHaveAttribute('title', /Community advice/);
+      await expect(marker).toHaveAttribute('aria-label', /Community advice/);
+      await page.locator('#helpBtn').click();
+      await expect(page.locator('#dlgUsage')).toContainText('Community advice');
+      await expect(page.locator('#dlgUsage .community-note')).toBeVisible();
+    });
+
     test('79. NI-born users who decline a GRC get an Irish-passport-only final step', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();

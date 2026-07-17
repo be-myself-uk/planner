@@ -2,10 +2,11 @@ exclude = [
   "^data:",
   "^mailto:",
   "forms\\.gle",
-  "google\\.co\\.uk"
+  "google\\.co\\.uk",
+  "github\\.com/be-myself-uk/planner/issues/new/choose"
 ]
 
-accept = [200, 403, 429]
+accept = [200, 202, 403, 429]
 
 timeout = 30
 max_retries = 3
