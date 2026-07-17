@@ -15,10 +15,9 @@ Each entry sits under one of these categories:
 
 ## [July 2026 Update (Part four)]
 
-- **⚠️ Northern Ireland health records: Freedom of Information responses from October 2025 to January 2026 confirm there is no published policy for changing a gender marker on GP records. The BSO stated that it asks for a GRC before changing the marker on the central register, and the Department of Health confirmed it holds no policy on the subject. The planner previously described a self-declaration process based on community experience; it now explains both positions.**
+- **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
 
 - **Information**
-  - Corrected the HMRC guidance: HMRC has confirmed it does not change the gender marker on a record without a GRC. Reports that privacy protections can still be applied without one are now marked as community advice.
   - Corrected the Northern Ireland deed poll guidance: the DVA lists a deed poll, a statutory declaration, or a GRC as acceptable evidence for a gender marker change, so a basic deed poll is no longer described as possibly not being enough. The community preference for statutory declarations is kept and marked as community advice.
   - Corrected the DWP name change guidance: no official source documents HMRC passing a name change to DWP, so the planner now advises telling each office that pays you a benefit.
   - Corrected the Scotland gender marker guidance to match the process published by NHS National Services Scotland: no evidence is needed, and you can tell either your GP practice or Practitioner Services.
