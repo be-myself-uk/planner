@@ -13,6 +13,25 @@ Each entry sits under one of these categories:
 
 ---
 
+## [July 2026 Update (Part four)]
+
+- **⚠️ Northern Ireland health records: Freedom of Information responses from October 2025 to January 2026 confirm there is no published policy for changing a gender marker on GP records. The BSO stated that it asks for a GRC before changing the marker on the central register, and the Department of Health confirmed it holds no policy on the subject. The planner previously described a self-declaration process based on community experience; it now explains both positions.**
+
+- **Information**
+  - Corrected the HMRC guidance: HMRC has confirmed it does not change the gender marker on a record without a GRC. Reports that privacy protections can still be applied without one are now marked as community advice.
+  - Corrected the Northern Ireland deed poll guidance: the DVA lists a deed poll, a statutory declaration, or a GRC as acceptable evidence for a gender marker change, so a basic deed poll is no longer described as possibly not being enough. The community preference for statutory declarations is kept and marked as community advice.
+  - Corrected the DWP name change guidance: no official source documents HMRC passing a name change to DWP, so the planner now advises telling each office that pays you a benefit.
+  - Corrected the Scotland gender marker guidance to match the process published by NHS National Services Scotland: no evidence is needed, and you can tell either your GP practice or Practitioner Services.
+  - Added the evidence the DVA accepts for a gender marker change: a deed poll, a statutory declaration, or a GRC, with no medical letter needed.
+  - Added that the "indeterminate" gender marker on NHS England records is only available from age 18.
+  - Added official links about water billing in Northern Ireland and Scotland to the utility bills service item.
+  - Clarified the HMRC team names: Special Section D handles changes, and restricted records are looked after by Public Department 1 (PD1).
+  - Fixed the National Records of Scotland name change link, which pointed to an old address.
+- **Layout**
+  - Added a community advice marker, a small circled "i", to guidance that comes from the shared experiences of the transgender and non-binary communities rather than an official source, and to time estimates. Hovering over the marker, or focusing it with the keyboard, shows an explanation, and the Usage guide describes it.
+- **Infrastructure**
+  - Added a test covering the community advice marker and its Usage guide entry.
+
 ## [July 2026 Update (Part three)]
 
 - **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
