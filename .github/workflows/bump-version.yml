@@ -12,7 +12,10 @@ on:
 
 jobs:
   bump-version:
-    if: github.event.pull_request.merged == true
+    if: >-
+      github.event.pull_request.merged == true &&
+      !(github.event.pull_request.head.ref == 'main' &&
+        github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -28,7 +31,7 @@ jobs:
         run: |
           # Get the current Unix timestamp
           CURRENT_TIME=$(date +%s)
-          
+
           # Find the exact line and replace the numbers with the new timestamp
           sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
 
@@ -37,9 +40,9 @@ jobs:
           # Set up the GitHub Actions bot user for the commit
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
+
           git add index.html
-          
+
           # Check if the file actually changed before trying to commit
           if ! git diff --staged --quiet; then
             # The [skip ci] tag stops this commit from triggering another GitHub Action loop
