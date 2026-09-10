@@ -42,7 +42,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 ├── CONTRIBUTING.md                : this file, how to contribute and how the repo is put together
 ├── CHANGELOG.md                   : plain-English history of changes to the site
 ├── SOURCES.md                     : canonical list of official sources behind planner content, with review-trigger automation
-├── LICENCE                        : CC BY-NC-SA 4.0
+├── LICENCE.md                     : CC BY-NC-SA 4.0
 ├── .gitignore                     : excludes node_modules/, test-results/, playwright-report/, blob-report/, __pycache__/, source-watch-report.md
 ├── tests/                         : self-contained test workspace; CI sets working-directory: tests so plain npm/npx commands resolve everything below without extra flags
 │   ├── planner.spec.js            : the entire end-to-end test suite (Playwright)

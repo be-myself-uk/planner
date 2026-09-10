@@ -41,7 +41,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
   - Status: Consulted, not linked in the planner
   - Note: Documents who can witness a statutory declaration: a solicitor, a notary public, a justice of the peace, a commissioner for oaths, a councillor (Scotland only, for documents dated on or after 10 December 2007), officers of the armed services at or above the rank of major or equivalent, and other persons authorised by law to administer an oath. This is the source for the witness list shown for Scotland, including local councillors.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-03
 
 ### Scotland
 
@@ -248,7 +248,13 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: NHS population screening information for trans and non-binary people**
   - <https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-03
+
+- **NHS Arden and GEM CSU: National Adult Gender Referral Support Service**
+  - <https://adult.genderreferralservice.nhs.uk/faq>
+  - Status: Linked in the planner
+  - Note: England only, for people aged 18 or over registered with a GP in England. Documents the single national waiting list for adult gender services, that a person's position is set by their original referral date to their chosen clinic, and that a person who changes their name must tell the referral service directly as well as their GP practice. Existing clinic referrals were still being transferred onto the national list at the time of verification, so this arrangement is expected to change. Not to be confused with the Gender Dysphoria National Referral Support Service (GDNRSS), which handles surgical referrals across the United Kingdom.
+  - Last verified: 2026-09-03
 
 ### Scotland
 
@@ -331,7 +337,7 @@ For items with no official source, the links in the general data protection sect
 - **Home Office caseworker guidance: EU Settlement Scheme, gender identity and sex markers on documents**
   - <https://www.gov.uk/government/publications/eu-settlement-scheme-caseworker-guidance/eu-settlement-scheme-interim-guidance-gender-identity-and-sex-markers-on-documents-accessible>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-03
 
 ## Irish passport and Irish gender recognition (irish_passport)
 
@@ -366,7 +372,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: List of medical practitioners in the field of gender dysphoria**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-03
 
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>

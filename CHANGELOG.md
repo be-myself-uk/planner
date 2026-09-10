@@ -13,6 +13,18 @@ Each entry sits under one of these categories:
 
 ---
 
+## [September 2026 Update]
+
+- **⚠️ NHS England has brought in a single national waiting list for adult gender services, held by the National Adult Gender Referral Support Service. If you are waiting for a first appointment in England, that service holds your referral separately from your GP record, and you need to tell it about a change of name or other details yourself. Your place on the list is set by your original referral date and does not change when you update your details.**
+
+- **Information**
+  - Added a note to the health record steps, for all four nations, explaining that updating your details with your GP may not update them with other services you use, and that this also applies if you are given a new NHS number, CHI number, or Health and Care Number. This warning previously appeared only for Northern Ireland.
+  - Added the National Adult Gender Referral Support Service to the England and Wales health record steps, with a link.
+  - Reviewed the GOV.UK sources flagged by the automated source check on the medical practitioners list, NHS population screening, passport name evidence, and EU Settlement Scheme guidance. None of the changes affected what the planner says.
+
+- **Infrastructure**
+  - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).
+
 ## [July 2026 Update (Part four)]
 
 - **There have been no government or policy changes that affect the planner since the previous update. If this is mistaken, please [create a Github issue](https://github.com/be-myself-uk/planner/issues).**
