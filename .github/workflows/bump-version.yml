@@ -15,10 +15,12 @@ jobs:
     if: >-
       github.event.pull_request.merged == true &&
       !(github.event.pull_request.head.ref == 'main' &&
-        github.event.pull_request.head.repo.full_name == github.repository)
+        github.event.pull_request.head.repo.full_name == github.repository) &&
+      !startsWith(github.event.pull_request.head.ref, 'version-bump/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -36,6 +38,7 @@ jobs:
           sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
 
       - name: Commit and push changes
+        id: commit
         run: |
           # Set up the GitHub Actions bot user for the commit
           git config --global user.name "github-actions[bot]"
@@ -44,9 +47,34 @@ jobs:
           git add index.html
 
           # Check if the file actually changed before trying to commit
-          if ! git diff --staged --quiet; then
-            git commit -m "Version bump [no ci]"
-            git push
-          else
+          if git diff --staged --quiet; then
             echo "No changes to commit."
+            echo "pushed=skipped" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
+          git commit -m "Version bump [no ci]"
+
+          # A repository ruleset on this branch may require changes to go
+          # through a pull request, which a direct push from this workflow's
+          # default token cannot satisfy. Fall back to opening a PR instead
+          # of failing silently.
+          if git push; then
+            echo "pushed=direct" >> "$GITHUB_OUTPUT"
+          else
+            echo "Direct push was rejected (likely a branch protection rule); opening a pull request instead."
+            echo "pushed=pr" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open a pull request with the version bump
+        if: steps.commit.outputs.pushed == 'pr'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BASE="${{ github.event.pull_request.base.ref }}"
+          BRANCH="version-bump/${BASE}-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git push origin "$BRANCH"
+          gh pr create --base "$BASE" --head "$BRANCH" \
+            --title "Version bump [no ci]" \
+            --body "Automated SCHEMA_VERSION bump, opened as a pull request because this workflow's token could not push directly to \`$BASE\`. Safe to merge as-is."
