@@ -840,6 +840,20 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).toContainText('Update your V5C with the DVLA to show your new name.');
     });
 
+    test('78b. Wales falls back to the shared England-and-Wales processes, not a duplicated regional copy', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkRegion"][value="wales"]').check();
+      await page.locator('#chkSvcCouncil').check();
+      await page.locator('#chkSvcElectoral').check();
+      await page.getByLabel(/I have a vehicle registered in my name/).check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).toContainText('Update your V5C with the DVLA to show your new name.');
+      await expect(page.locator('#planContent')).toContainText('Driving licence');
+      await expect(page.locator('#planContent')).not.toContainText('Driving licence (DVA)');
+      await expect(page.locator('#svc_detail_council')).not.toContainText('Land & Property Services');
+      await expect(page.locator('#svc_detail_electoral')).not.toContainText('Electoral Office for Northern Ireland');
+    });
+
     test('87. Community advice markers are shown in the plan and explained in the usage guide', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkRegion"][value="ni"]').check();
@@ -883,6 +897,8 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expectRecordNote(page, '#ssb_trk_nhs', 'a new NHS number');
+      await switchRegion(page, 'wales');
+      await expectRecordNote(page, '#ssb_trk_nhs', 'a new NHS number');
       await switchRegion(page, 'scot');
       await expectRecordNote(page, '#ssb_trk_nhs', 'a new CHI number');
       await switchRegion(page, 'ni');
@@ -894,22 +910,40 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkNewGP').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new NHS number');
+      await switchRegion(page, 'wales');
+      await expectRecordNote(page, '#ssb_trk_newgp', 'a new NHS number');
       await switchRegion(page, 'scot');
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new CHI number');
       await switchRegion(page, 'ni');
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new Health and Care Number');
     });
 
-    test('89. The gender service waiting list note is England and Wales only, and appears once', async ({ page }) => {
+    test('89. The gender service waiting list note is England only, and appears once', async ({ page }) => {
       const referralDate = 'Your place on the list is set by your original referral date.';
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('National Adult Gender Referral Support Service');
       expect(await page.locator('#planContent').getByText(referralDate).count()).toBe(1);
+      await switchRegion(page, 'wales');
+      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
       await switchRegion(page, 'scot');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
       await switchRegion(page, 'ni');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+    });
+
+    test('89b. The Wales gender service waiting list note is Wales only, and is distinct from the England note', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkRegion"][value="wales"]').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).toContainText('Welsh Gender Service');
+      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await switchRegion(page, 'ew');
+      await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
+      await switchRegion(page, 'scot');
+      await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
+      await switchRegion(page, 'ni');
+      await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
     });
 
     test('90. Driving licence and bank guidance no longer point users into the DVLA new-name-evidence deadlock', async ({ page }) => {

@@ -21,13 +21,18 @@ Each entry sits under one of these categories:
 
 - **Information**
   - Added a note to the health record steps, for all four nations, explaining that updating your details with your GP may not update them with other services you use, and that this also applies if you are given a new NHS number, CHI number, or Health and Care Number. This warning previously appeared only for Northern Ireland.
-  - Added the National Adult Gender Referral Support Service to the England and Wales health record steps, with a link.
+  - Added the National Adult Gender Referral Support Service to the England health record steps, with a link.
   - Reviewed the GOV.UK sources flagged by the automated source check on the medical practitioners list, NHS population screening, passport name evidence, and EU Settlement Scheme guidance. None of the changes affected what the planner says.
   - Corrected the driving licence step and the banks/services guidance, which previously told people that updating their driving licence first could help if a bank asked for photo ID. That is no longer possible under GOV.UK's current rules, since the DVLA needs a document already showing your new name before it will update the licence. The driving licence step now lists which documents can be used instead.
+  - Added the Welsh Gender Service (WGS) to the Wales health record steps, with a link to their change-of-details process. This is the Wales equivalent of the National Adult Gender Referral Support Service note added for England, and is shown only for Wales.
+
+- **Code**
+  - Added Wales as its own region, previously grouped with England as a single "England or Wales" option. Wherever a step's guidance does not genuinely differ for Wales (which is most of the planner: DBS, DWP, deed poll, driving licence, GRC, and more), Wales automatically uses the same content as England, so this did not duplicate content across the two nations.
 
 - **Infrastructure**
   - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).
   - Added GOV.UK's identity documents page for driving licence applications to [SOURCES.md](SOURCES.md).
+  - Added the Welsh Gender Service to [SOURCES.md](SOURCES.md).
 
 ## [July 2026 Update (Part four)]
 

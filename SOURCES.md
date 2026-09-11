@@ -262,6 +262,14 @@ For items with no official source, the links in the general data protection sect
   - Note: England only, for people aged 18 or over registered with a GP in England. Documents the single national waiting list for adult gender services, that a person's position is set by their original referral date to their chosen clinic, and that a person who changes their name must tell the referral service directly as well as their GP practice. Existing clinic referrals were still being transferred onto the national list at the time of verification, so this arrangement is expected to change. Not to be confused with the Gender Dysphoria National Referral Support Service (GDNRSS), which handles surgical referrals across the United Kingdom.
   - Last verified: 2026-09-03
 
+### Wales
+
+- **NHS Wales: Welsh Gender Service, update your details**
+  - <https://gender.wales/update-details/>
+  - Status: Linked in the planner
+  - Note: Wales-only. Documents that a change of name, address, contact information, or GP is reported to the Welsh Gender Service (WGS) directly by a form emailed to WGS, separately from a person's GP record. Not the National Adult Gender Referral Support Service, which is England-only. The site lists two different phone numbers for WGS across its own pages (029 2183 6619 on the homepage/contact page, 029 2183 6612 on this page); the planner does not repeat either number, only the link, to avoid going stale.
+  - Last verified: 2026-09-11
+
 ### Scotland
 
 - **NHS Inform: Registering with a GP practice**
