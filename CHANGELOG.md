@@ -30,6 +30,7 @@ Each entry sits under one of these categories:
   - Added a new "Dentist or optician" service item, since these are separate businesses from your GP practice with their own patient records.
   - Added a mention of Housing Benefit to the Council Tax step, since it is usually handled by the same council team, often alongside Council Tax Support.
   - Retitled the banks service item to "Banks, building societies, and financial accounts" and updated its wording to make clear it applies to building societies too, not just banks.
+  - Softened "public record"/"publicly accessible" wording on the Scottish and Northern Ireland birth certificate name-recording steps. Neither NRS's nor NI Direct's own guidance uses that phrasing; the supported fact is that the change is permanent and any future certified copy will show both names, which is what the planner now says.
 
 - **Wording**
   - Spelled out several abbreviations the first time they appear in a step a reader could see on their own, without having also seen a different step that happened to explain the same term first: CHI (Community Health Index) and HSCNI (Health and Social Care Northern Ireland), PCSE (Primary Care Support England), TENI (Transgender Equality Network Ireland), SAAS (Student Awards Agency for Scotland), and the GMC/HCPC medical regulators named in the passport step.
@@ -37,6 +38,7 @@ Each entry sits under one of these categories:
 
 - **Code**
   - Added Wales as its own region for both "Where do you live?" and "Where was your birth registered?", previously grouped with England as a single "England or Wales" option in both. Wherever a step's guidance does not genuinely differ for Wales (which is most of the planner: DBS, DWP, deed poll, driving licence, GRC, and more), Wales automatically uses the same content as England, so this did not duplicate content across the two nations. Birth registration currently treats Wales identically to England either way, since both share the General Register Office, but the two are now tracked separately so that can change independently if it ever needs to.
+  - Added an "All of these" button to the services checklist, in both the step-by-step wizard and the single checklist view, so people who need to update most or all of the listed services do not have to tick each one individually.
 
 - **Infrastructure**
   - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).

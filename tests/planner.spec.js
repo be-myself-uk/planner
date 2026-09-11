@@ -411,6 +411,39 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkSvcBanks')).toBeEnabled();
     });
 
+    test('91. Checklist "All of these" services button checks every service and clears none-of-these', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkSvcNone').check();
+      await expect(page.locator('#chkSvcBanks')).toBeDisabled();
+      await page.getByRole('button', { name: 'All of these' }).click();
+      await expect(page.locator('#chkSvcNone')).not.toBeChecked();
+      const boxes = page.locator('.chk-service');
+      const count = await boxes.count();
+      for (let i = 0; i < count; i++) {
+        await expect(boxes.nth(i)).toBeChecked();
+        await expect(boxes.nth(i)).toBeEnabled();
+      }
+    });
+
+    test('91b. Wizard "All of these" services button checks every service and clears none-of-these', async ({ page }) => {
+      await openWizard(page);
+      await page.evaluate(() => {
+        wizardState.svcNone = 'yes';
+        step = questions.findIndex(q => q.id === 'services');
+        renderWizard(false);
+      });
+      await expect(page.locator('#wizardStepFieldset legend')).toContainText('Do you need to update any of these services?');
+      await expect(page.locator('.multi-none')).toBeChecked();
+      await page.getByRole('button', { name: 'All of these' }).click();
+      await expect(page.locator('.multi-none')).not.toBeChecked();
+      const boxes = page.locator('.multi-opt');
+      const count = await boxes.count();
+      for (let i = 0; i < count; i++) {
+        await expect(boxes.nth(i)).toBeChecked();
+        await expect(boxes.nth(i)).toBeEnabled();
+      }
+    });
+
     test('61. Checklist goal warning shows correct message inline under the question', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').uncheck();

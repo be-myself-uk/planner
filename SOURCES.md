@@ -68,14 +68,16 @@ For items with no official source, the links in the general data protection sect
 - **National Records of Scotland: Changing your name**
   - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Note: Confirms new copies of the certificate show both the new and previous name. Does not say the record is public or publicly accessible; the planner previously used that phrasing and has been corrected to state only what this page confirms.
+  - Last verified: 2026-09-11
 
 ### Northern Ireland
 
 - **NI Direct: Recording a change of name**
   - <https://www.nidirect.gov.uk/articles/recording-change-name>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Note: Documents that a name change can be recorded with GRONI. Does not say the resulting record is public or publicly accessible; the planner previously used that phrasing and has been corrected to state only what this page confirms.
+  - Last verified: 2026-09-11
 
 ## Work, payroll, and volunteering (hr)
 
