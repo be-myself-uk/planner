@@ -93,6 +93,12 @@ For items with no official source, the links in the general data protection sect
   - Note: Documents Public Department 1 (PD1) and Special Section D, including writing to Special Section D about a name change only where gender has not been changed legally, and opting out of record restriction. It does not document placing records in a restricted gender role without a GRC.
   - Last verified: 2026-07-17
 
+- **GOV.UK: Your National Insurance number**
+  - <https://www.gov.uk/national-insurance/your-national-insurance-number>
+  - Status: Linked in the planner
+  - Note: Confirms a National Insurance number is sent shortly before a person's 16th birthday and never changes. Does not state a three-month window before the birthday; a related GOV.UK page about applying for a number because of a Child Benefit claim does, but this page is the canonical source and the planner's wording matches it rather than the narrower claim.
+  - Last verified: 2026-09-11
+
 - **HMRC internal manual: PAYE103005, Gender Recognition Act**
   - <https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye103005>
   - Status: Consulted, not linked in the planner
@@ -462,6 +468,14 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - Last verified: 2026-07-13
 
 ### Council Tax and rates (council)
+
+#### England, Wales, and Scotland
+
+- **GOV.UK: Housing Benefit**
+  - <https://www.gov.uk/housing-benefit>
+  - Status: Linked in the planner
+  - Note: Confirms Housing Benefit is administered by the local council (or, for Pension Credit claimants, the Pension Service), not DWP directly, so the planner mentions it alongside Council Tax rather than under HMRC and taxes or Benefits and State Pension.
+  - Last verified: 2026-09-11
 
 #### Northern Ireland
 
