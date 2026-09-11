@@ -378,7 +378,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: List of medical practitioners in the field of gender dysphoria**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
   - Status: Linked in the planner
-  - Last verified: 2026-09-03
+  - Last verified: 2026-09-11
 
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>

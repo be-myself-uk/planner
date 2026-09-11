@@ -39,6 +39,7 @@ jobs:
               state: 'open'
             });
             core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
 
       - name: Create issue if links are broken
         if: steps.lychee.outputs.exit_code != 0 && steps.existing.outputs.found == 'false'
@@ -48,6 +49,13 @@ jobs:
           content-filepath: ./lychee/out.md
           labels: bug, broken-links
 
+      - name: Comment on existing issue with the new report
+        if: steps.lychee.outputs.exit_code != 0 && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./lychee/out.md
+
   source-watch:
     runs-on: ubuntu-latest
     steps:
@@ -56,7 +64,9 @@ jobs:
 
       - name: Check GOV.UK sources against their Last verified date
         id: check
-        run: python3 .github/scripts/check_source_updates.py | tee -a "$GITHUB_OUTPUT"
+        run: |
+          set -o pipefail
+          python3 .github/scripts/check_source_updates.py | tee -a "$GITHUB_OUTPUT"
 
       - name: Check for existing open issue
         if: steps.check.outputs.changes_detected == 'true'
@@ -71,6 +81,7 @@ jobs:
               state: 'open'
             });
             core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
 
       - name: Create issue if a source may have changed
         if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'false'
@@ -79,3 +90,10 @@ jobs:
           title: "📄 Possible source changes in SOURCES.md"
           content-filepath: ./source-watch-report.md
           labels: source-changed
+
+      - name: Comment on existing issue with the new report
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./source-watch-report.md
