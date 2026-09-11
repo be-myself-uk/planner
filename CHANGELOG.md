@@ -17,13 +17,17 @@ Each entry sits under one of these categories:
 
 - **⚠️ NHS England has brought in a single national waiting list for adult gender services, held by the National Adult Gender Referral Support Service. If you are waiting for a first appointment in England, that service holds your referral separately from your GP record, and you need to tell it about a change of name or other details yourself. Your place on the list is set by your original referral date and does not change when you update your details.**
 
+- **⚠️ GOV.UK now requires a further document that already shows your new name when you apply to change your driving licence by deed poll or statutory declaration, dated after the deed poll and after your current licence if you already hold one. A driving licence can no longer be used to get photo ID in your new name for other services, such as a bank, since the licence itself now needs that evidence first.**
+
 - **Information**
   - Added a note to the health record steps, for all four nations, explaining that updating your details with your GP may not update them with other services you use, and that this also applies if you are given a new NHS number, CHI number, or Health and Care Number. This warning previously appeared only for Northern Ireland.
   - Added the National Adult Gender Referral Support Service to the England and Wales health record steps, with a link.
   - Reviewed the GOV.UK sources flagged by the automated source check on the medical practitioners list, NHS population screening, passport name evidence, and EU Settlement Scheme guidance. None of the changes affected what the planner says.
+  - Corrected the driving licence step and the banks/services guidance, which previously told people that updating their driving licence first could help if a bank asked for photo ID. That is no longer possible under GOV.UK's current rules, since the DVLA needs a document already showing your new name before it will update the licence. The driving licence step now lists which documents can be used instead.
 
 - **Infrastructure**
   - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).
+  - Added GOV.UK's identity documents page for driving licence applications to [SOURCES.md](SOURCES.md).
 
 ## [July 2026 Update (Part four)]
 

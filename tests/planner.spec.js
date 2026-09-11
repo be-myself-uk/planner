@@ -911,6 +911,18 @@ test.describe('Be myself Planner', () => {
       await switchRegion(page, 'ni');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
     });
+
+    test('90. Driving licence and bank guidance no longer point users into the DVLA new-name-evidence deadlock', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkSvcBanks').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan).not.toContainText('driving licence updated first');
+      await expect(plan).toContainText('Evidence needed');
+      await expect(plan).toContainText('dated after your deed poll or statutory declaration');
+      await expect(plan).toContainText('mobile, broadband, or streaming bill');
+      await expect(plan).toContainText('a recent bill or letter that already shows your new name is often accepted instead');
+    });
   });
 
   // --- Accessibility & layout ---

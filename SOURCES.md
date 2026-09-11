@@ -191,6 +191,12 @@ For items with no official source, the links in the general data protection sect
   - Note: Documents that a title can be changed as part of the same application without evidence, but does not name Mx and does not document the fine for failing to report a name change.
   - Last verified: 2026-07-17
 
+- **GOV.UK: Identity documents needed for a driving licence application**
+  - <https://www.gov.uk/id-for-driving-licence>
+  - Status: Linked in the planner
+  - Note: For a deed poll or statutory declaration name change, requires one further document that already shows the new name, dated after the deed poll or statutory declaration (and after the current licence, if one is held). Recently issued documents (within 12 months) include an HMRC letter, an employer letter, an education record, a letter from a government department or council, a visa or residence permit, a medical or health card, a voter card, a UK bank statement, a baptism or confirmation certificate, a child benefit record, or a utility bill (including mobile, broadband, or streaming). Older documents with no time limit include a non-GB driving licence, a UK passport number, a non-UK passport, or a national identity card. This closes a gap the planner previously had: it told users a driving licence update could resolve a bank's request for photo ID, which cannot work here since the licence itself cannot be the new-name evidence.
+  - Last verified: 2026-09-11
+
 - **Road Traffic Act 1988, section 99**
   - <https://www.legislation.gov.uk/ukpga/1988/52/section/99>
   - Status: Consulted, not linked in the planner
