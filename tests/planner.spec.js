@@ -411,11 +411,11 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkSvcBanks')).toBeEnabled();
     });
 
-    test('91. Checklist "All of these" services button checks every service and clears none-of-these', async ({ page }) => {
+    test('91. Checklist "All of these" services checkbox checks every service, clears none-of-these, and unticking one after does not disable the rest', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkSvcNone').check();
       await expect(page.locator('#chkSvcBanks')).toBeDisabled();
-      await page.getByRole('button', { name: 'All of these' }).click();
+      await page.locator('#chkSvcAll').check();
       await expect(page.locator('#chkSvcNone')).not.toBeChecked();
       const boxes = page.locator('.chk-service');
       const count = await boxes.count();
@@ -423,9 +423,13 @@ test.describe('Be myself Planner', () => {
         await expect(boxes.nth(i)).toBeChecked();
         await expect(boxes.nth(i)).toBeEnabled();
       }
+      await page.locator('#chkSvcBanks').uncheck();
+      await expect(page.locator('#chkSvcBanks')).toBeEnabled();
+      await expect(page.locator('#chkSvcInsurance')).toBeChecked();
+      await expect(page.locator('#chkSvcAll')).not.toBeChecked();
     });
 
-    test('91b. Wizard "All of these" services button checks every service and clears none-of-these', async ({ page }) => {
+    test('91b. Wizard "All of these" services checkbox checks every service, clears none-of-these, and unticking one after does not disable the rest', async ({ page }) => {
       await openWizard(page);
       await page.evaluate(() => {
         wizardState.svcNone = 'yes';
@@ -434,7 +438,7 @@ test.describe('Be myself Planner', () => {
       });
       await expect(page.locator('#wizardStepFieldset legend')).toContainText('Do you need to update any of these services?');
       await expect(page.locator('.multi-none')).toBeChecked();
-      await page.getByRole('button', { name: 'All of these' }).click();
+      await page.locator('.multi-all').check();
       await expect(page.locator('.multi-none')).not.toBeChecked();
       const boxes = page.locator('.multi-opt');
       const count = await boxes.count();
@@ -442,6 +446,9 @@ test.describe('Be myself Planner', () => {
         await expect(boxes.nth(i)).toBeChecked();
         await expect(boxes.nth(i)).toBeEnabled();
       }
+      await boxes.first().uncheck();
+      await expect(boxes.first()).toBeEnabled();
+      await expect(page.locator('.multi-all')).not.toBeChecked();
     });
 
     test('61. Checklist goal warning shows correct message inline under the question', async ({ page }) => {

@@ -38,7 +38,7 @@ Each entry sits under one of these categories:
 
 - **Code**
   - Added Wales as its own region for both "Where do you live?" and "Where was your birth registered?", previously grouped with England as a single "England or Wales" option in both. Wherever a step's guidance does not genuinely differ for Wales (which is most of the planner: DBS, DWP, deed poll, driving licence, GRC, and more), Wales automatically uses the same content as England, so this did not duplicate content across the two nations. Birth registration currently treats Wales identically to England either way, since both share the General Register Office, but the two are now tracked separately so that can change independently if it ever needs to.
-  - Added an "All of these" button to the services checklist, in both the step-by-step wizard and the single checklist view, so people who need to update most or all of the listed services do not have to tick each one individually.
+  - Added an "All of these" checkbox to the services question, in both the step-by-step wizard and the single checklist view, so people who need to update most or all of the listed services do not have to tick each one individually. Ticking individual services back off afterwards works normally and does not disable anything.
 
 - **Infrastructure**
   - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).
