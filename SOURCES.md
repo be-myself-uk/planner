@@ -41,7 +41,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
   - Status: Consulted, not linked in the planner
   - Note: Documents who can witness a statutory declaration: a solicitor, a notary public, a justice of the peace, a commissioner for oaths, a councillor (Scotland only, for documents dated on or after 10 December 2007), officers of the armed services at or above the rank of major or equivalent, and other persons authorised by law to administer an oath. This is the source for the witness list shown for Scotland, including local councillors.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-03
 
 ### Scotland
 
@@ -191,6 +191,12 @@ For items with no official source, the links in the general data protection sect
   - Note: Documents that a title can be changed as part of the same application without evidence, but does not name Mx and does not document the fine for failing to report a name change.
   - Last verified: 2026-07-17
 
+- **GOV.UK: Identity documents needed for a driving licence application**
+  - <https://www.gov.uk/id-for-driving-licence>
+  - Status: Linked in the planner
+  - Note: For a deed poll or statutory declaration name change, requires one further document that already shows the new name, dated after the deed poll or statutory declaration (and after the current licence, if one is held). Recently issued documents (within 12 months) include an HMRC letter, an employer letter, an education record, a letter from a government department or council, a visa or residence permit, a medical or health card, a voter card, a UK bank statement, a baptism or confirmation certificate, a child benefit record, or a utility bill (including mobile, broadband, or streaming). Older documents with no time limit include a non-GB driving licence, a UK passport number, a non-UK passport, or a national identity card. This closes a gap the planner previously had: it told users a driving licence update could resolve a bank's request for photo ID, which cannot work here since the licence itself cannot be the new-name evidence.
+  - Last verified: 2026-09-11
+
 - **Road Traffic Act 1988, section 99**
   - <https://www.legislation.gov.uk/ukpga/1988/52/section/99>
   - Status: Consulted, not linked in the planner
@@ -248,7 +254,13 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: NHS population screening information for trans and non-binary people**
   - <https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-03
+
+- **NHS Arden and GEM CSU: National Adult Gender Referral Support Service**
+  - <https://adult.genderreferralservice.nhs.uk/faq>
+  - Status: Linked in the planner
+  - Note: England only, for people aged 18 or over registered with a GP in England. Documents the single national waiting list for adult gender services, that a person's position is set by their original referral date to their chosen clinic, and that a person who changes their name must tell the referral service directly as well as their GP practice. Existing clinic referrals were still being transferred onto the national list at the time of verification, so this arrangement is expected to change. Not to be confused with the Gender Dysphoria National Referral Support Service (GDNRSS), which handles surgical referrals across the United Kingdom.
+  - Last verified: 2026-09-03
 
 ### Scotland
 
@@ -331,7 +343,7 @@ For items with no official source, the links in the general data protection sect
 - **Home Office caseworker guidance: EU Settlement Scheme, gender identity and sex markers on documents**
   - <https://www.gov.uk/government/publications/eu-settlement-scheme-caseworker-guidance/eu-settlement-scheme-interim-guidance-gender-identity-and-sex-markers-on-documents-accessible>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-03
 
 ## Irish passport and Irish gender recognition (irish_passport)
 
@@ -366,7 +378,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: List of medical practitioners in the field of gender dysphoria**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-11
 
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>

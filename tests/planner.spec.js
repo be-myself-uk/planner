@@ -861,6 +861,68 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
       await expect(page.locator('#planContent')).toContainText('You have not included a UK Gender Recognition Certificate');
     });
+
+    const NOTE_OPENER = 'Updating your details with your GP may not update them with other services you use.';
+    const NOTE_ACTION = 'Tell any service that is treating you, or that you are waiting to see, yourself.';
+
+    async function expectRecordNote(page, stepId, number) {
+      await expect(page.locator(stepId)).toBeAttached();
+      const plan = page.locator('#planContent');
+      await expect(plan).toContainText(NOTE_OPENER);
+      await expect(plan).toContainText(number);
+      await expect(plan).toContainText(NOTE_ACTION);
+    }
+
+    async function switchRegion(page, region) {
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator(`input[name="chkRegion"][value="${region}"]`).check();
+      await page.getByRole('button', { name: 'Update my action plan' }).click();
+    }
+
+    test('88. The existing health record item carries the other-services note in every nation', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expectRecordNote(page, '#ssb_trk_nhs', 'a new NHS number');
+      await switchRegion(page, 'scot');
+      await expectRecordNote(page, '#ssb_trk_nhs', 'a new CHI number');
+      await switchRegion(page, 'ni');
+      await expectRecordNote(page, '#ssb_trk_nhs', 'a new Health and Care Number');
+    });
+
+    test('88b. The new GP item carries the other-services note in every nation', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkNewGP').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expectRecordNote(page, '#ssb_trk_newgp', 'a new NHS number');
+      await switchRegion(page, 'scot');
+      await expectRecordNote(page, '#ssb_trk_newgp', 'a new CHI number');
+      await switchRegion(page, 'ni');
+      await expectRecordNote(page, '#ssb_trk_newgp', 'a new Health and Care Number');
+    });
+
+    test('89. The gender service waiting list note is England and Wales only, and appears once', async ({ page }) => {
+      const referralDate = 'Your place on the list is set by your original referral date.';
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).toContainText('National Adult Gender Referral Support Service');
+      expect(await page.locator('#planContent').getByText(referralDate).count()).toBe(1);
+      await switchRegion(page, 'scot');
+      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await switchRegion(page, 'ni');
+      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+    });
+
+    test('90. Driving licence and bank guidance no longer point users into the DVLA new-name-evidence deadlock', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkSvcBanks').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan).not.toContainText('driving licence updated first');
+      await expect(plan).toContainText('Evidence needed');
+      await expect(plan).toContainText('dated after your deed poll or statutory declaration');
+      await expect(plan).toContainText('mobile, broadband, or streaming bill');
+      await expect(plan).toContainText('a recent bill or letter that already shows your new name is often accepted instead');
+    });
   });
 
   // --- Accessibility & layout ---
