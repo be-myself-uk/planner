@@ -212,7 +212,7 @@
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
       <legend class="visually-hidden">Services I need to update</legend>
       <div class="chk-section">
-        <p class="chk-q">Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></p>
+        <p class="chk-q" style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;"><span>Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></span><button type="button" onclick="handleSvcAll()" style="width:auto;flex-shrink:0;background:none;border:none;padding:0;font-size:0.85em;font-weight:400;color:var(--primary);text-decoration:underline;cursor:pointer;">All of these</button></p>
         <label class="option option-sm"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks, building societies, and financial accounts</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
@@ -1539,6 +1539,13 @@ function handleSvcItem() {
   wizardState.svcNone = S.NO;
   applySvcNoneUiState();
 }
+function handleSvcAll() {
+  const none = gel('chkSvcNone');
+  if (none) none.checked = false;
+  wizardState.svcNone = S.NO;
+  document.querySelectorAll('.chk-service').forEach(cb => cb.checked = true);
+  applySvcNoneUiState();
+}
 function resetChecklist() {
   wizardState = {
     region: REGION.E, goal: S.BOTH,
@@ -1710,7 +1717,8 @@ function renderWizard(skipForward = true) {
     });
     if (q.id === 'services') {
       const noneChecked = wizardState.svcNone === S.YES ? 'checked' : '';
-      html += `<div class="multi-all-sep"></div>
+      html += `<button type="button" id="multiSvcAllBtn" style="width:auto;background:none;border:none;padding:4px 0;margin:2px 0 0;font-size:0.9em;font-weight:400;color:var(--primary);text-decoration:underline;cursor:pointer;">All of these</button>
+<div class="multi-all-sep"></div>
 <label class="option" for="multi_${q.id}_none">
   <input type="checkbox" id="multi_${q.id}_none" class="multi-none" ${noneChecked}>
   I do not need to update any of these
@@ -1753,6 +1761,12 @@ function renderWizard(skipForward = true) {
       };
       if (noneBox) noneBox.addEventListener('change', () => {
         if (noneBox.checked) optBoxes.forEach(cb => cb.checked = false);
+        applyNoneUi();
+      });
+      const allBtn = gel('multiSvcAllBtn');
+      if (allBtn) allBtn.addEventListener('click', () => {
+        if (noneBox) noneBox.checked = false;
+        optBoxes.forEach(cb => cb.checked = true);
         applyNoneUi();
       });
       applyNoneUi();
@@ -2753,6 +2767,7 @@ window.checkAgeGateShared    = checkAgeGateShared;
 window.updateLocks           = updateLocks;
 window.handleSvcItem         = handleSvcItem;
 window.handleSvcNone         = handleSvcNone;
+window.handleSvcAll          = handleSvcAll;
 window.cycleStepState        = cycleStepState;
 })();
 </script>
