@@ -27,7 +27,7 @@ Each entry sits under one of these categories:
   - Added the Welsh Gender Service (WGS) to the Wales health record steps, with a link to their change-of-details process. This is the Wales equivalent of the National Adult Gender Referral Support Service note added for England, and is shown only for Wales.
 
 - **Code**
-  - Added Wales as its own region, previously grouped with England as a single "England or Wales" option. Wherever a step's guidance does not genuinely differ for Wales (which is most of the planner: DBS, DWP, deed poll, driving licence, GRC, and more), Wales automatically uses the same content as England, so this did not duplicate content across the two nations.
+  - Added Wales as its own region for both "Where do you live?" and "Where was your birth registered?", previously grouped with England as a single "England or Wales" option in both. Wherever a step's guidance does not genuinely differ for Wales (which is most of the planner: DBS, DWP, deed poll, driving licence, GRC, and more), Wales automatically uses the same content as England, so this did not duplicate content across the two nations. Birth registration currently treats Wales identically to England either way, since both share the General Register Office, but the two are now tracked separately so that can change independently if it ever needs to.
 
 - **Infrastructure**
   - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).

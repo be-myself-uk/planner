@@ -391,11 +391,11 @@ test.describe('Be myself Planner', () => {
 
     test('41. Specific choices section hidden for EW; Scotland shows birth cert name', async ({ page }) => {
       await openChecklist(page);
-      await page.locator('input[name="chkBirthRegion"][value="ew"]').check();
+      await page.locator('input[name="chkBirthRegion"][value="e"]').check();
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
       await expect(page.locator('#wrapSpecificChoices')).toBeHidden();
-      await page.locator('input[name="chkBirthRegion"][value="scot"]').check();
+      await page.locator('input[name="chkBirthRegion"][value="s"]').check();
       await expect(page.locator('#wrapSpecificChoices')).toBeVisible();
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
     });
@@ -434,8 +434,8 @@ test.describe('Be myself Planner', () => {
     test('73. Wizard: NHS/HMRC never skipped or locked; driving licence locks instead of silently discarding; newGP and HMRC shown for gender-only', async ({ page }) => {
       await openWizard(page);
       await page.evaluate(() => {
-        wizardState.region = 'ew';
-        wizardState.birthRegion = 'ew';
+        wizardState.region = 'e';
+        wizardState.birthRegion = 'e';
         wizardState.goal = 'name';
         wizardState.deedpoll = 'no';
         step = questions.findIndex(q => q.id === 'nhs');
@@ -470,7 +470,7 @@ test.describe('Be myself Planner', () => {
     test('74. Wizard eVisa answer maps correctly, locks on passport, and produces the eVisa step', async ({ page }) => {
       await openWizard(page);
       await page.evaluate(() => {
-        Object.assign(wizardState, { region:'ew', birthRegion:'ew', goal:'both', goalParts:['name','gender'], citizen:'yes', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], citizen:'yes', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
         step = questions.findIndex(q => q.id === 'visaUpdated');
         renderWizard(false);
       });
@@ -721,6 +721,18 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]')).toBeChecked();
       await expect(page.locator('input[name="chkPassportOpt"][value="needs_update"]')).toBeChecked();
     });
+
+    test('83b. Links encoded with the old region codes (ew/wales/scot) still load correctly', async ({ page }) => {
+      const cases = [['wales', 'w'], ['scot', 's'], ['ew', 'e']];
+      for (const [legacy, current] of cases) {
+        const url = await getShareUrl(page, { goal: 'both', reg: legacy, emp: 'no' });
+        await page.evaluate(() => localStorage.clear());
+        await page.goto(url);
+        await checkAgeGateShared(page);
+        await expect(page.locator('#planView')).toBeVisible();
+        expect(await page.evaluate(() => wizardState.region)).toBe(current);
+      }
+    });
   });
 
   // --- Plan generation & content accuracy ---
@@ -728,7 +740,7 @@ test.describe('Be myself Planner', () => {
   test.describe('Plan generation & content accuracy', () => {
     test('46-52. PLAN_ITEMS rendering tests', async ({ page }) => {
       await openChecklist(page);
-      await page.locator('input[name="chkRegion"][value="scot"]').check();
+      await page.locator('input[name="chkRegion"][value="s"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Deed poll or statutory declaration');
       await expect(page.locator('#planContent')).toContainText('National Records of Scotland');
@@ -782,7 +794,7 @@ test.describe('Be myself Planner', () => {
 
     test('72b. Land title register service switches guidance for Scotland and Northern Ireland', async ({ page }) => {
       await openChecklist(page);
-      await page.locator('input[name="chkRegion"][value="scot"]').check();
+      await page.locator('input[name="chkRegion"][value="s"]').check();
       await page.locator('#chkSvcLandReg').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#svc_detail_landreg')).toContainText('Registers of Scotland');
@@ -842,7 +854,7 @@ test.describe('Be myself Planner', () => {
 
     test('78b. Wales falls back to the shared England-and-Wales processes, not a duplicated regional copy', async ({ page }) => {
       await openChecklist(page);
-      await page.locator('input[name="chkRegion"][value="wales"]').check();
+      await page.locator('input[name="chkRegion"][value="w"]').check();
       await page.locator('#chkSvcCouncil').check();
       await page.locator('#chkSvcElectoral').check();
       await page.getByLabel(/I have a vehicle registered in my name/).check();
@@ -876,6 +888,20 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).toContainText('You have not included a UK Gender Recognition Certificate');
     });
 
+    test('79b. Wales-born and England-born produce identical GRC final-step content, unlike Scotland/NI', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGRC').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const englandHtml = await page.locator('#planContent').innerHTML();
+      await page.getByRole('button', { name: 'Edit plan' }).click();
+      await page.locator('input[name="chkBirthRegion"][value="w"]').check();
+      await page.locator('#checklistStickyBar button').click();
+      const walesHtml = await page.locator('#planContent').innerHTML();
+      expect(walesHtml).toBe(englandHtml);
+      await expect(page.locator('#planContent')).toContainText('The final step (GRC)');
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport');
+    });
+
     const NOTE_OPENER = 'Updating your details with your GP may not update them with other services you use.';
     const NOTE_ACTION = 'Tell any service that is treating you, or that you are waiting to see, yourself.';
 
@@ -897,9 +923,9 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expectRecordNote(page, '#ssb_trk_nhs', 'a new NHS number');
-      await switchRegion(page, 'wales');
+      await switchRegion(page, 'w');
       await expectRecordNote(page, '#ssb_trk_nhs', 'a new NHS number');
-      await switchRegion(page, 'scot');
+      await switchRegion(page, 's');
       await expectRecordNote(page, '#ssb_trk_nhs', 'a new CHI number');
       await switchRegion(page, 'ni');
       await expectRecordNote(page, '#ssb_trk_nhs', 'a new Health and Care Number');
@@ -910,9 +936,9 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkNewGP').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new NHS number');
-      await switchRegion(page, 'wales');
+      await switchRegion(page, 'w');
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new NHS number');
-      await switchRegion(page, 'scot');
+      await switchRegion(page, 's');
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new CHI number');
       await switchRegion(page, 'ni');
       await expectRecordNote(page, '#ssb_trk_newgp', 'a new Health and Care Number');
@@ -924,9 +950,9 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('National Adult Gender Referral Support Service');
       expect(await page.locator('#planContent').getByText(referralDate).count()).toBe(1);
-      await switchRegion(page, 'wales');
+      await switchRegion(page, 'w');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
-      await switchRegion(page, 'scot');
+      await switchRegion(page, 's');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
       await switchRegion(page, 'ni');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
@@ -934,13 +960,13 @@ test.describe('Be myself Planner', () => {
 
     test('89b. The Wales gender service waiting list note is Wales only, and is distinct from the England note', async ({ page }) => {
       await openChecklist(page);
-      await page.locator('input[name="chkRegion"][value="wales"]').check();
+      await page.locator('input[name="chkRegion"][value="w"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Welsh Gender Service');
       await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
-      await switchRegion(page, 'ew');
+      await switchRegion(page, 'e');
       await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
-      await switchRegion(page, 'scot');
+      await switchRegion(page, 's');
       await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
       await switchRegion(page, 'ni');
       await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
