@@ -1134,7 +1134,7 @@ test.describe('Be myself Planner', () => {
 
     test('84. A phase with many expanded services is not clipped by its collapse-animation max-height', async ({ page }) => {
       await openChecklist(page);
-      for (const id of ['#chkSvcBanks','#chkSvcInsurance','#chkSvcCouncil','#chkSvcUtilities','#chkSvcElectoral','#chkSvcCRA','#chkSvcLandlord','#chkSvcPension','#chkSvcMortgage','#chkSvcMobile','#chkSvcProfBody','#chkSvcLandReg']) {
+      for (const id of ['#chkSvcBanks','#chkSvcInsurance','#chkSvcCouncil','#chkSvcUtilities','#chkSvcElectoral','#chkSvcCRA','#chkSvcLandlord','#chkSvcDentist','#chkSvcPension','#chkSvcMortgage','#chkSvcMobile','#chkSvcProfBody','#chkSvcLandReg']) {
         await page.locator(id).check();
       }
       await page.getByRole('button', { name: 'Show my action plan' }).click();

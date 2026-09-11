@@ -26,6 +26,10 @@ Each entry sits under one of these categories:
   - Corrected the driving licence step and the banks/services guidance, which previously told people that updating their driving licence first could help if a bank asked for photo ID. That is no longer possible under GOV.UK's current rules, since the DVLA needs a document already showing your new name before it will update the licence. The driving licence step now lists which documents can be used instead.
   - Added the Welsh Gender Service (WGS) to the Wales health record steps, with a link to their change-of-details process. This is the Wales equivalent of the National Adult Gender Referral Support Service note added for England, and is shown only for Wales.
   - Reviewed the plan's guidance text for references that only make sense if a different, separately-selected step also happens to be shown. The electoral register and mobile contract items pointed to "the credit reference agencies item below", which is not there unless that service is also selected; the driving licence step's comparison of slower documents named the electoral register itself, which is not one of the documents accepted for that step. Also added two GOV.UK links (the approved medical practitioner list and the approved countries list) to the Northern Ireland GRC step, which the rest of the UK already had for the same UK-wide process.
+  - Added a note to the HMRC step for 16 and 17 year olds: a National Insurance number is usually sent shortly before your 16th birthday, so the letter may arrive in your old name. The number itself does not need updating, but HMRC can still be told your new name.
+  - Added a new "Dentist or optician" service item, since these are separate businesses from your GP practice with their own patient records.
+  - Added a mention of Housing Benefit to the Council Tax step, since it is usually handled by the same council team, often alongside Council Tax Support.
+  - Retitled the banks service item to "Banks, building societies, and financial accounts" and updated its wording to make clear it applies to building societies too, not just banks.
 
 - **Wording**
   - Spelled out several abbreviations the first time they appear in a step a reader could see on their own, without having also seen a different step that happened to explain the same term first: CHI (Community Health Index) and HSCNI (Health and Social Care Northern Ireland), PCSE (Primary Care Support England), TENI (Transgender Equality Network Ireland), SAAS (Student Awards Agency for Scotland), and the GMC/HCPC medical regulators named in the passport step.
@@ -38,6 +42,7 @@ Each entry sits under one of these categories:
   - Added the National Adult Gender Referral Support Service to [SOURCES.md](SOURCES.md).
   - Added GOV.UK's identity documents page for driving licence applications to [SOURCES.md](SOURCES.md).
   - Added the Welsh Gender Service to [SOURCES.md](SOURCES.md).
+  - Added GOV.UK's National Insurance number page and Housing Benefit page to [SOURCES.md](SOURCES.md).
 
 ## [July 2026 Update (Part four)]
 
