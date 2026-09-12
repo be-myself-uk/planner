@@ -51,6 +51,7 @@ Each entry sits under one of these categories:
   - Added the Welsh Gender Service to [SOURCES.md](SOURCES.md).
   - Added GOV.UK's National Insurance number page and Housing Benefit page to [SOURCES.md](SOURCES.md).
   - Added HM Passport Office's "Gender recognition" caseworker guidance as a linked source, since the passport medical letter requirements come from it rather than from the shorter public-facing GOV.UK page. Added a UK Parliament written answer on DVLA evidence requirements, and section 9 of the Gender Recognition Act 2015 (Ireland), both to [SOURCES.md](SOURCES.md).
+  - Rebuilt `bump-version.yml`. It previously ran on every pull request merged into `main` or `preview`, tried to push the version bump directly, and fell back to opening a pull request when that push was rejected — a fallback that could not actually complete, since this repository does not allow GitHub Actions to open pull requests, so every run since at least July left behind an abandoned branch nobody could merge. It now runs only on a push to `main` that changes `index.html`, pushes directly, and fails the run with a clear error if that push is rejected, instead of creating a branch.
 
 ## [July 2026 Update (Part four)]
 

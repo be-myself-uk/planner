@@ -1,32 +1,23 @@
 name: Bump Schema Version
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - main
-      - preview
     paths:
       - index.html
 
 jobs:
   bump-version:
-    if: >-
-      github.event.pull_request.merged == true &&
-      !(github.event.pull_request.head.ref == 'main' &&
-        github.event.pull_request.head.repo.full_name == github.repository) &&
-      !startsWith(github.event.pull_request.head.ref, 'version-bump/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: main
           fetch-depth: 0
 
       - name: Update SCHEMA_VERSION in index.html
@@ -37,8 +28,7 @@ jobs:
           # Find the exact line and replace the numbers with the new timestamp
           sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
 
-      - name: Commit and push changes
-        id: commit
+      - name: Commit and push the version bump
         run: |
           # Set up the GitHub Actions bot user for the commit
           git config --global user.name "github-actions[bot]"
@@ -49,32 +39,20 @@ jobs:
           # Check if the file actually changed before trying to commit
           if git diff --staged --quiet; then
             echo "No changes to commit."
-            echo "pushed=skipped" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
+          # [no ci] is one of GitHub's recognised skip-CI markers, so this
+          # push does not trigger this same workflow again.
           git commit -m "Version bump [no ci]"
 
-          # A repository ruleset on this branch may require changes to go
-          # through a pull request, which a direct push from this workflow's
-          # default token cannot satisfy. Fall back to opening a PR instead
-          # of failing silently.
-          if git push; then
-            echo "pushed=direct" >> "$GITHUB_OUTPUT"
-          else
-            echo "Direct push was rejected (likely a branch protection rule); opening a pull request instead."
-            echo "pushed=pr" >> "$GITHUB_OUTPUT"
+          # A repository ruleset on main requires changes to go through a
+          # pull request, which this workflow's default token cannot open
+          # (GitHub Actions is not permitted to create pull requests in
+          # this repository). Until that is changed, a direct push here
+          # will keep failing. Fail loudly rather than leaving an orphaned
+          # branch behind, as an earlier version of this workflow did.
+          if ! git push; then
+            echo "::error::Direct push to main was rejected, most likely by a branch protection rule. The version bump was not applied. Either bump SCHEMA_VERSION manually, or fix the underlying permissions (see CONTRIBUTING.md)."
+            exit 1
           fi
-
-      - name: Open a pull request with the version bump
-        if: steps.commit.outputs.pushed == 'pr'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          BASE="${{ github.event.pull_request.base.ref }}"
-          BRANCH="version-bump/${BASE}-${{ github.run_id }}"
-          git checkout -b "$BRANCH"
-          git push origin "$BRANCH"
-          gh pr create --base "$BASE" --head "$BRANCH" \
-            --title "Version bump [no ci]" \
-            --body "Automated SCHEMA_VERSION bump, opened as a pull request because this workflow's token could not push directly to \`$BASE\`. Safe to merge as-is."
