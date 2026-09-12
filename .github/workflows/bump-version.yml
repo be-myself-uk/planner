@@ -11,8 +11,6 @@ on:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
@@ -20,6 +18,13 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          # main's ruleset requires a pull request for the default
+          # GITHUB_TOKEN, which is always the github-actions[bot] identity
+          # and cannot be added to a ruleset's bypass list. BUMP_VERSION_TOKEN
+          # is a fine-grained PAT belonging to a repository admin who is on
+          # the bypass list, so pushes authenticated with it go straight
+          # through, the same as if that admin had pushed it themselves.
+          token: ${{ secrets.BUMP_VERSION_TOKEN }}
 
       - name: Update SCHEMA_VERSION in index.html
         run: |
@@ -47,13 +52,13 @@ jobs:
           # push does not trigger this same workflow again.
           git commit -m "Version bump [no ci]"
 
-          # A repository ruleset on main requires changes to go through a
-          # pull request, which this workflow's default token cannot open
-          # (GitHub Actions is not permitted to create pull requests in
-          # this repository). Until that is changed, a direct push here
-          # will keep failing. Fail loudly rather than leaving an orphaned
-          # branch behind, as an earlier version of this workflow did.
+          # This push authenticates as BUMP_VERSION_TOKEN's owner, a
+          # bypass-listed admin, so it should go straight through main's
+          # ruleset. If it is ever rejected anyway (token expired, revoked,
+          # or removed from the bypass list), fail loudly rather than
+          # leaving an orphaned branch behind, as an earlier version of
+          # this workflow did.
           if ! git push; then
-            echo "::error::Direct push to main was rejected, most likely by a branch protection rule. The version bump was not applied. Either bump SCHEMA_VERSION manually, or fix the underlying permissions (see CONTRIBUTING.md)."
+            echo "::error::Direct push to main was rejected. BUMP_VERSION_TOKEN may have expired, been revoked, or its owner removed from main's ruleset bypass list. The version bump was not applied. See CONTRIBUTING.md."
             exit 1
           fi
