@@ -47,6 +47,9 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 ├── tests/                         : self-contained test workspace; CI sets working-directory: tests so plain npm/npx commands resolve everything below without extra flags
 │   ├── planner.spec.js            : the entire end-to-end test suite (Playwright)
 │   ├── playwright.config.js       : Playwright test runner configuration
+│   ├── content-snapshot-lib.js    : shared walker that extracts every PLAN_ITEMS/SERVICES content string, used by both the generator script and the content-integrity test
+│   ├── generate-content-snapshots.js : regenerates content-snapshots.json; run via `npm run generate-content-snapshots` after an intentional content change
+│   ├── content-snapshots.json     : committed fixture of every PLAN_ITEMS/SERVICES content string, compared against on every test run
 │   └── package.json / package-lock.json : the only dependency is @playwright/test (dev-only, for testing); node_modules/, test-results/, and playwright-report/ all generate here too
 ├── .github/
 │   ├── scripts/
@@ -76,7 +79,20 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently up to the low 80s; numbers were assigned as tests were added and some were removed or merged along the way, so they are not perfectly sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, accessibility/layout), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently up to the low 90s; numbers were assigned as tests were added and some were removed or merged along the way, so they are not perfectly sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+
+#### Content-integrity snapshot
+
+The "Content integrity" group's test reads every `PLAN_ITEMS`/`SERVICES` content string out of a running page (via `content-snapshot-lib.js`'s `extractContentMap()`, exposed on `window` for this purpose) and compares it against the committed `tests/content-snapshots.json` fixture, key by key. It exists to make content drift loud and specific: if any entry's wording changes, unintentionally or otherwise, the test fails and names the exact key (for example `dvla.variants.gender` or `SERVICES.council`) rather than a generic diff on the whole file.
+
+If you intentionally change any plan or service content, regenerate the fixture before pushing:
+```
+cd tests
+npm run generate-content-snapshots
+```
+This overwrites `content-snapshots.json` with the current content; review the diff to confirm only the change you intended shows up, then commit it alongside your `index.html` edit.
+
+This only catches literal text changes inside `summary`/`detail`/`title` strings (or the literal source text of the `summaryFn`/`detailFn`/`titleFn` functions that generate them) — it does not catch a shared constant referenced by name from inside one of those functions changing elsewhere, since the snapshot captures the function's source text, not its resolved output for any particular input.
 
 Run locally with:
 ```

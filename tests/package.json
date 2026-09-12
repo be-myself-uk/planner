@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "generate-content-snapshots": "node generate-content-snapshots.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0"
