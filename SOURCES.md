@@ -196,14 +196,20 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Change the name or gender on your driving licence**
   - <https://www.gov.uk/change-name-driving-licence>
   - Status: Linked in the planner
-  - Note: Documents that a title can be changed as part of the same application without evidence, but does not name Mx and does not document the fine for failing to report a name change.
-  - Last verified: 2026-07-17
+  - Note: Documents that a title can be changed as part of the same application without evidence, but does not name Mx and does not document the fine for failing to report a name change. Does not itself list what evidence is needed for a name or gender change; that is on the identity documents page below.
+  - Last verified: 2026-09-12
 
 - **GOV.UK: Identity documents needed for a driving licence application**
   - <https://www.gov.uk/id-for-driving-licence>
   - Status: Linked in the planner
-  - Note: For a deed poll or statutory declaration name change, requires one further document that already shows the new name, dated after the deed poll or statutory declaration (and after the current licence, if one is held). Recently issued documents (within 12 months) include an HMRC letter, an employer letter, an education record, a letter from a government department or council, a visa or residence permit, a medical or health card, a voter card, a UK bank statement, a baptism or confirmation certificate, a child benefit record, or a utility bill (including mobile, broadband, or streaming). Older documents with no time limit include a non-GB driving licence, a UK passport number, a non-UK passport, or a national identity card. This closes a gap the planner previously had: it told users a driving licence update could resolve a bank's request for photo ID, which cannot work here since the licence itself cannot be the new-name evidence.
-  - Last verified: 2026-09-11
+  - Note: The "If your name or gender has changed" section covers both kinds of change. For a gender identity change, it lists a deed poll, a statutory declaration, or a gender recognition certificate as accepted evidence. For a deed poll or statutory declaration name change, it requires one further document that already shows the new name, dated after the deed poll or statutory declaration (and after the current licence, if one is held). Recently issued documents (within 12 months) include an HMRC letter, an employer letter, an education record, a letter from a government department or council, a visa or residence permit, a medical or health card, a voter card, a UK bank statement, a baptism or confirmation certificate, a child benefit record, or a utility bill (including mobile, broadband, or streaming). Older documents with no time limit include a non-GB driving licence, a UK passport number, a non-UK passport, or a national identity card. This closes a gap the planner previously had: it told users a driving licence update could resolve a bank's request for photo ID, which cannot work here since the licence itself cannot be the new-name evidence.
+  - Last verified: 2026-09-12
+
+- **UK Parliament written question 156265: Driver and Vehicle Licensing Agency: Gender**
+  - <https://questions-statements.parliament.uk/written-questions/detail/2023-03-01/156265>
+  - Status: Consulted, not linked in the planner
+  - Note: Department for Transport answer, 6 March 2023, fetched via the Parliament open written-questions API since the public page and its mirrors are Cloudflare-protected. States that to change gender on the driver record, a GRC, a deed poll, or a statutory declaration is accepted; for a combined name and gender change, a deed poll or statutory declaration is accepted, and a GRC used for a combined change must be accompanied by a deed poll or a statutory declaration, since a GRC alone is not accepted for a combined change. Corroborated by a DVLA spokesperson quote reported by the Christian Institute, and consistent with the current GOV.UK identity documents page above.
+  - Last verified: 2026-09-12
 
 - **Road Traffic Act 1988, section 99**
   - <https://www.legislation.gov.uk/ukpga/1988/52/section/99>
@@ -335,8 +341,9 @@ For items with no official source, the links in the general data protection sect
 
 - **HM Passport Office caseworker guidance: Gender recognition**
   - <https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible>
-  - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Status: Linked in the planner
+  - Note: Version 29.0, updated 25 February 2026. This, not the public-facing page above, is the source for the medical letter bullet list: the letter must be dated, include the medical professional's handwritten signature, and confirm the professional knows the customer well enough to make a diagnosis, the specified name and gender, that both are used for all purposes, and that the change is likely to be permanent. It can be written by a GMC- or HCPC-registered professional, or by one in the UK or overseas who is not registered with either body but can provide evidence of their qualifications and experience (examples given include GPs, gender dysphoria clinicians and specialists, clinical psychologists, consultant psychologists and psychiatrists, practitioner psychologists, and specialist nurses; the list is not exhaustive). If a letter from someone in the second group is rejected, the guidance tells the examiner to ask for a replacement from someone GMC- or HCPC-registered. On consent for 16 and 17 year olds, the named exceptions are: within two weeks of the 18th birthday, both parents deceased, or no contact with one or both parents; where there are safeguarding concerns, none of the young adult exceptions apply and a court order is needed instead.
+  - Last verified: 2026-09-12
 
 - **HM Passport Office caseworker guidance: Authorisation and consent needed to issue a passport**
   - <https://www.gov.uk/government/publications/authorisation-and-consent-needed-to-issue-a-passport/authorisation-and-consent-needed-to-issue-a-passport-accessible#when-we-need-additional-consent>
@@ -366,18 +373,26 @@ For items with no official source, the links in the general data protection sect
 - **Irish Department of Foreign Affairs: Passport documentary requirements**
   - <https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Note: Under "Change information" > "My gender has now been recognised", the requirements are split by residence, not by first passport versus renewal. For an applicant resident in Northern Ireland or overseas, both a first passport and a renewal require a statutory declaration of settled and solemn intention to live in the new gender for the rest of their life, plus two documents from two different sources showing use of the new name over at least two years; a first application for this residency group also asks for an identity verification form, a full original birth certificate showing parents' names, proof of address within 12 months, and original government-issued photo identification. An Irish Gender Recognition Certificate is listed only for applicants resident in Ireland. The page also states that being issued a passport in the previous name during the reckonable usage period voids that period, and the two years restarts from the date that passport was issued. The planner previously described the GRC as a prerequisite and told users to get an ordinary passport first; both were wrong for the Northern Ireland/overseas resident route and have been corrected.
+  - Last verified: 2026-09-12
 
 - **Irish Department of Foreign Affairs: Gender recognition and citizenship (born abroad)**
   - <https://www.ireland.ie/en/dfa/citizenship/born-abroad/gender-recognition/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Note: This page covers updating the gender on an existing Foreign Birth Registration (FBR) entry, and requires an Irish Gender Recognition Certificate. This is a different process from applying for or renewing a passport, and is not the standard route for someone born in Northern Ireland who does not hold an FBR certificate. Kept as a further-reading link for the Irish GRC route, which the planner otherwise describes as applying only to people ordinarily resident in the Republic of Ireland (see the Gender Recognition Act 2015 section 9 entry below).
+  - Last verified: 2026-09-12
+
+- **Gender Recognition Act 2015 (Ireland), section 9**
+  - <https://www.irishstatutebook.ie/2015/en/act/pub/0025/sec0009.html>
+  - Status: Consulted, not linked in the planner
+  - Note: Sets out who may apply for gender recognition: a person whose birth, adoption, or foreign birth is registered in one of the Republic's own registers (regardless of residence), or a person ordinarily resident in the State whose birth is registered elsewhere. Someone born in Northern Ireland and living in Northern Ireland or Great Britain meets neither condition, so the Irish GRC route is usually not available to them at all, not merely an extra step.
+  - Last verified: 2026-09-12
 
 - **gov.ie (Department of Social Protection): Apply for a Gender Recognition Certificate / Revised Birth Certificate**
   - <https://www.gov.ie/en/department-of-social-protection/services/apply-for-a-gender-recognition-certificate-revised-birth-certificate/>
   - Status: Consulted, not linked in the planner
-  - Note: Documents the Irish GRC application process, including the Circuit Family Court exemption order required before an application can be made on behalf of a 16 or 17 year old.
-  - Last verified: 2026-07-17
+  - Note: Documents the Irish GRC application process, including the Circuit Family Court exemption order required before an application can be made on behalf of a 16 or 17 year old. This exemption order is part of the Irish GRC route, not the passport statutory-declaration route the planner now describes for Northern Ireland and overseas residents; the planner does not say whether the statutory-declaration route has its own age rules, since the adult DFA guidance does not address this.
+  - Last verified: 2026-09-12
 
 ## Gender Recognition Certificate (grc_med, grc_life)
 
@@ -389,12 +404,14 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Apply for a GRC, what documents you need**
   - <https://www.gov.uk/apply-gender-recognition-certificate/what-documents-you-need>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Note: Two medical reports are needed, written by either two different UK-registered medical doctors, or a UK-registered medical doctor and a UK-registered clinical psychologist. A nurse practitioner cannot write either report. There is no approval scheme for practitioners: the first report must be from a registered doctor or clinical psychologist practising in the field of gender dysphoria, and the published list of specialists is stated to be incomplete and not always up to date, so someone not on it still qualifies if they include a brief summary of their experience. The second report can be from any registered doctor or clinical psychologist, including a GP, a surgeon, or an endocrinologist, with no required content, and existing reports can be used if they already meet the requirements. The planner previously called this "medical reports from approved practitioners" and has been corrected.
+  - Last verified: 2026-09-12
 
 - **GOV.UK: List of medical practitioners in the field of gender dysphoria**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
   - Status: Linked in the planner
-  - Last verified: 2026-09-11
+  - Note: The planner's link label previously read "List of approved medical practitioners". This publication is not a list of approved practitioners; there is no approval scheme. The label has been corrected to match the publication's own title.
+  - Last verified: 2026-09-12
 
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>

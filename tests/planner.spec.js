@@ -1023,6 +1023,19 @@ test.describe('Be myself Planner', () => {
       await expect(plan).toContainText('mobile, broadband, or streaming bill');
       await expect(plan).toContainText('a recent bill or letter that already shows your new name is often accepted instead');
     });
+
+    test('92. DVLA gender-only variant does not show name-change evidence text', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalName').uncheck();
+      await expect(page.locator('#chkGoalGender')).toBeChecked();
+      await page.locator('#chkDrivingLicenceNeeds').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan).toContainText('The DVLA accepts a deed poll, a statutory declaration, or a GRC as evidence for a gender marker change');
+      await expect(plan).toContainText('A medical letter is not needed');
+      await expect(plan).not.toContainText('one other document that already shows your new name');
+      await expect(plan).not.toContainText('mobile, broadband, or streaming bill');
+    });
   });
 
   // --- Accessibility & layout ---
