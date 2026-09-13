@@ -7,7 +7,8 @@
  *
  * Renders each source with Playwright and extracts its article text with
  * Mozilla's Readability (the engine behind Firefox's Reader View), which
- * strips nav/footer/cookie-banner chrome without per-site configuration.
+ * strips static nav/footer chrome without per-site configuration; a live
+ * cookie banner is dismissed separately first (see source-snapshot-lib.js).
  * Text is stored, not hashed, so a mismatch shows a readable diff of what
  * actually changed instead of just "changed: yes/no".
  *
@@ -21,7 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('@playwright/test');
-const { parseSources, sourcesToCheck, extractReadableText, USER_AGENT } = require('./source-snapshot-lib');
+const { parseSources, sourcesToCheck, preparePage, extractReadableText, USER_AGENT } = require('./source-snapshot-lib');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SOURCES_MD = path.join(REPO_ROOT, 'SOURCES.md');
@@ -61,6 +62,7 @@ async function main() {
 
   const browser = await chromium.launch();
   const page = await browser.newPage({ userAgent: USER_AGENT });
+  await preparePage(page);
 
   const nextSnapshot = {};
   const changed = [];

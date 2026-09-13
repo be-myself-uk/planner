@@ -141,11 +141,21 @@ async function dismissCookieBanner(page) {
  * after the page has finished loading. Readability's own heuristics strip
  * static nav/footer chrome without per-site configuration, but a live
  * cookie banner needs dismissing first (see dismissCookieBanner).
+ *
+ * Readability is injected once per page via addInitScript, not
+ * addScriptTag: a real <script> element is subject to the page's own
+ * Content-Security-Policy, and mygov.scot's nonce-based script-src blocks
+ * it outright. addInitScript runs before the page's own scripts do, via
+ * the browser's automation protocol rather than the page's script-loading
+ * path, so it isn't subject to that CSP.
  */
+async function preparePage(page) {
+  await page.addInitScript({ path: READABILITY_PATH });
+}
+
 async function extractReadableText(page, url) {
   await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
   await dismissCookieBanner(page);
-  await page.addScriptTag({ path: READABILITY_PATH });
   return page.evaluate(() => {
     const clone = document.cloneNode(true);
     const article = new Readability(clone).parse();
@@ -154,4 +164,4 @@ async function extractReadableText(page, url) {
   });
 }
 
-module.exports = { parseSources, sourcesToCheck, extractReadableText, USER_AGENT, EXCLUDED_DOMAINS, KNOWN_BLOCKED_DOMAINS };
+module.exports = { parseSources, sourcesToCheck, preparePage, extractReadableText, USER_AGENT, EXCLUDED_DOMAINS, KNOWN_BLOCKED_DOMAINS };
