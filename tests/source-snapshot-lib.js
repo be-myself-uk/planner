@@ -102,15 +102,49 @@ function sourcesToCheck(entries) {
   return out;
 }
 
+// A live cookie-consent banner (only injected once its own JS runs, so it
+// never shows up when testing against a plain saved-HTML copy of a page) can
+// out-score a page's real content under Readability's heuristics, especially
+// on short "hub" pages where the actual content is mostly link fragments.
+// Confirmed on communities-ni.gov.uk and infrastructure-ni.gov.uk, which
+// share the same GOV.UK-style cookie banner text. Best-effort dismissal
+// before parsing; silently does nothing if no matching control is found.
+const COOKIE_ACCEPT_PATTERNS = [
+  /accept additional cookies/i,
+  /accept all cookies/i,
+  /^accept all$/i,
+  /^accept cookies$/i,
+  /^i accept$/i,
+  /^allow all cookies$/i,
+  /^allow all$/i,
+];
+
+async function dismissCookieBanner(page) {
+  for (const pattern of COOKIE_ACCEPT_PATTERNS) {
+    try {
+      const button = page.getByRole('button', { name: pattern }).first();
+      if (await button.isVisible({ timeout: 500 })) {
+        await button.click({ timeout: 1000 });
+        await page.waitForTimeout(300);
+        return;
+      }
+    } catch {
+      // Not present, or not clickable in time; try the next pattern.
+    }
+  }
+}
+
 /**
  * Renders a URL and runs Mozilla's Readability (the engine behind Firefox's
  * Reader View) against the live DOM, returning its extracted article text.
  * Works whether the page is server-rendered or a JS SPA, since it runs
- * after the page has finished loading, and needs no per-site configuration:
- * Readability's own heuristics strip nav/footer/cookie-banner chrome.
+ * after the page has finished loading. Readability's own heuristics strip
+ * static nav/footer chrome without per-site configuration, but a live
+ * cookie banner needs dismissing first (see dismissCookieBanner).
  */
 async function extractReadableText(page, url) {
   await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+  await dismissCookieBanner(page);
   await page.addScriptTag({ path: READABILITY_PATH });
   return page.evaluate(() => {
     const clone = document.cloneNode(true);
