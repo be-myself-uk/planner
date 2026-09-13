@@ -36,13 +36,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function fetchWithRetry(page, url) {
   try {
     return await extractReadableText(page, url);
-  } catch (e) {
+  } catch {
     await sleep(RETRY_DELAY_MS);
-    try {
-      return await extractReadableText(page, url);
-    } catch (e2) {
-      throw e2;
-    }
+    return extractReadableText(page, url);
   }
 }
 

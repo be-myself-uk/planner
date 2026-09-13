@@ -167,7 +167,7 @@ async function preparePage(page) {
 // website is busy, please try later." for three unrelated URLs at once.
 // Treating a match as a failure (so the caller's retry-then-error path
 // handles it) keeps a transient interstitial from ever being read as drift.
-const BUSY_PAGE_PATTERNS = [/website is busy/i, /please try again later/i, /too many requests/i, /rate limit/i];
+const BUSY_PAGE_PATTERNS = [/website is busy/i, /please try (again )?later/i, /too many requests/i, /rate limit/i];
 
 function looksLikeBusyPage(textContent) {
   return BUSY_PAGE_PATTERNS.some((pattern) => pattern.test(textContent));
@@ -188,4 +188,4 @@ async function extractReadableText(page, url) {
   return article;
 }
 
-module.exports = { parseSources, sourcesToCheck, preparePage, extractReadableText, USER_AGENT, EXCLUDED_DOMAINS, KNOWN_BLOCKED_DOMAINS };
+module.exports = { parseSources, sourcesToCheck, preparePage, extractReadableText, USER_AGENT };

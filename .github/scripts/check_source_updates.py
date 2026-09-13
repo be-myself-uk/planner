@@ -7,12 +7,12 @@ sources and the last-checked date.
 
 Scope is deliberately GOV.UK only. Every gov.uk page exposes a reliable
 public_updated_at timestamp for exactly what changed, with a plain JSON
-API call, no scraping. Non-GOV.UK sources are not checked automatically:
-several (NHS Inform, ireland.ie, Registers of Scotland) block scripted
-requests inconsistently, and a whole-page content hash would flag on
-sidebar links, image URLs, and other content that has nothing to do with
-what the source is actually cited for. Those sources stay on manual
-review, same as before this script existed.
+API call, no scraping. Most non-GOV.UK sources are covered separately by
+tests/source-content-check.js (the source-content-watch job), which
+renders each page with Playwright and diffs its extracted article text
+instead, since no non-GOV.UK site offers an equivalent change API. A
+small number of sites that block automated fetches outright stay on
+manual review; see KNOWN_BLOCKED_DOMAINS in tests/source-snapshot-lib.js.
 
 An entry is only checked if its "Last verified" field already holds a
 real ISO 8601 date; entries still marked "pending" are skipped, since
