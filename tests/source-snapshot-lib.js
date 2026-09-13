@@ -158,15 +158,34 @@ async function preparePage(page) {
   await page.addInitScript({ content: READABILITY_SOURCE });
 }
 
+// A rate-limited or overloaded site can return a normal 200 response with a
+// short "come back later" interstitial instead of its real page. Readability
+// parses that successfully (it's a perfectly well-formed little article), so
+// nothing throws and it would otherwise be indistinguishable from the site's
+// real content actually having changed to something short. Confirmed on
+// nhsinform.scot after repeated requests in a short window returned "The
+// website is busy, please try later." for three unrelated URLs at once.
+// Treating a match as a failure (so the caller's retry-then-error path
+// handles it) keeps a transient interstitial from ever being read as drift.
+const BUSY_PAGE_PATTERNS = [/website is busy/i, /please try again later/i, /too many requests/i, /rate limit/i];
+
+function looksLikeBusyPage(textContent) {
+  return BUSY_PAGE_PATTERNS.some((pattern) => pattern.test(textContent));
+}
+
 async function extractReadableText(page, url) {
   await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
   await dismissCookieBanner(page);
-  return page.evaluate(() => {
+  const article = await page.evaluate(() => {
     const clone = document.cloneNode(true);
-    const article = new Readability(clone).parse();
-    if (!article) return null;
-    return { title: article.title, textContent: article.textContent.trim().replace(/\n{2,}/g, '\n') };
+    const parsed = new Readability(clone).parse();
+    if (!parsed) return null;
+    return { title: parsed.title, textContent: parsed.textContent.trim().replace(/\n{2,}/g, '\n') };
   });
+  if (article && looksLikeBusyPage(article.textContent)) {
+    throw new Error('Extracted content looks like a rate-limit/busy interstitial, not the real page');
+  }
+  return article;
 }
 
 module.exports = { parseSources, sourcesToCheck, preparePage, extractReadableText, USER_AGENT, EXCLUDED_DOMAINS, KNOWN_BLOCKED_DOMAINS };
