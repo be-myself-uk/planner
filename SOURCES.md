@@ -23,12 +23,12 @@ For items with no official source, the links in the general data protection sect
 - **ICO: Your right to get your data corrected**
   - <https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **ICO: Employment records and data protection**
   - <https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/employment-practices-and-data-protection-keeping-employment-records/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ## Deed poll or statutory declaration (deedpoll)
 
@@ -48,14 +48,14 @@ For items with no official source, the links in the general data protection sect
 - **National Records of Scotland: Changing your name**
   - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ### Northern Ireland
 
 - **NI Direct: Recording a change of name**
   - <https://www.nidirect.gov.uk/articles/recording-change-name>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 *Note: the DVA identity evidence page (listed under driving licence below) accepts a deed poll, a statutory declaration, or a GRC as evidence of a gender change. The planner states this, and marks the community preference for statutory declarations as community advice.*
 
@@ -144,12 +144,12 @@ For items with no official source, the links in the general data protection sect
 - **Department for Communities: Benefits and pensions**
   - <https://www.communities-ni.gov.uk/topics/benefits-and-pensions>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **NI Direct: Equal treatment for State Pension for transgender people**
   - <https://www.nidirect.gov.uk/articles/equal-treatment-state-pension-transgender-people>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 *Note: no official source documents processing delays for benefit customers with restricted records. The planner marks this as community advice.*
 
@@ -179,14 +179,14 @@ For items with no official source, the links in the general data protection sect
 - **mygov.scot: Transgender disclosure applications**
   - <https://www.mygov.scot/transgender-disclosure-application>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ### Northern Ireland
 
 - **NI Direct: Using a criminal record check**
   - <https://www.nidirect.gov.uk/articles/using-criminal-record-check>
   - Status: Linked in the planner
-  - Last verified: 2026-07-14
+  - Last verified: 2026-09-13
   - Note: previously linked to the generic `/contacts/accessni` page, which does not document the transgender sensitive-applications route or the Operations Manager contact; this page does.
 
 ## Driving licence (dvla, dva)
@@ -229,13 +229,13 @@ For items with no official source, the links in the general data protection sect
   - <https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date>
   - Status: Linked in the planner
   - Note: Documents the requirement to tell the DVA immediately about a name change, and the DL1 postal process. It does not document a fee, a fine, or the Mx title.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 - **NI Direct: Proof of identity for a driving licence**
   - <https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence>
   - Status: Linked in the planner
   - Note: Documents the evidence accepted for a gender change: a deed poll, a statutory declaration, or a GRC. No medical letter is required. Also documents who can provide a statutory declaration in Northern Ireland: a solicitor, a magistrate, or a commissioner of oaths.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 ## Vehicle log book (v5c)
 
@@ -252,18 +252,18 @@ For items with no official source, the links in the general data protection sect
 - **NHS: How to register with a GP surgery**
   - <https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **PCSE: Gender reassignment and NHS records**
   - <https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment>
   - Status: Linked in the planner
   - Note: Documents the stop on gender marker and NHS number changes for under-18s, the new NHS number process and its irreversibility, the warning about waiting lists, the option to keep the existing NHS number, and the indeterminate ("I", shown as "Not specified") marker. PCSE limits the indeterminate marker to patients aged 18 and over, which the planner states.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 - **PCSE: Deductions and amendments**
   - <https://pcse.england.nhs.uk/help/patient-registrations/deductions-and-amendments>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **GOV.UK: NHS population screening information for trans and non-binary people**
   - <https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people>
@@ -290,30 +290,30 @@ For items with no official source, the links in the general data protection sect
   - <https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/>
   - Status: Linked in the planner
   - Note: Covers GP registration only. It does not document the gender marker change process; the NSS FOI response below does.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 - **NHS National Services Scotland FOI release FOI-000084: Requirements for processing a change of gender and title**
   - <https://www.nss.nhs.scot/publications/foi-000084-requirements-for-processing-a-change-of-gender-and-title/foi-000084-requirements-for-processing-a-change-of-gender-and-title-html/>
   - Status: Consulted, not linked in the planner
   - Note: Documents that no evidence is required and nothing depends on the Gender Recognition Act 2004 (self-declaration), that a gender change on the CHI requires manual intervention by trained staff, that Practitioner Services contacts the patient to establish whether they want a new CHI number and possibly a new NHS number, that patients are alerted to clinical risks around gender specific screening programmes, and that title is determined by gender and marital status in most systems.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 - **NHS Inform: Screening information for the transgender community**
   - <https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **NHS Inform Scotland (main site)**
   - <https://www.nhsinform.scot/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ### Northern Ireland
 
 - **Business Services Organisation (HSCNI)**
   - <https://bso.hscni.net>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **BSO FOI response FOI 2632: Changing gender marker on GP record**
   - <https://www.whatdotheyknow.com/request/changing_gender_marker_on_gp_rec>
@@ -330,7 +330,7 @@ For items with no official source, the links in the general data protection sect
 - **Public Health Agency: Screening information for transgender, non-binary and gender fluid service users**
   - <https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ## UK passport (ukpass)
 
@@ -444,14 +444,14 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **National Records of Scotland: Gender recognition**
   - <https://www.nrscotland.gov.uk/registration/gender-recognition/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ### Northern Ireland
 
 - **NI Direct: Gender recognition**
   - <https://www.nidirect.gov.uk/articles/gender-recognition>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ## Services to update (SERVICES)
 
@@ -479,12 +479,12 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **EONI: Register to vote**
   - <https://www.eoni.org.uk/register-to-vote/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 - **EONI: Anonymous registration**
   - <https://www.eoni.org.uk/register-to-vote/anonymous-registration/>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ### Council Tax and rates (council)
 
@@ -501,7 +501,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **Department of Finance: Domestic rating**
   - <https://www.finance-ni.gov.uk/topics/domestic-rating>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13
 
 ### Utility bills (utilities)
 
@@ -511,7 +511,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - <https://www.mygov.scot/water-sewerage-services>
   - Status: Linked in the planner
   - Note: Documents that household water and sewerage charges are included in the Council Tax bill and collected by the local council, so there is no separate water account to update.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 #### Northern Ireland
 
@@ -519,7 +519,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - <https://www.infrastructure-ni.gov.uk/articles/water-charges>
   - Status: Linked in the planner
   - Note: Documents that the Department for Infrastructure pays a subsidy to Northern Ireland Water in lieu of domestic consumers' contributions, so households are not billed for water and there is no water account to update.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 ### Credit reference agencies (cra)
 
@@ -527,7 +527,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - <https://www.experian.co.uk/consumer/guides/gender-transitioning-and-your-credit-report.html>
   - Status: Linked in the planner
   - Note: Documents the arrangement between the three UK credit reference agencies: contacting one about a transition-related update leads it to contact the other two with the customer's consent. Also confirms a GRC is not needed. The planner's description of lenders passively reporting name changes over time remains community experience.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-13
 
 ### Land title register (landreg)
 
@@ -555,4 +555,4 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **nidirect: Personal applications to land registers**
   - <https://www.nidirect.gov.uk/articles/personal-applications-land-registers>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-13

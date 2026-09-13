@@ -1200,4 +1200,16 @@ test.describe('Be myself Planner', () => {
     });
   });
 
+  // --- Content integrity ---
+  // Catches unintended drift in PLAN_ITEMS/SERVICES content; regenerate the
+  // fixture with `npm run generate-content-snapshots` after an intentional edit.
+  test.describe('Content integrity', () => {
+    test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
+      const { extractContentMap } = require('./content-snapshot-lib');
+      const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
+      const actual = await page.evaluate(extractContentMap);
+      expect(actual).toEqual(expected);
+    });
+  });
+
 });

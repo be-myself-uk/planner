@@ -111,6 +111,7 @@
       <div class="btn-group">
         <button onclick="continuePlan()">Continue my plan</button>
         <button class="secondary" onclick="confirmRestart(this)"><span aria-hidden="true">↺</span> New plan</button>
+        <a href="https://github.com/be-myself-uk/planner/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="contact-btn" style="margin-top:0;">See what's changed<span class="visually-hidden"> (opens in a new tab)</span></a>
       </div>
     </div>
     <div id="welcomeOutdated" class="phase simul hidden" style="margin-top:0;margin-bottom:25px;">
@@ -119,6 +120,7 @@
       <div class="btn-group">
         <button onclick="reviewAnswers()">Review my answers</button>
         <button class="secondary" onclick="confirmRestart(this)"><span aria-hidden="true">↺</span> New plan</button>
+        <a href="https://github.com/be-myself-uk/planner/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="contact-btn" style="margin-top:0;">See what's changed<span class="visually-hidden"> (opens in a new tab)</span></a>
       </div>
     </div>
     <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
@@ -2805,6 +2807,8 @@ window.handleSvcItem         = handleSvcItem;
 window.handleSvcNone         = handleSvcNone;
 window.handleSvcAll          = handleSvcAll;
 window.cycleStepState        = cycleStepState;
+window.PLAN_ITEMS            = PLAN_ITEMS;
+window.SERVICES              = SERVICES;
 })();
 </script>
 </body>
