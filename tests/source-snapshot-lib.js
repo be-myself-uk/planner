@@ -1,6 +1,14 @@
-const path = require('path');
+const fs = require('fs');
 
-const READABILITY_PATH = require.resolve('@mozilla/readability/Readability.js');
+// Readability.js only declares a top-level `class Readability`, relying on a
+// classic <script> tag's global scope to expose it as window.Readability; it
+// has no browser-global export path of its own (only `module.exports`, for
+// Node). addInitScript evaluates its content inside its own scope rather
+// than the page's true global scope, so that implicit global never appears
+// on window there the way it does with addScriptTag. Appending an explicit
+// assignment makes the export work the same way regardless of which
+// injection method is used.
+const READABILITY_SOURCE = fs.readFileSync(require.resolve('@mozilla/readability/Readability.js'), 'utf8') + '\nwindow.Readability = Readability;';
 
 // GOV.UK sources are already covered by .github/scripts/check_source_updates.py
 // via the GOV.UK Content API (a reliable public_updated_at field, no scraping).
@@ -150,7 +158,7 @@ async function dismissCookieBanner(page) {
  * path, so it isn't subject to that CSP.
  */
 async function preparePage(page) {
-  await page.addInitScript({ path: READABILITY_PATH });
+  await page.addInitScript({ content: READABILITY_SOURCE });
 }
 
 async function extractReadableText(page, url) {
