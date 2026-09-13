@@ -116,29 +116,26 @@ function sourcesToCheck(entries) {
 // on short "hub" pages where the actual content is mostly link fragments.
 // Confirmed on communities-ni.gov.uk and infrastructure-ni.gov.uk, which
 // share the same GOV.UK-style cookie banner text. Best-effort dismissal
-// before parsing; silently does nothing if no matching control is found.
-const COOKIE_ACCEPT_PATTERNS = [
-  /accept additional cookies/i,
-  /accept all cookies/i,
-  /^accept all$/i,
-  /^accept cookies$/i,
-  /^i accept$/i,
-  /^allow all cookies$/i,
-  /^allow all$/i,
-];
+// before parsing; silently does nothing if no matching control appears.
+//
+// A single locator combining every pattern, clicked once with a generous
+// timeout, rather than trying each pattern in turn with its own short
+// timeout: some banners render asynchronously a moment after networkidle
+// fires, and re-checking each of several patterns for only a few hundred
+// milliseconds each isn't a reliable wait for that (confirmed in practice:
+// infrastructure-ni.gov.uk's banner was missed intermittently under the
+// original per-pattern short-timeout version, on a run only seconds after
+// one that caught it fine). One combined locator lets Playwright's normal
+// actionability auto-waiting cover the whole timeout window regardless of
+// which pattern ends up matching.
+const COOKIE_ACCEPT_PATTERN = /accept additional cookies|accept all cookies|^accept all$|^accept cookies$|^i accept$|^allow all cookies$|^allow all$/i;
 
 async function dismissCookieBanner(page) {
-  for (const pattern of COOKIE_ACCEPT_PATTERNS) {
-    try {
-      const button = page.getByRole('button', { name: pattern }).first();
-      if (await button.isVisible({ timeout: 500 })) {
-        await button.click({ timeout: 1000 });
-        await page.waitForTimeout(300);
-        return;
-      }
-    } catch {
-      // Not present, or not clickable in time; try the next pattern.
-    }
+  try {
+    await page.getByRole('button', { name: COOKIE_ACCEPT_PATTERN }).first().click({ timeout: 4000 });
+    await page.waitForTimeout(300);
+  } catch {
+    // No matching control appeared in time; nothing to dismiss.
   }
 }
 
