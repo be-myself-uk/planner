@@ -4,3 +4,4 @@ playwright-report/
 blob-report/
 __pycache__/
 source-watch-report.md
+source-content-report.md
