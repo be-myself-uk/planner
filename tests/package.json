@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "test": "playwright test",
+    "generate-content-snapshots": "node generate-content-snapshots.js",
+    "generate-source-snapshots": "node source-content-check.js --write",
+    "check-source-content": "node source-content-check.js"
+  },
+  "devDependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "@playwright/test": "^1.56.0"
+  }
+}

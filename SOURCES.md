@@ -1,0 +1,598 @@
+# Sources
+
+This document lists the official sources of information used in the planner (`index.html`): where the planner and a source listed here disagree, the planner may be outdated, and the related content may need review. Only if that review leads to an actual change in `index.html` does the change appear in `CHANGELOG.md`.
+
+**Important note:**
+
+GOV.UK links in this document are automatically checked twice a month for updates; any changes are listed in an issue.
+
+Deviations from official sources usually reflect realistic differences in practice observed by the transgender and non-binary communities, though not always. A deviation may sometimes just be an error, in which case please [create a new issue](https://github.com/be-myself-uk/planner/issues/new/choose).
+
+## Scope
+
+Only official sources are listed: the UK government, devolved governments and their departments and agencies, statutory regulators, public health bodies, arm's length bodies, and legislation. The Irish government is included where the planner covers Irish processes. There is a single scope exception for Experian as a CRA.
+
+Freedom of Information responses issued by bodies within this scope are treated as official sources, including where the response is archived on a third party service such as WhatDoTheyKnow. The author of the response, not the host, determines whether it is official.
+
+For items with no official source, the links in the general data protection section at the top of this list serve as the underlying legal basis for these items. Policies and guidance for items with no official source that would be out of scope for this document can usually be found online with a simple search for the providers name and context.
+
+---
+
+## General data protection (used across items)
+
+- **ICO: Your right to get your data corrected**
+  - <https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+- **ICO: Employment records and data protection**
+  - <https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/employment-practices-and-data-protection-keeping-employment-records/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+## Deed poll or statutory declaration (deedpoll)
+
+- **GOV.UK: Change your name by deed poll**
+  - <https://www.gov.uk/change-name-deed-poll>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **HM Passport Office caseworker guidance: Names, evidence to change a name**
+  - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
+  - Status: Consulted, not linked in the planner
+  - Note: Documents who can witness a statutory declaration: a solicitor, a notary public, a justice of the peace, a commissioner for oaths, a councillor (Scotland only, for documents dated on or after 10 December 2007), officers of the armed services at or above the rank of major or equivalent, and other persons authorised by law to administer an oath. This is the source for the witness list shown for Scotland, including local councillors.
+  - Last verified: 2026-09-03
+
+### Scotland
+
+- **National Records of Scotland: Changing your name**
+  - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+### Northern Ireland
+
+- **NI Direct: Recording a change of name**
+  - <https://www.nidirect.gov.uk/articles/recording-change-name>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+*Note: the DVA identity evidence page (listed under driving licence below) accepts a deed poll, a statutory declaration, or a GRC as evidence of a gender change. The planner states this, and marks the community preference for statutory declarations as community advice.*
+
+## Birth certificate name recording (birthcertname)
+
+*Note: This item only appears for people whose birth was registered in Scotland or Northern Ireland; England and Wales have no equivalent general route.*
+
+### Scotland
+
+- **National Records of Scotland: Changing your name**
+  - <https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/>
+  - Status: Linked in the planner
+  - Note: Confirms new copies of the certificate show both the new and previous name. Does not say the record is public or publicly accessible; the planner previously used that phrasing and has been corrected to state only what this page confirms.
+  - Last verified: 2026-09-11
+
+### Northern Ireland
+
+- **NI Direct: Recording a change of name**
+  - <https://www.nidirect.gov.uk/articles/recording-change-name>
+  - Status: Linked in the planner
+  - Note: Documents that a name change can be recorded with GRONI. Does not say the resulting record is public or publicly accessible; the planner previously used that phrasing and has been corrected to state only what this page confirms.
+  - Last verified: 2026-09-11
+
+## Work, payroll, and volunteering (hr)
+
+- **GOV.UK: What to do if an employee changes gender**
+  - <https://www.gov.uk/employee-changes-gender>
+  - Status: Linked in the planner
+  - Note: Documents reporting name and gender changes in separate Full Payment Submissions, the risk of duplicate payroll records and a higher PAYE bill, and National Insurance category changes.
+  - Last verified: 2026-07-17
+
+## HMRC and taxes (hmrc)
+
+- **GOV.UK: Tell HMRC about a change of details (gender change)**
+  - <https://www.gov.uk/tell-hmrc-change-of-details/gender-change>
+  - Status: Linked in the planner
+  - Note: Documents Public Department 1 (PD1) and Special Section D, including writing to Special Section D about a name change only where gender has not been changed legally, and opting out of record restriction. It does not document placing records in a restricted gender role without a GRC. The page itself hedges that HMRC is "usually" (not always) told automatically on a legal gender change; the planner's wording now matches this rather than stating it as unconditional.
+  - Last verified: 2026-09-17
+
+- **GOV.UK: Your National Insurance number**
+  - <https://www.gov.uk/national-insurance/your-national-insurance-number>
+  - Status: Linked in the planner
+  - Note: Confirms a National Insurance number is sent shortly before a person's 16th birthday and never changes. Does not state a three-month window before the birthday; a related GOV.UK page about applying for a number because of a Child Benefit claim does, but this page is the canonical source and the planner's wording matches it rather than the narrower claim.
+  - Last verified: 2026-09-11
+
+- **HMRC internal manual: PAYE103005, Gender Recognition Act**
+  - <https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye103005>
+  - Status: Consulted, not linked in the planner
+  - Note: States that HMRC does not amend the gender on a customer record until a full GRC is provided.
+  - Last verified: 2026-07-17
+
+- **HMRC FOI response FOI2025/153485: RTI submissions for transgender employees with Special Section D records without a GRC**
+  - <https://www.whatdotheyknow.com/request/foi_request_hmrc_guidance_on_rti>
+  - Status: Consulted, not linked in the planner
+  - Note: HMRC confirms it changes the sex marker on a customer record only once a full GRC is provided, and holds no guidance for restricted records without a GRC. The planner states this, and marks the reports of privacy protections being applied without a GRC as community advice.
+  - Last verified: 2026-07-17
+
+## Benefits and State Pension (dwp)
+
+### England, Wales, and Scotland
+
+- **GOV.UK: Benefits**
+  - <https://www.gov.uk/browse/benefits>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **GOV.UK: Tell HMRC about a change of details (gender change)**
+  - <https://www.gov.uk/tell-hmrc-change-of-details/gender-change>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-17
+
+- **DWP: Summary of policy on the retention of information relating to transgender customers**
+  - <https://www.gov.uk/government/publications/transgender-customers-summary-of-dwps-policy-in-respect-of-the-retention-of-information/summary-of-dwps-policy-on-the-retention-of-information-relating-to-transgender-customers>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+- **GOV.UK: State Pension age**
+  - <https://www.gov.uk/state-pension-age>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+*Note: no official source documents HMRC automatically passing a name change to DWP, so the planner advises telling each office that pays a benefit directly.*
+
+### Northern Ireland
+
+- **Department for Communities: Benefits and pensions**
+  - <https://www.communities-ni.gov.uk/topics/benefits-and-pensions>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+- **NI Direct: Equal treatment for State Pension for transgender people**
+  - <https://www.nidirect.gov.uk/articles/equal-treatment-state-pension-transgender-people>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+*Note: no official source documents processing delays for benefit customers with restricted records. The planner marks this as community advice.*
+
+## Qualifications, student records, and professional registrations (student)
+
+### England, Wales, and Northern Ireland
+
+- **GOV.UK: Student finance (who qualifies)**
+  - <https://www.gov.uk/student-finance/who-qualifies>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **GOV.UK: Updating your personal details (student finance)**
+  - <https://www.gov.uk/guidance/updating-your-personal-details>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **Student Finance England: Updating your personal details**
+  - <https://www.gov.uk/guidance/updating-your-personal-details>
+  - Status: Consulted (same URL as above; this is the Content API's rendering of it)
+  - Note: Confirms name changes need a signed covering letter plus evidence (birth/marriage certificate, decree, an un-enrolled Change of Name Deed, or statutory declaration), uploaded through the online account. Confirms title and gender changes need no documents or evidence at all — just a phone call, live chat, or letter — and that a gender change is never assumed from a name change alone. This is the source for the "in England, a title or gender change... needs no supporting documents" line.
+  - Last verified: 2026-09-17
+
+- **Student Finance Wales: Changes to your information or circumstances**
+  - <https://www.studentfinancewales.co.uk/undergraduate-finance/part-time/tuition-fee-and-living-cost-students/changes-to-your-information-or-circumstances/>
+  - Status: Consulted, not linked in the planner
+  - Note: Confirms a name change needs a written letter (customer reference number, date, signature) with evidence such as a marriage certificate or change of name deed. Does not have its own separate page documenting a title/gender-specific process the way Student Finance England does, so the planner does not claim the English no-evidence shortcut also applies in Wales.
+  - Last verified: 2026-09-17
+
+- **Student Finance NI: Keeping your information up to date**
+  - <https://www.studentfinanceni.co.uk/student-finance-explained/during-your-course/changes-to-your-information-or-circumstances/>
+  - Status: Consulted, not linked in the planner
+  - Note: Only says to report a name change "through your student finance account" with no further detail on evidence or on title/gender changes specifically, so the planner does not claim anything more specific for Northern Ireland than for Wales.
+  - Last verified: 2026-09-17
+
+### Scotland
+
+- **SAAS: Changing your details**
+  - <https://www.saas.gov.uk/guides/hints-and-tips/changing-details>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-17
+
+- **SAAS: Change of name, gender and title (form)**
+  - <https://www.saas.gov.uk/files/485/saas-change-of-name-gender-title.pdf>
+  - Status: Linked in the planner
+  - Note: SAAS uses one combined form (sections A-E) for a name, gender, and title change together, emailed to a confidential mailbox (SAAS_Confidential@gov.scot), unlike SFE/SFW/SFNI's separate name/title/gender processes. Accepts a wide range of evidence for Section D, including a birth certificate, marriage/civil partnership certificate, decree nisi/absolute, GRC, statutory declaration or deed poll, passport or driving licence in the new name, or a letter from a doctor, solicitor, local authority, or the student's college/university — a GRC is listed as one option among several, not a requirement. States SAAS deletes/destroys the change-of-details documents from the student's record afterwards. Recommends also updating the Student Loans Company and DWP directly, since SAAS does not do this automatically. This is the source for the whole Scotland branch of the "Student finance" paragraph.
+  - Last verified: 2026-09-17
+
+## Criminal record checks (dbs)
+
+### England and Wales
+
+- **GOV.UK: DBS transgender applications**
+  - <https://www.gov.uk/guidance/transgender-applications>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+### Scotland
+
+- **mygov.scot: Transgender disclosure applications**
+  - <https://www.mygov.scot/transgender-disclosure-application>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+### Northern Ireland
+
+- **NI Direct: Using a criminal record check**
+  - <https://www.nidirect.gov.uk/articles/using-criminal-record-check>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+  - Note: previously linked to the generic `/contacts/accessni` page, which does not document the transgender sensitive-applications route or the Operations Manager contact; this page does.
+
+## Driving licence (dvla, dva)
+
+### England, Wales, and Scotland
+
+- **GOV.UK: Change the name or gender on your driving licence**
+  - <https://www.gov.uk/change-name-driving-licence>
+  - Status: Linked in the planner
+  - Note: Documents that a title can be changed as part of the same application without evidence, but does not name Mx and does not document the fine for failing to report a name change. Does not itself list what evidence is needed for a name or gender change; that is on the identity documents page below. Re-checked 2026-09-17 (page last edited 2026-09-09, the same day as the identity documents page below) after a question about whether DVLA had adopted anything like HMPO's new "letter requesting the change of gender" requirement for passports (see the passport section): it has not. The page mentions no cover letter or letter-of-request requirement of any kind, so the planner's "cover letter not required" wording stands.
+  - Last verified: 2026-09-17
+
+- **GOV.UK: Identity documents needed for a driving licence application**
+  - <https://www.gov.uk/id-for-driving-licence>
+  - Status: Linked in the planner
+  - Note: The "If your name or gender has changed" section covers both kinds of change. For a gender identity change, it lists a deed poll, a statutory declaration, or a gender recognition certificate as accepted evidence. For a deed poll or statutory declaration name change, it requires one further document that already shows the new name, dated after the deed poll or statutory declaration (and after the current licence, if one is held). Recently issued documents (within 12 months) include an HMRC letter, an employer letter, an education record, a letter from a government department or council, a visa or residence permit, a medical or health card, a voter card, a UK bank statement, a baptism or confirmation certificate, a child benefit record, or a utility bill (including mobile, broadband, or streaming). Older documents with no time limit include a non-GB driving licence, a UK passport number, a non-UK passport, or a national identity card. This closes a gap the planner previously had: it told users a driving licence update could resolve a bank's request for photo ID, which cannot work here since the licence itself cannot be the new-name evidence.
+  - Last verified: 2026-09-12
+
+- **UK Parliament written question 156265: Driver and Vehicle Licensing Agency: Gender**
+  - <https://questions-statements.parliament.uk/written-questions/detail/2023-03-01/156265>
+  - Status: Consulted, not linked in the planner
+  - Note: Department for Transport answer, 6 March 2023, fetched via the Parliament open written-questions API since the public page and its mirrors are Cloudflare-protected. States that to change gender on the driver record, a GRC, a deed poll, or a statutory declaration is accepted; for a combined name and gender change, a deed poll or statutory declaration is accepted, and a GRC used for a combined change must be accompanied by a deed poll or a statutory declaration, since a GRC alone is not accepted for a combined change. Corroborated by a DVLA spokesperson quote reported by the Christian Institute, and consistent with the current GOV.UK identity documents page above.
+  - Last verified: 2026-09-12
+
+- **Road Traffic Act 1988, section 99**
+  - <https://www.legislation.gov.uk/ukpga/1988/52/section/99>
+  - Status: Consulted, not linked in the planner
+  - Note: Legal basis for the requirement to surrender a licence for updating when the name on it ceases to be correct, and for the fine for failing to do so.
+  - Last verified: 2026-07-17
+
+- **DVLA FOI response FOIR9901: titles used on driving licence applications and renewals**
+  - <https://www.whatdotheyknow.com/request/number_of_people_using_honorific_2>
+  - Status: Consulted, not linked in the planner
+  - Note: Confirms the DVLA records Mx as a title on driving licences and provides a count of licences held with the title Mx.
+  - Last verified: 2026-07-17
+
+### Northern Ireland
+
+- **NI Direct: Keeping your driving licence up to date**
+  - <https://www.nidirect.gov.uk/articles/keeping-your-driving-licence-date>
+  - Status: Linked in the planner
+  - Note: Documents the requirement to tell the DVA immediately about a name change, and the DL1 postal process. It does not document a fee, a fine, or the Mx title.
+  - Last verified: 2026-09-13
+
+- **NI Direct: Proof of identity for a driving licence**
+  - <https://www.nidirect.gov.uk/articles/providing-proof-identity-driving-licence>
+  - Status: Linked in the planner
+  - Note: Documents the evidence accepted for a gender change: a deed poll, a statutory declaration, or a GRC. No medical letter is required. Also documents who can provide a statutory declaration in Northern Ireland: a solicitor, a magistrate, or a commissioner of oaths.
+  - Last verified: 2026-09-13
+
+## Vehicle log book (v5c)
+
+- **GOV.UK: Change your name on your vehicle log book (V5C)**
+  - <https://www.gov.uk/change-name-v5c>
+  - Status: Linked in the planner
+  - Note: Documents the fine of up to £1,000 for not telling the DVLA about a name change.
+  - Last verified: 2026-07-17
+
+## NHS and health records (nhs, newgp)
+
+### England and Wales
+
+- **NHS: How to register with a GP surgery**
+  - <https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+- **PCSE: Gender reassignment and NHS records**
+  - <https://pcse.england.nhs.uk/help/patient-registrations/gender-reassignment>
+  - Status: Linked in the planner
+  - Note: Documents the stop on gender marker and NHS number changes for under-18s, the new NHS number process and its irreversibility, the warning about waiting lists, the option to keep the existing NHS number, and the indeterminate ("I", shown as "Not specified") marker. PCSE limits the indeterminate marker to patients aged 18 and over, which the planner states.
+  - Last verified: 2026-09-13
+
+- **PCSE: Deductions and amendments**
+  - <https://pcse.england.nhs.uk/help/patient-registrations/deductions-and-amendments>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-09-13
+
+- **GOV.UK: NHS population screening information for trans and non-binary people**
+  - <https://www.gov.uk/government/publications/nhs-population-screening-information-for-transgender-people/nhs-population-screening-information-for-trans-people>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-03
+
+- **NHS Arden and GEM CSU: National Adult Gender Referral Support Service**
+  - <https://adult.genderreferralservice.nhs.uk/faq>
+  - Status: Linked in the planner
+  - Note: England only, for people aged 18 or over registered with a GP in England. Documents the single national waiting list for adult gender services, that a person's position is set by their original referral date to their chosen clinic, and that a person who changes their name must tell the referral service directly as well as their GP practice. Existing clinic referrals were still being transferred onto the national list at the time of verification, so this arrangement is expected to change. Not to be confused with the Gender Dysphoria National Referral Support Service (GDNRSS), which handles surgical referrals across the United Kingdom.
+  - Last verified: 2026-09-03
+
+### Wales
+
+- **NHS Wales: Welsh Gender Service, update your details**
+  - <https://gender.wales/update-details/>
+  - Status: Linked in the planner
+  - Note: Wales-only. Documents that a change of name, address, contact information, or GP is reported to the Welsh Gender Service (WGS) directly by a form emailed to WGS, separately from a person's GP record. Not the National Adult Gender Referral Support Service, which is England-only. The site lists two different phone numbers for WGS across its own pages (029 2183 6619 on the homepage/contact page, 029 2183 6612 on this page); the planner does not repeat either number, only the link, to avoid going stale.
+  - Last verified: 2026-09-11
+
+### Scotland
+
+- **NHS Inform: Registering with a GP practice**
+  - <https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/>
+  - Status: Linked in the planner
+  - Note: Covers GP registration only. It does not document the gender marker change process; the NSS FOI response below does.
+  - Last verified: 2026-09-13
+
+- **NHS National Services Scotland FOI release FOI-000084: Requirements for processing a change of gender and title**
+  - <https://www.nss.nhs.scot/publications/foi-000084-requirements-for-processing-a-change-of-gender-and-title/foi-000084-requirements-for-processing-a-change-of-gender-and-title-html/>
+  - Status: Consulted, not linked in the planner
+  - Note: Documents that no evidence is required and nothing depends on the Gender Recognition Act 2004 (self-declaration), that a gender change on the CHI requires manual intervention by trained staff, that Practitioner Services contacts the patient to establish whether they want a new CHI number and possibly a new NHS number, that patients are alerted to clinical risks around gender specific screening programmes, and that title is determined by gender and marital status in most systems.
+  - Last verified: 2026-09-13
+
+- **NHS Inform: Screening information for the transgender community**
+  - <https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+- **NHS Inform Scotland (main site)**
+  - <https://www.nhsinform.scot/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+### Northern Ireland
+
+- **Business Services Organisation (HSCNI)**
+  - <https://bso.hscni.net>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+- **BSO FOI response FOI 2632: Changing gender marker on GP record**
+  - <https://www.whatdotheyknow.com/request/changing_gender_marker_on_gp_rec>
+  - Status: Consulted, not linked in the planner
+  - Note: Response letter of 30 October 2025 and review panel outcome of 5 January 2026. BSO confirms it holds no policy or guidance on changing sex markers on GP records, that in the absence of policy it requests a GRC before changing a person's sex on the patient registration system (NHAIS), that this has been its position since 2009, and that Department of Health legal advice is that declining such a request without a GRC is not unlawful. The planner states this position and marks the differing community experience as community advice.
+  - Last verified: 2026-07-17
+
+- **Department of Health (NI) FOI response DOH 2025-0312: Changing gender marker on GP record**
+  - <https://www.whatdotheyknow.com/request/changing_gender_marker_on_gp_rec_2>
+  - Status: Consulted, not linked in the planner
+  - Note: The Department of Health confirms it holds no policy, draft policy, or related correspondence on changing a sex or gender marker on GP records or the central register maintained by BSO. Official confirmation that no documented patient-facing process exists in Northern Ireland.
+  - Last verified: 2026-07-17
+
+- **Public Health Agency: Screening information for transgender, non-binary and gender fluid service users**
+  - <https://www.publichealth.hscni.net/publications/screening-information-transgender-non-binary-and-gender-fluid-service-users>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+## UK passport (ukpass)
+
+- **GOV.UK: Change your name or gender on your passport**
+  - <https://www.gov.uk/changing-passport-information/gender>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **HM Passport Office caseworker guidance: Gender recognition**
+  - <https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible>
+  - Status: Linked in the planner
+  - Note: Version 29.0, updated 25 February 2026. This, not the public-facing page above, is the source for the medical letter bullet list: the letter must be dated, include the medical professional's handwritten signature, and confirm the professional knows the customer well enough to make a diagnosis, the specified name and gender, that both are used for all purposes, and that the change is likely to be permanent. It can be written by a GMC- or HCPC-registered professional, or by one in the UK or overseas who is not registered with either body but can provide evidence of their qualifications and experience (examples given include GPs, gender dysphoria clinicians and specialists, clinical psychologists, consultant psychologists and psychiatrists, practitioner psychologists, and specialist nurses; the list is not exhaustive). If a letter from someone in the second group is rejected, the guidance tells the examiner to ask for a replacement from someone GMC- or HCPC-registered. On consent for 16 and 17 year olds, the named exceptions are: within two weeks of the 18th birthday, both parents deceased, or no contact with one or both parents; where there are safeguarding concerns, none of the young adult exceptions apply and a court order is needed instead.
+  - Last verified: 2026-09-12
+
+- **HM Passport Office caseworker guidance: Names, change of name passport applications**
+  - <https://www.gov.uk/government/publications/change-of-name-passport-applications-caseworker-guidance/names-change-of-name-passport-applications-accessible#name-change-gender>
+  - Status: Linked in the planner
+  - Note: Version 36.0, published 27 July 2026, updated 3 September 2026 (fetched directly from the GOV.UK Content API, not scraped). A separate document from "Names: evidence to change a name" above, which it cross-references for general name-usage evidence; this one covers name changes specifically due to a change of gender. Its "No full or interim Gender Recognition Certificate" subsection is new in this version (per the page's own "Changes from last version" log) and is the source for the added requirement that, without a GRC, the customer must provide "a letter that requests a change of gender" in addition to the medical permanence letter and name-usage evidence already covered by the Gender recognition guidance above. With a full or interim GRC, it is accepted as evidence of the name change on its own, and no further name-change evidence should be requested unless there's reason to doubt the name is used for all purposes.
+  - Last verified: 2026-09-16
+
+- **HM Passport Office caseworker guidance: Authorisation and consent needed to issue a passport**
+  - <https://www.gov.uk/government/publications/authorisation-and-consent-needed-to-issue-a-passport/authorisation-and-consent-needed-to-issue-a-passport-accessible#when-we-need-additional-consent>
+  - Status: Consulted, not linked in the planner
+  - Note: "Consent to change the gender on the passport" confirms a gender marker change for someone under 18 needs signed consent from everyone with parental responsibility, with a safeguarding-concerns exception for 16 and 17 year olds; "Consent to change a young adult's name" confirms 16 and 17 year olds can consent to a name-only change themselves.
+  - Last verified: 2026-07-15
+
+## Immigration, eVisa, and home country passport (evisa, homepass)
+
+- **GOV.UK: UK Visas and Immigration**
+  - <https://www.gov.uk/government/organisations/uk-visas-and-immigration>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **Home Office policy: Use and change of names**
+  - <https://www.gov.uk/government/publications/change-of-name-guidance/use-and-change-of-names>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+- **Home Office caseworker guidance: EU Settlement Scheme, gender identity and sex markers on documents**
+  - <https://www.gov.uk/government/publications/eu-settlement-scheme-caseworker-guidance/eu-settlement-scheme-interim-guidance-gender-identity-and-sex-markers-on-documents-accessible>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-09-03
+
+## Irish passport and Irish gender recognition (irish_passport)
+
+- **Irish Department of Foreign Affairs: Passport documentary requirements**
+  - <https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/>
+  - Status: Linked in the planner
+  - Note: Under "Change information" > "My gender has now been recognised", the requirements are split by residence, not by first passport versus renewal. For an applicant resident in Northern Ireland or overseas, both a first passport and a renewal require a statutory declaration of settled and solemn intention to live in the new gender for the rest of their life, plus two documents from two different sources showing use of the new name over at least two years; a first application for this residency group also asks for an identity verification form, a full original birth certificate showing parents' names, proof of address within 12 months, and original government-issued photo identification. An Irish Gender Recognition Certificate is listed only for applicants resident in Ireland. The page also states that being issued a passport in the previous name during the reckonable usage period voids that period, and the two years restarts from the date that passport was issued. The planner previously described the GRC as a prerequisite and told users to get an ordinary passport first; both were wrong for the Northern Ireland/overseas resident route and have been corrected.
+  - Last verified: 2026-09-17
+
+- **Irish Department of Foreign Affairs: Gender recognition and citizenship (born abroad)**
+  - <https://www.ireland.ie/en/dfa/citizenship/born-abroad/gender-recognition/>
+  - Status: Linked in the planner
+  - Note: This page covers updating the gender on an existing Foreign Birth Registration (FBR) entry, and requires an Irish Gender Recognition Certificate. This is a different process from applying for or renewing a passport, and is not the standard route for someone born in Northern Ireland who does not hold an FBR certificate. Kept as a further-reading link for the Irish GRC route, which the planner otherwise describes as applying only to people ordinarily resident in the Republic of Ireland (see the Gender Recognition Act 2015 section 9 entry below).
+  - Last verified: 2026-09-12
+
+- **Gender Recognition Act 2015 (Ireland), section 9**
+  - <https://www.irishstatutebook.ie/2015/en/act/pub/0025/sec0009.html>
+  - Status: Consulted, not linked in the planner
+  - Note: Sets out who may apply for gender recognition: a person whose birth, adoption, or foreign birth is registered in one of the Republic's own registers (regardless of residence), or a person ordinarily resident in the State whose birth is registered elsewhere. Someone born in Northern Ireland and living in Northern Ireland or Great Britain meets neither condition, so the Irish GRC route is usually not available to them at all, not merely an extra step.
+  - Last verified: 2026-09-12
+
+- **gov.ie (Department of Social Protection): Apply for a Gender Recognition Certificate / Revised Birth Certificate**
+  - <https://www.gov.ie/en/department-of-social-protection/services/apply-for-a-gender-recognition-certificate-revised-birth-certificate/>
+  - Status: Consulted, not linked in the planner
+  - Note: Documents the Irish GRC application process, including the Circuit Family Court exemption order required before an application can be made on behalf of a 16 or 17 year old. This exemption order is part of the Irish GRC route, not the passport statutory-declaration route the planner now describes for Northern Ireland and overseas residents; the planner does not say whether the statutory-declaration route has its own age rules, since the adult DFA guidance does not address this.
+  - Last verified: 2026-09-12
+
+## Gender Recognition Certificate (grc_med, grc_life)
+
+- **GOV.UK: Apply for a Gender Recognition Certificate**
+  - <https://www.gov.uk/apply-gender-recognition-certificate>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **GOV.UK: Apply for a GRC, what documents you need**
+  - <https://www.gov.uk/apply-gender-recognition-certificate/what-documents-you-need>
+  - Status: Linked in the planner
+  - Note: Two medical reports are needed, written by either two different UK-registered medical doctors, or a UK-registered medical doctor and a UK-registered clinical psychologist. A nurse practitioner cannot write either report. There is no approval scheme for practitioners: the first report must be from a registered doctor or clinical psychologist practising in the field of gender dysphoria, and the published list of specialists is stated to be incomplete and not always up to date, so someone not on it still qualifies if they include a brief summary of their experience. The second report can be from any registered doctor or clinical psychologist, including a GP, a surgeon, or an endocrinologist, with no required content, and existing reports can be used if they already meet the requirements. The planner previously called this "medical reports from approved practitioners" and has been corrected.
+  - Note: This page's "What you need to do" list also sets out the application documents beyond the medical reports and the evidence of living in the acquired gender, which the planner previously did not mention at all: a statutory declaration; an original or certified copy of the full birth or adoption certificate; and, where the applicant has changed their name, copies of all documents showing when they did so, which it states "includes enrolled or unenrolled deed polls and statutory declarations of name changes" and which do not need to be certified. It also requires copies of every marriage or civil partnership certificate where the applicant has ever been married or in a civil partnership, a statutory declaration from the spouse or civil partner where the applicant intends to remain in one, a decree absolute, final order, or partner's death certificate where one has ended, and a translation of any document not in English, by a translator who needs no qualifications. Copies are usually acceptable, but the panel may ask to see originals after applying. This is the source for the "Paperwork for your GRC application" item and its checklist. The planner does not ask about marital status, so the marriage and spouse lines carry their condition in their own wording rather than being shown conditionally.
+  - Last verified: 2026-09-17
+
+- **GOV.UK: List of medical practitioners in the field of gender dysphoria**
+  - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
+  - Status: Linked in the planner
+  - Note: The planner's link label previously read "List of approved medical practitioners". This publication is not a list of approved practitioners; there is no approval scheme. The label has been corrected to match the publication's own title.
+  - Last verified: 2026-09-12
+
+- **GOV.UK: List of approved countries and territories**
+  - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **The Commissioners for Oaths (Fees) Order 1993 (SI 1993/2297)**
+  - <https://www.legislation.gov.uk/uksi/1993/2297/made>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+- **The Commissioners for Oaths (Fees) Order (Northern Ireland) 1993 (SR 1993/418)**
+  - <https://www.legislation.gov.uk/nisr/1993/418/contents/made>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+## Birth certificate after a GRC (birthcert)
+
+Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) is able to issue a new birth certificate upon notification from the GRP.
+
+### England and Wales
+
+- **GOV.UK: Apply for a Gender Recognition Certificate**
+  - <https://www.gov.uk/apply-gender-recognition-certificate>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+### Scotland
+
+- **National Records of Scotland: Gender recognition**
+  - <https://www.nrscotland.gov.uk/registration/gender-recognition/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+### Northern Ireland
+
+- **NI Direct: Gender recognition**
+  - <https://www.nidirect.gov.uk/articles/gender-recognition>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+## Services to update (SERVICES)
+
+### Electoral register (electoral)
+
+#### England, Wales, and Scotland
+
+- **GOV.UK: Register to vote**
+  - <https://www.gov.uk/register-to-vote>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
+  - <https://www.electoralcommission.org.uk/voting-and-elections/register-vote/register-vote-anonymously>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
+  - <https://www.electoralcommission.org.uk/running-electoral-registration-england/special-category-electors/anonymous-registration/how-should-application-anonymous-registration-be-processed>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+#### Northern Ireland
+
+- **EONI: Register to vote**
+  - <https://www.eoni.org.uk/register-to-vote/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+- **EONI: Anonymous registration**
+  - <https://www.eoni.org.uk/register-to-vote/anonymous-registration/>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+### Council Tax and rates (council)
+
+#### England, Wales, and Scotland
+
+- **GOV.UK: Housing Benefit**
+  - <https://www.gov.uk/housing-benefit>
+  - Status: Linked in the planner
+  - Note: Confirms Housing Benefit is administered by the local council (or, for Pension Credit claimants, the Pension Service), not DWP directly, so the planner mentions it alongside Council Tax rather than under HMRC and taxes or Benefits and State Pension.
+  - Last verified: 2026-09-11
+
+#### Northern Ireland
+
+- **Department of Finance: Domestic rating**
+  - <https://www.finance-ni.gov.uk/topics/domestic-rating>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13
+
+### Utility bills (utilities)
+
+#### Scotland
+
+- **mygov.scot: Public water and sewerage services**
+  - <https://www.mygov.scot/water-sewerage-services>
+  - Status: Linked in the planner
+  - Note: Documents that household water and sewerage charges are included in the Council Tax bill and collected by the local council, so there is no separate water account to update.
+  - Last verified: 2026-09-13
+
+#### Northern Ireland
+
+- **Department for Infrastructure: Water charges**
+  - <https://www.infrastructure-ni.gov.uk/articles/water-charges>
+  - Status: Linked in the planner
+  - Note: Documents that the Department for Infrastructure pays a subsidy to Northern Ireland Water in lieu of domestic consumers' contributions, so households are not billed for water and there is no water account to update.
+  - Last verified: 2026-09-13
+
+### Credit reference agencies (cra)
+
+- **Experian: Gender transitioning and your credit report**
+  - <https://www.experian.co.uk/consumer/guides/gender-transitioning-and-your-credit-report.html>
+  - Status: Linked in the planner
+  - Note: Documents the arrangement between the three UK credit reference agencies: contacting one about a transition-related update leads it to contact the other two with the customer's consent. Also confirms a GRC is not needed. The planner's description of lenders passively reporting name changes over time remains community experience.
+  - Last verified: 2026-09-13
+
+### Land title register (landreg)
+
+#### England and Wales
+
+- **HM Land Registry: Update or correct the register**
+  - <https://www.gov.uk/registering-land-or-property-with-land-registry/update-or-correct-the-register>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+- **GOV.UK: Change of gender (form CNG)**
+  - <https://www.gov.uk/government/publications/change-of-gender-cng>
+  - Status: Consulted, not linked in the planner
+  - Last verified: 2026-07-13
+
+#### Scotland
+
+- **Registers of Scotland: Managing a recorded person's details**
+  - <https://kb.ros.gov.uk/rci/managing-an-entry/managing-a-recorded-persons-details>
+  - Status: Linked in the planner
+  - Last verified: 2026-07-13
+
+#### Northern Ireland
+
+- **nidirect: Personal applications to land registers**
+  - <https://www.nidirect.gov.uk/articles/personal-applications-land-registers>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-13

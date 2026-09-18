@@ -1,0 +1,181 @@
+name: Check Content
+
+on:
+  schedule:
+    - cron: "0 0 1,15 * *"
+  workflow_dispatch:
+    inputs:
+      write_source_snapshots:
+        description: "source-content-watch: regenerate tests/source-content-snapshots.json instead of checking it, and upload the result as a build artifact (download and commit it yourself: this workflow has no repo push access). Use after adding a source or confirming a flagged change needs no fix; leave unchecked for a normal manual run."
+        type: boolean
+        default: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  issues: write
+
+jobs:
+  link-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Lychee Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: "--verbose --no-progress --config .github/scripts/lychee.toml './index.html' './README.md' './CHANGELOG.md' './SOURCES.md'"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for existing open issue
+        if: steps.lychee.outputs.exit_code != 0
+        id: existing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'broken-links',
+              state: 'open'
+            });
+            core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
+
+      - name: Create issue if links are broken
+        if: steps.lychee.outputs.exit_code != 0 && steps.existing.outputs.found == 'false'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "🚨 Broken links detected in the planner"
+          content-filepath: ./lychee/out.md
+          labels: bug, broken-links
+
+      - name: Comment on existing issue with the new report
+        if: steps.lychee.outputs.exit_code != 0 && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./lychee/out.md
+
+  source-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check GOV.UK sources against their Last verified date
+        id: check
+        run: |
+          set -o pipefail
+          python3 .github/scripts/check_source_updates.py | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check for existing open issue
+        if: steps.check.outputs.changes_detected == 'true'
+        id: existing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'source-changed',
+              state: 'open'
+            });
+            core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
+
+      - name: Create issue if a source may have changed
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'false'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "📄 Possible source changes in SOURCES.md"
+          content-filepath: ./source-watch-report.md
+          labels: source-changed
+
+      - name: Comment on existing issue with the new report
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./source-watch-report.md
+
+  source-content-watch:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('tests/package-lock.json') }}
+
+      - name: Install Playwright browsers and system deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium --with-deps
+
+      - name: Regenerate source-content-snapshots.json
+        if: inputs.write_source_snapshots == true
+        run: node source-content-check.js --write
+
+      - name: Upload regenerated snapshot
+        if: inputs.write_source_snapshots == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-content-snapshots
+          path: tests/source-content-snapshots.json
+          retention-days: 14
+
+      - name: Check non-GOV.UK sources against their last snapshot
+        if: inputs.write_source_snapshots != true
+        id: check
+        run: |
+          set -o pipefail
+          node source-content-check.js | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check for existing open issue
+        if: inputs.write_source_snapshots != true && steps.check.outputs.changes_detected == 'true'
+        id: existing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'source-changed',
+              state: 'open'
+            });
+            core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
+
+      - name: Create issue if a source may have changed
+        if: inputs.write_source_snapshots != true && steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'false'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "📄 Possible source changes in SOURCES.md"
+          content-filepath: ./source-content-report.md
+          labels: source-changed
+
+      - name: Comment on existing issue with the new report
+        if: inputs.write_source_snapshots != true && steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./source-content-report.md

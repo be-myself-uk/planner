@@ -1,0 +1,46 @@
+name: Bump Schema Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - index.html
+  workflow_dispatch: {}
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.BUMP_VERSION_TOKEN }}
+
+      - name: Update SCHEMA_VERSION in index.html
+        run: |
+          CURRENT_TIME=$(date +%s)
+
+          sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
+
+      - name: Commit and push the version bump
+        run: |
+          git config --global user.name "37273045+Venae@users.noreply.github.com"
+          git config --global user.email "37273045+Venae@users.noreply.github.com"
+
+          git add index.html
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Version bump [no ci]"
+
+          if ! git push; then
+            echo "::error::Direct push to main was rejected. BUMP_VERSION_TOKEN may have expired, been revoked, or its owner removed from main's ruleset bypass list. The version bump was not applied. See CONTRIBUTING.md."
+            exit 1
+          fi
