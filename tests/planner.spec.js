@@ -1315,22 +1315,33 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).not.toContainText('Irish passport');
     });
 
-    test('103. NI-born pursuing both the Irish passport and UK GRC routes gets a split final step', async ({ page }) => {
+    test('103. NI-born pursuing both the Irish passport and UK GRC routes gets two separate final steps', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkRegion"][value="ni"]').check();
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkGRCYes').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      const finalPhase = page.locator('.phase', { hasText: 'Legal gender recognition' });
-      const details = finalPhase.locator('.final-step-route');
-      await expect(details).toHaveCount(2);
-      await expect(details.nth(0).locator('> summary')).toHaveText('Irish passport route');
-      await expect(details.nth(1).locator('> summary')).toHaveText('UK GRC route');
-      await expect(details.nth(0)).toContainText('Irish passport (Good Friday Agreement route)');
-      await expect(details.nth(1)).toContainText('UK Gender Recognition Certificate (GRC)');
-      await expect(details.nth(1)).toContainText('Living proof for GRC');
-      await expect(finalPhase.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
-      await expect(finalPhase.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
+
+      const irish = page.locator('.phase[data-phase-key="final_irish"]');
+      const grc = page.locator('.phase[data-phase-key="final_grc"]');
+      await expect(irish).toHaveCount(1);
+      await expect(grc).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final"]')).toHaveCount(0);
+
+      await expect(irish.locator('> .phase-header h3')).toContainText('Legal gender recognition (Irish passport)');
+      await expect(grc.locator('> .phase-header h3')).toContainText('Legal gender recognition (GRC)');
+      await expect(irish.locator('.badge-time')).toContainText('Irish passport: 2+ years of name-use proof');
+      await expect(grc.locator('.badge-time')).toContainText('Long-term (2+ years)');
+
+      await expect(irish).toContainText('Irish passport (Good Friday Agreement route)');
+      await expect(grc).toContainText('UK Gender Recognition Certificate (GRC)');
+      await expect(grc).toContainText('Living proof for GRC');
+      await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
+      await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
+
+      // each route stands on its own, so neither points at the other
+      await expect(irish).not.toContainText('described first below');
+      await expect(grc).not.toContainText('described below alongside');
     });
 
     test('104. NI-born already having a GRC with no birth-cert follow-up gets a single, unsplit final step', async ({ page }) => {
@@ -1338,8 +1349,9 @@ test.describe('Be myself Planner', () => {
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkGRCUpdated').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      const finalPhase = page.locator('.phase', { hasText: 'Legal gender recognition' });
-      await expect(finalPhase.locator('.final-step-route')).toHaveCount(0);
+      const finalPhase = page.locator('.phase[data-phase-key="final"]');
+      await expect(finalPhase).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(0);
       await expect(finalPhase).toContainText('Irish passport (Good Friday Agreement route)');
     });
 
