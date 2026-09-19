@@ -17,6 +17,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Information
 
+- The two questions about your visa or eVisa are now one. It asks "Do you have a visa or eVisa?" with the same three answers used for your driving licence and passport, instead of asking separately whether you have one and whether it needs updating.
 - The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one of these as evidence for a gender marker change.
 
 ### Code
@@ -25,10 +26,12 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The question counter in the step-by-step view now only counts up. The total can still fall once you say what you need to update, because that removes questions that no longer apply.
 - The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
 - Fixed the checklist naming a button that was not on the page after switching views.
+- The step-by-step questions now start with what you need to update, since that answer decides which later questions apply. Where your birth was registered is asked straight after where you live.
 
 ### Layout
 
 - Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
+- Darkened the community advice marker so it meets contrast guidelines, and shortened what screen readers announce for it. It is no longer a keyboard stop, so it does not interrupt tabbing through a plan.
 
 ## [September 2026]
 

@@ -500,10 +500,9 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
       await expect(page.locator('#wrapGRC')).toBeHidden();
-      await expect(page.locator('#wrapVisa')).toBeHidden();
-      await page.getByLabel(/I have a UK visa or eVisa/).check();
       await expect(page.locator('#wrapVisa')).toBeVisible();
-      await expect(page.locator('#wrapVisa .note')).toContainText('already updated');
+      await expect(page.locator('#wrapVisa .chk-q--flex')).toContainText('Do you have a visa or eVisa?');
+      await expect(page.locator('#chkVisaNone')).toBeChecked();
       await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
       await page.getByLabel(/Yes, I need to update my records/).check();
@@ -512,8 +511,8 @@ test.describe('Be myself Planner', () => {
       await page.getByLabel(/I've already updated my records/).check();
       await expect(page.locator('#wrapDBS')).toBeVisible();
       await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
-      await expect(page.locator('#chkVisa')).toBeDisabled();
-      await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
+      await expect(page.locator('#chkVisaUpdated')).toBeDisabled();
+      await expect(page.locator('#chkVisaUpdated')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
     });
 
     test('99. Employment "already updated" hides the HR step but still offers DBS', async ({ page }) => {
@@ -651,20 +650,21 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="ans"][value="updated"]')).toBeEnabled();
     });
 
-    test('74. Wizard eVisa answer maps correctly, locks on passport, and produces the eVisa step', async ({ page }) => {
+    test('74. Wizard visa answer maps correctly, locks on passport, and produces the eVisa step', async ({ page }) => {
       await openWizard(page);
       await page.evaluate(() => {
-        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], citizen:'yes', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
-        step = questions.findIndex(q => q.id === 'visaUpdated');
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], visa:'needs_update', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
+        step = questions.findIndex(q => q.id === 'visa');
         renderWizard(false);
       });
-      await expect(page.locator('input[name="ans"][value="yes"]')).toBeDisabled();
-      await expect(page.locator('input[name="ans"][value="no"]')).toBeEnabled();
+      await expect(page.locator('input[name="ans"][value="updated"]')).toBeDisabled();
+      await expect(page.locator('input[name="ans"][value="needs_update"]')).toBeEnabled();
+      await expect(page.locator('input[name="ans"][value="none"]')).toBeEnabled();
       await page.evaluate(() => { wizardState.passport = 'updated'; renderWizard(false); });
-      await expect(page.locator('input[name="ans"][value="yes"]')).toBeEnabled();
+      await expect(page.locator('input[name="ans"][value="updated"]')).toBeEnabled();
       await page.evaluate(() => {
         wizardState.passport = 'needs_update';
-        wizardState.visaUpdated = 'no';
+        wizardState.visa = 'needs_update';
         step = questions.findIndex(q => q.id === 'grc');
         renderWizard(false);
       });
@@ -693,13 +693,27 @@ test.describe('Be myself Planner', () => {
 
     test('75. Checklist eVisa lock releases on passport status, not the deed poll', async ({ page }) => {
       await openChecklist(page);
-      await page.getByLabel(/I have a UK visa or eVisa/).check();
-      await expect(page.locator('#chkVisa')).toBeDisabled();
-      await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
+      await expect(page.locator('#chkVisaUpdated')).toBeDisabled();
+      await expect(page.locator('#chkVisaUpdated')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
       await page.getByLabel(/Deed poll or statutory declaration/).check();
-      await expect(page.locator('#chkVisa')).toBeDisabled();
+      await expect(page.locator('#chkVisaUpdated')).toBeDisabled();
       await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
-      await expect(page.locator('#chkVisa')).toBeEnabled();
+      await expect(page.locator('#chkVisaUpdated')).toBeEnabled();
+    });
+
+    test('140. The merged visa question derives both legacy fields, and cascades down with the passport', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByLabel(/Deed poll or statutory declaration/).check();
+      await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
+      await page.locator('#chkVisaUpdated').check();
+      expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
+        .toEqual(['updated', 'yes', 'yes']);
+      await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
+      expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
+        .toEqual(['needs_update', 'yes', 'no']);
+      await page.locator('#chkVisaNone').check();
+      expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
+        .toEqual(['none', 'no', 'no']);
     });
 
     test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
