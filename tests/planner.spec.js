@@ -724,6 +724,34 @@ test.describe('Be myself Planner', () => {
       expect(await label()).toBe('');
     });
 
+    test('144. Shared question notes come from one source and match in both views', async ({ page }) => {
+      await openChecklist(page);
+      const slots = await page.evaluate(() =>
+        [...document.querySelectorAll('#checklistView [data-note]')].map(el => ({
+          key: el.dataset.note,
+          rendered: el.textContent.replace(/\s+/g, ' ').trim(),
+          source: (window.NOTES || {})[el.dataset.note],
+        })));
+      expect(slots.length).toBeGreaterThan(8);
+      for (const s of slots) {
+        expect(s.source, `NOTES is missing an entry for ${s.key}`).toBeTruthy();
+        expect(s.rendered).toBe(s.source.replace(/\s+/g, ' ').trim());
+      }
+
+      // the wizard renders the same strings, so the two views cannot drift apart
+      const inWizard = await page.evaluate(() => {
+        const seen = {};
+        questions.forEach(q => {
+          const t = typeof q.q === 'function' ? q.q() : q.q;
+          Object.entries(window.NOTES).forEach(([k, v]) => { if (t.includes(v)) seen[k] = true; });
+        });
+        return seen;
+      });
+      for (const key of ['goal', 'visa', 'employment', 'student', 'vehicle', 'services']) {
+        expect(inWizard[key], `${key} note not found in any wizard question`).toBe(true);
+      }
+    });
+
     test('143. Every question is shown in both views or neither, across goal, region and employment', async ({ page }) => {
       await openChecklist(page);
       const mismatches = await page.evaluate(() => {
@@ -1085,7 +1113,8 @@ test.describe('Be myself Planner', () => {
       await firstBtn.click();
       await expect(firstBtn).toHaveAttribute('data-state', '1');
       await page.waitForTimeout(200);
-      await page.goto(filePath + '?p=%%%notvalid%%%');
+      await gotoUntil(page, filePath + '?p=%%%notvalid%%%',
+        () => page.locator('#welcomeOutdated').isVisible());
       await expect(page.locator('#welcomeOutdated')).toBeVisible();
       expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
     });
