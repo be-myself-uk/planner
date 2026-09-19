@@ -435,6 +435,49 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#checklistView')).toBeVisible();
       await expect(page.locator('#checklistAdaptiveNote')).toBeVisible();
     });
+
+    test('137. Wizard question number never decreases while answering forward', async ({ page }) => {
+      await openWizard(page);
+      const seen = [];
+      for (let i = 0; i < 30; i++) {
+        if (!(await page.locator('#wizardView').isVisible())) break;
+        const text = await page.locator('#controlBarProgressText').textContent();
+        const m = text.match(/Question (\d+) of (\d+)/);
+        if (!m) break;
+        seen.push(Number(m[1]));
+        await wizardNext(page);
+      }
+      expect(seen.length).toBeGreaterThan(5);
+      for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeGreaterThanOrEqual(seen[i - 1]);
+      expect(seen[0]).toBe(1);
+      expect(seen[1]).toBe(2);
+    });
+
+    test('138. Checklist intro, generate button and sticky bar agree from every entry point', async ({ page }) => {
+      const state = () => page.evaluate(() => ({
+        intro: document.getElementById('checklistIntroText').textContent.trim(),
+        label: document.getElementById('checklistGenerateBtn').textContent.trim(),
+        hidden: document.getElementById('checklistGenerateBtn').classList.contains('hidden'),
+        sticky: document.getElementById('checklistStickyBar').classList.contains('hidden')
+          ? null : document.querySelector('#checklistStickyBar button').textContent.trim(),
+      }));
+      const agrees = (s) => {
+        const named = (s.intro.match(/"([^"]+)"/) || [])[1];
+        return s.hidden ? (named === 'Update my action plan' && s.sticky === 'Update my action plan')
+                        : (named === 'Show my action plan' && s.label === 'Show my action plan' && s.sticky === null);
+      };
+
+      await openChecklist(page);
+      expect(agrees(await state())).toBe(true);
+
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.getByRole('button', { name: 'Edit plan' }).click();
+      expect(agrees(await state())).toBe(true);
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      expect(agrees(await state())).toBe(true);
+    });
   });
 
   test.describe('Locks, gating & validation', () => {
@@ -449,7 +492,9 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeEnabled();
       await page.locator('#chkGoalName').uncheck();
       await page.locator('#chkGoalGender').check();
-      await expect(page.locator('#wrapDeedPoll')).toBeHidden();
+      await expect(page.locator('#wrapDeedPoll')).toBeVisible();
+      await expect(page.locator('#wrapDeedPoll .label-dp-gender')).toBeVisible();
+      await expect(page.locator('#wrapDeedPoll .label-dp-dft')).toBeHidden();
       await expect(page.getByLabel('NHS record')).toBeEnabled();
       await expect(page.getByLabel('HMRC and taxes')).toBeVisible();
       await page.locator('#chkGoalName').check();
@@ -1335,6 +1380,17 @@ test.describe('Be myself Planner', () => {
       await expect(plan).not.toContainText('one other document that already shows your new name');
       await expect(plan).not.toContainText('mobile, broadband, or streaming bill');
     });
+
+    test('139. A gender-only plan that asks for a name-change document also gives a step for getting one', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalName').uncheck();
+      await expect(page.locator('#wrapDeedPoll')).toBeVisible();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const text = await page.locator('#planContent').innerText();
+      if (/deed poll|statutory declaration/i.test(text)) {
+        await expect(page.locator('#planContent [data-item-id="trk_deedpoll"]')).toHaveCount(1);
+      }
+    });
   });
 
   test.describe('Plan reordering', () => {
@@ -1584,8 +1640,22 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('link', { name: 'Usage guide' }).click();
       await page.keyboard.press('Escape');
       await expect(dlg).toBeHidden();
+      await page.waitForTimeout(1200);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page).not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
       await page.keyboard.press('Escape');
       await expect(page).toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+    });
+
+    test('135. Two slow Escape presses do not trigger the quick exit', async ({ page }) => {
+      await openWizard(page);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(1200);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page).not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+      await expect(page.locator('#wizardView')).toBeVisible();
     });
 
     test('19b. Keyboard ? shortcut opens help modal', async ({ page }) => {
@@ -1843,6 +1913,23 @@ test.describe('Be myself Planner', () => {
       expect(focusedId).toBe(zeroBtnId);
     });
 
+    test('136. Printing renders the guidance inside collapsed details, not just titles', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const screenWords = await page.evaluate(() => document.body.innerText.split(/\s+/).length);
+      await page.emulateMedia({ media: 'print' });
+      const printWords = await page.evaluate(() => document.body.innerText.split(/\s+/).length);
+      expect(printWords).toBeGreaterThan(screenWords * 1.5);
+      const probe = await page.evaluate(() => {
+        const d = [...document.querySelectorAll('#planContent details.tmpl-details')].find(x => !x.open);
+        return d ? d.querySelector('.details-body').textContent.trim().split(/\s+/).slice(3, 11).join(' ') : null;
+      });
+      expect(probe).toBeTruthy();
+      expect(await page.evaluate(() => document.body.innerText)).toContain(probe);
+      await page.emulateMedia({ media: 'screen' });
+      const stillOpen = await page.locator('#planContent details[open]').count();
+      expect(stillOpen).toBeLessThanOrEqual(1);
+    });
+
     test('70. Print-only disclaimer footer shows on the plan, hidden on screen', async ({ page }) => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
@@ -1879,6 +1966,10 @@ test.describe('Be myself Planner', () => {
   });
 
   test.describe('Content integrity', () => {
+
+
+
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
