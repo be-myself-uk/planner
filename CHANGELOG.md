@@ -23,6 +23,8 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Wording
 
+- Reworded several questions so they say why they are being asked and drop wording most people do not need. The deed poll, birth registration, visa, NHS record, and HMRC notes are all shorter.
+- The visa question's first answer now reads "I do not have one" rather than "No", matching the driving licence and passport questions. The employment question's "No" now reads "No, I do not have any to update".
 - Corrected the benefits question, which named "PIP" in the checklist but spelled out "Personal Independence Payment (PIP)" in the step-by-step view. It is now spelled out in both. The Northern Ireland version also said updating your details while claiming benefits can sometimes cause delays. No source supports that, so it now says the same as the rest of the UK: a change of name or gender can affect how some benefits are administered.
 
 ### Code
@@ -35,6 +37,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The checklist now runs in the same order: what you need to update, then your current documents, then your situation, then long-term goals. It previously asked about a Gender Recognition Certificate, which takes years, before asking whether you have a deed poll, which can be done in a day.
 - Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
 - The step-by-step questions now ask about a Gender Recognition Certificate before asking about your birth certificate, since you cannot change the gender on a birth certificate without one.
+- Editing your answers after returning to a saved plan no longer starts by asking your age again.
 
 ### Layout
 
@@ -47,6 +50,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Toolbar buttons are now at least 44 pixels on a phone, including the quick exit button, so they are easier to hit.
 - The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
 - The checklist's section indicator now reaches the last section while there is still page left to scroll, rather than only at the very bottom.
+- Fixed the visa question on the checklist, where the explanation sat beside the question instead of underneath it, squashing both into narrow columns.
 
 ## [September 2026]
 
