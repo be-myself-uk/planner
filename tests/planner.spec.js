@@ -2335,6 +2335,26 @@ test.describe('Be myself Planner', () => {
       expect(floating).toEqual([]);
     });
 
+    test('155. The progress tip sits below both top panels, directly above the first step', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const order = await page.evaluate(() =>
+        [...document.getElementById('planContent').children]
+          .map(el => el.id || (el.dataset.phaseKey ? 'phase:' + el.dataset.phaseKey : el.tagName)));
+      expect(order.slice(0, 3)).toEqual(['planSummaryBox', 'titlesInfoBox', 'trackTipBox']);
+      expect(order[3]).toMatch(/^phase:/);
+
+      // the tip carries class="phase" but holds no steps, so nothing counts it as one
+      expect(await page.evaluate(() =>
+        document.getElementById('trackTipBox').querySelectorAll('.step-state-btn').length)).toBe(0);
+
+      // dismissing the titles panel leaves the tip adjacent to the summary
+      await page.locator('#titlesInfoBox summary').click();
+      await page.locator('#titlesInfoBox').getByRole('button', { name: "Don't show this again" }).click();
+      const after = await page.evaluate(() =>
+        [...document.getElementById('planContent').children].map(el => el.id).filter(Boolean));
+      expect(after).toEqual(['planSummaryBox', 'trackTipBox']);
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));

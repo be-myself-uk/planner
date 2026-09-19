@@ -2578,8 +2578,8 @@ function buildSharedPlan(p) {
   </div>
 </details>`;
     }
-    if (ssg('trackTipDismissed') !== '1') html += TRACK_TIP_HTML;
     if (ssg('titlesInfoDismissed') !== '1') html += PLAN_ITEMS.titles_info.html;
+    if (ssg('trackTipDismissed') !== '1') html += TRACK_TIP_HTML;
   } else {
     stepsHtml = `<div class="phase success" role="status">
   <h2>🎉 Nothing left to do!</h2>
