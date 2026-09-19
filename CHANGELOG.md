@@ -22,7 +22,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Wording
 
-- Corrected the benefits question, which named "PIP" in the checklist but spelled out "Personal Independence Payment (PIP)" in the step-by-step view. It is now spelled out in both. The Northern Ireland version also said updating your details while claiming benefits can sometimes cause delays, which no source supports; it now says the same as the rest of the UK, that a change of name or gender can affect how some benefits are administered.
+- Corrected the benefits question, which named "PIP" in the checklist but spelled out "Personal Independence Payment (PIP)" in the step-by-step view. It is now spelled out in both. The Northern Ireland version also said updating your details while claiming benefits can sometimes cause delays. No source supports that, so it now says the same as the rest of the UK: a change of name or gender can affect how some benefits are administered.
 
 ### Code
 
@@ -119,7 +119,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Removed the path filter from `playwright.yml`. Once the suite became a required check on `main`, the filter meant a pull request touching only documentation could never satisfy it, leaving the pull request stuck.
 - Fixed two tests that could fail for no real reason and hold up unrelated work. Both save something, reload, and check it survived. Run against a local file, the browser occasionally loses a value saved moments before a reload, and the value was gone for good. The tests now keep a copy and restore anything lost before reloading again.
 - Added tests covering keyboard navigation, the new employment and GRC answers, and several accessibility attributes.
-- Added sources to [SOURCES.md](SOURCES.md): the National Adult Gender Referral Support Service, the Welsh Gender Service, GOV.UK's identity documents, National Insurance and Housing Benefit pages, HM Passport Office's gender recognition caseworker guidance, a UK Parliament written answer on DVLA evidence, and section 9 of the Gender Recognition Act 2015 (Ireland).
+- Added sources to [SOURCES.md](SOURCES.md). These were the National Adult Gender Referral Support Service, the Welsh Gender Service, and the Welsh Gender Service's change-of-details process. Also added GOV.UK's identity documents, National Insurance and Housing Benefit pages, HM Passport Office's gender recognition caseworker guidance, a UK Parliament written answer on DVLA evidence, and section 9 of the Gender Recognition Act 2015 (Ireland).
 - Added notes to the GitHub issue templates pointing at the project's constraints and sourcing expectations.
 
 ## [July 2026]
