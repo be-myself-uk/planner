@@ -1557,11 +1557,6 @@ function restartApp() {
   document.getElementById('dlgDisclaimer')?.showModal();
   refreshToolbarTabindex();
 }
-const CHK_MAP = [
-  ['chkDBS','dbs'], ['chkDWP','dwp'], ['chkStudent','student'], ['chkVehicle','vehicle'],
-  ['chkDeedPoll','deedpoll'], ['chkNHS','nhs'], ['chkNewGP','newGP'], ['chkHMRC','hmrc'],
-  ['chkBirthCertName','birthCertName'], ['chkBirthCert','birthCert'],
-];
 function setEmploymentRadio(val) {
   document.querySelectorAll('input[name="chkEmployment"]').forEach(r => { r.checked = r.value === val; });
 }
@@ -1602,7 +1597,7 @@ function renderChecklist() {
     gel('chkGoalName').checked   = wizardState.goal === S.BOTH || wizardState.goal === S.NAME;
     gel('chkGoalGender').checked = wizardState.goal === S.BOTH || wizardState.goal === S.GENDER;
   }
-  CHK_MAP.forEach(([id, prop]) => { gel(id).checked = wizardState[prop] === S.YES; });
+  CHK_MAP.forEach(([id, prop]) => { const el = gel(id); if (el) el.checked = wizardState[prop] === S.YES; });
   const docRadio = (name, state) => {
     const v = state === S.UPDATED ? 'updated' : state === S.NONE ? 'none' : 'needs_update';
     const el = document.querySelector(`input[name="${name}"][value="${v}"]`);
@@ -1822,7 +1817,7 @@ const questions = [
     [REGION.NI,   'Northern Ireland'],
     ['out',       'Outside the UK']
   ]},
-  { id:'deedpoll', wrap:'wrapDeedPoll',
+  { id:'deedpoll', chk:'chkDeedPoll', wrap:'wrapDeedPoll',
     q:() => wizardState.goal === S.GENDER
       ? 'Do you have a deed poll, statutory declaration, or Gender Recognition Certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.deedpollGender + '</em>'
       : regionText({
@@ -1833,7 +1828,7 @@ const questions = [
     o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'nhs', wrap:'wrapNHS',
+  { id:'nhs', chk:'chkNHS', wrap:'wrapNHS',
     q:() => regionText({
       s:  'Is your GP record and CHI number updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Your CHI (Community Health Index) number is Scotland\'s equivalent of the NHS number. Changing your gender marker on your health record affects which screening programmes you are automatically invited to.</em>',
       ni: 'Is your HSCNI health record updated with your new details?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Health and Social Care Northern Ireland uses a Health and Care Number (HCN) instead of an NHS number. A gender marker update may lead to a new HCN and affects automated cancer screening invitations.</em>',
@@ -1841,7 +1836,7 @@ const questions = [
     }),
     cond:() => wizardState.regionOutsideUK !== S.YES, o:() => [[S.YES,'Yes'],[S.NO,'No']]
   },
-  { id:'newGP', wrap:'wrapNewGP',
+  { id:'newGP', chk:'chkNewGP', wrap:'wrapNewGP',
     q:() => regionText({
       s:  'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new practice means your new name and CHI number are on file from day one, with no need to update an existing record. This is an alternative to updating your current record.</em>',
       ni: 'Would you also like to register with a new GP?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Registering at a new HSCNI practice means your new details are on file from day one. A new Health and Care Number may be issued. This is an alternative to updating your current record.</em>',
@@ -1851,7 +1846,7 @@ const questions = [
     [S.YES,'Yes, I would like to register with a new GP'],
     [S.NO, 'No']
   ]},
-  { id:'hmrc', wrap:'wrapHMRC', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', o:() => [[S.YES,'Yes'],[S.NO,'No']]
+  { id:'hmrc', chk:'chkHMRC', wrap:'wrapHMRC', q:'Have you already updated your HMRC and tax records?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">HMRC can restrict who can access your records, which is useful for privacy. The evidence needed also differs depending on whether you are changing your name, your gender marker, or both.</em>', o:() => [[S.YES,'Yes'],[S.NO,'No']]
   },
   { id:'driving', q:'What is the status of your UK driving licence?', o:() => {
     const locked = wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO;
@@ -1870,7 +1865,7 @@ const questions = [
     [S.UPDATED,      "I've already updated my records"],
     [S.NO,           'No'],
   ]},
-  { id:'dbs', wrap:'wrapDBS',
+  { id:'dbs', chk:'chkDBS', wrap:'wrapDBS',
     q:() => regionText({
       ni: 'Does your role or course require an AccessNI check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">AccessNI is Northern Ireland\'s equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people, including many nursing, teaching, and social work courses. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em>',
       s:  'Does your role or course require a Disclosure Scotland check?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Disclosure Scotland is Scotland\'s equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people, including many nursing, teaching, and social work courses. There is a specific process for trans people that keeps your previous name off the certificate shown to your employer or university.</em>',
@@ -1879,7 +1874,7 @@ const questions = [
     cond:() => wizardState.employment !== S.NO && wizardState.regionOutsideUK !== S.YES, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'dwp', wrap:'wrapDWP',
+  { id:'dwp', chk:'chkDWP', wrap:'wrapDWP',
     q:() => regionText({
       ni: 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.dwpNI + '</em>',
       default: 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.dwp + '</em>',
@@ -1892,20 +1887,20 @@ const questions = [
     cond:() => wizardState.goal !== S.GENDER,
     o:() => SERVICES.filter(s => wizardState.regionOutsideUK !== S.YES || (s.key !== 'council' && s.key !== 'electoral')).map(s => ({ value:s.key, label:s.label }))
   },
-  { id:'vehicle', wrap:'wrapVehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.vehicle + '</em>', o:() => [
+  { id:'vehicle', chk:'chkVehicle', wrap:'wrapVehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.vehicle + '</em>', o:() => [
     [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
   ], cond:() => wizardState.goal !== S.GENDER },
-  { id:'student', q:'Do you have educational qualifications or certificates to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.student + '</em>', o:() => [
+  { id:'student', chk:'chkStudent', q:'Do you have educational qualifications or certificates to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.student + '</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'birthCertName', wrap:'wrapBirthCertName',
+  { id:'birthCertName', chk:'chkBirthCertName', wrap:'wrapBirthCertName',
     q:() => wizardState.birthRegion === REGION.NI
       ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.birthCertNI + '</em>'
       : 'Would you like to record your new name on your Scottish birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.birthCertScot + '</em>',
     cond:() => (wizardState.birthRegion === REGION.S || wizardState.birthRegion === REGION.NI) && wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
-  { id:'birthCert', wrap:'wrapBirthCert', q:'Would you like to update your birth certificate to show your new gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This requires a Gender Recognition Certificate (GRC), as it is not possible without one. It is a long-term step and is not needed for most day-to-day purposes.</em>',
+  { id:'birthCert', chk:'chkBirthCert', wrap:'wrapBirthCert', q:'Would you like to update your birth certificate to show your new gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This requires a Gender Recognition Certificate (GRC), as it is not possible without one. It is a long-term step and is not needed for most day-to-day purposes.</em>',
     cond:() => wizardState.goal !== S.NAME, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
@@ -1914,6 +1909,7 @@ const questions = [
     [S.NO,'No'],[S.YES,'No, but I plan to apply for one at some point'],[S.UPDATED,'I already have one']
   ]}
 ];
+const CHK_MAP = questions.filter(q => q.chk).map(q => [q.chk, q.id]);
 function renderWizard(skipForward = true) {
   V.warning.classList.remove('visible');
   if (skipForward) {
@@ -3219,7 +3215,7 @@ window.onload = () => {
       else if (goalName)          wizardState.goal = S.NAME;
       else if (goalGender)        wizardState.goal = S.GENDER;
       else                        wizardState.goal = 'none';
-      CHK_MAP.forEach(([id, prop]) => { wizardState[prop] = gel(id).checked ? S.YES : S.NO; });
+      CHK_MAP.forEach(([id, prop]) => { const el = gel(id); if (el) wizardState[prop] = el.checked ? S.YES : S.NO; });
       const emp = document.querySelector('input[name="chkEmployment"]:checked');
       if (emp) wizardState.employment = emp.value;
       const dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
