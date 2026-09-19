@@ -701,6 +701,26 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkVisaUpdated')).toBeEnabled();
     });
 
+    test('141. Checklist sections run documents before long-term goals, numbered without gaps', async ({ page }) => {
+      await openChecklist(page);
+      const labels = () => page.evaluate(() =>
+        [...document.querySelectorAll('#checklistView > fieldset')].filter(f => f.offsetParent)
+          .map(f => f.querySelector('legend').textContent.trim()));
+
+      let ls = await labels();
+      expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
+        ['About you', 'Your current documents', 'Your situation', 'Long-term legal goals']);
+      expect(ls.map(l => Number(l.match(/^(\d+)/)[1]))).toEqual([1, 2, 3, 4]);
+
+      await expect(page.locator('#wrapSectionBasics .chk-q').first())
+        .toContainText('What do you need to update on your documents?');
+
+      await page.locator('input[name="chkBirthRegion"][value="s"]').check();
+      ls = await labels();
+      expect(ls.map(l => Number(l.match(/^(\d+)/)[1]))).toEqual([1, 2, 3, 4, 5]);
+      expect(ls[3]).toContain('Long-term goals (additional)');
+    });
+
     test('140. The merged visa question derives both legacy fields, and cascades down with the passport', async ({ page }) => {
       await openChecklist(page);
       await page.getByLabel(/Deed poll or statutory declaration/).check();

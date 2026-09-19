@@ -164,6 +164,12 @@
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 28px 0;">
 
       <legend class="section-title">1. About you</legend>
+      <div class="chk-section">
+        <p class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em></p>
+        <label class="option option-sm"><input type="checkbox" id="chkGoalName" checked> My name</label>
+        <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
+        <div id="checklistGoalWarning" class="warning-text" style="margin:10px 0 0 0;" role="alert"><span aria-hidden="true">⚠️</span> Please select at least one option for what you need to update on your documents.</div>
+      </div>
       <div class="chk-section chk-section--mb">
         <p class="chk-q">Where do you live?</p>
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="e" checked> England</label>
@@ -181,30 +187,35 @@
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionNI"   value="ni"> Northern Ireland</label>
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionOut"  value="out"> Outside the UK</label>
       </div>
-      <div class="chk-section">
-        <p class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em></p>
-        <label class="option option-sm"><input type="checkbox" id="chkGoalName" checked> My name</label>
-        <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
-        <div id="checklistGoalWarning" class="warning-text" style="margin:10px 0 0 0;" role="alert"><span aria-hidden="true">⚠️</span> Please select at least one option for what you need to update on your documents.</div>
-      </div>
       <div id="checklistAdaptiveNote" class="phase info hidden" style="margin:16px 0 0 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;" role="status">
         <span>💡 The sections below adapt to your answers here — some questions only appear for certain regions or update goals. If something you expect isn't showing, check your answers to "Where do you live?" and "What do you need to update?" above.</span>
         <button onclick="dismissAdaptiveNote()" aria-label="Dismiss tip">✕</button>
       </div>
     </fieldset>
-    <fieldset id="wrapSpecificChoices" data-section-label="Long-term goals (additional)" style="border:none;padding:0;margin:0 0 28px 0;">
-      <legend class="section-title">2. Long-term goals (additional)</legend>
-      <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-scot">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names, permanently linking them on your official birth record.</em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
-    </fieldset>
-    <fieldset id="wrapSectionLongterm" data-section-label="Long-term legal goals" style="border:none;padding:0;margin:0 0 28px 0;">
-      <legend class="section-title">3. Long-term legal goals</legend>
-      <div class="chk-section chk-section--mv" id="wrapGRC">
-        <p class="chk-q--flex">Do you plan to apply for a Gender Recognition Certificate (GRC)?</p>
-        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCNo" value="no" checked> No</label>
-        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCYes" value="yes"> Yes, I plan to apply for one at some point</label>
-        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCUpdated" value="updated"> I already have one</label>
-      </div>
-      <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a Gender Recognition Certificate (GRC).</em></span></label></div>
+    <fieldset id="wrapSectionDocuments" data-section-label="Your current documents" style="border:none;padding:0;margin:0 0 28px 0;">
+      <legend class="section-title">5. Your current documents</legend>
+    <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span><span class="label-dp-dft">Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span><span class="label-dp-gender">Deed poll, statutory declaration, or Gender Recognition Certificate<br><em class="note" style="margin-top:4px;font-style:italic;">The DVLA, the DVA, and the NHS accept one of these as evidence for a gender marker change. Your answer helps us work out whether getting one should be your first step.</em></span></span></label>
+    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span><br><em class="note" style="margin-top:2px;">Tick this once it is already updated with your new details, not just because you already have one.</em></span></label>
+    <div id="wrapNewGP" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkNewGP"><span>I would like to register with a new GP<br><em class="note" style="margin-top:2px;">Registering at a new practice means your new details are on file from day one.</em></span></label></div>
+    <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"><span>HMRC and taxes<br><em class="note" style="margin-top:2px;">Tick this once you have already updated your HMRC and tax records, not just because you pay tax.</em></span></label>
+    <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">What is the status of your UK driving licence?</p>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update" checked> It has my old details</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated"> It is already updated</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none"> I do not have one</label>
+    </div>
+    <div id="wrapPassport" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">What is the status of your passport?</p>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update" checked> It has my old details</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> It is already updated</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
+    </div>
+    <div id="wrapVisa" class="chk-section chk-section--mv">
+      <p class="chk-q--flex">Do you have a visa or eVisa?<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.</em></p>
+      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNone"    value="none" checked> No</label>
+      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNeeds"   value="needs_update"> Yes, and it has my old details</label>
+      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaUpdated" value="updated"> Yes, and it is already updated</label>
+    </div>
     </fieldset>
     <fieldset id="wrapSectionCircumstances" data-section-label="Your situation" style="border:none;padding:0;margin:0 0 28px 0;">
       <legend class="section-title">4. Your situation</legend>
@@ -246,30 +257,19 @@
       </fieldset>
     </div>
     </fieldset>
-    <fieldset id="wrapSectionDocuments" data-section-label="Your current documents" style="border:none;padding:0;margin:0 0 28px 0;">
-      <legend class="section-title">5. Your current documents</legend>
-    <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span><span class="label-dp-dft">Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span><span class="label-dp-gender">Deed poll, statutory declaration, or Gender Recognition Certificate<br><em class="note" style="margin-top:4px;font-style:italic;">The DVLA, the DVA, and the NHS accept one of these as evidence for a gender marker change. Your answer helps us work out whether getting one should be your first step.</em></span></span></label>
-    <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span><br><em class="note" style="margin-top:2px;">Tick this once it is already updated with your new details, not just because you already have one.</em></span></label>
-    <div id="wrapNewGP" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkNewGP"><span>I would like to register with a new GP<br><em class="note" style="margin-top:2px;">Registering at a new practice means your new details are on file from day one.</em></span></label></div>
-    <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"><span>HMRC and taxes<br><em class="note" style="margin-top:2px;">Tick this once you have already updated your HMRC and tax records, not just because you pay tax.</em></span></label>
-    <div id="wrapDrivingLicence" class="chk-section chk-section--mv">
-      <p class="chk-q--flex">What is the status of your UK driving licence?</p>
-      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update" checked> It has my old details</label>
-      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated"> It is already updated</label>
-      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none"> I do not have one</label>
-    </div>
-    <div id="wrapPassport" class="chk-section chk-section--mv">
-      <p class="chk-q--flex">What is the status of your passport?</p>
-      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update" checked> It has my old details</label>
-      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> It is already updated</label>
-      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
-    </div>
-    <div id="wrapVisa" class="chk-section chk-section--mv">
-      <p class="chk-q--flex">Do you have a visa or eVisa?<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.</em></p>
-      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNone"    value="none" checked> No</label>
-      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNeeds"   value="needs_update"> Yes, and it has my old details</label>
-      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaUpdated" value="updated"> Yes, and it is already updated</label>
-    </div>
+    <fieldset id="wrapSpecificChoices" data-section-label="Long-term goals (additional)" style="border:none;padding:0;margin:0 0 28px 0;">
+      <legend class="section-title">2. Long-term goals (additional)</legend>
+      <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-scot">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names, permanently linking them on your official birth record.</em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
+    </fieldset>
+    <fieldset id="wrapSectionLongterm" data-section-label="Long-term legal goals" style="border:none;padding:0;margin:0 0 28px 0;">
+      <legend class="section-title">3. Long-term legal goals</legend>
+      <div class="chk-section chk-section--mv" id="wrapGRC">
+        <p class="chk-q--flex">Do you plan to apply for a Gender Recognition Certificate (GRC)?</p>
+        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCNo" value="no" checked> No</label>
+        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCYes" value="yes"> Yes, I plan to apply for one at some point</label>
+        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCUpdated" value="updated"> I already have one</label>
+      </div>
+      <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a Gender Recognition Certificate (GRC).</em></span></label></div>
     </fieldset>
     <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
     <div id="checklistStickyBar" class="hidden" aria-hidden="true">
@@ -1676,7 +1676,7 @@ function updateLocks() {
   renumberSections();
 }
 function renumberSections() {
-  const sectionIds = ['wrapSectionBasics','wrapSpecificChoices','wrapSectionLongterm','wrapSectionCircumstances','wrapSectionDocuments'];
+  const sectionIds = ['wrapSectionBasics','wrapSectionDocuments','wrapSectionCircumstances','wrapSpecificChoices','wrapSectionLongterm'];
   let n = 1;
   sectionIds.forEach(id => {
     const el = gel(id);
