@@ -44,34 +44,34 @@
 <div id="controlBar" role="region" aria-label="Page controls for your plan">
   <div id="saveWarnBanner" class="hidden save-warn-banner" role="alert">
     <span>⚠️ Progress cannot be saved automatically on this device (you may be in private browsing mode). To keep your plan, use the Copy link or Print buttons before you leave this page.</span>
-    <button onclick="this.closest('.save-warn-banner').classList.add('hidden')" aria-label="Dismiss save warning">✕</button>
+    <button data-action="dismissBanner" aria-label="Dismiss save warning">✕</button>
   </div>
   <div id="controlBarCard" role="toolbar" aria-label="Page controls">
     <div id="controlBarButtons">
       <div id="cbLeftGroup">
         <div id="cbStartActions" class="ub-group hidden">
-          <button id="cbAboutBtn" class="ub-icon-btn" onclick="document.getElementById('dlgAbout').showModal()">What is this?</button>
-          <button id="cbUsageBtn" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()">How do I use it?</button>
+          <button id="cbAboutBtn" class="ub-icon-btn" data-action="openDialog" data-arg="dlgAbout">What is this?</button>
+          <button id="cbUsageBtn" class="ub-icon-btn" data-action="openDialog" data-arg="dlgUsage">How do I use it?</button>
         </div>
         <div id="cbPlanActions" class="ub-group">
-          <button id="ubRestartBtn" class="ub-icon-btn" onclick="confirmUtilityRestart(this)" aria-label="New plan" title="New plan"><span class="ub-label" aria-hidden="true">New plan</span><span aria-hidden="true">↺</span></button>
-          <button id="ubMakeChangesBtn" class="ub-icon-btn" onclick="makeChanges()" aria-label="Edit plan" title="Edit plan"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
+          <button id="ubRestartBtn" class="ub-icon-btn" data-action="confirmUtilityRestart" aria-label="New plan" title="New plan"><span class="ub-label" aria-hidden="true">New plan</span><span aria-hidden="true">↺</span></button>
+          <button id="ubMakeChangesBtn" class="ub-icon-btn" data-action="makeChanges" aria-label="Edit plan" title="Edit plan"><span class="ub-label" aria-hidden="true">Edit plan</span><span aria-hidden="true">✏️</span></button>
           <div class="ub-sep" aria-hidden="true"></div>
-          <button id="resetProgressBtn" class="ub-icon-btn" onclick="confirmResetProgress(this)" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">🧹</span></button>
-          <button id="resetOrderBtn" class="ub-icon-btn hidden" onclick="confirmResetOrder(this)" aria-label="Reset order" title="Reset order"><span class="ub-label" aria-hidden="true">Reset order</span><span aria-hidden="true">🔀</span></button>
-          <button id="focusToggleBtn" class="ub-icon-btn" onclick="toggleFocusMode()" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus mode</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
-          <button id="shareBtn" class="ub-icon-btn" onclick="copyShareableLink()" aria-label="Copy link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
-          <button class="ub-icon-btn" onclick="window.print()" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
+          <button id="resetProgressBtn" class="ub-icon-btn" data-action="confirmResetProgress" aria-label="Reset progress" title="Reset progress"><span class="ub-label" aria-hidden="true">Reset progress</span><span aria-hidden="true">🧹</span></button>
+          <button id="resetOrderBtn" class="ub-icon-btn hidden" data-action="confirmResetOrder" aria-label="Reset order" title="Reset order"><span class="ub-label" aria-hidden="true">Reset order</span><span aria-hidden="true">🔀</span></button>
+          <button id="focusToggleBtn" class="ub-icon-btn" data-action="toggleFocusMode" aria-label="Focus mode: off" aria-pressed="false" title="Focus mode"><span class="ub-label" aria-hidden="true">Focus mode</span><span aria-hidden="true">👁️</span><span id="focusCountBadge" class="focus-count-badge" aria-hidden="true"></span></button>
+          <button id="shareBtn" class="ub-icon-btn" data-action="copyShareableLink" aria-label="Copy link to this plan" title="Copy link"><span class="ub-label" aria-hidden="true">Copy link</span><span aria-hidden="true">🔗</span></button>
+          <button class="ub-icon-btn" data-action="print" aria-label="Print or save as PDF" title="Print or save as PDF"><span class="ub-label" aria-hidden="true">Print</span><span aria-hidden="true">🖨️</span></button>
         </div>
-        <button id="cbHomeBtn" class="ub-icon-btn" onclick="backToStart()" aria-label="Back to start" title="Back to start" style="display:none"><span class="ub-label" aria-hidden="true">Back to start</span><span aria-hidden="true">⌂</span></button>
-        <button id="cbSwitchView" class="ub-icon-btn" onclick="toggleMode()" aria-label="Switch view" title="Switch view"><span class="ub-label" aria-hidden="true">Switch view</span><span aria-hidden="true">⇄</span></button>
+        <button id="cbHomeBtn" class="ub-icon-btn" data-action="backToStart" aria-label="Back to start" title="Back to start" style="display:none"><span class="ub-label" aria-hidden="true">Back to start</span><span aria-hidden="true">⌂</span></button>
+        <button id="cbSwitchView" class="ub-icon-btn" data-action="toggleMode" aria-label="Switch view" title="Switch view"><span class="ub-label" aria-hidden="true">Switch view</span><span aria-hidden="true">⇄</span></button>
       </div>
       <span id="controlBarProgressText" aria-hidden="true"></span>
       <div id="cbRightGroup">
-<button id="helpBtn" class="ub-icon-btn" onclick="document.getElementById('dlgUsage').showModal()" aria-label="Usage guide" title="Usage guide"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">Guide</span></button>
-<button id="themeToggleBtn" class="ub-icon-btn" onclick="toggleTheme()" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
+<button id="helpBtn" class="ub-icon-btn" data-action="openDialog" data-arg="dlgUsage" aria-label="Usage guide" title="Usage guide"><span aria-hidden="true">?</span><span class="ub-label" aria-hidden="true">Guide</span></button>
+<button id="themeToggleBtn" class="ub-icon-btn" data-action="toggleTheme" aria-label="Theme: toggle light/dark mode" title="Toggle light/dark mode"><span class="ub-label" aria-hidden="true">Theme</span></button>
       </div>
-      <button id="panicBtn" class="ub-icon-btn panic-btn" onclick="panicExit()" aria-label="Quick Exit, leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
+      <button id="panicBtn" class="ub-icon-btn panic-btn" data-action="panicExit" aria-label="Quick Exit, leaves this page immediately" title="Quick Exit"><span aria-hidden="true">⚠️</span><span class="ub-label" aria-hidden="true">Quick exit</span></button>
     </div>
     <div id="controlBarProgress" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div id="controlBarProgressFill"></div>
@@ -83,8 +83,8 @@
   <span id="lock-visa-reason" class="visually-hidden">You usually need to update your home country passport first, as UKVI generally needs that as evidence before your eVisa can be changed.</span>
   <div id="startView">
     <div class="start-actions">
-      <button class="large-btn" id="startWizardBtn" onclick="startWizard()">Start here</button>
-      <a class="start-checklist-link" id="startChecklistLink" href="#" onclick="startChecklist();return false;">Or view all questions as a single checklist</a>
+      <button class="large-btn" id="startWizardBtn" data-action="startWizard">Start here</button>
+      <a class="start-checklist-link" id="startChecklistLink" href="#" data-action="startChecklist">Or view all questions as a single checklist</a>
     </div>
   </div>
   <div id="ageKickout" class="hidden">
@@ -96,14 +96,14 @@
         <li><a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids</a>: support for transgender and gender-diverse children and young people</li>
         <li><a href="https://genderedintelligence.co.uk/" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a>: youth services and resources</li>
       </ul>
-      <button class="secondary" onclick="hideAgeKickout()">Go back</button>
+      <button class="secondary" data-action="hideAgeKickout">Go back</button>
     </div>
   </div>
   <div id="disclaimerKickout" class="hidden">
     <div class="phase info" style="margin-top:0;">
       <h2>You must read the disclaimer before using this tool</h2>
       <p>This planner provides general guidance only. It is not legal, medical, financial, or tax advice.</p>
-      <button class="secondary" onclick="hideDisclaimerKickout()">Go back</button>
+      <button class="secondary" data-action="hideDisclaimerKickout">Go back</button>
     </div>
   </div>
   <div id="welcomeBackView" class="hidden">
@@ -111,8 +111,8 @@
       <h2>Welcome back</h2>
       <p>Your plan is saved on this device.</p>
       <div class="btn-group">
-        <button onclick="continuePlan()">Continue my plan</button>
-        <button class="secondary" onclick="confirmRestart(this)"><span aria-hidden="true">↺</span> New plan</button>
+        <button data-action="continuePlan">Continue my plan</button>
+        <button class="secondary" data-action="confirmRestart"><span aria-hidden="true">↺</span> New plan</button>
         <a href="https://github.com/be-myself-uk/planner/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="contact-btn" style="margin-top:0;">Recent changes<span class="visually-hidden"> (opens in a new tab)</span></a>
       </div>
     </div>
@@ -120,31 +120,31 @@
       <h2>Your action plan may be out of date</h2>
       <p>This planner has been updated since your plan was created. Check your answers are still correct before continuing.</p>
       <div class="btn-group">
-        <button onclick="reviewAnswers()">Review my answers</button>
-        <button class="secondary" onclick="confirmRestart(this)"><span aria-hidden="true">↺</span> New plan</button>
+        <button data-action="reviewAnswers">Review my answers</button>
+        <button class="secondary" data-action="confirmRestart"><span aria-hidden="true">↺</span> New plan</button>
         <a href="https://github.com/be-myself-uk/planner/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="contact-btn" style="margin-top:0;">Recent changes<span class="visually-hidden"> (opens in a new tab)</span></a>
       </div>
     </div>
     <div id="welcomeNewDevice" class="phase info hidden" style="margin-top:0;margin-bottom:25px;">
       <h2>Someone shared a plan with you</h2>
       <p>This looks like a new device or browser. To view the plan, please confirm you are aged 16 or over and that you understand this is general guidance only.</p>
-      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" onchange="checkAgeGateShared()"> Yes, I am aged 16 or over</label>
-      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="disclaimerConfirmShared" onchange="checkAgeGateShared()"> Yes, I understand this is general guidance only, not legal or other professional advice</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="ageConfirmShared" data-action="checkAgeGateShared"> Yes, I am aged 16 or over</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="disclaimerConfirmShared" data-action="checkAgeGateShared"> Yes, I understand this is general guidance only, not legal or other professional advice</label>
     </div>
   </div>
 
   <div id="wizardView" class="hidden">
     <div id="wizardEditTip" class="phase info hidden" style="margin:0 0 16px 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;" role="status">
       <span>💡 Editing? Switch to the <strong>⇄ checklist view</strong> to see and change all your answers on one page, instead of stepping through questions.</span>
-      <button onclick="dismissWizardEditTip()" aria-label="Dismiss tip">✕</button>
+      <button data-action="dismissWizardEditTip" aria-label="Dismiss tip">✕</button>
     </div>
     <div id="wizardWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> Select an answer to continue.</div>
     <div id="wizardBackNav" style="margin-bottom:8px;">
-      <button id="wizardBackBtn" class="wizard-back-link" onclick="prevWizard()">← Back</button>
+      <button id="wizardBackBtn" class="wizard-back-link" data-action="prevWizard">← Back</button>
     </div>
     <div id="wizardForm"></div>
     <div id="wizardBtns" class="wizard-btn-row">
-      <button id="wizardNextBtn" onclick="nextWizard()">Continue →</button>
+      <button id="wizardNextBtn" data-action="nextWizard">Continue →</button>
     </div>
   </div>
 
@@ -153,12 +153,12 @@
     <div id="checklistAgeGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
       <p class="chk-q">Are you aged 16 or over?</p>
       <p style="font-size:0.9em;color:var(--text-muted);">This planner is designed for people aged 16 and over. If you are under 16, <a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids</a> and <a href="https://genderedintelligence.co.uk/" target="_blank" rel="noopener noreferrer">Gendered Intelligence</a> offer support for young people.</p>
-      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistAgeConfirm" onchange="handleChecklistAge(this)"> Yes, I am aged 16 or over</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistAgeConfirm" data-action="handleChecklistAge"> Yes, I am aged 16 or over</label>
     </div>
     <div id="checklistDisclaimerGate" class="phase info" style="margin-top:0;margin-bottom:20px;">
       <p class="chk-q">Do you understand that this is only general guidance?</p>
       <p style="font-size:0.9em;color:var(--text-muted);">This planner provides general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice. More information can be read in the disclaimer at the bottom of this page.</p>
-      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" onchange="handleChecklistDisclaimer(this)"> Yes, I understand</label>
+      <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" data-action="handleChecklistDisclaimer"> Yes, I understand</label>
     </div>
     <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You can not continue unless you are aged 16 or over and understand that this is general guidance only.</div>
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 28px 0;">
@@ -189,7 +189,7 @@
       </div>
       <div id="checklistAdaptiveNote" class="phase info hidden" style="margin:16px 0 0 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;" role="status">
         <span>💡 The sections below adapt to your answers here — some questions only appear for certain regions or update goals. If something you expect isn't showing, check your answers to "Where do you live?" and "What do you need to update?" above.</span>
-        <button onclick="dismissAdaptiveNote()" aria-label="Dismiss tip">✕</button>
+        <button data-action="dismissAdaptiveNote" aria-label="Dismiss tip">✕</button>
       </div>
     </fieldset>
     <fieldset id="wrapSectionDocuments" data-section-label="Your current documents" style="border:none;padding:0;margin:0 0 28px 0;">
@@ -237,22 +237,22 @@
       <legend class="visually-hidden">Services I need to update</legend>
       <div class="chk-section">
         <p class="chk-q">Services I need to update<br><em class="note" style="margin-top:2px;" data-note="services"></em></p>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks, building societies, and financial accounts</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcUtilities" class="chk-service" onchange="handleSvcItem()"> Utility bills (gas, electric, water, broadband)</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcElectoral" class="chk-service" onchange="handleSvcItem()"> Electoral register</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcCRA" class="chk-service" onchange="handleSvcItem()"> Credit reference agencies (Experian, Equifax, TransUnion)</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcLandlord" class="chk-service" onchange="handleSvcItem()"> Landlord or letting agency</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcDentist" class="chk-service" onchange="handleSvcItem()"> Dentist or optician</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcPension" class="chk-service" onchange="handleSvcItem()"> Pension provider</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcMortgage" class="chk-service" onchange="handleSvcItem()"> Mortgage or home loan lender</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcMobile" class="chk-service" onchange="handleSvcItem()"> Mobile or phone contract</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcProfBody" class="chk-service" onchange="handleSvcItem()"> Professional body or regulator</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcLandReg" class="chk-service" onchange="handleSvcItem()"> Land title register (property)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcBanks" class="chk-service" data-action="handleSvcItem"> Banks, building societies, and financial accounts</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcInsurance" class="chk-service" data-action="handleSvcItem"> Insurance policies (car, home, life, health)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcCouncil" class="chk-service" data-action="handleSvcItem"> Council Tax</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcUtilities" class="chk-service" data-action="handleSvcItem"> Utility bills (gas, electric, water, broadband)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcElectoral" class="chk-service" data-action="handleSvcItem"> Electoral register</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcCRA" class="chk-service" data-action="handleSvcItem"> Credit reference agencies (Experian, Equifax, TransUnion)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcLandlord" class="chk-service" data-action="handleSvcItem"> Landlord or letting agency</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcDentist" class="chk-service" data-action="handleSvcItem"> Dentist or optician</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcPension" class="chk-service" data-action="handleSvcItem"> Pension provider</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcMortgage" class="chk-service" data-action="handleSvcItem"> Mortgage or home loan lender</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcMobile" class="chk-service" data-action="handleSvcItem"> Mobile or phone contract</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcProfBody" class="chk-service" data-action="handleSvcItem"> Professional body or regulator</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcLandReg" class="chk-service" data-action="handleSvcItem"> Land title register (property)</label>
         <div style="border-top:1px solid var(--border);margin:8px 4px 2px;"></div>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcAll" onchange="handleSvcAll(this)"> All of these</label>
-        <label class="option option-sm"><input type="checkbox" id="chkSvcNone" onchange="handleSvcNone(this)"> I do not need to update any of these</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcAll" data-action="handleSvcAll"> All of these</label>
+        <label class="option option-sm"><input type="checkbox" id="chkSvcNone" data-action="handleSvcNone"> I do not need to update any of these</label>
       </div>
       </fieldset>
     </div>
@@ -271,9 +271,9 @@
       </div>
       <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a Gender Recognition Certificate (GRC).</em></span></label></div>
     </fieldset>
-    <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" onclick="generateChecklistPlan()">Show my action plan</button>
+    <button id="checklistGenerateBtn" style="width:100%;margin-top:25px;" data-action="generateChecklistPlan">Show my action plan</button>
     <div id="checklistStickyBar" class="hidden" aria-hidden="true">
-      <button style="width:100%;" onclick="generateChecklistPlan()">Update my action plan</button>
+      <button style="width:100%;" data-action="generateChecklistPlan">Update my action plan</button>
     </div>
   </div>
   <div id="planView" class="hidden">
@@ -282,10 +282,10 @@
     <div id="planPrintFooter" class="plan-print-footer">General guidance only, not legal advice. Rules and fees change; check official government guidance before applying. Generated on <span id="planGeneratedDate"></span>.</div>
   </div>
 </main>
-<dialog id="dlgAbout" aria-labelledby="dlgAboutTitle" onclick="closeDialogOnBackdrop(event)">
+<dialog id="dlgAbout" aria-labelledby="dlgAboutTitle" data-action="closeDialogOnBackdrop">
   <div class="dialog-header">
     <h2 id="dlgAboutTitle" style="margin:0;font-size:1.2em;">About this planner</h2>
-    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+    <button class="ub-icon-btn" data-action="closeDialog" aria-label="Close">✕</button>
   </div>
   <div class="dialog-body">
     <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
@@ -293,7 +293,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
     <p>Anyone in the UK aged 16 or over who wants to update their legal documents to match their gender identity. This includes people who only want a name change, only a gender marker change, or both. There is also guidance for people from outside the UK who hold a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
-    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page. For full details, see <a href="#" onclick="this.closest('dialog').close();document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>.</p>
+    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page. For full details, see <a href="#" data-action="openFromDialog" data-arg="dlgPrivacy">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Can I use this offline?</h3>
     <p>Yes. This is a single web page with no external files, so you can save it to your device (usually Ctrl+S or File &gt; Save page as) and open it later without an internet connection. If you already have an action plan, use the 🔗 Copy link button to preserve it for use offline. When you open your offline copy of the website, you will need to edit the URL (everything from "?p=" onwards).</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
@@ -307,10 +307,10 @@
   </div>
 </dialog>
 
-<dialog id="dlgUsage" aria-labelledby="dlgUsageTitle" onclick="closeDialogOnBackdrop(event)">
+<dialog id="dlgUsage" aria-labelledby="dlgUsageTitle" data-action="closeDialogOnBackdrop">
   <div class="dialog-header">
     <h2 id="dlgUsageTitle" style="margin:0;font-size:1.2em;">Usage guide</h2>
-    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+    <button class="ub-icon-btn" data-action="closeDialog" aria-label="Close">✕</button>
   </div>
   <div class="dialog-body">
     <h3 style="margin:0 0 6px 0;font-size:1em;">Getting started</h3>
@@ -379,10 +379,10 @@
   </div>
 </dialog>
 
-<dialog id="dlgPrivacy" aria-labelledby="dlgPrivacyTitle" onclick="closeDialogOnBackdrop(event)">
+<dialog id="dlgPrivacy" aria-labelledby="dlgPrivacyTitle" data-action="closeDialogOnBackdrop">
   <div class="dialog-header">
     <h2 id="dlgPrivacyTitle" style="margin:0;font-size:1.2em;">Privacy</h2>
-    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+    <button class="ub-icon-btn" data-action="closeDialog" aria-label="Close">✕</button>
   </div>
   <div class="dialog-body">
     <p>No personal information is collected and nothing you enter is ever sent to a server. This tool runs entirely in your browser.</p>
@@ -391,10 +391,10 @@
   </div>
 </dialog>
 
-<dialog id="dlgSupport" aria-labelledby="dlgSupportTitle" onclick="closeDialogOnBackdrop(event)">
+<dialog id="dlgSupport" aria-labelledby="dlgSupportTitle" data-action="closeDialogOnBackdrop">
   <div class="dialog-header">
     <h2 id="dlgSupportTitle" style="margin:0;font-size:1.2em;">Support &amp; feedback</h2>
-    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+    <button class="ub-icon-btn" data-action="closeDialog" aria-label="Close">✕</button>
   </div>
   <div class="dialog-body">
     <p><strong>You do not have to do this alone.</strong> There are organisations and communities across the UK that can help:</p>
@@ -428,10 +428,10 @@
   </div>
 </dialog>
 
-<dialog id="dlgDisclaimer" aria-labelledby="dlgDisclaimerTitle" onclick="closeDialogOnBackdrop(event)">
+<dialog id="dlgDisclaimer" aria-labelledby="dlgDisclaimerTitle" data-action="closeDialogOnBackdrop">
   <div class="dialog-header">
     <h2 id="dlgDisclaimerTitle" style="margin:0;font-size:1.2em;">Disclaimer</h2>
-    <button class="ub-icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+    <button class="ub-icon-btn" data-action="closeDialog" aria-label="Close">✕</button>
   </div>
   <div class="dialog-body">
     <p class="disclaimer-muted">This disclaimer opens automatically on your first visit or if starting a new action plan.</p>
@@ -450,11 +450,11 @@
   <div class="footer-inner">
 
     <div class="footer-links" style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-bottom:16px;">
-      <a href="#" onclick="document.getElementById('dlgAbout').showModal();return false;">About</a>
-      <a href="#" onclick="document.getElementById('dlgPrivacy').showModal();return false;">Privacy</a>
-      <a href="#" onclick="document.getElementById('dlgUsage').showModal();return false;">Usage guide</a>
-      <a href="#" onclick="document.getElementById('dlgSupport').showModal();return false;">Support &amp; feedback</a>
-      <a href="#" onclick="document.getElementById('dlgDisclaimer').showModal();return false;">Disclaimer</a>
+      <a href="#" data-action="openDialog" data-arg="dlgAbout">About</a>
+      <a href="#" data-action="openDialog" data-arg="dlgPrivacy">Privacy</a>
+      <a href="#" data-action="openDialog" data-arg="dlgUsage">Usage guide</a>
+      <a href="#" data-action="openDialog" data-arg="dlgSupport">Support &amp; feedback</a>
+      <a href="#" data-action="openDialog" data-arg="dlgDisclaimer">Disclaimer</a>
     </div>
     <div class="footer-meta">
       <p>Be myself © <span id="schemaCopyYear"></span> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>
@@ -478,8 +478,8 @@
         <strong class="tmpl-title"></strong>
         <div class="tmpl-badges" role="group" aria-label="Difficulty and cost"></div>
         <div class="item-move-group" role="group" aria-label="Reorder this step">
-          <button type="button" class="item-move-btn tmpl-move-up" onclick="moveOrderable(this)" title="Move up"><span aria-hidden="true">▲</span></button>
-          <button type="button" class="item-move-btn tmpl-move-down" onclick="moveOrderable(this)" title="Move down"><span aria-hidden="true">▼</span></button>
+          <button type="button" class="item-move-btn tmpl-move-up" data-action="moveOrderable" title="Move up"><span aria-hidden="true">▲</span></button>
+          <button type="button" class="item-move-btn tmpl-move-down" data-action="moveOrderable" title="Move down"><span aria-hidden="true">▼</span></button>
           <button type="button" class="item-drag-handle" tabindex="-1" aria-hidden="true" title="Drag to reorder"><span aria-hidden="true">⠿</span></button>
         </div>
       </div>
@@ -869,14 +869,14 @@ const PLAN_ITEMS = {
   <div class="plan-top-body">
   <p style="margin-top:0;">You do <strong>not</strong> need a deed poll or any legal document to change your title to Mr, Mrs, Miss, Ms, or Mx. You can ask any organisation to update your title at any time.</p>
   <p>${CN} There is generally no formal process required to change your title in the UK. Most organisations will update it on request. This includes banks, the NHS, HMRC, and government services.</p><p>This applies to common social titles such as Mr, Mrs, Miss, Ms, and Mx. It does not cover professional titles (such as Doctor) or hereditary titles (titles passed down through families, such as Lord or Dame), which have different rules.</p><a href="https://transactual.org.uk/law/change-details/" target="_blank" rel="noopener noreferrer" class="links">🔗 TransActual: Updating your details with organisations</a><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links">🔗 ICO: Your right to get your data corrected</a>
-  <p style="margin:12px 0 0;"><button type="button" class="secondary" style="font-size:0.85em;padding:6px 10px;" onclick="dismissTitlesInfo()">Don't show this again</button></p>
+  <p style="margin:12px 0 0;"><button type="button" class="secondary" style="font-size:0.85em;padding:6px 10px;" data-action="dismissTitlesInfo">Don't show this again</button></p>
   </div>
 </details>`,
   },
 }
 const TRACK_TIP_HTML = `<div id="trackTipBox" class="phase info" style="margin:0 0 16px 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;" role="status">
   <span>\u{1F4A1} Use the box beside each step to mark it as in progress, done, or not needed. Your progress is saved on this device.</span>
-  <button onclick="dismissTrackTip()" aria-label="Dismiss tip">\u2715</button>
+  <button data-action="dismissTrackTip" aria-label="Dismiss tip">\u2715</button>
 </div>`;
 const planItemRegion  = (item, region) => item.regions ? (item.regions[region] || item.regions.default) : item;
 const planItemVariant = (regional, goal)  => regional.variants ? (regional.variants[goal] || regional.variants.gender) : regional;
@@ -1009,10 +1009,10 @@ function toggleHelp() {
   if (!dlg) return;
   if (dlg.open) dlg.close(); else dlg.showModal();
 }
-function closeDialogOnBackdrop(e) {
-  const rect = e.currentTarget.getBoundingClientRect();
+function closeDialogOnBackdrop(dlg, e) {
+  const rect = dlg.getBoundingClientRect();
   if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-    e.currentTarget.close();
+    dlg.close();
   }
 }
 let _printRestore = [];
@@ -2170,7 +2170,7 @@ function generateChecklistPlan() {
   focusPlan();
   refreshToolbarTabindex();
 }
-const subItem = (subId, parentId, label) => `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="${parentId}" onclick="cycleStepState('${subId}')" aria-pressed="false" aria-label="${label}: Not started. Click to cycle status" title="Click to cycle status"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
+const subItem = (subId, parentId, label) => `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="${parentId}" data-action="cycleStepState" data-arg="${subId}" aria-pressed="false" aria-label="${label}: Not started. Click to cycle status" title="Click to cycle status"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
 function evidenceList(ev, parentId) {
   if (!ev || !ev.items || !ev.items.length) return '';
   const intro = ev.intro ? ` ${ev.intro}` : '';
@@ -2189,7 +2189,8 @@ function planItemHtml(id, dTag, costTag, title, desc, expanded, evidence) {
   btn.id = `ssb_${trackId}`;
   btn.dataset.trackId   = trackId;
   btn.dataset.stepLabel = title;
-  btn.setAttribute('onclick', `cycleStepState('${trackId}')`);
+  btn.dataset.action = 'cycleStepState';
+  btn.dataset.arg = trackId;
   btn.setAttribute('aria-label', `${title}: Not started. Click to cycle through status values.`);
   btn.title = 'Click to cycle status';
   btn.querySelector('span').textContent = STATE_ICONS[0];
@@ -2348,8 +2349,8 @@ function buildSharedPlan(p) {
   let phaseIdx = 0;
   const nextPhaseColour = () => 'phase-' + (phaseIdx++ % 4);
   const phaseMoveGroup = `<div class="phase-move-group" role="group" aria-label="Reorder this step">
-    <button type="button" class="item-move-btn tmpl-move-up" onclick="moveOrderable(this)" title="Move up"><span aria-hidden="true">▲</span></button>
-    <button type="button" class="item-move-btn tmpl-move-down" onclick="moveOrderable(this)" title="Move down"><span aria-hidden="true">▼</span></button>
+    <button type="button" class="item-move-btn tmpl-move-up" data-action="moveOrderable" title="Move up"><span aria-hidden="true">▲</span></button>
+    <button type="button" class="item-move-btn tmpl-move-down" data-action="moveOrderable" title="Move down"><span aria-hidden="true">▼</span></button>
     <button type="button" class="item-drag-handle" tabindex="-1" aria-hidden="true" title="Drag to reorder"><span aria-hidden="true">⠿</span></button>
   </div>`;
   const phaseHeader = (sn, title, time) => `${nb(`phase_s${sn}`)}
@@ -2434,7 +2435,7 @@ function buildSharedPlan(p) {
         const subItems = allServices.map(svc => {
           const subId = `trk_svc_${svc}`;
           const label = svcLabels[svc] || svc;
-          return `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="trk_services_all" onclick="cycleStepState('${subId}')" aria-pressed="false" aria-label="${label}: Not started. Click to cycle status" title="Click to cycle status"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
+          return `<li class="svc-sub-li"><button type="button" id="ssb_${subId}" class="step-state-btn" data-state="0" data-track-id="${subId}" data-step-label="${label}" data-svc-parent="trk_services_all" data-action="cycleStepState" data-arg="${subId}" aria-pressed="false" aria-label="${label}: Not started. Click to cycle status" title="Click to cycle status"><span aria-hidden="true">${STATE_ICONS[0]}</span></button><span class="svc-sub-label">${label}</span></li>`;
         }).join('');
         const svcDetailMap = Object.fromEntries(SERVICES.map(s => [s.key, s.detailFn ? s.detailFn(p) : s.detail]));
         const expandedDetails = allServices.map(s => hasMultiple ? `<div class="svc-group">${svcDetailMap[s] || ''}</div>` : (svcDetailMap[s] || '')).join('') +
@@ -2547,7 +2548,7 @@ function buildSharedPlan(p) {
   <summary>⏳ Estimated time and costs</summary>
   <div class="plan-top-body">
   ${inner}
-  <p style="margin:12px 0 0;"><button type="button" class="secondary" style="font-size:0.85em;padding:6px 10px;" onclick="dismissPlanSummary()">Don't show this again</button></p>
+  <p style="margin:12px 0 0;"><button type="button" class="secondary" style="font-size:0.85em;padding:6px 10px;" data-action="dismissPlanSummary">Don't show this again</button></p>
   </div>
 </details>`;
     }
@@ -3110,6 +3111,30 @@ function initDragReorder() {
     handle.addEventListener('pointercancel', onUp);
   });
 }
+const ACTIONS = {
+  startWizard, startChecklist, continuePlan, reviewAnswers, backToStart, makeChanges,
+  prevWizard, nextWizard, generateChecklistPlan, toggleMode, toggleTheme, toggleFocusMode,
+  copyShareableLink, panicExit, hideAgeKickout, hideDisclaimerKickout,
+  dismissWizardEditTip, dismissAdaptiveNote, dismissTitlesInfo, dismissPlanSummary, dismissTrackTip,
+  handleSvcItem, handleSvcAll, handleSvcNone,
+  confirmRestart, confirmUtilityRestart, confirmResetProgress, confirmResetOrder,
+  moveOrderable, handleChecklistAge, handleChecklistDisclaimer, checkAgeGateShared,
+  closeDialogOnBackdrop: (el, arg, e) => closeDialogOnBackdrop(el, e),
+  cycleStepState: (el, arg) => cycleStepState(arg),
+  openDialog:    (el, arg) => gel(arg)?.showModal(),
+  closeDialog:   (el) => el.closest('dialog')?.close(),
+  openFromDialog:(el, arg) => { el.closest('dialog')?.close(); gel(arg)?.showModal(); },
+  dismissBanner: (el) => el.closest('.save-warn-banner')?.classList.add('hidden'),
+  print: () => window.print(),
+};
+function runAction(e) {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.action];
+  if (!fn) { console.warn('No handler for data-action:', el.dataset.action); return; }
+  if (el.tagName === 'A') e.preventDefault();
+  fn(el, el.dataset.arg, e);
+}
 function initToolbarNav() {
   const card = gel('controlBarCard');
   if (!card) return;
@@ -3139,6 +3164,8 @@ window.onload = () => {
     const t = NOTES[el.dataset.note];
     if (t) el.textContent = t;
   });
+  document.addEventListener('click', runAction);
+  document.addEventListener('change', runAction, true);
   initDragReorder();
   updateThemeIcon();
   const chkView = gel('checklistView');
@@ -3283,45 +3310,13 @@ Object.defineProperty(window, 'wizardState', { get: () => wizardState, set: v =>
 Object.defineProperty(window, 'isWizardMode', { get: () => isWizardMode, set: v => { isWizardMode = v; }, configurable: true });
 Object.defineProperty(window, 'step', { get: () => step, set: v => { step = v; }, configurable: true });
 window.questions      = questions;
+window.ACTIONS        = ACTIONS;
 window.NOTES          = NOTES;
 window.SCHEMA_VERSION = SCHEMA_VERSION;
 window.renderWizard   = renderWizard;
-window.panicExit             = panicExit;
-window.confirmUtilityRestart = confirmUtilityRestart;
-window.makeChanges           = makeChanges;
-window.dismissWizardEditTip  = dismissWizardEditTip;
-window.dismissAdaptiveNote   = dismissAdaptiveNote;
-window.dismissTitlesInfo     = dismissTitlesInfo;
-window.dismissPlanSummary    = dismissPlanSummary;
-window.dismissTrackTip       = dismissTrackTip;
-window.moveOrderable         = moveOrderable;
-window.confirmResetOrder     = confirmResetOrder;
-window.confirmResetProgress  = confirmResetProgress;
-window.toggleFocusMode       = toggleFocusMode;
-window.copyShareableLink     = copyShareableLink;
-window.toggleMode            = toggleMode;
-window.closeDialogOnBackdrop = closeDialogOnBackdrop;
-window.toggleTheme           = toggleTheme;
-window.startWizard           = startWizard;
-window.startChecklist        = startChecklist;
-window.continuePlan          = continuePlan;
-window.confirmRestart        = confirmRestart;
-window.reviewAnswers         = reviewAnswers;
-window.prevWizard            = prevWizard;
-window.nextWizard            = nextWizard;
-window.generateChecklistPlan = generateChecklistPlan;
-window.backToStart           = backToStart;
-window.hideAgeKickout        = hideAgeKickout;
-window.hideDisclaimerKickout = hideDisclaimerKickout;
-window.handleChecklistAge    = handleChecklistAge;
-window.handleChecklistDisclaimer = handleChecklistDisclaimer;
 window.checkAgeGateShared    = checkAgeGateShared;
 window.updateLocks           = updateLocks;
-window.handleSvcItem         = handleSvcItem;
 window.getToolbarButtons     = getToolbarButtons;
-window.handleSvcNone         = handleSvcNone;
-window.handleSvcAll          = handleSvcAll;
-window.cycleStepState        = cycleStepState;
 window.PLAN_ITEMS            = PLAN_ITEMS;
 window.SERVICES              = SERVICES;
 window.CHK_MAP                = CHK_MAP;

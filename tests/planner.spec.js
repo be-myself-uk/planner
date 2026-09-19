@@ -2116,6 +2116,36 @@ test.describe('Be myself Planner', () => {
 
 
 
+    test('146. Every data-action resolves to a handler, and no inline event handlers remain', async ({ page }) => {
+      const source = fs.readFileSync(filePath.replace(/^file:\/\//, ''), 'utf8');
+      const inline = source.match(/\son(click|change|input|submit|keydown|keyup)\s*=/gi) || [];
+      expect(inline).toEqual([]);
+
+      const before = await page.evaluate(() => {
+        const els = [...document.querySelectorAll('[data-action]')];
+        return {
+          total: els.length,
+          unresolved: [...new Set(els.map(el => el.dataset.action))]
+            .filter(a => typeof window.ACTIONS[a] !== 'function'),
+        };
+      });
+      expect(before.total).toBeGreaterThan(50);
+      expect(before.unresolved).toEqual([]);
+
+      await openMultiPhasePlan(page);
+
+      const after = await page.evaluate(() => {
+        const els = [...document.querySelectorAll('[data-action]')];
+        return {
+          total: els.length,
+          unresolved: [...new Set(els.map(el => el.dataset.action))]
+            .filter(a => typeof window.ACTIONS[a] !== 'function'),
+        };
+      });
+      expect(after.total).toBeGreaterThan(before.total);
+      expect(after.unresolved).toEqual([]);
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
