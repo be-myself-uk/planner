@@ -742,7 +742,7 @@ test.describe('Be myself Planner', () => {
         propsWithoutQuestion: CHK_MAP.filter(([, prop]) => !questions.some(q => q.id === prop)).map(([, p]) => p),
         taggedQuestions: questions.filter(q => q.chk).map(q => q.id),
       }));
-      expect(state.pairs.length).toBe(10);
+      expect(state.pairs.length).toBe(11);
       expect(state.idsPresent).toEqual([]);
       expect(state.propsWithoutQuestion).toEqual([]);
       expect(state.pairs.map(([, prop]) => prop)).toEqual(state.taggedQuestions);
@@ -1390,6 +1390,7 @@ test.describe('Be myself Planner', () => {
     test('79. NI-born users who decline a GRC get an Irish-passport-only final step', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+      await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Legal gender recognition (Irish passport)');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
@@ -1415,6 +1416,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('input[name="chkRegion"][value="ni"]').check();
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkGRCYes').check();
+      await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
 
       const irish = page.locator('.phase[data-phase-key="final_irish"]');
@@ -1443,6 +1445,7 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkGRCUpdated').check();
+      await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       const finalPhase = page.locator('.phase[data-phase-key="final"]');
       await expect(finalPhase).toHaveCount(1);
@@ -2253,6 +2256,83 @@ test.describe('Be myself Planner', () => {
         return !q.cond || q.cond();
       })).toBe(true);
       expect(inSession).toBeGreaterThan(0);
+    });
+
+    test('151. The Irish passport route only appears when asked for', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+      await expect(page.locator('#wrapIrishRoute')).toBeVisible();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
+      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(0);
+      await expect(page.locator('#planContent')).not.toContainText('Legal gender recognition (Irish passport)');
+
+      await page.getByRole('button', { name: /Edit plan/ }).click();
+      await page.locator('#chkIrishRoute').check();
+      await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
+      await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
+
+      // and it still splits into two phases when a GRC is wanted as well
+      await page.getByRole('button', { name: /Edit plan/ }).click();
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
+      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final_grc"]')).toHaveCount(1);
+    });
+
+    test('152. Declining the Irish route leaves the other Northern Ireland content alone', async ({ page }) => {
+      // bornInNI also selects the GRONI birth-certificate variant and its cost line,
+      // which must not be gated on the Irish route question
+      await openChecklist(page);
+      await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+      await page.locator('#chkBirthCertName').check();
+      await expect(page.locator('#chkIrishRoute')).not.toBeChecked();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      await expect(page.locator('#planContent')).toContainText('Birth certificate name recording (GRONI)');
+      await expect(page.locator('#planContent')).toContainText('GRONI name recording');
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
+    });
+
+    test('153. A shared link round-trips the Irish route answer, and an older link decodes to no', async ({ page }) => {
+      const base = {reg:"ni",bri:"ni",goal:"gender",nonUK:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,
+                    nhs:false,dl:"none",hmrc:false,pass:"none",grc:false,newgp:false,dwp:false,bcn:false,bc:false,srv:""};
+      const open = async (data) => {
+        await gotoUntil(page, await getShareUrl(page, data), () => page.evaluate(() =>
+          ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+        // a shared link asks for the gates once; a second one in the same browser does not
+        if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+        await expect(page.locator('#planView')).toBeVisible();
+      };
+
+      await open({ ...base, irish: true });
+      expect(await page.evaluate(() => wizardState.irishRoute)).toBe('yes');
+      await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
+
+      // a link made before the field existed carries no answer, so it decodes to no
+      await open(base);
+      expect(await page.evaluate(() => wizardState.irishRoute)).toBe('no');
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
+    });
+
+    test('154. Every community advice marker opens a paragraph rather than floating mid-sentence', async ({ page }) => {
+      const floating = await page.evaluate(() => {
+        const all = { ...window.PLAN_ITEMS, ...window.SERVICES };
+        const out = [];
+        const walk = (node, path) => {
+          if (typeof node === 'string') {
+            const re = /(.{0,3})<span class="community-note"/g;
+            let m;
+            while ((m = re.exec(node))) if (!m[1].endsWith('<p>') && !m[1].endsWith('> ')) out.push(path);
+          } else if (node && typeof node === 'object') {
+            Object.entries(node).forEach(([k, v]) => walk(v, path + '.' + k));
+          }
+        };
+        walk(all, '');
+        return [...new Set(out)];
+      });
+      expect(floating).toEqual([]);
     });
 
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {

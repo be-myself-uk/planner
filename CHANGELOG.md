@@ -19,6 +19,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 - The two questions about your visa or eVisa are now one. It asks "Do you have a visa or eVisa?" with the same three answers used for your driving licence and passport, instead of asking separately whether you have one and whether it needs updating.
 - The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one of these as evidence for a gender marker change.
+- Corrected the Irish passport step, which said people born in Northern Ireland can claim Irish citizenship. Since 1 January 2005 this depends on your parents: one must be a British or Irish citizen, or have lived on the island of Ireland for three of the four years before your birth.
 - Added State Pension to the Northern Ireland benefits question and step. The Department for Communities administers State Pension in Northern Ireland alongside Universal Credit, Personal Independence Payment (PIP), and Employment Support Allowance (ESA). The step now also says to tell the Northern Ireland Pension Centre about a name change if you get State Pension or Pension Credit, as your local Jobs & Benefits Office does not handle those.
 
 ### Wording
@@ -38,6 +39,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
 - The step-by-step questions now ask about a Gender Recognition Certificate before asking about your birth certificate, since you cannot change the gender on a birth certificate without one.
 - Editing your answers after returning to a saved plan no longer starts by asking your age again.
+- The Irish passport route is now shown only if you ask for it. If your birth was registered in Northern Ireland and you are changing your gender marker, there is a new question for it. It used to appear for everyone born in Northern Ireland, even people who had said they did not want a Gender Recognition Certificate. It is not an alternative to one: it gives you a passport in your correct name and gender but does not change your UK records.
 
 ### Layout
 
@@ -51,6 +53,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
 - The checklist's section indicator now reaches the last section while there is still page left to scroll, rather than only at the very bottom.
 - Fixed the visa question on the checklist, where the explanation sat beside the question instead of underneath it, squashing both into narrow columns.
+- The community advice marker now starts its own paragraph instead of sitting mid-sentence, so it is clear which part of a step it applies to.
 
 ## [September 2026]
 
