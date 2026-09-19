@@ -724,6 +724,40 @@ test.describe('Be myself Planner', () => {
       expect(await label()).toBe('');
     });
 
+    test('143. Every question is shown in both views or neither, across goal, region and employment', async ({ page }) => {
+      await openChecklist(page);
+      const mismatches = await page.evaluate(() => {
+        const bad = [];
+        for (const reg of ['e', 'w', 's', 'ni', 'out'])
+          for (const goal of ['both', 'name', 'gender'])
+            for (const emp of ['no', 'needs_update', 'updated'])
+              for (const br of ['e', 'w', 's', 'ni']) {
+                Object.assign(wizardState, {
+                  region: reg === 'out' ? 'e' : reg, regionOutsideUK: reg === 'out' ? 'yes' : 'no',
+                  birthRegion: br, birthOutsideUK: 'no',
+                  goal, goalParts: goal === 'both' ? ['name', 'gender'] : [goal], employment: emp,
+                });
+                updateLocks();
+                const askedInWizard = questions
+                  .filter(q => q.wrap && (!q.cond || q.cond())).map(q => q.wrap).sort();
+                const shownInChecklist = questions.filter(q => q.wrap)
+                  .filter(q => {
+                    const el = document.getElementById(q.wrap);
+                    return el && !el.classList.contains('hidden');
+                  }).map(q => q.wrap).sort();
+                if (JSON.stringify(askedInWizard) !== JSON.stringify(shownInChecklist)) {
+                  bad.push({ reg, goal, emp, br, askedInWizard, shownInChecklist });
+                }
+              }
+        return bad;
+      });
+      expect(mismatches).toEqual([]);
+
+      const missing = await page.evaluate(() =>
+        questions.filter(q => q.wrap && !document.getElementById(q.wrap)).map(q => q.wrap));
+      expect(missing).toEqual([]);
+    });
+
     test('141. Checklist sections run documents before long-term goals, numbered without gaps', async ({ page }) => {
       await openChecklist(page);
       const labels = () => page.evaluate(() =>
