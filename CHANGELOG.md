@@ -19,6 +19,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 - The two questions about your visa or eVisa are now one. It asks "Do you have a visa or eVisa?" with the same three answers used for your driving licence and passport, instead of asking separately whether you have one and whether it needs updating.
 - The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one of these as evidence for a gender marker change.
+- Added State Pension to the Northern Ireland benefits question and step. The Department for Communities administers State Pension in Northern Ireland alongside Universal Credit, Personal Independence Payment (PIP), and Employment Support Allowance (ESA). The step now also says to tell the Northern Ireland Pension Centre about a name change if you get State Pension or Pension Credit, as your local Jobs & Benefits Office does not handle those.
 
 ### Wording
 
@@ -32,6 +33,8 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Fixed the checklist naming a button that was not on the page after switching views.
 - The step-by-step questions now start with what you need to update, since that answer decides which later questions apply. Where your birth was registered is asked straight after where you live.
 - The checklist now runs in the same order: what you need to update, then your current documents, then your situation, then long-term goals. It previously asked about a Gender Recognition Certificate, which takes years, before asking whether you have a deed poll, which can be done in a day.
+- Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
+- The step-by-step questions now ask about a Gender Recognition Certificate before asking about your birth certificate, since you cannot change the gender on a birth certificate without one.
 
 ### Layout
 
@@ -39,6 +42,11 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - If you were born in Northern Ireland and are pursuing both the Irish passport route and a UK Gender Recognition Certificate, these are now two separate steps rather than two sections of one. Each has its own time estimate, since they differ, and each can be moved around your plan on its own.
 - The checklist now shows which section you are in, as "Section 2 of 4: Your current documents", with a bar in the toolbar. It is a long page and previously gave no sense of where you were or how much was left.
 - Darkened the community advice marker so it meets contrast guidelines, and shortened what screen readers announce for it. It is no longer a keyboard stop, so it does not interrupt tabbing through a plan.
+- The checklist's two long-term sections are now one, called "Long-term goals". The birth certificate name question sat in a section of its own that appeared above the Gender Recognition Certificate question.
+- Added the missing gap between the first two questions on the checklist, which sat flush against each other.
+- Toolbar buttons are now at least 44 pixels on a phone, including the quick exit button, so they are easier to hit.
+- The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
+- The checklist's section indicator now reaches the last section while there is still page left to scroll, rather than only at the very bottom.
 
 ## [September 2026]
 
