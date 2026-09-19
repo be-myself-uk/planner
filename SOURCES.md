@@ -146,6 +146,11 @@ For items with no official source, the links in the general data protection sect
   - Status: Linked in the planner
   - Last verified: 2026-09-13
 
+- **Citizens Information: Irish citizenship through birth or descent**
+  - <https://www.citizensinformation.ie/en/moving-country/irish-citizenship/irish-citizenship-through-birth-or-descent/>
+  - Status: Cited in the planner
+  - Last verified: 2026-09-19
+
 - **nidirect: State Pension - report a change in your circumstances**
   - <https://www.nidirect.gov.uk/articles/state-pension-report-change-your-circumstances>
   - Status: Linked in the planner
