@@ -87,7 +87,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 121 of them numbered up to 134; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 133 of them numbered up to 146; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 #### Content-integrity snapshot
 
@@ -119,7 +119,7 @@ Running against a `file://` URL has one cost. Chromium's `localStorage` backend 
 
 ## How index.html is structured
 
-The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then HTML body (views and dialogs), then JavaScript (`<script>`)**. Roughly 3,250 lines total. Everything below is a rough map; exact line numbers shift as the file changes, so use them as a starting point for search, not a promise.
+The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then HTML body (views and dialogs), then JavaScript (`<script>`)**. Roughly 3,330 lines total. Everything below is a rough map; exact line numbers shift as the file changes, so use them as a starting point for search, not a promise.
 
 ### 1. `<head>` (lines 1 to 29)
 
@@ -143,7 +143,7 @@ The page has a small number of top-level "views" that are shown and hidden by Ja
 
 Alongside the views are five `<dialog>` elements (native HTML `<dialog>`, opened via `.showModal()`): `dlgAbout`, `dlgUsage`, `dlgPrivacy`, `dlgSupport`, `dlgDisclaimer`, all linked from the footer, plus a toolbar `?` button that opens `dlgUsage` directly.
 
-### 4. JavaScript (lines ~492 to 3245, inside one `<script>` block, no modules or imports)
+### 4. JavaScript (lines ~492 to 3325, inside one `<script>` block, no modules or imports)
 
 This is the entire application logic. Key pieces, roughly in the order they appear:
 
@@ -173,10 +173,11 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 - Progress on individual plan steps is stored separately, per step, as `st_<trackId>` keys directly in `localStorage` (via `getStepState`/`setStepState`), not inside `wizardState`, since progress needs to survive independently of the answers that generated the plan.
 
 **The wizard**
-- `questions`: an ordered array of question definitions (`id`, `q` for the question text, `cond` for a function deciding whether to show it based on `wizardState`, `o` for the answer options). `renderWizard()` draws the current step; `nextWizard()`/`prevWizard()` walk forward and back through only the questions whose `cond` currently passes.
+- `questions`: an ordered array of question definitions (`id`, `q` for the question text, `cond` for a function deciding whether to show it based on `wizardState`, `o` for the answer options, plus `wrap` and `chk` naming the question's checklist container and checkbox where it has them). `renderWizard()` draws the current step; `nextWizard()`/`prevWizard()` walk forward and back through only the questions whose `cond` currently passes. `updateLocks()` hides the matching `wrap` in the checklist using the same `cond`, so the two views cannot disagree about which questions apply.
+- `NOTES`: the explanatory sentences that sit under a question. Both views read them from here, the wizard by interpolating into the question text and the checklist through `<em class="note" data-note="key">` slots filled at startup, so the copy has one home.
 
 **The checklist**
-- One large `<form>`-like block of checkboxes and radios (in the HTML body) representing every question at once. `renderChecklist()` pushes `wizardState` values into the DOM (used when entering or re-entering the checklist); a single delegated `change` event listener on `#checklistView` reads the DOM back into `wizardState` on every interaction. **Anything added to the checklist needs both directions wired up**, or you get sync bugs (see `CHANGELOG.md`'s 2026-07-05 entries for two real examples of exactly that).
+- One large `<form>`-like block of checkboxes and radios (in the HTML body) representing every question at once. `renderChecklist()` pushes `wizardState` values into the DOM (used when entering or re-entering the checklist); a single delegated `change` event listener on `#checklistView` reads the DOM back into `wizardState` on every interaction. A plain yes/no checkbox gets both directions for free through `CHK_MAP`, which is derived from the `chk` fields on `questions`; **anything else added to the checklist needs both directions wired up by hand**, or you get sync bugs (see `CHANGELOG.md`'s 2026-07-05 entries for two real examples of exactly that).
 
 **Building and rendering the plan**
 - `generateWizardPlan()` / `generateChecklistPlan()`: validate answers, then call `buildSharedPlan()`.
@@ -194,7 +195,9 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 **Everything else**
 - Dialog handling (`closeDialogOnBackdrop`, `toggleHelp`), theme toggling, the "panic button" quick-exit, confetti animation on plan completion, and toolbar keyboard navigation (`initToolbarNav`, arrow-key roving tabindex per the WAI-ARIA toolbar pattern). The `window.onload` bootstrap at the bottom restores saved state, wires up the `checklistView` change listener, and sets the footer's copyright year and last-reviewed date.
 
-**`window.X = X` exports** (near the very end of the file): because everything is defined inside one `<script>` block without modules, but the HTML uses inline `onclick="..."` attributes throughout, every function that needs to be called from markup is explicitly re-exported onto `window` at the bottom of the script. If you add a new function and wire it to an `onclick`, it needs a line here too, or the browser will report it as undefined.
+**`ACTIONS` and `runAction()`** (near the very end of the file): the markup has no inline `onclick`/`onchange` attributes. Instead, a clickable or changeable element carries `data-action="handlerName"`, optionally with `data-arg="..."`, and two delegated listeners on `document` (click, and change in the capture phase) look the name up in the `ACTIONS` map and call it as `fn(element, arg, event)`. To wire up a new control, add the function to `ACTIONS` and put its key in the element's `data-action`. An unknown key logs a warning to the console rather than failing silently, and test 146 fails if any `data-action` in the page has no matching entry, or if an inline handler attribute reappears.
+
+The handful of remaining `window.X = X` lines below the map exist only so the Playwright suite can reach internals such as `questions`, `PLAN_ITEMS` and `CHK_MAP`. They are not needed by the page itself.
 
 ---
 
@@ -202,5 +205,5 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 
 - The project principles above are constraints (no server calls, no personal data storage, single file, no build step) that shape every decision in `index.html`, not just style preferences.
 - `SERVICES` and `PLAN_ITEMS` are where almost all day-to-day maintenance happens (correcting guidance, adding a new step). You rarely need to touch the rendering logic itself.
-- Any change to a checklist input needs both a `renderChecklist()` line (state to DOM) and a line in the `checklistEl` change handler (DOM to state). Any one-time UI element (a dismissible tip, a warning banner) needs to be explicitly reset by every "fresh start" entry point (`startWizard()`, `startChecklist()`, `openChecklist()`, `restartApp()`), not just the one place that shows it.
+- A plain yes/no checklist checkbox only needs a `chk` field naming its element id on the matching `questions` entry; `CHK_MAP` is derived from those and drives both directions. Anything else (a radio group, a multi-select) still needs both a `renderChecklist()` line (state to DOM) and a line in the `checklistEl` change handler (DOM to state). Any one-time UI element (a dismissible tip, a warning banner) needs to be explicitly reset by every "fresh start" entry point (`startWizard()`, `startChecklist()`, `openChecklist()`, `restartApp()`), not just the one place that shows it.
 - Run the Playwright suite before and after any change. It is the only safety net given there is no type system or build step to catch mistakes.
