@@ -27,6 +27,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
 - Fixed the checklist naming a button that was not on the page after switching views.
 - The step-by-step questions now start with what you need to update, since that answer decides which later questions apply. Where your birth was registered is asked straight after where you live.
+- The checklist now runs in the same order: what you need to update, then your current documents, then your situation, then long-term goals. It previously asked about a Gender Recognition Certificate, which takes years, before asking whether you have a deed poll, which can be done in a day.
 
 ### Layout
 
