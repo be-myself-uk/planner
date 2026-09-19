@@ -87,7 +87,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 133 of them numbered up to 146; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 135 of them numbered up to 148; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 #### Content-integrity snapshot
 
@@ -119,7 +119,7 @@ Running against a `file://` URL has one cost. Chromium's `localStorage` backend 
 
 ## How index.html is structured
 
-The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then HTML body (views and dialogs), then JavaScript (`<script>`)**. Roughly 3,330 lines total. Everything below is a rough map; exact line numbers shift as the file changes, so use them as a starting point for search, not a promise.
+The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then HTML body (views and dialogs), then JavaScript (`<script>`)**. Roughly 3,340 lines total. Everything below is a rough map; exact line numbers shift as the file changes, so use them as a starting point for search, not a promise.
 
 ### 1. `<head>` (lines 1 to 29)
 
@@ -143,7 +143,7 @@ The page has a small number of top-level "views" that are shown and hidden by Ja
 
 Alongside the views are five `<dialog>` elements (native HTML `<dialog>`, opened via `.showModal()`): `dlgAbout`, `dlgUsage`, `dlgPrivacy`, `dlgSupport`, `dlgDisclaimer`, all linked from the footer, plus a toolbar `?` button that opens `dlgUsage` directly.
 
-### 4. JavaScript (lines ~492 to 3325, inside one `<script>` block, no modules or imports)
+### 4. JavaScript (lines ~492 to 3335, inside one `<script>` block, no modules or imports)
 
 This is the entire application logic. Key pieces, roughly in the order they appear:
 
@@ -173,7 +173,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 - Progress on individual plan steps is stored separately, per step, as `st_<trackId>` keys directly in `localStorage` (via `getStepState`/`setStepState`), not inside `wizardState`, since progress needs to survive independently of the answers that generated the plan.
 
 **The wizard**
-- `questions`: an ordered array of question definitions (`id`, `q` for the question text, `cond` for a function deciding whether to show it based on `wizardState`, `o` for the answer options, plus `wrap` and `chk` naming the question's checklist container and checkbox where it has them). `renderWizard()` draws the current step; `nextWizard()`/`prevWizard()` walk forward and back through only the questions whose `cond` currently passes. `updateLocks()` hides the matching `wrap` in the checklist using the same `cond`, so the two views cannot disagree about which questions apply.
+- `questions`: an ordered array of question definitions (`id`, `q` for the question text, `cond` for a function deciding whether to show it based on `wizardState`, `o` for the answer options, plus `wrap`, `chk` and `chkName` naming the question's checklist container, checkbox and radio-group name where it has them). `renderWizard()` draws the current step; `nextWizard()`/`prevWizard()` walk forward and back through only the questions whose `cond` currently passes. `updateLocks()` hides the matching `wrap` in the checklist using the same `cond`, so the two views cannot disagree about which questions apply. `questionIdForInput()` maps a checklist input back to the question that owns it, which is how `chkTouched` records what has been answered so that switching to the step-by-step view resumes rather than starting over.
 - `NOTES`: the explanatory sentences that sit under a question. Both views read them from here, the wizard by interpolating into the question text and the checklist through `<em class="note" data-note="key">` slots filled at startup, so the copy has one home.
 
 **The checklist**

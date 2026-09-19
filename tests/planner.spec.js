@@ -46,6 +46,14 @@ async function wizardNext(page) {
   await nextBtn.click();
 }
 
+async function finishWizard(page) {
+  for (let i = 0; i < 8; i++) {
+    if (await page.locator('#planView').isVisible()) return;
+    await page.getByRole('button', { name: /Continue →|Show my plan →/ }).click();
+  }
+  await expect(page.locator('#planView')).toBeVisible();
+}
+
 async function readStorage(page) {
   return page.evaluate(() => {
     const out = {};
@@ -533,14 +541,16 @@ test.describe('Be myself Planner', () => {
       await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
     });
 
-    test('41. Specific choices section hidden for EW; Scotland shows birth cert name', async ({ page }) => {
+    test('41. Birth cert name question hidden for EW; Scotland shows it in the long-term section', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="e"]').check();
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
-      await expect(page.locator('#wrapSpecificChoices')).toBeHidden();
+      await expect(page.locator('#wrapBirthCertName')).toBeHidden();
+      // name-only plus an England birth leaves the whole section empty, so it hides
+      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
-      await expect(page.locator('#wrapSpecificChoices')).toBeVisible();
+      await expect(page.locator('#wrapSectionLongterm')).toBeVisible();
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
     });
 
@@ -669,7 +679,7 @@ test.describe('Be myself Planner', () => {
         renderWizard(false);
       });
       await page.locator('input[name="ans"][value="no"]').check();
-      await page.getByRole('button', { name: 'Show my plan →' }).click();
+      await finishWizard(page);
       await expect(page.locator('#planContent')).toContainText('UK eVisa and UKVI');
       await expect(page.locator('#planContent')).toContainText('Home country passport');
       await expect(page.locator('#planContent')).not.toContainText('UK passport:');
@@ -686,7 +696,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="ans"]')).toHaveCount(3);
       await expect(page.locator('input[name="ans"][value="updated"]')).toHaveCount(1);
       await page.locator('input[name="ans"][value="updated"]').check();
-      await page.getByRole('button', { name: 'Show my plan →' }).click();
+      await finishWizard(page);
       await expect(page.locator('#planContent')).toContainText('You already have a Gender Recognition Certificate (GRC).');
       await expect(page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(0);
     });
@@ -808,16 +818,24 @@ test.describe('Be myself Planner', () => {
 
       let ls = await labels();
       expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
-        ['About you', 'Your current documents', 'Your situation', 'Long-term legal goals']);
+        ['About you', 'Your current documents', 'Your situation', 'Long-term goals']);
       expect(ls.map(l => Number(l.match(/^(\d+)/)[1]))).toEqual([1, 2, 3, 4]);
 
       await expect(page.locator('#wrapSectionBasics .chk-q').first())
         .toContainText('What do you need to update on your documents?');
 
+      // the Scotland-only birth certificate question joins the same section, it does not open a new one
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
       ls = await labels();
-      expect(ls.map(l => Number(l.match(/^(\d+)/)[1]))).toEqual([1, 2, 3, 4, 5]);
-      expect(ls[3]).toContain('Long-term goals (additional)');
+      expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
+        ['About you', 'Your current documents', 'Your situation', 'Long-term goals']);
+      await expect(page.locator('#wrapBirthCertName')).toBeVisible();
+
+      // with nothing long-term left to ask, the section hides rather than showing an empty heading
+      await page.locator('input[name="chkBirthRegion"][value="e"]').check();
+      await page.locator('#chkGoalGender').uncheck();
+      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
+      expect(await labels()).toHaveLength(3);
     });
 
     test('140. The merged visa question derives both legacy fields, and cascades down with the passport', async ({ page }) => {
@@ -2144,6 +2162,50 @@ test.describe('Be myself Planner', () => {
       });
       expect(after.total).toBeGreaterThan(before.total);
       expect(after.unresolved).toEqual([]);
+    });
+
+    test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
+      await openChecklist(page);
+
+      // touching nothing leaves the switch at the first question, as before
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'))
+        .toContainText('What do you need to update on your documents?');
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await page.locator('input[name="chkRegion"][value="s"]').check();
+      await page.locator('#chkDeedPoll').check();
+      await page.locator('#chkHMRC').check();
+      await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').check();
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      const resumed = await page.evaluate(() => questions[window.step].id);
+      const furthest = await page.evaluate(() => questions.findIndex(q => q.id === 'driving'));
+      expect(await page.evaluate(() => window.step)).toBeGreaterThan(furthest);
+      expect(['passport', 'visa']).toContain(resumed);
+
+      // Back still walks through the questions the checklist already answered
+      await page.locator('#wizardBackBtn').click();
+      expect(await page.evaluate(() => questions[window.step].id)).toBe('driving');
+    });
+
+    test('148. Every checklist input maps back to the question that owns it', async ({ page }) => {
+      await openChecklist(page);
+      const result = await page.evaluate(() => {
+        const gates = ['checklistAgeConfirm', 'checklistDisclaimerConfirm', 'ageConfirmShared', 'disclaimerConfirmShared'];
+        const inputs = [...document.querySelectorAll('#checklistView input')].filter(el => !gates.includes(el.id));
+        return {
+          unmapped: inputs.filter(el => !window.questionIdForInput(el)).map(el => el.id || el.name),
+          unknownIds: inputs.map(el => window.questionIdForInput(el))
+            .filter(id => id && !questions.some(q => q.id === id)),
+          namesWithoutInput: questions.filter(q => q.chkName)
+            .filter(q => !document.querySelector(`#checklistView input[name="${q.chkName}"]`))
+            .map(q => q.id),
+        };
+      });
+      expect(result.unmapped).toEqual([]);
+      expect(result.unknownIds).toEqual([]);
+      expect(result.namesWithoutInput).toEqual([]);
     });
 
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {

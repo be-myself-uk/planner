@@ -146,6 +146,16 @@ For items with no official source, the links in the general data protection sect
   - Status: Linked in the planner
   - Last verified: 2026-09-13
 
+- **nidirect: State Pension - report a change in your circumstances**
+  - <https://www.nidirect.gov.uk/articles/state-pension-report-change-your-circumstances>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-19
+
+- **Department for Communities: Northern Ireland Pension Centre**
+  - <https://www.communities-ni.gov.uk/contacts/northern-ireland-pension-centre>
+  - Status: Cited in the planner
+  - Last verified: 2026-09-19
+
 - **NI Direct: Equal treatment for State Pension for transgender people**
   - <https://www.nidirect.gov.uk/articles/equal-treatment-state-pension-transgender-people>
   - Status: Linked in the planner
