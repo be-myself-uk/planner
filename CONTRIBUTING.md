@@ -87,7 +87,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 135 of them numbered up to 148; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 137 of them numbered up to 150; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 #### Content-integrity snapshot
 
@@ -119,7 +119,7 @@ Running against a `file://` URL has one cost. Chromium's `localStorage` backend 
 
 ## How index.html is structured
 
-The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then HTML body (views and dialogs), then JavaScript (`<script>`)**. Roughly 3,340 lines total. Everything below is a rough map; exact line numbers shift as the file changes, so use them as a starting point for search, not a promise.
+The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then HTML body (views and dialogs), then JavaScript (`<script>`)**. Roughly 3,345 lines total. Everything below is a rough map; exact line numbers shift as the file changes, so use them as a starting point for search, not a promise.
 
 ### 1. `<head>` (lines 1 to 29)
 

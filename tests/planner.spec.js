@@ -509,7 +509,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkGoalGender').uncheck();
       await expect(page.locator('#wrapGRC')).toBeHidden();
       await expect(page.locator('#wrapVisa')).toBeVisible();
-      await expect(page.locator('#wrapVisa .chk-q--flex')).toContainText('Do you have a visa or eVisa?');
+      await expect(page.locator('#wrapVisa .chk-q')).toContainText('Do you have a visa or eVisa?');
       await expect(page.locator('#chkVisaNone')).toBeChecked();
       await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
@@ -2206,6 +2206,53 @@ test.describe('Be myself Planner', () => {
       expect(result.unmapped).toEqual([]);
       expect(result.unknownIds).toEqual([]);
       expect(result.namesWithoutInput).toEqual([]);
+    });
+
+    test('149. A question note sits below its question, never beside it', async ({ page }) => {
+      await openChecklist(page);
+
+      // .chk-q--flex laid its children out in a row, so a note landed next to the question
+      expect(await page.locator('.chk-q--flex').count()).toBe(0);
+
+      const boxes = await page.locator('#wrapVisa').evaluate(el => {
+        const p = el.querySelector('.chk-q');
+        const note = p.querySelector('.note');
+        const r = document.createRange();
+        r.setStart(p.firstChild, 0);
+        r.setEnd(p.firstChild, p.firstChild.length);
+        const q = r.getBoundingClientRect();
+        const n = note.getBoundingClientRect();
+        return { qBottom: q.bottom, qLeft: q.left, nTop: n.top, nLeft: n.left };
+      });
+      expect(boxes.nTop).toBeGreaterThanOrEqual(boxes.qBottom - 1);
+      expect(Math.abs(boxes.nLeft - boxes.qLeft)).toBeLessThan(2);
+    });
+
+    test('150. Editing a plan after a reload does not reopen the age gate', async ({ page }) => {
+      await openWizard(page);
+      for (let i = 0; i < 30; i++) {
+        if (await page.locator('#planView').isVisible()) break;
+        await wizardNext(page);
+      }
+      await expect(page.locator('#planView')).toBeVisible();
+      const inSession = await page.evaluate(() => window.step);
+
+      await page.reload();
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await page.getByRole('button', { name: /Edit plan/ }).click();
+
+      const landed = await page.evaluate(() => questions[window.step].id);
+      expect(landed).not.toBe('age');
+      expect(landed).not.toBe('disclaimer');
+      await expect(page.locator('#wizardStepFieldset legend'))
+        .toContainText('What do you need to update on your documents?');
+
+      // every question it can land on is one that currently applies
+      expect(await page.evaluate(() => {
+        const q = questions[window.step];
+        return !q.cond || q.cond();
+      })).toBe(true);
+      expect(inSession).toBeGreaterThan(0);
     });
 
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
