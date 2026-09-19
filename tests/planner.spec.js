@@ -701,6 +701,29 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkVisaUpdated')).toBeEnabled();
     });
 
+    test('142. The checklist shows which section you are in, and clears it on leaving', async ({ page }) => {
+      const label = () => page.locator('#controlBarProgressText').textContent();
+      await openChecklist(page);
+      await expect(page.locator('#controlBarProgress')).toBeVisible();
+      await expect(page.locator('#controlBarProgress')).toHaveAttribute('aria-label', 'Checklist position');
+      expect(await label()).toBe('Section 1 of 4: About you');
+
+      const ids = await page.evaluate(() =>
+        [...document.querySelectorAll('#checklistView > fieldset')].filter(f => f.offsetParent).map(f => f.id));
+      for (let i = 0; i < ids.length; i++) {
+        await page.evaluate((id) => {
+          const el = document.getElementById(id);
+          const bar = document.getElementById('controlBar').getBoundingClientRect().height;
+          window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - bar - 4);
+        }, ids[i]);
+        await expect.poll(label).toContain(`Section ${i + 1} of ${ids.length}`);
+      }
+
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#controlBarProgress')).toHaveAttribute('aria-label', 'Plan progress');
+      expect(await label()).toBe('');
+    });
+
     test('141. Checklist sections run documents before long-term goals, numbered without gaps', async ({ page }) => {
       await openChecklist(page);
       const labels = () => page.evaluate(() =>

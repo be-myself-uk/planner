@@ -32,6 +32,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 ### Layout
 
 - Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
+- The checklist now shows which section you are in, as "Section 2 of 4: Your current documents", with a bar in the toolbar. It is a long page and previously gave no sense of where you were or how much was left.
 - Darkened the community advice marker so it meets contrast guidelines, and shortened what screen readers announce for it. It is no longer a keyboard stop, so it does not interrupt tabbing through a plan.
 
 ## [September 2026]
