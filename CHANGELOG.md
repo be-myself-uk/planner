@@ -20,6 +20,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The two questions about your visa or eVisa are now one. It asks "Do you have a visa or eVisa?" with the same three answers used for your driving licence and passport, instead of asking separately whether you have one and whether it needs updating.
 - The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one of these as evidence for a gender marker change.
 
+### Wording
+
+- Corrected the benefits question, which named "PIP" in the checklist but spelled out "Personal Independence Payment (PIP)" in the step-by-step view. It is now spelled out in both. The Northern Ireland version also said updating your details while claiming benefits can sometimes cause delays, which no source supports; it now says the same as the rest of the UK, that a change of name or gender can affect how some benefits are administered.
+
 ### Code
 
 - Printing your plan, or saving it as a PDF, now includes the "more information" for each step.

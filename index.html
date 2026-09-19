@@ -165,7 +165,7 @@
 
       <legend class="section-title">1. About you</legend>
       <div class="chk-section">
-        <p class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em></p>
+        <p class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;" data-note="goal"></em></p>
         <label class="option option-sm"><input type="checkbox" id="chkGoalName" checked> My name</label>
         <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
         <div id="checklistGoalWarning" class="warning-text" style="margin:10px 0 0 0;" role="alert"><span aria-hidden="true">⚠️</span> Please select at least one option for what you need to update on your documents.</div>
@@ -194,7 +194,7 @@
     </fieldset>
     <fieldset id="wrapSectionDocuments" data-section-label="Your current documents" style="border:none;padding:0;margin:0 0 28px 0;">
       <legend class="section-title">5. Your current documents</legend>
-    <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span><span class="label-dp-dft">Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em></span><span class="label-dp-gender">Deed poll, statutory declaration, or Gender Recognition Certificate<br><em class="note" style="margin-top:4px;font-style:italic;">The DVLA, the DVA, and the NHS accept one of these as evidence for a gender marker change. Your answer helps us work out whether getting one should be your first step.</em></span></span></label>
+    <label class="checkbox-item" id="wrapDeedPoll"><input type="checkbox" id="chkDeedPoll"><span><span class="label-dp-dft">Deed poll or statutory declaration (name change document)<br><em class="note" style="margin-top:4px;font-style:italic;" data-note="deedpollName"></em></span><span class="label-dp-gender">Deed poll, statutory declaration, or Gender Recognition Certificate<br><em class="note" style="margin-top:4px;font-style:italic;" data-note="deedpollGender"></em></span></span></label>
     <label class="checkbox-item" id="wrapNHS"><input type="checkbox" id="chkNHS"><span><span class="label-nhs-ew">NHS record</span><span class="label-nhs-scot">GP record and CHI number (Scotland)</span><span class="label-nhs-ni">HSCNI health record and Health and Care Number (HCN)</span><br><em class="note" style="margin-top:2px;">Tick this once it is already updated with your new details, not just because you already have one.</em></span></label>
     <div id="wrapNewGP" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkNewGP"><span>I would like to register with a new GP<br><em class="note" style="margin-top:2px;">Registering at a new practice means your new details are on file from day one.</em></span></label></div>
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"><span>HMRC and taxes<br><em class="note" style="margin-top:2px;">Tick this once you have already updated your HMRC and tax records, not just because you pay tax.</em></span></label>
@@ -211,7 +211,7 @@
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
     </div>
     <div id="wrapVisa" class="chk-section chk-section--mv">
-      <p class="chk-q--flex">Do you have a visa or eVisa?<br><em class="note" style="margin-top:2px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.</em></p>
+      <p class="chk-q--flex">Do you have a visa or eVisa?<br><em class="note" style="margin-top:2px;" data-note="visa"></em></p>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNone"    value="none" checked> No</label>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNeeds"   value="needs_update"> Yes, and it has my old details</label>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaUpdated" value="updated"> Yes, and it is already updated</label>
@@ -222,21 +222,21 @@
     <fieldset style="border:none;padding:0;margin:10px 0;">
       <legend class="visually-hidden">Employment, volunteering, and student placement status</legend>
       <div class="chk-section">
-        <p class="chk-q">Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="margin-top:2px;">This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em></p>
+        <p class="chk-q">Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="margin-top:2px;" data-note="employment"></em></p>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> Yes, I need to update my records</label>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="updated"> I've already updated my records</label>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> No</label>
       </div>
     </fieldset>
     <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">My role or course requires a DBS check<br><em class="note" style="margin-top:2px;">A DBS check is a background check for roles and placements working with vulnerable people, including many nursing, teaching, and social work courses. If your role or course does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em></span><span class="label-dbs-ni">My role or course requires an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people. If your role or course does not require one, select no. There is a specific route for trans people that keeps your previous name off the certificate shown to your employer or university.</em></span><span class="label-dbs-scot">My role or course requires a Disclosure Scotland check<br><em class="note" style="margin-top:2px;">Disclosure Scotland is Scotland's equivalent of the DBS. It is a background check for roles and placements working or volunteering with vulnerable people. If your role or course does not require one, select no. There is a specific process for trans people that keeps your previous name off the certificate shown to your employer or university.</em></span></span></label>
-    <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, State Pension, or Employment Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.</em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;">For example: Universal Credit, PIP, or Employment Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.</em></span></span></label>
-    <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications, student records, or professional registrations to update<br><em class="note" style="margin-top:2px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or a legal regulator. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.</em></span></label>
-    <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I have a vehicle registered in my name that needs updating<br><em class="note" style="margin-top:2px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em></span></label>
+    <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;" data-note="dwp"></em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;" data-note="dwpNI"></em></span></span></label>
+    <label class="checkbox-item"><input type="checkbox" id="chkStudent"><span>I have qualifications, student records, or professional registrations to update<br><em class="note" style="margin-top:2px;" data-note="student"></em></span></label>
+    <label class="checkbox-item" id="wrapVehicle"><input type="checkbox" id="chkVehicle"><span>I have a vehicle registered in my name that needs updating<br><em class="note" style="margin-top:2px;" data-note="vehicle"></em></span></label>
     <div id="wrapChkServices" class="hidden">
       <fieldset style="border:none;padding:0;margin:10px 0 0 0;">
       <legend class="visually-hidden">Services I need to update</legend>
       <div class="chk-section">
-        <p class="chk-q">Services I need to update<br><em class="note" style="margin-top:2px;">Select all that apply.</em></p>
+        <p class="chk-q">Services I need to update<br><em class="note" style="margin-top:2px;" data-note="services"></em></p>
         <label class="option option-sm"><input type="checkbox" id="chkSvcBanks" class="chk-service" onchange="handleSvcItem()"> Banks, building societies, and financial accounts</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcInsurance" class="chk-service" onchange="handleSvcItem()"> Insurance policies (car, home, life, health)</label>
         <label class="option option-sm"><input type="checkbox" id="chkSvcCouncil" class="chk-service" onchange="handleSvcItem()"> Council Tax</label>
@@ -259,7 +259,7 @@
     </fieldset>
     <fieldset id="wrapSpecificChoices" data-section-label="Long-term goals (additional)" style="border:none;padding:0;margin:0 0 28px 0;">
       <legend class="section-title">2. Long-term goals (additional)</legend>
-      <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-scot">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names, permanently linking them on your official birth record.</em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
+      <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-scot">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;" data-note="birthCertScot"></em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
     </fieldset>
     <fieldset id="wrapSectionLongterm" data-section-label="Long-term legal goals" style="border:none;padding:0;margin:0 0 28px 0;">
       <legend class="section-title">3. Long-term legal goals</legend>
@@ -1781,6 +1781,20 @@ function computeHistoryUpTo(targetStep) {
   }
   return hist;
 }
+const NOTES = {
+  goal: 'Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.',
+  deedpollName: 'Your answer helps us work out whether getting one should be your first step, as most other documents require one.',
+  deedpollGender: 'The DVLA, the DVA, and the NHS accept one of these as evidence for a gender marker change. Your answer helps us work out whether getting one should be your first step.',
+  visa: 'An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.',
+  employment: 'This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.',
+  student: 'For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or a legal regulator. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.',
+  vehicle: 'For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.',
+  services: 'Select all that apply.',
+  birthCertScot: 'Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names, permanently linking them on your official birth record.',
+  birthCertNI: 'Only available if your birth was registered in Northern Ireland. The General Register Office for Northern Ireland (GRONI) can record a name change on a birth certificate. ⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.',
+  dwp: 'For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.',
+  dwpNI: 'For example: Universal Credit, Personal Independence Payment (PIP), or Employment Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.',
+};
 const questions = [
   { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Under-16s need parental consent and follow a different process.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes'],
@@ -1790,7 +1804,7 @@ const questions = [
     [S.YES, 'Yes, I understand'],
     [S.NO,  'No']
   ]},
-  { id:'goalParts', type:'multi', q:'What do you need to update on your documents?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.</em>', o:() => ([
+  { id:'goalParts', type:'multi', q:'What do you need to update on your documents?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.goal + '</em>', o:() => ([
     { value:'name',   label:'My name' },
     { value:'gender', label:'My gender marker (M or F)' },
   ])},
@@ -1810,11 +1824,11 @@ const questions = [
   ]},
   { id:'deedpoll', wrap:'wrapDeedPoll',
     q:() => wizardState.goal === S.GENDER
-      ? 'Do you have a deed poll, statutory declaration, or Gender Recognition Certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">The DVLA, the DVA, and the NHS accept one of these as evidence for a gender marker change. Your answer helps us work out whether getting one should be your first step.</em>'
+      ? 'Do you have a deed poll, statutory declaration, or Gender Recognition Certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.deedpollGender + '</em>'
       : regionText({
       s:  'Do you have a deed poll or statutory declaration for your name change?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">In Scotland, a free unenrolled deed poll is accepted by most organisations. A statutory declaration through the National Records of Scotland is also an option. Your answer helps us work out whether getting one should be your first step.</em>',
       ni: 'Do you have a deed poll or statutory declaration for your name change?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">In Northern Ireland, the DVA accepts both a free unenrolled deed poll and a statutory declaration witnessed by a solicitor. A statutory declaration is used for the Irish passport gender-change route. Your answer helps us work out whether getting one should be your first step.</em>',
-      default: 'Do you have a deed poll or statutory declaration for your name change?<br><em class="note" style="font-style:italic;display:block;margin-top:6px;color:var(--text-muted);">Your answer helps us work out whether getting one should be your first step, as most other documents require one.</em>',
+      default: 'Do you have a deed poll or statutory declaration for your name change?<br><em class="note" style="font-style:italic;display:block;margin-top:6px;color:var(--text-muted);">' + NOTES.deedpollName + '</em>',
     }),
     o:() => [
     [S.YES,'Yes'],[S.NO,'No']
@@ -1847,11 +1861,11 @@ const questions = [
     const locked = wizardState.goal !== S.GENDER && wizardState.deedpoll === S.NO;
     return [[S.NEEDS_UPDATE,'It has my old details'],[S.UPDATED,'It is already updated', locked],[S.NONE,'I do not have one']];
   }},
-  { id:'visa', q:'Do you have a visa or eVisa?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">An eVisa is a digital visa stored online. Updating one is a separate process, and the order you do things in matters. In most cases, update your passport before your eVisa.</em>', o:() => {
+  { id:'visa', q:'Do you have a visa or eVisa?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.visa + '</em>', o:() => {
     const locked = wizardState.passport !== S.UPDATED;
     return [[S.NONE,'No'],[S.NEEDS_UPDATE,'Yes, and it has my old details'],[S.UPDATED,'Yes, and it is already updated', locked]];
   }},
-  { id:'employment', q:'Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.</em>', o:() => [
+  { id:'employment', q:'Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.employment + '</em>', o:() => [
     [S.NEEDS_UPDATE, 'Yes, I need to update my records'],
     [S.UPDATED,      "I've already updated my records"],
     [S.NO,           'No'],
@@ -1867,27 +1881,27 @@ const questions = [
   ]},
   { id:'dwp', wrap:'wrapDWP',
     q:() => regionText({
-      ni: 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), or Employment Support Allowance. Updating your details while claiming benefits can sometimes cause delays.</em>',
-      default: 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.</em>',
+      ni: 'Are you currently receiving any benefits from the Department for Communities (DfC)?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.dwpNI + '</em>',
+      default: 'Are you currently receiving any DWP benefits?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.dwp + '</em>',
     }),
     cond:() => wizardState.regionOutsideUK !== S.YES, o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'services', wrap:'wrapChkServices', type:'multi',
-    q:'Do you need to update any of these services?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Select all that apply.</em>',
+    q:'Do you need to update any of these services?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.services + '</em>',
     cond:() => wizardState.goal !== S.GENDER,
     o:() => SERVICES.filter(s => wizardState.regionOutsideUK !== S.YES || (s.key !== 'council' && s.key !== 'electoral')).map(s => ({ value:s.key, label:s.label }))
   },
-  { id:'vehicle', wrap:'wrapVehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.</em>', o:() => [
+  { id:'vehicle', wrap:'wrapVehicle', q:'Do you have a vehicle registered in your name that needs updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.vehicle + '</em>', o:() => [
     [S.YES,'Yes, it needs updating'],[S.NO,'No, or it is already updated']
   ], cond:() => wizardState.goal !== S.GENDER },
-  { id:'student', q:'Do you have educational qualifications or certificates to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or a legal regulator. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.</em>', o:() => [
+  { id:'student', q:'Do you have educational qualifications or certificates to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.student + '</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
   { id:'birthCertName', wrap:'wrapBirthCertName',
     q:() => wizardState.birthRegion === REGION.NI
-      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Northern Ireland. The General Register Office for Northern Ireland (GRONI) can record a name change on a birth certificate. ⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.</em>'
-      : 'Would you like to record your new name on your Scottish birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">Only available if your birth was registered in Scotland. This can be done without a GRC through the National Records of Scotland. ⚠️ The new certificate will show both your old and new names, permanently linking them on your official birth record.</em>',
+      ? 'Would you like to record your new name on your Northern Ireland birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.birthCertNI + '</em>'
+      : 'Would you like to record your new name on your Scottish birth certificate?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.birthCertScot + '</em>',
     cond:() => (wizardState.birthRegion === REGION.S || wizardState.birthRegion === REGION.NI) && wizardState.goal !== S.GENDER, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
@@ -3125,6 +3139,10 @@ window.onload = () => {
   [V.wizard, V.checklist, V.plan].forEach(v => v?.classList.add('hidden'));
   document.body.classList.remove('plan-ready', 'wizard-active');
   initToolbarNav();
+  document.querySelectorAll('[data-note]').forEach(el => {
+    const t = NOTES[el.dataset.note];
+    if (t) el.textContent = t;
+  });
   initDragReorder();
   updateThemeIcon();
   const chkView = gel('checklistView');
@@ -3269,6 +3287,7 @@ Object.defineProperty(window, 'wizardState', { get: () => wizardState, set: v =>
 Object.defineProperty(window, 'isWizardMode', { get: () => isWizardMode, set: v => { isWizardMode = v; }, configurable: true });
 Object.defineProperty(window, 'step', { get: () => step, set: v => { step = v; }, configurable: true });
 window.questions      = questions;
+window.NOTES          = NOTES;
 window.SCHEMA_VERSION = SCHEMA_VERSION;
 window.SVC_MAP        = SVC_MAP;
 window.encodeState    = encodeState;
