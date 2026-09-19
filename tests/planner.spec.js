@@ -724,6 +724,20 @@ test.describe('Be myself Planner', () => {
       expect(await label()).toBe('');
     });
 
+    test('145. CHK_MAP is derived from the question array and stays in step with the DOM', async ({ page }) => {
+      await openChecklist(page);
+      const state = await page.evaluate(() => ({
+        pairs: CHK_MAP.map(([id, prop]) => [id, prop]),
+        idsPresent: CHK_MAP.filter(([id]) => !document.getElementById(id)).map(([id]) => id),
+        propsWithoutQuestion: CHK_MAP.filter(([, prop]) => !questions.some(q => q.id === prop)).map(([, p]) => p),
+        taggedQuestions: questions.filter(q => q.chk).map(q => q.id),
+      }));
+      expect(state.pairs.length).toBe(10);
+      expect(state.idsPresent).toEqual([]);
+      expect(state.propsWithoutQuestion).toEqual([]);
+      expect(state.pairs.map(([, prop]) => prop)).toEqual(state.taggedQuestions);
+    });
+
     test('144. Shared question notes come from one source and match in both views', async ({ page }) => {
       await openChecklist(page);
       const slots = await page.evaluate(() =>
