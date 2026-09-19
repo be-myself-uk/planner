@@ -17,18 +17,18 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Information
 
-- The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker, not just if you are changing your name. The DVLA, the DVA, and the NHS all accept one of these as evidence for a gender marker change, so the planner was asking for a document it never checked you had, and never offered a step for getting one.
+- The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one of these as evidence for a gender marker change.
 
 ### Code
 
-- Printing your plan, or saving it as a PDF, now includes the "more information" for each step. Those sections were being left out, so a printed plan listed the steps but not how to do them.
-- The question counter in the step-by-step view no longer goes backwards. Answering the first few questions used to leave it stuck on "Question 1" while the total dropped. It now counts up as you answer. The total can still go down once you say what you need to update, because that removes questions that no longer apply.
-- The Esc key now needs two presses within a second to leave the site, so it is not triggered by pressing Esc to close something. The red Quick exit button still works with one click.
-- Fixed the checklist telling you to click a button that was not on the page. Coming back to the checklist by switching views left instructions naming "Show my action plan" while the only button said "Update my action plan".
+- Printing your plan, or saving it as a PDF, now includes the "more information" for each step.
+- The question counter in the step-by-step view now only counts up. The total can still fall once you say what you need to update, because that removes questions that no longer apply.
+- The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
+- Fixed the checklist naming a button that was not on the page after switching views.
 
 ### Layout
 
-- Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed. This was only explained in the usage guide and in a tooltip that does not appear on phones.
+- Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
 
 ## [September 2026]
 
