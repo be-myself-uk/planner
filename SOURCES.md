@@ -35,7 +35,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Change your name by deed poll**
   - <https://www.gov.uk/change-name-deed-poll>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **HM Passport Office caseworker guidance: Names, evidence to change a name**
   - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
@@ -85,7 +85,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/employee-changes-gender>
   - Status: Linked in the planner
   - Note: Documents reporting name and gender changes in separate Full Payment Submissions, the risk of duplicate payroll records and a higher PAYE bill, and National Insurance category changes.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-19
 
 ## HMRC and taxes (hmrc)
 
@@ -105,7 +105,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye103005>
   - Status: Consulted, not linked in the planner
   - Note: States that HMRC does not amend the gender on a customer record until a full GRC is provided.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-19
 
 - **HMRC FOI response FOI2025/153485: RTI submissions for transgender employees with Special Section D records without a GRC**
   - <https://www.whatdotheyknow.com/request/foi_request_hmrc_guidance_on_rti>
@@ -120,22 +120,22 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Benefits**
   - <https://www.gov.uk/browse/benefits>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **GOV.UK: Tell HMRC about a change of details (gender change)**
   - <https://www.gov.uk/tell-hmrc-change-of-details/gender-change>
   - Status: Linked in the planner
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-19
 
 - **DWP: Summary of policy on the retention of information relating to transgender customers**
   - <https://www.gov.uk/government/publications/transgender-customers-summary-of-dwps-policy-in-respect-of-the-retention-of-information/summary-of-dwps-policy-on-the-retention-of-information-relating-to-transgender-customers>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **GOV.UK: State Pension age**
   - <https://www.gov.uk/state-pension-age>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 *Note: no official source documents HMRC automatically passing a name change to DWP, so the planner advises telling each office that pays a benefit directly.*
 
@@ -145,6 +145,21 @@ For items with no official source, the links in the general data protection sect
   - <https://www.communities-ni.gov.uk/topics/benefits-and-pensions>
   - Status: Linked in the planner
   - Last verified: 2026-09-13
+
+- **Citizens Information: Irish citizenship through birth or descent**
+  - <https://www.citizensinformation.ie/en/moving-country/irish-citizenship/irish-citizenship-through-birth-or-descent/>
+  - Status: Cited in the planner
+  - Last verified: 2026-09-19
+
+- **nidirect: State Pension - report a change in your circumstances**
+  - <https://www.nidirect.gov.uk/articles/state-pension-report-change-your-circumstances>
+  - Status: Linked in the planner
+  - Last verified: 2026-09-19
+
+- **Department for Communities: Northern Ireland Pension Centre**
+  - <https://www.communities-ni.gov.uk/contacts/northern-ireland-pension-centre>
+  - Status: Cited in the planner
+  - Last verified: 2026-09-19
 
 - **NI Direct: Equal treatment for State Pension for transgender people**
   - <https://www.nidirect.gov.uk/articles/equal-treatment-state-pension-transgender-people>
@@ -160,12 +175,12 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Student finance (who qualifies)**
   - <https://www.gov.uk/student-finance/who-qualifies>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **GOV.UK: Updating your personal details (student finance)**
   - <https://www.gov.uk/guidance/updating-your-personal-details>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **Student Finance England: Updating your personal details**
   - <https://www.gov.uk/guidance/updating-your-personal-details>
@@ -205,7 +220,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: DBS transgender applications**
   - <https://www.gov.uk/guidance/transgender-applications>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 ### Scotland
 
@@ -248,7 +263,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.legislation.gov.uk/ukpga/1988/52/section/99>
   - Status: Consulted, not linked in the planner
   - Note: Legal basis for the requirement to surrender a licence for updating when the name on it ceases to be correct, and for the fine for failing to do so.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-19
 
 - **DVLA FOI response FOIR9901: titles used on driving licence applications and renewals**
   - <https://www.whatdotheyknow.com/request/number_of_people_using_honorific_2>
@@ -276,7 +291,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/change-name-v5c>
   - Status: Linked in the planner
   - Note: Documents the fine of up to £1,000 for not telling the DVLA about a name change.
-  - Last verified: 2026-07-17
+  - Last verified: 2026-09-19
 
 ## NHS and health records (nhs, newgp)
 
@@ -370,7 +385,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Change your name or gender on your passport**
   - <https://www.gov.uk/changing-passport-information/gender>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **HM Passport Office caseworker guidance: Gender recognition**
   - <https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible>
@@ -388,19 +403,19 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/authorisation-and-consent-needed-to-issue-a-passport/authorisation-and-consent-needed-to-issue-a-passport-accessible#when-we-need-additional-consent>
   - Status: Consulted, not linked in the planner
   - Note: "Consent to change the gender on the passport" confirms a gender marker change for someone under 18 needs signed consent from everyone with parental responsibility, with a safeguarding-concerns exception for 16 and 17 year olds; "Consent to change a young adult's name" confirms 16 and 17 year olds can consent to a name-only change themselves.
-  - Last verified: 2026-07-15
+  - Last verified: 2026-09-19
 
 ## Immigration, eVisa, and home country passport (evisa, homepass)
 
 - **GOV.UK: UK Visas and Immigration**
   - <https://www.gov.uk/government/organisations/uk-visas-and-immigration>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **Home Office policy: Use and change of names**
   - <https://www.gov.uk/government/publications/change-of-name-guidance/use-and-change-of-names>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **Home Office caseworker guidance: EU Settlement Scheme, gender identity and sex markers on documents**
   - <https://www.gov.uk/government/publications/eu-settlement-scheme-caseworker-guidance/eu-settlement-scheme-interim-guidance-gender-identity-and-sex-markers-on-documents-accessible>
@@ -438,7 +453,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Apply for a Gender Recognition Certificate**
   - <https://www.gov.uk/apply-gender-recognition-certificate>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **GOV.UK: Apply for a GRC, what documents you need**
   - <https://www.gov.uk/apply-gender-recognition-certificate/what-documents-you-need>
@@ -456,12 +471,12 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **The Commissioners for Oaths (Fees) Order 1993 (SI 1993/2297)**
   - <https://www.legislation.gov.uk/uksi/1993/2297/made>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **The Commissioners for Oaths (Fees) Order (Northern Ireland) 1993 (SR 1993/418)**
   - <https://www.legislation.gov.uk/nisr/1993/418/contents/made>
@@ -477,7 +492,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **GOV.UK: Apply for a Gender Recognition Certificate**
   - <https://www.gov.uk/apply-gender-recognition-certificate>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 ### Scotland
 
@@ -502,7 +517,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **GOV.UK: Register to vote**
   - <https://www.gov.uk/register-to-vote>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
   - <https://www.electoralcommission.org.uk/voting-and-elections/register-vote/register-vote-anonymously>
@@ -576,12 +591,12 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **HM Land Registry: Update or correct the register**
   - <https://www.gov.uk/registering-land-or-property-with-land-registry/update-or-correct-the-register>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 - **GOV.UK: Change of gender (form CNG)**
   - <https://www.gov.uk/government/publications/change-of-gender-cng>
   - Status: Consulted, not linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-09-19
 
 #### Scotland
 
