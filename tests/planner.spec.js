@@ -46,6 +46,14 @@ async function wizardNext(page) {
   await nextBtn.click();
 }
 
+async function finishWizard(page) {
+  for (let i = 0; i < 8; i++) {
+    if (await page.locator('#planView').isVisible()) return;
+    await page.getByRole('button', { name: /Continue →|Show my plan →/ }).click();
+  }
+  await expect(page.locator('#planView')).toBeVisible();
+}
+
 async function readStorage(page) {
   return page.evaluate(() => {
     const out = {};
@@ -435,6 +443,49 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#checklistView')).toBeVisible();
       await expect(page.locator('#checklistAdaptiveNote')).toBeVisible();
     });
+
+    test('137. Wizard question number never decreases while answering forward', async ({ page }) => {
+      await openWizard(page);
+      const seen = [];
+      for (let i = 0; i < 30; i++) {
+        if (!(await page.locator('#wizardView').isVisible())) break;
+        const text = await page.locator('#controlBarProgressText').textContent();
+        const m = text.match(/Question (\d+) of (\d+)/);
+        if (!m) break;
+        seen.push(Number(m[1]));
+        await wizardNext(page);
+      }
+      expect(seen.length).toBeGreaterThan(5);
+      for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeGreaterThanOrEqual(seen[i - 1]);
+      expect(seen[0]).toBe(1);
+      expect(seen[1]).toBe(2);
+    });
+
+    test('138. Checklist intro, generate button and sticky bar agree from every entry point', async ({ page }) => {
+      const state = () => page.evaluate(() => ({
+        intro: document.getElementById('checklistIntroText').textContent.trim(),
+        label: document.getElementById('checklistGenerateBtn').textContent.trim(),
+        hidden: document.getElementById('checklistGenerateBtn').classList.contains('hidden'),
+        sticky: document.getElementById('checklistStickyBar').classList.contains('hidden')
+          ? null : document.querySelector('#checklistStickyBar button').textContent.trim(),
+      }));
+      const agrees = (s) => {
+        const named = (s.intro.match(/"([^"]+)"/) || [])[1];
+        return s.hidden ? (named === 'Update my action plan' && s.sticky === 'Update my action plan')
+                        : (named === 'Show my action plan' && s.label === 'Show my action plan' && s.sticky === null);
+      };
+
+      await openChecklist(page);
+      expect(agrees(await state())).toBe(true);
+
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.getByRole('button', { name: 'Edit plan' }).click();
+      expect(agrees(await state())).toBe(true);
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      expect(agrees(await state())).toBe(true);
+    });
   });
 
   test.describe('Locks, gating & validation', () => {
@@ -449,16 +500,17 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="updated"]')).toBeEnabled();
       await page.locator('#chkGoalName').uncheck();
       await page.locator('#chkGoalGender').check();
-      await expect(page.locator('#wrapDeedPoll')).toBeHidden();
+      await expect(page.locator('#wrapDeedPoll')).toBeVisible();
+      await expect(page.locator('#wrapDeedPoll .label-dp-gender')).toBeVisible();
+      await expect(page.locator('#wrapDeedPoll .label-dp-dft')).toBeHidden();
       await expect(page.getByLabel('NHS record')).toBeEnabled();
       await expect(page.getByLabel('HMRC and taxes')).toBeVisible();
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
       await expect(page.locator('#wrapGRC')).toBeHidden();
-      await expect(page.locator('#wrapVisa')).toBeHidden();
-      await page.getByLabel(/I have a UK visa or eVisa/).check();
       await expect(page.locator('#wrapVisa')).toBeVisible();
-      await expect(page.locator('#wrapVisa .note')).toContainText('already updated');
+      await expect(page.locator('#wrapVisa .chk-q')).toContainText('Do you have a visa or eVisa?');
+      await expect(page.locator('#chkVisaNone')).toBeChecked();
       await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
       await page.getByLabel(/Yes, I need to update my records/).check();
@@ -467,8 +519,8 @@ test.describe('Be myself Planner', () => {
       await page.getByLabel(/I've already updated my records/).check();
       await expect(page.locator('#wrapDBS')).toBeVisible();
       await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
-      await expect(page.locator('#chkVisa')).toBeDisabled();
-      await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
+      await expect(page.locator('#chkVisaUpdated')).toBeDisabled();
+      await expect(page.locator('#chkVisaUpdated')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
     });
 
     test('99. Employment "already updated" hides the HR step but still offers DBS', async ({ page }) => {
@@ -489,14 +541,16 @@ test.describe('Be myself Planner', () => {
       await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
     });
 
-    test('41. Specific choices section hidden for EW; Scotland shows birth cert name', async ({ page }) => {
+    test('41. Birth cert name question hidden for EW; Scotland shows it in the long-term section', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="e"]').check();
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
-      await expect(page.locator('#wrapSpecificChoices')).toBeHidden();
+      await expect(page.locator('#wrapBirthCertName')).toBeHidden();
+      // name-only plus an England birth leaves the whole section empty, so it hides
+      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
-      await expect(page.locator('#wrapSpecificChoices')).toBeVisible();
+      await expect(page.locator('#wrapSectionLongterm')).toBeVisible();
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
     });
 
@@ -606,25 +660,26 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="ans"][value="updated"]')).toBeEnabled();
     });
 
-    test('74. Wizard eVisa answer maps correctly, locks on passport, and produces the eVisa step', async ({ page }) => {
+    test('74. Wizard visa answer maps correctly, locks on passport, and produces the eVisa step', async ({ page }) => {
       await openWizard(page);
       await page.evaluate(() => {
-        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], citizen:'yes', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
-        step = questions.findIndex(q => q.id === 'visaUpdated');
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], visa:'needs_update', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'no', grc:'no' });
+        step = questions.findIndex(q => q.id === 'visa');
         renderWizard(false);
       });
-      await expect(page.locator('input[name="ans"][value="yes"]')).toBeDisabled();
-      await expect(page.locator('input[name="ans"][value="no"]')).toBeEnabled();
+      await expect(page.locator('input[name="ans"][value="updated"]')).toBeDisabled();
+      await expect(page.locator('input[name="ans"][value="needs_update"]')).toBeEnabled();
+      await expect(page.locator('input[name="ans"][value="none"]')).toBeEnabled();
       await page.evaluate(() => { wizardState.passport = 'updated'; renderWizard(false); });
-      await expect(page.locator('input[name="ans"][value="yes"]')).toBeEnabled();
+      await expect(page.locator('input[name="ans"][value="updated"]')).toBeEnabled();
       await page.evaluate(() => {
         wizardState.passport = 'needs_update';
-        wizardState.visaUpdated = 'no';
+        wizardState.visa = 'needs_update';
         step = questions.findIndex(q => q.id === 'grc');
         renderWizard(false);
       });
       await page.locator('input[name="ans"][value="no"]').check();
-      await page.getByRole('button', { name: 'Show my plan →' }).click();
+      await finishWizard(page);
       await expect(page.locator('#planContent')).toContainText('UK eVisa and UKVI');
       await expect(page.locator('#planContent')).toContainText('Home country passport');
       await expect(page.locator('#planContent')).not.toContainText('UK passport:');
@@ -641,20 +696,161 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="ans"]')).toHaveCount(3);
       await expect(page.locator('input[name="ans"][value="updated"]')).toHaveCount(1);
       await page.locator('input[name="ans"][value="updated"]').check();
-      await page.getByRole('button', { name: 'Show my plan →' }).click();
+      await finishWizard(page);
       await expect(page.locator('#planContent')).toContainText('You already have a Gender Recognition Certificate (GRC).');
       await expect(page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(0);
     });
 
     test('75. Checklist eVisa lock releases on passport status, not the deed poll', async ({ page }) => {
       await openChecklist(page);
-      await page.getByLabel(/I have a UK visa or eVisa/).check();
-      await expect(page.locator('#chkVisa')).toBeDisabled();
-      await expect(page.locator('#chkVisa')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
+      await expect(page.locator('#chkVisaUpdated')).toBeDisabled();
+      await expect(page.locator('#chkVisaUpdated')).toHaveAttribute('aria-describedby', 'lock-visa-reason');
       await page.getByLabel(/Deed poll or statutory declaration/).check();
-      await expect(page.locator('#chkVisa')).toBeDisabled();
+      await expect(page.locator('#chkVisaUpdated')).toBeDisabled();
       await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
-      await expect(page.locator('#chkVisa')).toBeEnabled();
+      await expect(page.locator('#chkVisaUpdated')).toBeEnabled();
+    });
+
+    test('142. The checklist shows which section you are in, and clears it on leaving', async ({ page }) => {
+      const label = () => page.locator('#controlBarProgressText').textContent();
+      await openChecklist(page);
+      await expect(page.locator('#controlBarProgress')).toBeVisible();
+      await expect(page.locator('#controlBarProgress')).toHaveAttribute('aria-label', 'Checklist position');
+      expect(await label()).toBe('Section 1 of 4: About you');
+
+      const ids = await page.evaluate(() =>
+        [...document.querySelectorAll('#checklistView > fieldset')].filter(f => f.offsetParent).map(f => f.id));
+      for (let i = 0; i < ids.length; i++) {
+        await page.evaluate((id) => {
+          const el = document.getElementById(id);
+          const bar = document.getElementById('controlBar').getBoundingClientRect().height;
+          window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - bar - 4);
+        }, ids[i]);
+        await expect.poll(label).toContain(`Section ${i + 1} of ${ids.length}`);
+      }
+
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#controlBarProgress')).toHaveAttribute('aria-label', 'Plan progress');
+      expect(await label()).toBe('');
+    });
+
+    test('145. CHK_MAP is derived from the question array and stays in step with the DOM', async ({ page }) => {
+      await openChecklist(page);
+      const state = await page.evaluate(() => ({
+        pairs: CHK_MAP.map(([id, prop]) => [id, prop]),
+        idsPresent: CHK_MAP.filter(([id]) => !document.getElementById(id)).map(([id]) => id),
+        propsWithoutQuestion: CHK_MAP.filter(([, prop]) => !questions.some(q => q.id === prop)).map(([, p]) => p),
+        taggedQuestions: questions.filter(q => q.chk).map(q => q.id),
+      }));
+      expect(state.pairs.length).toBe(11);
+      expect(state.idsPresent).toEqual([]);
+      expect(state.propsWithoutQuestion).toEqual([]);
+      expect(state.pairs.map(([, prop]) => prop)).toEqual(state.taggedQuestions);
+    });
+
+    test('144. Shared question notes come from one source and match in both views', async ({ page }) => {
+      await openChecklist(page);
+      const slots = await page.evaluate(() =>
+        [...document.querySelectorAll('#checklistView [data-note]')].map(el => ({
+          key: el.dataset.note,
+          rendered: el.textContent.replace(/\s+/g, ' ').trim(),
+          source: (window.NOTES || {})[el.dataset.note],
+        })));
+      expect(slots.length).toBeGreaterThan(8);
+      for (const s of slots) {
+        expect(s.source, `NOTES is missing an entry for ${s.key}`).toBeTruthy();
+        expect(s.rendered).toBe(s.source.replace(/\s+/g, ' ').trim());
+      }
+
+      // the wizard renders the same strings, so the two views cannot drift apart
+      const inWizard = await page.evaluate(() => {
+        const seen = {};
+        questions.forEach(q => {
+          const t = typeof q.q === 'function' ? q.q() : q.q;
+          Object.entries(window.NOTES).forEach(([k, v]) => { if (t.includes(v)) seen[k] = true; });
+        });
+        return seen;
+      });
+      for (const key of ['goal', 'visa', 'employment', 'student', 'vehicle', 'services']) {
+        expect(inWizard[key], `${key} note not found in any wizard question`).toBe(true);
+      }
+    });
+
+    test('143. Every question is shown in both views or neither, across goal, region and employment', async ({ page }) => {
+      await openChecklist(page);
+      const mismatches = await page.evaluate(() => {
+        const bad = [];
+        for (const reg of ['e', 'w', 's', 'ni', 'out'])
+          for (const goal of ['both', 'name', 'gender'])
+            for (const emp of ['no', 'needs_update', 'updated'])
+              for (const br of ['e', 'w', 's', 'ni']) {
+                Object.assign(wizardState, {
+                  region: reg === 'out' ? 'e' : reg, regionOutsideUK: reg === 'out' ? 'yes' : 'no',
+                  birthRegion: br, birthOutsideUK: 'no',
+                  goal, goalParts: goal === 'both' ? ['name', 'gender'] : [goal], employment: emp,
+                });
+                updateLocks();
+                const askedInWizard = questions
+                  .filter(q => q.wrap && (!q.cond || q.cond())).map(q => q.wrap).sort();
+                const shownInChecklist = questions.filter(q => q.wrap)
+                  .filter(q => {
+                    const el = document.getElementById(q.wrap);
+                    return el && !el.classList.contains('hidden');
+                  }).map(q => q.wrap).sort();
+                if (JSON.stringify(askedInWizard) !== JSON.stringify(shownInChecklist)) {
+                  bad.push({ reg, goal, emp, br, askedInWizard, shownInChecklist });
+                }
+              }
+        return bad;
+      });
+      expect(mismatches).toEqual([]);
+
+      const missing = await page.evaluate(() =>
+        questions.filter(q => q.wrap && !document.getElementById(q.wrap)).map(q => q.wrap));
+      expect(missing).toEqual([]);
+    });
+
+    test('141. Checklist sections run documents before long-term goals, numbered without gaps', async ({ page }) => {
+      await openChecklist(page);
+      const labels = () => page.evaluate(() =>
+        [...document.querySelectorAll('#checklistView > fieldset')].filter(f => f.offsetParent)
+          .map(f => f.querySelector('legend').textContent.trim()));
+
+      let ls = await labels();
+      expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
+        ['About you', 'Your current documents', 'Your situation', 'Long-term goals']);
+      expect(ls.map(l => Number(l.match(/^(\d+)/)[1]))).toEqual([1, 2, 3, 4]);
+
+      await expect(page.locator('#wrapSectionBasics .chk-q').first())
+        .toContainText('What do you need to update on your documents?');
+
+      // the Scotland-only birth certificate question joins the same section, it does not open a new one
+      await page.locator('input[name="chkBirthRegion"][value="s"]').check();
+      ls = await labels();
+      expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
+        ['About you', 'Your current documents', 'Your situation', 'Long-term goals']);
+      await expect(page.locator('#wrapBirthCertName')).toBeVisible();
+
+      // with nothing long-term left to ask, the section hides rather than showing an empty heading
+      await page.locator('input[name="chkBirthRegion"][value="e"]').check();
+      await page.locator('#chkGoalGender').uncheck();
+      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
+      expect(await labels()).toHaveLength(3);
+    });
+
+    test('140. The merged visa question derives both legacy fields, and cascades down with the passport', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByLabel(/Deed poll or statutory declaration/).check();
+      await page.locator('input[name="chkPassportOpt"][value="updated"]').check();
+      await page.locator('#chkVisaUpdated').check();
+      expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
+        .toEqual(['updated', 'yes', 'yes']);
+      await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
+      expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
+        .toEqual(['needs_update', 'yes', 'no']);
+      await page.locator('#chkVisaNone').check();
+      expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
+        .toEqual(['none', 'no', 'no']);
     });
 
     test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
@@ -949,7 +1145,8 @@ test.describe('Be myself Planner', () => {
       await firstBtn.click();
       await expect(firstBtn).toHaveAttribute('data-state', '1');
       await page.waitForTimeout(200);
-      await page.goto(filePath + '?p=%%%notvalid%%%');
+      await gotoUntil(page, filePath + '?p=%%%notvalid%%%',
+        () => page.locator('#welcomeOutdated').isVisible());
       await expect(page.locator('#welcomeOutdated')).toBeVisible();
       expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
     });
@@ -1193,6 +1390,7 @@ test.describe('Be myself Planner', () => {
     test('79. NI-born users who decline a GRC get an Irish-passport-only final step', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+      await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Legal gender recognition (Irish passport)');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
@@ -1213,31 +1411,45 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planContent')).not.toContainText('Irish passport');
     });
 
-    test('103. NI-born pursuing both the Irish passport and UK GRC routes gets a split final step', async ({ page }) => {
+    test('103. NI-born pursuing both the Irish passport and UK GRC routes gets two separate final steps', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkRegion"][value="ni"]').check();
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkGRCYes').check();
+      await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      const finalPhase = page.locator('.phase', { hasText: 'Legal gender recognition' });
-      const details = finalPhase.locator('.final-step-route');
-      await expect(details).toHaveCount(2);
-      await expect(details.nth(0).locator('> summary')).toHaveText('Irish passport route');
-      await expect(details.nth(1).locator('> summary')).toHaveText('UK GRC route');
-      await expect(details.nth(0)).toContainText('Irish passport (Good Friday Agreement route)');
-      await expect(details.nth(1)).toContainText('UK Gender Recognition Certificate (GRC)');
-      await expect(details.nth(1)).toContainText('Living proof for GRC');
-      await expect(finalPhase.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
-      await expect(finalPhase.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
+
+      const irish = page.locator('.phase[data-phase-key="final_irish"]');
+      const grc = page.locator('.phase[data-phase-key="final_grc"]');
+      await expect(irish).toHaveCount(1);
+      await expect(grc).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final"]')).toHaveCount(0);
+
+      await expect(irish.locator('> .phase-header h3')).toContainText('Legal gender recognition (Irish passport)');
+      await expect(grc.locator('> .phase-header h3')).toContainText('Legal gender recognition (GRC)');
+      await expect(irish.locator('.badge-time')).toContainText('Irish passport: 2+ years of name-use proof');
+      await expect(grc.locator('.badge-time')).toContainText('Long-term (2+ years)');
+
+      await expect(irish).toContainText('Irish passport (Good Friday Agreement route)');
+      await expect(grc).toContainText('UK Gender Recognition Certificate (GRC)');
+      await expect(grc).toContainText('Living proof for GRC');
+      await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
+      await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
+
+      // each route stands on its own, so neither points at the other
+      await expect(irish).not.toContainText('described first below');
+      await expect(grc).not.toContainText('described below alongside');
     });
 
     test('104. NI-born already having a GRC with no birth-cert follow-up gets a single, unsplit final step', async ({ page }) => {
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkGRCUpdated').check();
+      await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      const finalPhase = page.locator('.phase', { hasText: 'Legal gender recognition' });
-      await expect(finalPhase.locator('.final-step-route')).toHaveCount(0);
+      const finalPhase = page.locator('.phase[data-phase-key="final"]');
+      await expect(finalPhase).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(0);
       await expect(finalPhase).toContainText('Irish passport (Good Friday Agreement route)');
     });
 
@@ -1334,6 +1546,17 @@ test.describe('Be myself Planner', () => {
       await expect(plan).toContainText('A medical letter is not needed');
       await expect(plan).not.toContainText('one other document that already shows your new name');
       await expect(plan).not.toContainText('mobile, broadband, or streaming bill');
+    });
+
+    test('139. A gender-only plan that asks for a name-change document also gives a step for getting one', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalName').uncheck();
+      await expect(page.locator('#wrapDeedPoll')).toBeVisible();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const text = await page.locator('#planContent').innerText();
+      if (/deed poll|statutory declaration/i.test(text)) {
+        await expect(page.locator('#planContent [data-item-id="trk_deedpoll"]')).toHaveCount(1);
+      }
     });
   });
 
@@ -1584,8 +1807,22 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('link', { name: 'Usage guide' }).click();
       await page.keyboard.press('Escape');
       await expect(dlg).toBeHidden();
+      await page.waitForTimeout(1200);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page).not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
       await page.keyboard.press('Escape');
       await expect(page).toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+    });
+
+    test('135. Two slow Escape presses do not trigger the quick exit', async ({ page }) => {
+      await openWizard(page);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(1200);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page).not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+      await expect(page.locator('#wizardView')).toBeVisible();
     });
 
     test('19b. Keyboard ? shortcut opens help modal', async ({ page }) => {
@@ -1843,6 +2080,23 @@ test.describe('Be myself Planner', () => {
       expect(focusedId).toBe(zeroBtnId);
     });
 
+    test('136. Printing renders the guidance inside collapsed details, not just titles', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const screenWords = await page.evaluate(() => document.body.innerText.split(/\s+/).length);
+      await page.emulateMedia({ media: 'print' });
+      const printWords = await page.evaluate(() => document.body.innerText.split(/\s+/).length);
+      expect(printWords).toBeGreaterThan(screenWords * 1.5);
+      const probe = await page.evaluate(() => {
+        const d = [...document.querySelectorAll('#planContent details.tmpl-details')].find(x => !x.open);
+        return d ? d.querySelector('.details-body').textContent.trim().split(/\s+/).slice(3, 11).join(' ') : null;
+      });
+      expect(probe).toBeTruthy();
+      expect(await page.evaluate(() => document.body.innerText)).toContain(probe);
+      await page.emulateMedia({ media: 'screen' });
+      const stillOpen = await page.locator('#planContent details[open]').count();
+      expect(stillOpen).toBeLessThanOrEqual(1);
+    });
+
     test('70. Print-only disclaimer footer shows on the plan, hidden on screen', async ({ page }) => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
@@ -1879,6 +2133,228 @@ test.describe('Be myself Planner', () => {
   });
 
   test.describe('Content integrity', () => {
+
+
+
+
+    test('146. Every data-action resolves to a handler, and no inline event handlers remain', async ({ page }) => {
+      const source = fs.readFileSync(filePath.replace(/^file:\/\//, ''), 'utf8');
+      const inline = source.match(/\son(click|change|input|submit|keydown|keyup)\s*=/gi) || [];
+      expect(inline).toEqual([]);
+
+      const before = await page.evaluate(() => {
+        const els = [...document.querySelectorAll('[data-action]')];
+        return {
+          total: els.length,
+          unresolved: [...new Set(els.map(el => el.dataset.action))]
+            .filter(a => typeof window.ACTIONS[a] !== 'function'),
+        };
+      });
+      expect(before.total).toBeGreaterThan(50);
+      expect(before.unresolved).toEqual([]);
+
+      await openMultiPhasePlan(page);
+
+      const after = await page.evaluate(() => {
+        const els = [...document.querySelectorAll('[data-action]')];
+        return {
+          total: els.length,
+          unresolved: [...new Set(els.map(el => el.dataset.action))]
+            .filter(a => typeof window.ACTIONS[a] !== 'function'),
+        };
+      });
+      expect(after.total).toBeGreaterThan(before.total);
+      expect(after.unresolved).toEqual([]);
+    });
+
+    test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
+      await openChecklist(page);
+
+      // touching nothing leaves the switch at the first question, as before
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'))
+        .toContainText('What do you need to update on your documents?');
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await page.locator('input[name="chkRegion"][value="s"]').check();
+      await page.locator('#chkDeedPoll').check();
+      await page.locator('#chkHMRC').check();
+      await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').check();
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      const resumed = await page.evaluate(() => questions[window.step].id);
+      const furthest = await page.evaluate(() => questions.findIndex(q => q.id === 'driving'));
+      expect(await page.evaluate(() => window.step)).toBeGreaterThan(furthest);
+      expect(['passport', 'visa']).toContain(resumed);
+
+      // Back still walks through the questions the checklist already answered
+      await page.locator('#wizardBackBtn').click();
+      expect(await page.evaluate(() => questions[window.step].id)).toBe('driving');
+    });
+
+    test('148. Every checklist input maps back to the question that owns it', async ({ page }) => {
+      await openChecklist(page);
+      const result = await page.evaluate(() => {
+        const gates = ['checklistAgeConfirm', 'checklistDisclaimerConfirm', 'ageConfirmShared', 'disclaimerConfirmShared'];
+        const inputs = [...document.querySelectorAll('#checklistView input')].filter(el => !gates.includes(el.id));
+        return {
+          unmapped: inputs.filter(el => !window.questionIdForInput(el)).map(el => el.id || el.name),
+          unknownIds: inputs.map(el => window.questionIdForInput(el))
+            .filter(id => id && !questions.some(q => q.id === id)),
+          namesWithoutInput: questions.filter(q => q.chkName)
+            .filter(q => !document.querySelector(`#checklistView input[name="${q.chkName}"]`))
+            .map(q => q.id),
+        };
+      });
+      expect(result.unmapped).toEqual([]);
+      expect(result.unknownIds).toEqual([]);
+      expect(result.namesWithoutInput).toEqual([]);
+    });
+
+    test('149. A question note sits below its question, never beside it', async ({ page }) => {
+      await openChecklist(page);
+
+      // .chk-q--flex laid its children out in a row, so a note landed next to the question
+      expect(await page.locator('.chk-q--flex').count()).toBe(0);
+
+      const boxes = await page.locator('#wrapVisa').evaluate(el => {
+        const p = el.querySelector('.chk-q');
+        const note = p.querySelector('.note');
+        const r = document.createRange();
+        r.setStart(p.firstChild, 0);
+        r.setEnd(p.firstChild, p.firstChild.length);
+        const q = r.getBoundingClientRect();
+        const n = note.getBoundingClientRect();
+        return { qBottom: q.bottom, qLeft: q.left, nTop: n.top, nLeft: n.left };
+      });
+      expect(boxes.nTop).toBeGreaterThanOrEqual(boxes.qBottom - 1);
+      expect(Math.abs(boxes.nLeft - boxes.qLeft)).toBeLessThan(2);
+    });
+
+    test('150. Editing a plan after a reload does not reopen the age gate', async ({ page }) => {
+      await openWizard(page);
+      for (let i = 0; i < 30; i++) {
+        if (await page.locator('#planView').isVisible()) break;
+        await wizardNext(page);
+      }
+      await expect(page.locator('#planView')).toBeVisible();
+      const inSession = await page.evaluate(() => window.step);
+
+      await page.reload();
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await page.getByRole('button', { name: /Edit plan/ }).click();
+
+      const landed = await page.evaluate(() => questions[window.step].id);
+      expect(landed).not.toBe('age');
+      expect(landed).not.toBe('disclaimer');
+      await expect(page.locator('#wizardStepFieldset legend'))
+        .toContainText('What do you need to update on your documents?');
+
+      // every question it can land on is one that currently applies
+      expect(await page.evaluate(() => {
+        const q = questions[window.step];
+        return !q.cond || q.cond();
+      })).toBe(true);
+      expect(inSession).toBeGreaterThan(0);
+    });
+
+    test('151. The Irish passport route only appears when asked for', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+      await expect(page.locator('#wrapIrishRoute')).toBeVisible();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
+      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(0);
+      await expect(page.locator('#planContent')).not.toContainText('Legal gender recognition (Irish passport)');
+
+      await page.getByRole('button', { name: /Edit plan/ }).click();
+      await page.locator('#chkIrishRoute').check();
+      await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
+      await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
+
+      // and it still splits into two phases when a GRC is wanted as well
+      await page.getByRole('button', { name: /Edit plan/ }).click();
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
+      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final_grc"]')).toHaveCount(1);
+    });
+
+    test('152. Declining the Irish route leaves the other Northern Ireland content alone', async ({ page }) => {
+      // bornInNI also selects the GRONI birth-certificate variant and its cost line,
+      // which must not be gated on the Irish route question
+      await openChecklist(page);
+      await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
+      await page.locator('#chkBirthCertName').check();
+      await expect(page.locator('#chkIrishRoute')).not.toBeChecked();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      await expect(page.locator('#planContent')).toContainText('Birth certificate name recording (GRONI)');
+      await expect(page.locator('#planContent')).toContainText('GRONI name recording');
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
+    });
+
+    test('153. A shared link round-trips the Irish route answer, and an older link decodes to no', async ({ page }) => {
+      const base = {reg:"ni",bri:"ni",goal:"gender",nonUK:false,emp:"no",dbs:false,stu:false,dp:true,visa:false,
+                    nhs:false,dl:"none",hmrc:false,pass:"none",grc:false,newgp:false,dwp:false,bcn:false,bc:false,srv:""};
+      const open = async (data) => {
+        await gotoUntil(page, await getShareUrl(page, data), () => page.evaluate(() =>
+          ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+        // a shared link asks for the gates once; a second one in the same browser does not
+        if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+        await expect(page.locator('#planView')).toBeVisible();
+      };
+
+      await open({ ...base, irish: true });
+      expect(await page.evaluate(() => wizardState.irishRoute)).toBe('yes');
+      await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
+
+      // a link made before the field existed carries no answer, so it decodes to no
+      await open(base);
+      expect(await page.evaluate(() => wizardState.irishRoute)).toBe('no');
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
+    });
+
+    test('154. Every community advice marker opens a paragraph rather than floating mid-sentence', async ({ page }) => {
+      const floating = await page.evaluate(() => {
+        const all = { ...window.PLAN_ITEMS, ...window.SERVICES };
+        const out = [];
+        const walk = (node, path) => {
+          if (typeof node === 'string') {
+            const re = /(.{0,3})<span class="community-note"/g;
+            let m;
+            while ((m = re.exec(node))) if (!m[1].endsWith('<p>') && !m[1].endsWith('> ')) out.push(path);
+          } else if (node && typeof node === 'object') {
+            Object.entries(node).forEach(([k, v]) => walk(v, path + '.' + k));
+          }
+        };
+        walk(all, '');
+        return [...new Set(out)];
+      });
+      expect(floating).toEqual([]);
+    });
+
+    test('155. The progress tip sits below both top panels, directly above the first step', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const order = await page.evaluate(() =>
+        [...document.getElementById('planContent').children]
+          .map(el => el.id || (el.dataset.phaseKey ? 'phase:' + el.dataset.phaseKey : el.tagName)));
+      expect(order.slice(0, 3)).toEqual(['planSummaryBox', 'titlesInfoBox', 'trackTipBox']);
+      expect(order[3]).toMatch(/^phase:/);
+
+      // the tip carries class="phase" but holds no steps, so nothing counts it as one
+      expect(await page.evaluate(() =>
+        document.getElementById('trackTipBox').querySelectorAll('.step-state-btn').length)).toBe(0);
+
+      // dismissing the titles panel leaves the tip adjacent to the summary
+      await page.locator('#titlesInfoBox summary').click();
+      await page.locator('#titlesInfoBox').getByRole('button', { name: "Don't show this again" }).click();
+      const after = await page.evaluate(() =>
+        [...document.getElementById('planContent').children].map(el => el.id).filter(Boolean));
+      expect(after).toEqual(['planSummaryBox', 'trackTipBox']);
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
