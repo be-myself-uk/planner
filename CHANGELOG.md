@@ -13,48 +13,6 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [Unreleased]
-
-### Information
-
-- The two questions about your visa or eVisa are now one. It asks "Do you have a visa or eVisa?" with the same three answers used for your driving licence and passport, instead of asking separately whether you have one and whether it needs updating.
-- The question about whether you have a deed poll or statutory declaration is now asked if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one of these as evidence for a gender marker change.
-- Corrected the Irish passport step, which said people born in Northern Ireland can claim Irish citizenship. Since 1 January 2005 this depends on your parents: one must be a British or Irish citizen, or have lived on the island of Ireland for three of the four years before your birth.
-- Added State Pension to the Northern Ireland benefits question and step. The Department for Communities administers State Pension in Northern Ireland alongside Universal Credit, Personal Independence Payment (PIP), and Employment Support Allowance (ESA). The step now also says to tell the Northern Ireland Pension Centre about a name change if you get State Pension or Pension Credit, as your local Jobs & Benefits Office does not handle those.
-
-### Wording
-
-- Reworded several questions so they say why they are being asked and drop wording most people do not need. The deed poll, birth registration, visa, NHS record, and HMRC notes are all shorter.
-- The visa question's first answer now reads "I do not have one" rather than "No", matching the driving licence and passport questions. The employment question's "No" now reads "No, I do not have any to update".
-- Corrected the benefits question, which named "PIP" in the checklist but spelled out "Personal Independence Payment (PIP)" in the step-by-step view. It is now spelled out in both. The Northern Ireland version also said updating your details while claiming benefits can sometimes cause delays. No source supports that, so it now says the same as the rest of the UK: a change of name or gender can affect how some benefits are administered.
-
-### Code
-
-- Printing your plan, or saving it as a PDF, now includes the "more information" for each step.
-- The question counter in the step-by-step view now only counts up. The total can still fall once you say what you need to update, because that removes questions that no longer apply.
-- The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
-- Fixed the checklist naming a button that was not on the page after switching views.
-- The step-by-step questions now start with what you need to update, since that answer decides which later questions apply. Where your birth was registered is asked straight after where you live.
-- The checklist now runs in the same order: what you need to update, then your current documents, then your situation, then long-term goals. It previously asked about a Gender Recognition Certificate, which takes years, before asking whether you have a deed poll, which can be done in a day.
-- Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
-- The step-by-step questions now ask about a Gender Recognition Certificate before asking about your birth certificate, since you cannot change the gender on a birth certificate without one.
-- Editing your answers after returning to a saved plan no longer starts by asking your age again.
-- The Irish passport route is now shown only if you ask for it. If your birth was registered in Northern Ireland and you are changing your gender marker, there is a new question for it. It used to appear for everyone born in Northern Ireland, even people who had said they did not want a Gender Recognition Certificate. It is not an alternative to one: it gives you a passport in your correct name and gender but does not change your UK records.
-
-### Layout
-
-- Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
-- If you were born in Northern Ireland and are pursuing both the Irish passport route and a UK Gender Recognition Certificate, these are now two separate steps rather than two sections of one. Each has its own time estimate, since they differ, and each can be moved around your plan on its own.
-- The checklist now shows which section you are in, as "Section 2 of 4: Your current documents", with a bar in the toolbar. It is a long page and previously gave no sense of where you were or how much was left.
-- Darkened the community advice marker so it meets contrast guidelines, and shortened what screen readers announce for it. It is no longer a keyboard stop, so it does not interrupt tabbing through a plan.
-- The checklist's two long-term sections are now one, called "Long-term goals". The birth certificate name question sat in a section of its own that appeared above the Gender Recognition Certificate question.
-- Added the missing gap between the first two questions on the checklist, which sat flush against each other.
-- Toolbar buttons are now at least 44 pixels on a phone, including the quick exit button, so they are easier to hit.
-- The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
-- The checklist's section indicator now reaches the last section while there is still page left to scroll, rather than only at the very bottom.
-- Fixed the visa question on the checklist, where the explanation sat beside the question instead of underneath it, squashing both into narrow columns.
-- The community advice marker now starts its own paragraph instead of sitting mid-sentence, so it is clear which part of a step it applies to.
-
 ## [September 2026]
 
 - **⚠️ NHS England has brought in a single national waiting list for adult gender services, held by the National Adult Gender Referral Support Service. If you are waiting for a first appointment in England, that service holds your referral separately from your GP record, and you need to tell it about a change of name or other details yourself. Your place on the list is set by your original referral date and does not change when you update your details.**
@@ -88,6 +46,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Removed references pointing at other steps that may not be in your plan. The electoral register and mobile contract items pointed at the credit reference agencies item, which is only there if you chose it.
 - Added a "Sources" link to the support and feedback panel. The list of official sources behind the guidance was previously only reachable through GitHub.
 - Reviewed every source behind the planner's guidance, both GOV.UK and others. None of the changes found affected what the planner says. Two sources could not be reached and are due another look next time.
+- The two questions about your visa or eVisa are now one, with the same three answers used for the driving licence and passport.
+- You are now asked whether you have a deed poll or statutory declaration even if you are only changing your gender marker. The DVLA, the DVA, and the NHS each accept one as evidence for a gender marker change.
+- Corrected the Irish passport step, which said anyone born in Northern Ireland can claim Irish citizenship. Since 1 January 2005 this depends on your parents: one must be a British or Irish citizen, or have lived on the island of Ireland for three of the four years before your birth.
+- Added State Pension to the Northern Ireland benefits question and step, which the Department for Communities administers alongside Universal Credit, Personal Independence Payment (PIP), and Employment Support Allowance (ESA). Tell the Northern Ireland Pension Centre about a name change if you get State Pension or Pension Credit, as your local Jobs & Benefits Office does not handle those.
 
 ### Wording
 
@@ -96,6 +58,8 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Rewrote the page title and the description shown in search results and link previews, so the planner can be found by people searching for it.
 - Spelled out several abbreviations the first time they appear in a step, rather than assuming you had read a different step first: CHI, HSCNI, PCSE, TENI, SAAS, and the GMC and HCPC medical regulators.
 - Split the driving licence step's list of eight acceptable documents into two short lists instead of one long sentence.
+- Removed a claim on the Northern Ireland benefits step that updating your details while claiming can cause delays. No source supports it, so it now says the same as the rest of the UK: a change of name or gender can affect how some benefits are administered.
+- Shortened the notes under the deed poll, birth registration, visa, NHS record, and HMRC questions, and made them say why each is being asked.
 
 ### Code
 
@@ -106,7 +70,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Added a third employment answer, "I've already updated my records". Choosing it still asks about DBS, AccessNI, or Disclosure Scotland, since that depends on your role rather than on your employer's records.
 - Added Wales as its own option for both "Where do you live?" and "Where was your birth registered?", instead of grouping it with England.
 - Added an "All of these" option to the services question, so you do not have to tick each one.
-- Split the last step into separate sections if you were born in Northern Ireland and are pursuing both a UK Gender Recognition Certificate and an Irish passport, instead of one long block.
+- If you were born in Northern Ireland and are pursuing both the Irish passport route and a UK Gender Recognition Certificate, these are now two separate steps rather than one long block. Each has its own time estimate, since they differ, and each can be moved around your plan on its own.
 - Made the "Estimated time" and "Approximate costs" summary collapsible, with a "Don't show this again" option, matching the "Did you know about titles?" note.
 - Added a countdown to the restart and reset-progress buttons, so you can see the warning that a screen reader already announced.
 - Added a short, dismissible note explaining that later checklist sections change based on your region and goal, so a section disappearing is not a fault.
@@ -116,13 +80,24 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Fixed the "?" keyboard shortcut for the help dialog not working while a checkbox or radio button had focus.
 - Fixed the toolbar's arrow-key order on narrow screens, where a button on the second row could be reached before one still on the first.
 - Fixed the checklist not showing a group's tick straight away when restored from a saved plan or a shared link.
+- Printing your plan, or saving it as a PDF, now includes the "more information" for each step.
+- The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
+- Reordered the questions in both views. What you need to update comes first, since that answer decides which later questions apply, and a Gender Recognition Certificate is asked about before your birth certificate, which you cannot change without one. The checklist previously asked about a GRC, which takes years, before a deed poll, which can be done in a day.
+- Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
+- Editing your answers after returning to a saved plan no longer starts by asking your age again.
+- The Irish passport route is now shown only if you ask for it, rather than to everyone whose birth was registered in Northern Ireland. It is not an alternative to a Gender Recognition Certificate: it gives you a passport in your correct name and gender, but does not change your UK records.
 
 ### Layout
 
 - Increased the spacing between steps within a group, so a group with several steps reads less cramped.
 - Fixed a step's title, on narrow screens, wrapping onto several lines with its difficulty and cost badges sitting across them. The title now gets its own room, with badges moving underneath when there is no space beside it.
-- Fixed the Irish passport and UK GRC routes, shown as two boxes side by side, having no spacing around their contents.
 - Improved the colour contrast of greyed-out checklist text.
+- Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
+- The checklist now shows which section you are in, as "Section 2 of 4: Your current documents", with a bar in the toolbar. It is a long page and previously gave no sense of where you were or how much was left.
+- The checklist's two long-term sections are now one, called "Long-term goals".
+- Darkened the community advice marker so it meets contrast guidelines, shortened what screen readers announce for it, and took it out of the tab order so it does not interrupt tabbing through a plan. It now starts its own paragraph, making clear which part of a step it applies to.
+- Toolbar buttons are now at least 44 pixels on a phone, including the quick exit button, so they are easier to hit.
+- The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
 
 ### Infrastructure
 
