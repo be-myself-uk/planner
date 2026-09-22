@@ -291,9 +291,11 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
     <p>Anyone in the UK aged 16 or over who wants to update their legal documents to match their gender identity. This includes people who only want a name change, only a gender marker change, or both. There is also guidance for people from outside the UK who hold a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
-    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button or the Esc key at any time to instantly leave the page. For full details, see <a href="#" data-action="openFromDialog" data-arg="dlgPrivacy">Privacy</a>.</p>
+    <p>Yes. Nothing you enter is ever sent to a server or stored outside your own device. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button at any time to instantly leave the page, or press Esc twice within a second. For full details, see <a href="#" data-action="openFromDialog" data-arg="dlgPrivacy">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Can I use this offline?</h3>
-    <p>Yes. This is a single web page with no external files, so you can save it to your device (usually Ctrl+S or File &gt; Save page as) and open it later without an internet connection. If you already have an action plan, use the 🔗 Copy link button to preserve it for use offline. When you open your offline copy of the website, you will need to edit the URL (everything from "?p=" onwards).</p>
+    <p><strong>Yes.</strong> This is a single web page with no external files, so you can save it to your device (usually Ctrl+S, or File &gt; Save page as &gt; <strong>HTML only</strong>) and use it offline. Alternatively, use the download button below.</p>
+    <p>If you already have an action plan, use the 🔗 Copy link button on the toolbar to preserve it for use offline or on other devices. For offline use, open your saved .html file in your browser and paste your copied link onto the end of the address, removing "https://bemyself.uk/" so that you keep everything after it.</p>
+    <p id="offlineDownloadWrap"><a class="contact-btn" id="offlineDownloadBtn" href="/" download="bemyself.html">⬇️ Download this page</a></p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
     <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner builds a step-by-step action plan with links to the relevant official pages.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
@@ -330,6 +332,7 @@
       <span class="legend-tb-icon">↺</span><span><strong>New plan:</strong> starts over completely. ⚠️ This deletes your plan and all progress and cannot be undone.</span>
       <span class="legend-tb-icon">✏️</span><span><strong>Edit plan:</strong> go back and change your answers, then regenerate the plan.</span>
       <span class="legend-tb-icon">🧹</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
+      <span class="legend-tb-icon">🔀</span><span><strong>Reset order:</strong> appears once you have moved something, and puts the steps back in their suggested order.</span>
       <span class="legend-tb-icon">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
       <span class="legend-tb-icon">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
       <span class="legend-tb-icon">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
@@ -357,6 +360,8 @@
       <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="2" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✓</span></button><span style="font-size:0.85em;">Done</span></span>
       <span style="display:inline-flex;align-items:center;gap:4px;"><button class="step-state-btn" data-state="3" tabindex="-1" aria-hidden="true" style="cursor:default;pointer-events:none;"><span>✕</span></button><span style="font-size:0.85em;">Not needed</span></span>
     </div>
+    <p style="margin:12px 0 8px 0;font-size:0.9em;color:var(--text-muted);">Changing the order</p>
+    <p style="margin:0 0 12px 0;">Each step and each group has ▲ and ▼ buttons to move it, and a ⠿ handle you can drag. Steps stay inside their own group. Your order is saved on this device and carries over in a shared link, and the 🔀 Reset order button puts it back.</p>
     <p style="margin:12px 0 8px 0;font-size:0.9em;color:var(--text-muted);">Community advice</p>
     <p style="margin:0 0 12px 0;">Some guidance is marked with <span class="community-note" role="img" aria-label="Community advice marker">i</span>. This marks information that comes from the shared experiences of the transgender and non-binary communities rather than from an official source. Hover over the symbol, or focus it with the keyboard, to read this reminder. What happens in your case may differ. Time estimates carry the same marker.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Keyboard shortcuts</h3>
@@ -369,7 +374,7 @@
         <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate toolbar button</td></tr>
         <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
         <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this dialog</td></tr>
-        <tr><td><kbd>Esc</kbd></td><td>Quick exit: leaves the page immediately</td></tr>
+        <tr><td><kbd>Esc</kbd> <kbd>Esc</kbd></td><td>Quick exit: press twice within a second to leave the page</td></tr>
         <tr><td><kbd>?</kbd></td><td>Open usage guide</td></tr>
       </tbody>
     </table>
@@ -3205,6 +3210,8 @@ window.onload = () => {
     const _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const _lr = gel('footerLastReviewed'); if (_lr) _lr.textContent = _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _cy = gel('schemaCopyYear'); if (_cy) _cy.textContent = _d.getUTCFullYear();
+    // a saved copy is opened from the filesystem, where there is nothing to download
+    if (location.protocol === 'file:') gel('offlineDownloadWrap')?.classList.add('hidden');
   if (window.matchMedia)
     window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', e => { if (!ssg('theme')) { document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); updateThemeIcon(); } });
   if (ssg('ageConfirmed') === 'true') {

@@ -2355,6 +2355,35 @@ test.describe('Be myself Planner', () => {
       expect(after).toEqual(['planSummaryBox', 'trackTipBox']);
     });
 
+    test('156. The usage guide and About dialog describe what the site actually does', async ({ page }) => {
+      await page.getByRole('button', { name: 'Usage guide' }).click();
+      const guide = page.locator('#dlgUsage');
+
+      // every toolbar button that can appear has a legend entry
+      await expect(guide).toContainText('Reset order');
+      await expect(guide).toContainText('Reset progress');
+      await expect(guide).toContainText('Focus mode');
+      await expect(guide).toContainText('Copy link');
+
+      // reordering exists on every plan, so the guide has to mention it
+      await expect(guide).toContainText('Reset order');
+      await expect(guide.locator('text=/▲ and ▼/')).toHaveCount(1);
+
+      // Esc has needed two presses since the quick-exit change
+      await expect(guide).toContainText('press twice within a second');
+      await expect(guide).not.toContainText('Quick exit: leaves the page immediately');
+
+      await page.locator('#dlgUsage').getByRole('button', { name: 'Close' }).click();
+      await page.getByRole('button', { name: 'What is this?' }).click();
+      const about = page.locator('#dlgAbout');
+      const dl = about.locator('#offlineDownloadBtn');
+      await expect(dl).toHaveAttribute('download', 'bemyself.html');
+      await expect(dl).toHaveAttribute('href', '/');
+      // a saved copy is opened from the filesystem, where that link goes nowhere
+      expect(await page.evaluate(() => location.protocol)).toBe('file:');
+      await expect(dl).toBeHidden();
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
