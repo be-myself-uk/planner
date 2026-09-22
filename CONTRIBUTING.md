@@ -131,11 +131,11 @@ The entire block is one long minified line, so search for a selector or property
 
 All styling lives here: no separate stylesheet, no CSS framework. Organised loosely by component: toolbar/icon buttons, dialogs, phase cards, checklist/wizard question cards, badges (difficulty/cost), footer, print styles (`@media print`), and responsive breakpoints (`@media (max-width:600px)` and `400px`) for mobile. Dark mode is done via CSS custom properties (`--bg-card`, `--text`, etc.) swapped by a `data-theme` attribute on `<html>`, not a separate stylesheet.
 
-### 3. HTML body (lines ~30 to 490)
+### 3. HTML body (lines ~30 to ~500)
 
 The page has a small number of top-level "views" that are shown and hidden by JavaScript (never actually navigated to as separate pages):
 
-- **`#startView`**: the landing screen (hero text, "Start now" / checklist link)
+- **`#startView`**: the landing screen (hero text, "Start here" / checklist link)
 - **`#welcomeBackView`**: shown instead of the start screen if a saved plan already exists
 - **`#wizardView`**: the step-by-step question flow
 - **`#checklistView`**: the "everything on one page" alternative to the wizard
@@ -143,7 +143,7 @@ The page has a small number of top-level "views" that are shown and hidden by Ja
 
 Alongside the views are five `<dialog>` elements (native HTML `<dialog>`, opened via `.showModal()`): `dlgAbout`, `dlgUsage`, `dlgPrivacy`, `dlgSupport`, `dlgDisclaimer`, all linked from the footer, plus a toolbar `?` button that opens `dlgUsage` directly.
 
-### 4. JavaScript (lines ~492 to 3335, inside one `<script>` block, no modules or imports)
+### 4. JavaScript (from line ~500 to the end of the file, inside one `<script>` block, no modules or imports)
 
 This is the entire application logic. Key pieces, roughly in the order they appear:
 
@@ -157,6 +157,8 @@ This is the entire application logic. Key pieces, roughly in the order they appe
   `planItemRegion()` falls back to a `PLAN_ITEMS` entry's `default` variant for any region key it does not recognise, so Wales needs its own `regions.wales` entry only where it actually differs from England. Today that is just the gender-service waiting-list note in `buildHealthItems()`. Nothing keys off `birthRegion === REGION.W`, so a Wales-born person gets the same birth certificate and GRC content as an England-born one. NI-born and Scotland-born get their own content by comparing against `REGION.NI` and `REGION.S`; everything else falls through unchanged.
 
   Note that the `PLAN_ITEMS.regions` keys (`ni`, `scot`, `wales`, `default`) are a separate, human-readable naming convention for content lookup. They are not tied to `REGION`'s own short values.
+
+  Northern Ireland has two separate derived flags, and conflating them breaks content. `p.bornInNI` is true for anyone whose birth was registered there, and gates the GRONI birth-certificate-name variant and its cost line. `p.showIrishRoute` additionally requires a gender goal and a yes to the `irishRoute` question, and gates the Irish passport route alone. Someone who declines that route must keep the GRONI content; test 152 exists to catch exactly that regression.
 
   "Outside the UK" is not a fifth region. It is tracked as a separate flag (`regionOutsideUK`, `birthOutsideUK`) alongside a region that falls back to `E`, because most of the regional logic only needs to tell England, Wales, Scotland and NI apart. The flags are checked directly wherever UK-specific content has to be skipped: `planParamsFromWizard()` and `updateLocks()` gate off the NHS/GP, DBS, DWP, Council Tax and electoral register content, the `nhs`, `newGP`, `dbs` and `dwp` questions use them in their `cond`, and a flag can select an `out` variant on a `PLAN_ITEMS` entry (see `birthcert`) the same way `ni` and `scot` do.
 - **`SERVICES`**: the single source of truth for the "services to update" checklist item (banks, insurance, DBS/Disclosure Scotland/AccessNI, credit reference agencies, and so on). Each entry is `{ key, id, label, detail }`, or `{ key, id, label, detailFn(p) }` when the guidance differs by region (see the Council Tax, electoral register, and V5C entries for examples). The wizard's services question, the checklist's checkboxes, and the generated plan's service list all derive from this one array. Adding a new service means adding a checkbox in `#wrapChkServices` plus one entry here.
@@ -173,7 +175,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 - Progress on individual plan steps is stored separately, per step, as `st_<trackId>` keys directly in `localStorage` (via `getStepState`/`setStepState`), not inside `wizardState`, since progress needs to survive independently of the answers that generated the plan.
 
 **The wizard**
-- `questions`: an ordered array of question definitions (`id`, `q` for the question text, `cond` for a function deciding whether to show it based on `wizardState`, `o` for the answer options, plus `wrap`, `chk` and `chkName` naming the question's checklist container, checkbox and radio-group name where it has them). `renderWizard()` draws the current step; `nextWizard()`/`prevWizard()` walk forward and back through only the questions whose `cond` currently passes. `updateLocks()` hides the matching `wrap` in the checklist using the same `cond`, so the two views cannot disagree about which questions apply. `questionIdForInput()` maps a checklist input back to the question that owns it, which is how `chkTouched` records what has been answered so that switching to the step-by-step view resumes rather than starting over.
+- `questions`: an ordered array of question definitions (`id`, `q` for the question text, `cond` for a function deciding whether to show it based on `wizardState`, `o` for the answer options, plus `wrap`, `chk` and `chkName` naming the question's checklist container, checkbox and radio-group name where it has them). `irishRoute` is the only question gated on where a birth was registered rather than on the goal or where someone lives, and it is what keeps the Irish passport route out of plans that did not ask for it. `renderWizard()` draws the current step; `nextWizard()`/`prevWizard()` walk forward and back through only the questions whose `cond` currently passes. `updateLocks()` hides the matching `wrap` in the checklist using the same `cond`, so the two views cannot disagree about which questions apply. `questionIdForInput()` maps a checklist input back to the question that owns it, which is how `chkTouched` records what has been answered so that switching to the step-by-step view resumes rather than starting over.
 - `NOTES`: the explanatory sentences that sit under a question. Both views read them from here, the wizard by interpolating into the question text and the checklist through `<em class="note" data-note="key">` slots filled at startup, so the copy has one home.
 
 **The checklist**
@@ -187,6 +189,11 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 **Progress tracking**
 - `getStepState()` / `setStepState()` / `applyStepState()`: the generic four-state (not started, in progress, done, not needed) tracker used by every plan item and sub-item, keyed only by a track ID string. `syncSvcParent()` / `syncSvcChildren()` handle the parent-checkbox-reflects-children pattern (used by both the services list and the GRC evidence sub-checklists). These are generalised to work for any parent/child group via a `data-svc-parent` attribute, not hardcoded to one specific group.
 - `cycleStepState()`: the click handler that advances a step through its four states.
+
+**Reordering the plan**
+- `moveOrderable()`: the up/down buttons on every step and phase. Steps cannot leave the phase they belong to, so a phase's title and time estimate always describe what it actually contains; whole phases move freely.
+- Pointer drag handling on `.item-drag-handle`, with a movement threshold so a short wiggle does not reorder anything.
+- `computePlanFingerprint()` / `applyStoredOrderIfValid()`: a custom order is kept in the `planOrder` localStorage key and travels in the shared link. It is stored against a fingerprint of the plan's shape, so if answers change and the plan no longer holds the same steps, the order is discarded rather than applied to the wrong things, and the user is told. `refreshOrderControls()` hides the move controls where there is nothing to move.
 
 **Sharing and persistence**
 - `encodeState()` / `decodeState()` / `copyShareableLink()`: encode the current answers and progress into the `?p=...` shareable link.
