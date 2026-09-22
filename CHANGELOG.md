@@ -2,7 +2,7 @@
 
 All notable changes to [Be myself](https://bemyself.uk) are recorded here, newest first.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project has no version numbers, so entries are grouped by the month the work landed.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project has no version numbers, so entries are grouped by the month they went live on the site. Work that is finished but not yet released sits under `[Unreleased]` until it goes live.
 
 Small fixes and one-off wording tweaks are left out. Changes are grouped under these headings:
 
@@ -12,6 +12,19 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Code**: how the website works
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
+
+## [Unreleased]
+
+### Code
+
+- A printed or saved plan now lists each link on its own line with its full web address after it, since you cannot click a link on paper. A step heading is no longer left stranded at the foot of a page, and a single step is not split across two. The tip about the status boxes and the "Don't show this again" button no longer print either.
+
+### Layout
+
+- In the services list, a step marked done is no longer crossed out. Crossing out now means "not needed" everywhere in a plan, as it already did for every other step.
+- Reordered the questions in the "What is this?" panel so they follow how you use the planner: what it is, who it is for, privacy, how it works, then keeping your plan. Saving and offline use were four questions apart and are now together at the end.
+- Added a download button to the "What is this?" panel, so you can save the planner for offline use without a "Save page as" menu. The offline instructions now also explain how to restore a saved plan from a copied link.
+- The usage guide was missing the 🔀 Reset order button and said nothing about moving steps around, and its keyboard list still said one press of Esc leaves the site. It now needs two presses within a second.
 
 ## [September 2026]
 
@@ -81,7 +94,6 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Fixed the toolbar's arrow-key order on narrow screens, where a button on the second row could be reached before one still on the first.
 - Fixed the checklist not showing a group's tick straight away when restored from a saved plan or a shared link.
 - Printing your plan, or saving it as a PDF, now includes the "more information" for each step.
-- A printed or saved plan now lists each link on its own line with its full web address after it, since you cannot click a link on paper. A step heading is no longer left stranded at the foot of a page, and a single step is not split across two. The tip about the status boxes and the "Don't show this again" button no longer print either.
 - The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
 - Reordered the questions in both views. What you need to update comes first, since that answer decides which later questions apply, and a Gender Recognition Certificate is asked about before your birth certificate, which you cannot change without one. The checklist previously asked about a GRC, which takes years, before a deed poll, which can be done in a day.
 - Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
@@ -93,16 +105,12 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Increased the spacing between steps within a group, so a group with several steps reads less cramped.
 - Fixed a step's title, on narrow screens, wrapping onto several lines with its difficulty and cost badges sitting across them. The title now gets its own room, with badges moving underneath when there is no space beside it.
 - Improved the colour contrast of greyed-out checklist text.
-- In the services list, a step marked done is no longer crossed out. Crossing out now means "not needed" everywhere in a plan, as it already did for every other step.
 - Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
 - The checklist now shows which section you are in, as "Section 2 of 4: Your current documents", with a bar in the toolbar. It is a long page and previously gave no sense of where you were or how much was left.
 - The checklist's two long-term sections are now one, called "Long-term goals".
 - Darkened the community advice marker so it meets contrast guidelines, shortened what screen readers announce for it, and took it out of the tab order so it does not interrupt tabbing through a plan. It now starts its own paragraph, making clear which part of a step it applies to.
 - Toolbar buttons are now at least 44 pixels on a phone, including the quick exit button, so they are easier to hit.
 - The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
-- Reordered the questions in the "What is this?" panel so they follow how you use the planner: what it is, who it is for, privacy, how it works, then keeping your plan. Saving and offline use were four questions apart and are now together at the end.
-- Added a download button to the "What is this?" panel, so you can save the planner for offline use without a "Save page as" menu. The offline instructions now also explain how to restore a saved plan from a copied link.
-- The usage guide was missing the 🔀 Reset order button and said nothing about moving steps around, and its keyboard list still said one press of Esc leaves the site. It now needs two presses within a second.
 
 ### Infrastructure
 
