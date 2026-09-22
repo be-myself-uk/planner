@@ -32,7 +32,9 @@ Yes. Nothing you enter is sent to a server or stored anywhere outside your own d
 
 ### Can I use this offline?
 
-Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button first to keep it. When you open your offline copy, you will need to paste everything from `?p=` onwards onto the end of the address.
+Yes. It is a single web page with no external files, so you can save it to your device (usually Ctrl+S, or File > Save page as > HTML only) and use it offline. There is also a download button in the "What is this?" panel.
+
+If you already have an action plan, use the Copy link button first to keep it. To use that plan offline, open your saved `.html` file in your browser and paste the copied link onto the end of the address, removing `https://bemyself.uk/` so that you keep everything after it.
 
 ### Step-by-step or checklist?
 
