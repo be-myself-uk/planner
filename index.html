@@ -509,7 +509,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1789732871;
+const SCHEMA_VERSION = 1789916245;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { E:'e', W:'w', S:'s', NI:'ni' };
 const REGION_LEGACY = { ew: REGION.E, wales: REGION.W, scot: REGION.S };
