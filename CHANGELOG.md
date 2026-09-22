@@ -81,6 +81,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Fixed the toolbar's arrow-key order on narrow screens, where a button on the second row could be reached before one still on the first.
 - Fixed the checklist not showing a group's tick straight away when restored from a saved plan or a shared link.
 - Printing your plan, or saving it as a PDF, now includes the "more information" for each step.
+- A printed or saved plan now shows the full web address after each link, since you cannot click a link on paper. The tip about the status boxes and the "Don't show this again" button no longer print either.
 - The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
 - Reordered the questions in both views. What you need to update comes first, since that answer decides which later questions apply, and a Gender Recognition Certificate is asked about before your birth certificate, which you cannot change without one. The checklist previously asked about a GRC, which takes years, before a deed poll, which can be done in a day.
 - Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
@@ -92,6 +93,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Increased the spacing between steps within a group, so a group with several steps reads less cramped.
 - Fixed a step's title, on narrow screens, wrapping onto several lines with its difficulty and cost badges sitting across them. The title now gets its own room, with badges moving underneath when there is no space beside it.
 - Improved the colour contrast of greyed-out checklist text.
+- In the services list, a step marked done is no longer crossed out. Crossing out now means "not needed" everywhere in a plan, as it already did for every other step.
 - Added a short, dismissible note at the top of a new plan explaining that the box beside each step marks it as in progress, done, or not needed.
 - The checklist now shows which section you are in, as "Section 2 of 4: Your current documents", with a bar in the toolbar. It is a long page and previously gave no sense of where you were or how much was left.
 - The checklist's two long-term sections are now one, called "Long-term goals".
