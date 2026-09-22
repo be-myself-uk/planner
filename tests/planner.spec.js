@@ -2421,6 +2421,72 @@ test.describe('Be myself Planner', () => {
       expect(fits).toBe(true);
     });
 
+    test('158. Strikethrough means not needed, in the services list as everywhere else', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkSvcAll').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      const btns = page.locator('.step-state-btn[data-svc-parent]');
+      const detailOf = async (i) => page.evaluate((n) => {
+        const btn = document.querySelectorAll('.step-state-btn[data-svc-parent]')[n];
+        const d = document.getElementById('svc_detail_' + btn.dataset.trackId.replace('trk_svc_', ''));
+        return { state: btn.dataset.state, strike: d.style.textDecoration };
+      }, i);
+
+      await btns.nth(0).click();
+      await btns.nth(0).click();
+      expect(await detailOf(0)).toEqual({ state: '2', strike: 'none' });   // done
+
+      await btns.nth(0).click();
+      expect(await detailOf(0)).toEqual({ state: '3', strike: 'line-through' });  // not needed
+    });
+
+    test('159. Printing shows where each link goes, since paper cannot be clicked', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const first = page.locator('#planContent .links').first();
+      const href = await first.getAttribute('href');
+
+      await page.emulateMedia({ media: 'screen' });
+      expect(await first.evaluate(a => getComputedStyle(a, '::after').content))
+        .toContain('opens in a new tab');
+
+      await page.emulateMedia({ media: 'print' });
+      const printed = await first.evaluate(a => getComputedStyle(a, '::after').content);
+      expect(printed).toContain(href);
+
+      // long URLs must not push a step's box off the page
+      await page.evaluate(() => document.querySelectorAll('#planContent details').forEach(d => { d.open = true; }));
+      const overflowing = await page.evaluate(() =>
+        [...document.querySelectorAll('#planContent .details-body, #planContent .phase')]
+          .filter(d => d.scrollWidth > d.clientWidth + 1).length);
+      expect(overflowing).toBe(0);
+
+      // nothing you could only click belongs on paper
+      const chrome = await page.evaluate(() => {
+        const shown = (el) => {
+          const s = getComputedStyle(el);
+          if (s.display === 'none' || s.visibility === 'hidden') return false;
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        };
+        const count = (sel) => [...document.querySelectorAll(sel)].filter(shown).length;
+        return {
+          tip: count('#trackTipBox'), dismiss: count('#planSummaryBox button'),
+          move: count('.item-move-btn'), drag: count('.item-drag-handle'),
+          // the status boxes stay: on paper they are something to tick by hand
+          status: count('.step-state-btn'), footer: count('.plan-print-footer'),
+        };
+      });
+      expect(chrome.tip).toBe(0);
+      expect(chrome.dismiss).toBe(0);
+      expect(chrome.move).toBe(0);
+      expect(chrome.drag).toBe(0);
+      expect(chrome.status).toBeGreaterThan(0);
+      expect(chrome.footer).toBe(1);
+      await page.emulateMedia({ media: 'screen' });
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
