@@ -30,12 +30,6 @@ The process for under-16s needs parental consent and follows different steps, wh
 
 Yes. Nothing you enter is sent to a server or stored anywhere outside your own device. Your progress is saved in your browser so you can come back to it later. See [Privacy](#privacy) below.
 
-### Can I use this offline?
-
-Yes. It is a single web page with no external files, so you can save it to your device (usually Ctrl+S, or File > Save page as > HTML only) and use it offline. There is also a download button in the "What is this?" panel.
-
-If you already have an action plan, use the Copy link button first to keep it. To use that plan offline, open your saved `.html` file in your browser and paste the copied link onto the end of the address, removing `https://bemyself.uk/` so that you keep everything after it.
-
 ### Step-by-step or checklist?
 
 Both produce the same plan. The step-by-step questions show one at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is quicker if you already know your situation. You can switch between them at any time.
@@ -47,6 +41,12 @@ No. This planner gives general guidance only. It does not replace advice from a 
 ### How do I save or share my plan?
 
 Your plan is saved in your browser and will still be there next time you visit on the same device. To open it on another device, or to share it, use the Copy link button in the toolbar. You can also print it or save it as a PDF. There is no account or login.
+
+### Can I use this offline?
+
+Yes. It is a single web page with no external files, so you can save it to your device (usually Ctrl+S, or File > Save page as > HTML only) and use it offline. There is also a download button in the "What is this?" panel.
+
+If you already have an action plan, use the Copy link button first to keep it. To use that plan offline, open your saved `.html` file in your browser and paste the copied link onto the end of the address, removing `https://bemyself.uk/` so that you keep everything after it.
 
 ## Features
 
