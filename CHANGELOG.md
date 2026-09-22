@@ -98,6 +98,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Darkened the community advice marker so it meets contrast guidelines, shortened what screen readers announce for it, and took it out of the tab order so it does not interrupt tabbing through a plan. It now starts its own paragraph, making clear which part of a step it applies to.
 - Toolbar buttons are now at least 44 pixels on a phone, including the quick exit button, so they are easier to hit.
 - The title block shrinks on a phone once you start answering questions or have a plan, leaving more room for the page itself.
+- Reordered the questions in the "What is this?" panel so they follow how you use the planner: what it is, who it is for, privacy, how it works, then keeping your plan. Saving and offline use were four questions apart and are now together at the end.
 - Added a download button to the "What is this?" panel, so you can save the planner for offline use without a "Save page as" menu. The offline instructions now also explain how to restore a saved plan from a copied link.
 - The usage guide was missing the 🔀 Reset order button and said nothing about moving steps around, and its keyboard list still said one press of Esc leaves the site. It now needs two presses within a second.
 

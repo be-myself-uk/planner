@@ -2382,6 +2382,14 @@ test.describe('Be myself Planner', () => {
       // a saved copy is opened from the filesystem, where that link goes nowhere
       expect(await page.evaluate(() => location.protocol)).toBe('file:');
       await expect(dl).toBeHidden();
+
+      // the README carries the same questions; the two drifted apart once before
+      const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8');
+      const inReadme = [...readme.matchAll(/^### (.+)$/gm)].map(m => m[1].trim());
+      const inDialog = await about.evaluate(el => [...el.querySelectorAll('h3')].map(h => h.textContent.trim()));
+      const shared = inDialog.filter(q => inReadme.includes(q));
+      expect(shared.length).toBeGreaterThan(5);
+      expect(inReadme.filter(q => shared.includes(q))).toEqual(shared);
     });
 
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
