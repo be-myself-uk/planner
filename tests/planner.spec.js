@@ -2392,6 +2392,35 @@ test.describe('Be myself Planner', () => {
       expect(inReadme.filter(q => shared.includes(q))).toEqual(shared);
     });
 
+    test('157. Every dialog keeps its content inside its scrollable body', async ({ page }) => {
+      // reordering blocks inside a dialog can carry the body's closing tag with them,
+      // which leaves a section rendering full-bleed outside the padded container
+      const strays = await page.evaluate(() =>
+        [...document.querySelectorAll('dialog')].map(d => {
+          const body = d.querySelector('.dialog-body');
+          const content = [...d.querySelectorAll('h3, p, table, .legend-toolbar')];
+          return {
+            id: d.id,
+            outside: content.filter(el => !body || !body.contains(el))
+              .filter(el => !el.closest('.dialog-header'))
+              .map(el => (el.textContent || '').trim().slice(0, 40)),
+          };
+        }).filter(d => d.outside.length));
+      expect(strays).toEqual([]);
+
+      // and the rendered geometry agrees, for the dialog that was actually broken
+      await page.getByRole('button', { name: 'What is this?' }).click();
+      const fits = await page.evaluate(() => {
+        const body = document.querySelector('#dlgAbout .dialog-body');
+        const bb = body.getBoundingClientRect();
+        return [...body.querySelectorAll('h3')].every(h => {
+          const r = h.getBoundingClientRect();
+          return r.left >= bb.left && r.right <= bb.right;
+        });
+      });
+      expect(fits).toBe(true);
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
