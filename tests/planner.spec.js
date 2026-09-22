@@ -2484,6 +2484,19 @@ test.describe('Be myself Planner', () => {
       expect(chrome.drag).toBe(0);
       expect(chrome.status).toBeGreaterThan(0);
       expect(chrome.footer).toBe(1);
+
+      // each link gets its own line, and a step heading is never left at the foot of a page
+      const layout = await page.evaluate(() => {
+        const g = getComputedStyle;
+        return {
+          linkDisplay: g(document.querySelector('#planContent .links')).display,
+          headerBreakAfter: g(document.querySelector('#planContent .phase-header')).breakAfter,
+          itemBreakInside: g(document.querySelector('#planView li.plan-item')).breakInside,
+        };
+      });
+      expect(layout.linkDisplay).toBe('block');
+      expect(layout.headerBreakAfter).toBe('avoid');
+      expect(layout.itemBreakInside).toBe('avoid');
       await page.emulateMedia({ media: 'screen' });
     });
 

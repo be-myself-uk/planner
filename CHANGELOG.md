@@ -81,7 +81,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Fixed the toolbar's arrow-key order on narrow screens, where a button on the second row could be reached before one still on the first.
 - Fixed the checklist not showing a group's tick straight away when restored from a saved plan or a shared link.
 - Printing your plan, or saving it as a PDF, now includes the "more information" for each step.
-- A printed or saved plan now shows the full web address after each link, since you cannot click a link on paper. The tip about the status boxes and the "Don't show this again" button no longer print either.
+- A printed or saved plan now lists each link on its own line with its full web address after it, since you cannot click a link on paper. A step heading is no longer left stranded at the foot of a page, and a single step is not split across two. The tip about the status boxes and the "Don't show this again" button no longer print either.
 - The Esc key now needs two presses within a second to leave the site. The red Quick exit button still works with one click.
 - Reordered the questions in both views. What you need to update comes first, since that answer decides which later questions apply, and a Gender Recognition Certificate is asked about before your birth certificate, which you cannot change without one. The checklist previously asked about a GRC, which takes years, before a deed poll, which can be done in a day.
 - Switching from the checklist to the step-by-step questions now carries on from where you were, instead of starting again at the first question. Your answers were always kept; only your place was lost.
