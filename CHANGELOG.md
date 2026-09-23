@@ -2,7 +2,7 @@
 
 All notable changes to [Be myself](https://bemyself.uk) are recorded here, newest first.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project has no version numbers, so entries are grouped by the month the work landed.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). This project has no version numbers, so entries are grouped by the month they went live on the site. Work that is finished but not yet released sits under `[Unreleased]` until it goes live.
 
 Small fixes and one-off wording tweaks are left out. Changes are grouped under these headings:
 
@@ -12,6 +12,19 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Code**: how the website works
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
+
+## [Unreleased]
+
+### Code
+
+- A printed or saved plan now lists each link on its own line with its full web address after it, since you cannot click a link on paper. A step heading is no longer left stranded at the foot of a page, and a single step is not split across two. The tip about the status boxes and the "Don't show this again" button no longer print either.
+
+### Layout
+
+- In the services list, a step marked done is no longer crossed out. Crossing out now means "not needed" everywhere in a plan, as it already did for every other step.
+- Reordered the questions in the "What is this?" panel so they follow how you use the planner: what it is, who it is for, privacy, how it works, then keeping your plan. Saving and offline use were four questions apart and are now together at the end.
+- Added a download button to the "What is this?" panel, so you can save the planner for offline use without a "Save page as" menu. The offline instructions now also explain how to restore a saved plan from a copied link.
+- The usage guide was missing the 🔀 Reset order button and said nothing about moving steps around, and its keyboard list still said one press of Esc leaves the site. It now needs two presses within a second.
 
 ## [September 2026]
 

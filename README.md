@@ -30,10 +30,6 @@ The process for under-16s needs parental consent and follows different steps, wh
 
 Yes. Nothing you enter is sent to a server or stored anywhere outside your own device. Your progress is saved in your browser so you can come back to it later. See [Privacy](#privacy) below.
 
-### Can I use this offline?
-
-Yes. It is a single web page with no external files, so you can save it to your device and open it later without an internet connection. If you already have an action plan, use the Copy link button first to keep it. When you open your offline copy, you will need to paste everything from `?p=` onwards onto the end of the address.
-
 ### Step-by-step or checklist?
 
 Both produce the same plan. The step-by-step questions show one at a time, which works well if you are not sure where to start. The checklist shows everything at once, which is quicker if you already know your situation. You can switch between them at any time.
@@ -46,13 +42,19 @@ No. This planner gives general guidance only. It does not replace advice from a 
 
 Your plan is saved in your browser and will still be there next time you visit on the same device. To open it on another device, or to share it, use the Copy link button in the toolbar. You can also print it or save it as a PDF. There is no account or login.
 
+### Can I use this offline?
+
+Yes. It is a single web page with no external files, so you can save it to your device (usually Ctrl+S, or File > Save page as > HTML only) and use it offline. There is also a download button in the "What is this?" panel.
+
+If you already have an action plan, use the Copy link button first to keep it. To use that plan offline, open your saved `.html` file in your browser and paste the copied link onto the end of the address, removing `https://bemyself.uk/` so that you keep everything after it.
+
 ## Features
 
 - **Guidance for where you live**: England, Wales, Scotland, and Northern Ireland each get their own content, including the Irish passport gender recognition route for people born in Northern Ireland
 - **Two ways to answer**: step-by-step questions, or a single checklist if you already know your situation, switching between them at any time
 - **A personal action plan**: deed polls, driving licences, health records, HMRC, criminal record checks, benefits, birth certificates, and GRC applications, each with an estimated cost, difficulty, and time
-- **Progress tracking**: mark each step as not started, in progress, done, or not needed, with a Focus mode that hides what is finished
-- **Save, share, or print**: your plan is saved on your device; copy a link to continue elsewhere or hand to someone you trust, or print a paper or PDF copy
+- **Progress tracking**: mark each step as not started, in progress, done, or not needed, with a Focus mode that hides what is finished, and reorder the plan to suit you by dragging steps or using the up and down arrows
+- **Save, share, or print**: your plan is saved on your device; copy a link to continue elsewhere or hand to someone you trust, print a paper or PDF copy, or download the whole planner to use offline
 - **Private by design**: nothing is sent to a server, and a quick-exit button is there if you need to leave the page in a hurry
 - **Accessible**: full keyboard and screen reader support, light and dark mode, and works from a small phone up to a desktop
 - **Free**: no account, no login, and it works offline as a single downloadable page

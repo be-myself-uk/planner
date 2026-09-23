@@ -2355,6 +2355,151 @@ test.describe('Be myself Planner', () => {
       expect(after).toEqual(['planSummaryBox', 'trackTipBox']);
     });
 
+    test('156. The usage guide and About dialog describe what the site actually does', async ({ page }) => {
+      await page.getByRole('button', { name: 'Usage guide' }).click();
+      const guide = page.locator('#dlgUsage');
+
+      // every toolbar button that can appear has a legend entry
+      await expect(guide).toContainText('Reset order');
+      await expect(guide).toContainText('Reset progress');
+      await expect(guide).toContainText('Focus mode');
+      await expect(guide).toContainText('Copy link');
+
+      // reordering exists on every plan, so the guide has to mention it
+      await expect(guide).toContainText('Reset order');
+      await expect(guide.locator('text=/▲ and ▼/')).toHaveCount(1);
+
+      // Esc has needed two presses since the quick-exit change
+      await expect(guide).toContainText('press twice within a second');
+      await expect(guide).not.toContainText('Quick exit: leaves the page immediately');
+
+      await page.locator('#dlgUsage').getByRole('button', { name: 'Close' }).click();
+      await page.getByRole('button', { name: 'What is this?' }).click();
+      const about = page.locator('#dlgAbout');
+      const dl = about.locator('#offlineDownloadBtn');
+      await expect(dl).toHaveAttribute('download', 'bemyself.html');
+      await expect(dl).toHaveAttribute('href', '/');
+      // a saved copy is opened from the filesystem, where that link goes nowhere
+      expect(await page.evaluate(() => location.protocol)).toBe('file:');
+      await expect(dl).toBeHidden();
+
+      // the README carries the same questions; the two drifted apart once before
+      const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8');
+      const inReadme = [...readme.matchAll(/^### (.+)$/gm)].map(m => m[1].trim());
+      const inDialog = await about.evaluate(el => [...el.querySelectorAll('h3')].map(h => h.textContent.trim()));
+      const shared = inDialog.filter(q => inReadme.includes(q));
+      expect(shared.length).toBeGreaterThan(5);
+      expect(inReadme.filter(q => shared.includes(q))).toEqual(shared);
+    });
+
+    test('157. Every dialog keeps its content inside its scrollable body', async ({ page }) => {
+      // reordering blocks inside a dialog can carry the body's closing tag with them,
+      // which leaves a section rendering full-bleed outside the padded container
+      const strays = await page.evaluate(() =>
+        [...document.querySelectorAll('dialog')].map(d => {
+          const body = d.querySelector('.dialog-body');
+          const content = [...d.querySelectorAll('h3, p, table, .legend-toolbar')];
+          return {
+            id: d.id,
+            outside: content.filter(el => !body || !body.contains(el))
+              .filter(el => !el.closest('.dialog-header'))
+              .map(el => (el.textContent || '').trim().slice(0, 40)),
+          };
+        }).filter(d => d.outside.length));
+      expect(strays).toEqual([]);
+
+      // and the rendered geometry agrees, for the dialog that was actually broken
+      await page.getByRole('button', { name: 'What is this?' }).click();
+      const fits = await page.evaluate(() => {
+        const body = document.querySelector('#dlgAbout .dialog-body');
+        const bb = body.getBoundingClientRect();
+        return [...body.querySelectorAll('h3')].every(h => {
+          const r = h.getBoundingClientRect();
+          return r.left >= bb.left && r.right <= bb.right;
+        });
+      });
+      expect(fits).toBe(true);
+    });
+
+    test('158. Strikethrough means not needed, in the services list as everywhere else', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkSvcAll').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      const btns = page.locator('.step-state-btn[data-svc-parent]');
+      const detailOf = async (i) => page.evaluate((n) => {
+        const btn = document.querySelectorAll('.step-state-btn[data-svc-parent]')[n];
+        const d = document.getElementById('svc_detail_' + btn.dataset.trackId.replace('trk_svc_', ''));
+        return { state: btn.dataset.state, strike: d.style.textDecoration };
+      }, i);
+
+      await btns.nth(0).click();
+      await btns.nth(0).click();
+      expect(await detailOf(0)).toEqual({ state: '2', strike: 'none' });   // done
+
+      await btns.nth(0).click();
+      expect(await detailOf(0)).toEqual({ state: '3', strike: 'line-through' });  // not needed
+    });
+
+    test('159. Printing shows where each link goes, since paper cannot be clicked', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const first = page.locator('#planContent .links').first();
+      const href = await first.getAttribute('href');
+
+      await page.emulateMedia({ media: 'screen' });
+      expect(await first.evaluate(a => getComputedStyle(a, '::after').content))
+        .toContain('opens in a new tab');
+
+      await page.emulateMedia({ media: 'print' });
+      const printed = await first.evaluate(a => getComputedStyle(a, '::after').content);
+      expect(printed).toContain(href);
+
+      // long URLs must not push a step's box off the page
+      await page.evaluate(() => document.querySelectorAll('#planContent details').forEach(d => { d.open = true; }));
+      const overflowing = await page.evaluate(() =>
+        [...document.querySelectorAll('#planContent .details-body, #planContent .phase')]
+          .filter(d => d.scrollWidth > d.clientWidth + 1).length);
+      expect(overflowing).toBe(0);
+
+      // nothing you could only click belongs on paper
+      const chrome = await page.evaluate(() => {
+        const shown = (el) => {
+          const s = getComputedStyle(el);
+          if (s.display === 'none' || s.visibility === 'hidden') return false;
+          const r = el.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        };
+        const count = (sel) => [...document.querySelectorAll(sel)].filter(shown).length;
+        return {
+          tip: count('#trackTipBox'), dismiss: count('#planSummaryBox button'),
+          move: count('.item-move-btn'), drag: count('.item-drag-handle'),
+          // the status boxes stay: on paper they are something to tick by hand
+          status: count('.step-state-btn'), footer: count('.plan-print-footer'),
+        };
+      });
+      expect(chrome.tip).toBe(0);
+      expect(chrome.dismiss).toBe(0);
+      expect(chrome.move).toBe(0);
+      expect(chrome.drag).toBe(0);
+      expect(chrome.status).toBeGreaterThan(0);
+      expect(chrome.footer).toBe(1);
+
+      // each link gets its own line, and a step heading is never left at the foot of a page
+      const layout = await page.evaluate(() => {
+        const g = getComputedStyle;
+        return {
+          linkDisplay: g(document.querySelector('#planContent .links')).display,
+          headerBreakAfter: g(document.querySelector('#planContent .phase-header')).breakAfter,
+          itemBreakInside: g(document.querySelector('#planView li.plan-item')).breakInside,
+        };
+      });
+      expect(layout.linkDisplay).toBe('block');
+      expect(layout.headerBreakAfter).toBe('avoid');
+      expect(layout.itemBreakInside).toBe('avoid');
+      await page.emulateMedia({ media: 'screen' });
+    });
+
     test('93. Plan item and service content matches the committed snapshot', async ({ page }) => {
       const { extractContentMap } = require('./content-snapshot-lib');
       const expected = JSON.parse(fs.readFileSync(path.resolve('content-snapshots.json'), 'utf8'));
