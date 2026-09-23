@@ -547,8 +547,8 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
       await expect(page.locator('#wrapBirthCertName')).toBeHidden();
-      // name-only plus an England birth leaves the whole section empty, so it hides
-      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
+      await expect(page.locator('#wrapSectionLongterm'),
+        'name-only plus an England birth leaves the whole section empty, so it hides').toBeHidden();
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
       await expect(page.locator('#wrapSectionLongterm')).toBeVisible();
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
@@ -762,7 +762,6 @@ test.describe('Be myself Planner', () => {
         expect(s.rendered).toBe(s.source.replace(/\s+/g, ' ').trim());
       }
 
-      // the wizard renders the same strings, so the two views cannot drift apart
       const inWizard = await page.evaluate(() => {
         const seen = {};
         questions.forEach(q => {
@@ -772,7 +771,8 @@ test.describe('Be myself Planner', () => {
         return seen;
       });
       for (const key of ['goal', 'visa', 'employment', 'student', 'vehicle', 'services']) {
-        expect(inWizard[key], `${key} note not found in any wizard question`).toBe(true);
+        expect(inWizard[key],
+          `${key} note not found in any wizard question, so the two views have drifted apart`).toBe(true);
       }
     });
 
@@ -824,17 +824,17 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wrapSectionBasics .chk-q').first())
         .toContainText('What do you need to update on your documents?');
 
-      // the Scotland-only birth certificate question joins the same section, it does not open a new one
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
       ls = await labels();
-      expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
+      expect(ls.map(l => l.replace(/^\d+\.\s*/, '')),
+        'the Scotland-only birth certificate question joins the same section, it does not open a new one').toEqual(
         ['About you', 'Your current documents', 'Your situation', 'Long-term goals']);
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
 
-      // with nothing long-term left to ask, the section hides rather than showing an empty heading
       await page.locator('input[name="chkBirthRegion"][value="e"]').check();
       await page.locator('#chkGoalGender').uncheck();
-      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
+      await expect(page.locator('#wrapSectionLongterm'),
+        'with nothing long-term left to ask, the section hides rather than showing an empty heading').toBeHidden();
       expect(await labels()).toHaveLength(3);
     });
 
@@ -1436,8 +1436,8 @@ test.describe('Be myself Planner', () => {
       await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
       await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
 
-      // each route stands on its own, so neither points at the other
-      await expect(irish).not.toContainText('described first below');
+      await expect(irish,
+        'each route stands on its own, so neither points at the other').not.toContainText('described first below');
       await expect(grc).not.toContainText('described below alongside');
     });
 
@@ -2170,9 +2170,9 @@ test.describe('Be myself Planner', () => {
     test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
       await openChecklist(page);
 
-      // touching nothing leaves the switch at the first question, as before
       await page.getByRole('button', { name: 'Switch view' }).click();
-      await expect(page.locator('#wizardStepFieldset legend'))
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'touching nothing leaves the switch at the first question, as before')
         .toContainText('What do you need to update on your documents?');
 
       await page.getByRole('button', { name: 'Switch view' }).click();
@@ -2187,9 +2187,9 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => window.step)).toBeGreaterThan(furthest);
       expect(['passport', 'visa']).toContain(resumed);
 
-      // Back still walks through the questions the checklist already answered
       await page.locator('#wizardBackBtn').click();
-      expect(await page.evaluate(() => questions[window.step].id)).toBe('driving');
+      expect(await page.evaluate(() => questions[window.step].id),
+        'Back still walks through the questions the checklist already answered').toBe('driving');
     });
 
     test('148. Every checklist input maps back to the question that owns it', async ({ page }) => {
@@ -2214,8 +2214,8 @@ test.describe('Be myself Planner', () => {
     test('149. A question note sits below its question, never beside it', async ({ page }) => {
       await openChecklist(page);
 
-      // .chk-q--flex laid its children out in a row, so a note landed next to the question
-      expect(await page.locator('.chk-q--flex').count()).toBe(0);
+      expect(await page.locator('.chk-q--flex').count(),
+        '.chk-q--flex laid its children out in a row, so a note landed next to the question').toBe(0);
 
       const boxes = await page.locator('#wrapVisa').evaluate(el => {
         const p = el.querySelector('.chk-q');
@@ -2250,11 +2250,10 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wizardStepFieldset legend'))
         .toContainText('What do you need to update on your documents?');
 
-      // every question it can land on is one that currently applies
       expect(await page.evaluate(() => {
         const q = questions[window.step];
         return !q.cond || q.cond();
-      })).toBe(true);
+      }), 'every question it can land on is one that currently applies').toBe(true);
       expect(inSession).toBeGreaterThan(0);
     });
 
@@ -2273,24 +2272,24 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
       await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
 
-      // and it still splits into two phases when a GRC is wanted as well
       await page.getByRole('button', { name: /Edit plan/ }).click();
       await page.locator('#chkGRCYes').check();
       await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
-      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final_irish"]'),
+        'it still splits into two phases when a GRC is wanted as well').toHaveCount(1);
       await expect(page.locator('.phase[data-phase-key="final_grc"]')).toHaveCount(1);
     });
 
     test('152. Declining the Irish route leaves the other Northern Ireland content alone', async ({ page }) => {
-      // bornInNI also selects the GRONI birth-certificate variant and its cost line,
-      // which must not be gated on the Irish route question
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkBirthCertName').check();
       await expect(page.locator('#chkIrishRoute')).not.toBeChecked();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
 
-      await expect(page.locator('#planContent')).toContainText('Birth certificate name recording (GRONI)');
+      await expect(page.locator('#planContent'),
+        'bornInNI also selects the GRONI birth-certificate variant and its cost line, which must not be gated on the Irish route question')
+        .toContainText('Birth certificate name recording (GRONI)');
       await expect(page.locator('#planContent')).toContainText('GRONI name recording');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
     });
@@ -2301,8 +2300,8 @@ test.describe('Be myself Planner', () => {
       const open = async (data) => {
         await gotoUntil(page, await getShareUrl(page, data), () => page.evaluate(() =>
           ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
-        // a shared link asks for the gates once; a second one in the same browser does not
-        if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+        const gatesNotYetAnsweredInThisBrowser = await page.locator('#ageConfirmShared').isVisible();
+        if (gatesNotYetAnsweredInThisBrowser) await checkAgeGateShared(page);
         await expect(page.locator('#planView')).toBeVisible();
       };
 
@@ -2310,9 +2309,9 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => wizardState.irishRoute)).toBe('yes');
       await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
 
-      // a link made before the field existed carries no answer, so it decodes to no
       await open(base);
-      expect(await page.evaluate(() => wizardState.irishRoute)).toBe('no');
+      expect(await page.evaluate(() => wizardState.irishRoute),
+        'a link made before the field existed carries no answer, so it decodes to no').toBe('no');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
     });
 
@@ -2343,34 +2342,34 @@ test.describe('Be myself Planner', () => {
       expect(order.slice(0, 3)).toEqual(['planSummaryBox', 'titlesInfoBox', 'trackTipBox']);
       expect(order[3]).toMatch(/^phase:/);
 
-      // the tip carries class="phase" but holds no steps, so nothing counts it as one
       expect(await page.evaluate(() =>
-        document.getElementById('trackTipBox').querySelectorAll('.step-state-btn').length)).toBe(0);
+        document.getElementById('trackTipBox').querySelectorAll('.step-state-btn').length),
+        'the tip carries class="phase" but holds no steps, so nothing counts it as one').toBe(0);
 
-      // dismissing the titles panel leaves the tip adjacent to the summary
       await page.locator('#titlesInfoBox summary').click();
       await page.locator('#titlesInfoBox').getByRole('button', { name: "Don't show this again" }).click();
       const after = await page.evaluate(() =>
         [...document.getElementById('planContent').children].map(el => el.id).filter(Boolean));
-      expect(after).toEqual(['planSummaryBox', 'trackTipBox']);
+      expect(after,
+        'dismissing the titles panel leaves the tip adjacent to the summary').toEqual(['planSummaryBox', 'trackTipBox']);
     });
 
     test('156. The usage guide and About dialog describe what the site actually does', async ({ page }) => {
       await page.getByRole('button', { name: 'Usage guide' }).click();
       const guide = page.locator('#dlgUsage');
 
-      // every toolbar button that can appear has a legend entry
-      await expect(guide).toContainText('Reset order');
+      await expect(guide,
+        'every toolbar button that can appear has a legend entry').toContainText('Reset order');
       await expect(guide).toContainText('Reset progress');
       await expect(guide).toContainText('Focus mode');
       await expect(guide).toContainText('Copy link');
 
-      // reordering exists on every plan, so the guide has to mention it
-      await expect(guide).toContainText('Reset order');
+      await expect(guide,
+        'reordering exists on every plan, so the guide has to mention it').toContainText('Reset order');
       await expect(guide.locator('text=/▲ and ▼/')).toHaveCount(1);
 
-      // Esc has needed two presses since the quick-exit change
-      await expect(guide).toContainText('press twice within a second');
+      await expect(guide,
+        'Esc has needed two presses since the quick-exit change').toContainText('press twice within a second');
       await expect(guide).not.toContainText('Quick exit: leaves the page immediately');
 
       await page.locator('#dlgUsage').getByRole('button', { name: 'Close' }).click();
@@ -2379,22 +2378,20 @@ test.describe('Be myself Planner', () => {
       const dl = about.locator('#offlineDownloadBtn');
       await expect(dl).toHaveAttribute('download', 'bemyself.html');
       await expect(dl).toHaveAttribute('href', '/');
-      // a saved copy is opened from the filesystem, where that link goes nowhere
-      expect(await page.evaluate(() => location.protocol)).toBe('file:');
+      expect(await page.evaluate(() => location.protocol),
+        'a saved copy is opened from the filesystem, where that link goes nowhere').toBe('file:');
       await expect(dl).toBeHidden();
 
-      // the README carries the same questions; the two drifted apart once before
       const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8');
       const inReadme = [...readme.matchAll(/^### (.+)$/gm)].map(m => m[1].trim());
       const inDialog = await about.evaluate(el => [...el.querySelectorAll('h3')].map(h => h.textContent.trim()));
       const shared = inDialog.filter(q => inReadme.includes(q));
-      expect(shared.length).toBeGreaterThan(5);
+      expect(shared.length,
+        'the README carries the same questions; the two drifted apart once before').toBeGreaterThan(5);
       expect(inReadme.filter(q => shared.includes(q))).toEqual(shared);
     });
 
     test('157. Every dialog keeps its content inside its scrollable body', async ({ page }) => {
-      // reordering blocks inside a dialog can carry the body's closing tag with them,
-      // which leaves a section rendering full-bleed outside the padded container
       const strays = await page.evaluate(() =>
         [...document.querySelectorAll('dialog')].map(d => {
           const body = d.querySelector('.dialog-body');
@@ -2406,9 +2403,10 @@ test.describe('Be myself Planner', () => {
               .map(el => (el.textContent || '').trim().slice(0, 40)),
           };
         }).filter(d => d.outside.length));
-      expect(strays).toEqual([]);
+      expect(strays,
+        "reordering blocks inside a dialog can carry the body's closing tag with them, leaving a section rendering full-bleed outside the padded container")
+        .toEqual([]);
 
-      // and the rendered geometry agrees, for the dialog that was actually broken
       await page.getByRole('button', { name: 'What is this?' }).click();
       const fits = await page.evaluate(() => {
         const body = document.querySelector('#dlgAbout .dialog-body');
@@ -2418,7 +2416,8 @@ test.describe('Be myself Planner', () => {
           return r.left >= bb.left && r.right <= bb.right;
         });
       });
-      expect(fits).toBe(true);
+      expect(fits,
+        'and the rendered geometry agrees, for the dialog that was actually broken').toBe(true);
     });
 
     test('158. Strikethrough means not needed, in the services list as everywhere else', async ({ page }) => {
@@ -2435,10 +2434,12 @@ test.describe('Be myself Planner', () => {
 
       await btns.nth(0).click();
       await btns.nth(0).click();
-      expect(await detailOf(0)).toEqual({ state: '2', strike: 'none' });   // done
+      expect(await detailOf(0), 'state 2 is done, and done is not crossed out')
+        .toEqual({ state: '2', strike: 'none' });
 
       await btns.nth(0).click();
-      expect(await detailOf(0)).toEqual({ state: '3', strike: 'line-through' });  // not needed
+      expect(await detailOf(0), 'state 3 is not needed, and only not needed is crossed out')
+        .toEqual({ state: '3', strike: 'line-through' });
     });
 
     test('159. Printing shows where each link goes, since paper cannot be clicked', async ({ page }) => {
@@ -2455,14 +2456,12 @@ test.describe('Be myself Planner', () => {
       const printed = await first.evaluate(a => getComputedStyle(a, '::after').content);
       expect(printed).toContain(href);
 
-      // long URLs must not push a step's box off the page
       await page.evaluate(() => document.querySelectorAll('#planContent details').forEach(d => { d.open = true; }));
       const overflowing = await page.evaluate(() =>
         [...document.querySelectorAll('#planContent .details-body, #planContent .phase')]
           .filter(d => d.scrollWidth > d.clientWidth + 1).length);
-      expect(overflowing).toBe(0);
+      expect(overflowing, "long URLs must not push a step's box off the page").toBe(0);
 
-      // nothing you could only click belongs on paper
       const chrome = await page.evaluate(() => {
         const shown = (el) => {
           const s = getComputedStyle(el);
@@ -2474,18 +2473,17 @@ test.describe('Be myself Planner', () => {
         return {
           tip: count('#trackTipBox'), dismiss: count('#planSummaryBox button'),
           move: count('.item-move-btn'), drag: count('.item-drag-handle'),
-          // the status boxes stay: on paper they are something to tick by hand
           status: count('.step-state-btn'), footer: count('.plan-print-footer'),
         };
       });
-      expect(chrome.tip).toBe(0);
+      expect(chrome.tip, 'nothing you could only click belongs on paper').toBe(0);
       expect(chrome.dismiss).toBe(0);
       expect(chrome.move).toBe(0);
       expect(chrome.drag).toBe(0);
-      expect(chrome.status).toBeGreaterThan(0);
+      expect(chrome.status,
+        'the status boxes stay: on paper they are something to tick by hand').toBeGreaterThan(0);
       expect(chrome.footer).toBe(1);
 
-      // each link gets its own line, and a step heading is never left at the foot of a page
       const layout = await page.evaluate(() => {
         const g = getComputedStyle;
         return {
@@ -2494,7 +2492,8 @@ test.describe('Be myself Planner', () => {
           itemBreakInside: g(document.querySelector('#planView li.plan-item')).breakInside,
         };
       });
-      expect(layout.linkDisplay).toBe('block');
+      expect(layout.linkDisplay,
+        'each link gets its own line, and a step heading is never left at the foot of a page').toBe('block');
       expect(layout.headerBreakAfter).toBe('avoid');
       expect(layout.itemBreakInside).toBe('avoid');
       await page.emulateMedia({ media: 'screen' });

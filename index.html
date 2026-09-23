@@ -1310,9 +1310,6 @@ function updateChecklistPosition() {
   if (!secs.length) return;
   const bar = gel('controlBar');
   const anchor = (bar ? bar.getBoundingClientRect().bottom : 0) + 12;
-  // The short sections at the end can never bring their heading up to the anchor,
-  // because the page runs out of scroll first. Over the last screenful the reading
-  // line slides down to the bottom of the viewport so they still get a turn.
   const left = Math.max(0, document.documentElement.scrollHeight - window.innerHeight - window.scrollY);
   const line = anchor + Math.max(0, window.innerHeight - anchor - left);
   let idx = 0;
@@ -3210,7 +3207,6 @@ window.onload = () => {
     const _months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const _lr = gel('footerLastReviewed'); if (_lr) _lr.textContent = _months[_d.getUTCMonth()] + ' ' + _d.getUTCFullYear();
     const _cy = gel('schemaCopyYear'); if (_cy) _cy.textContent = _d.getUTCFullYear();
-    // a saved copy is opened from the filesystem, where there is nothing to download
     if (location.protocol === 'file:') gel('offlineDownloadWrap')?.classList.add('hidden');
   if (window.matchMedia)
     window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', e => { if (!ssg('theme')) { document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light'); updateThemeIcon(); } });

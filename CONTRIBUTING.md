@@ -87,7 +87,9 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 146 of them numbered up to 159; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), each with a short comment; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 146 of them numbered up to 159; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+
+The spec carries no comments. Where an assertion is not self-explanatory, the reason it exists goes in the message argument (`expect(value, 'why this must hold').toBe(...)`), which Playwright prints when the assertion fails, so the reasoning reaches whoever is looking at the failure. Keep new assertions to that pattern.
 
 #### Content-integrity snapshot
 
@@ -147,6 +149,8 @@ Alongside the views are five `<dialog>` elements (native HTML `<dialog>`, opened
 
 This is the entire application logic. Key pieces, roughly in the order they appear:
 
+`index.html` carries no comments of any kind. Where something in it is genuinely not obvious from the code, it is explained in this section instead, so the explanation is in one place rather than scattered through a 300 KB file.
+
 **Constants and content data**
 - `SCHEMA_VERSION`: a Unix timestamp, auto-bumped by the `bump-version.yml` workflow whenever a push to `main` changes `index.html`.
 - `S`: an enum-like object for answer states (`YES`, `NO`, `UPDATED`, `NEEDS_UPDATE`, `NONE`, `BOTH`, `NAME`, `GENDER`).
@@ -180,6 +184,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 
 **The checklist**
 - One large `<form>`-like block of checkboxes and radios (in the HTML body) representing every question at once. `renderChecklist()` pushes `wizardState` values into the DOM (used when entering or re-entering the checklist); a single delegated `change` event listener on `#checklistView` reads the DOM back into `wizardState` on every interaction. A plain yes/no checkbox gets both directions for free through `CHK_MAP`, which is derived from the `chk` fields on `questions`; **anything else added to the checklist needs both directions wired up by hand**, or you get sync bugs (see `CHANGELOG.md`'s 2026-07-05 entries for two real examples of exactly that).
+- `updateChecklistPosition()`: the "Section 2 of 4" indicator and its bar. It picks the last section whose top has passed a reading line just below the toolbar. A fixed line would never reach the short sections at the end, because the page runs out of scroll before their headings get that high, so over the final screenful the line slides down to the bottom of the viewport and they get their turn. Changing the line back to a fixed offset will silently strand the last section, which is how it behaved before.
 
 **Building and rendering the plan**
 - `generateWizardPlan()` / `generateChecklistPlan()`: validate answers, then call `buildSharedPlan()`.
