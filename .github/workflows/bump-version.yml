@@ -26,21 +26,47 @@ jobs:
 
           sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
 
-      - name: Commit and push the version bump
+      - name: Commit the version bump through the GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.BUMP_VERSION_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          git config --global user.name "37273045+Venae@users.noreply.github.com"
-          git config --global user.email "37273045+Venae@users.noreply.github.com"
-
-          git add index.html
-
-          if git diff --staged --quiet; then
+          if git diff --quiet -- index.html; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "Version bump [no ci]"
+          base64 -w0 index.html > "$RUNNER_TEMP/index.b64"
+          jq -n \
+            --arg repo "$REPO" \
+            --arg head "$(git rev-parse HEAD)" \
+            --rawfile contents "$RUNNER_TEMP/index.b64" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
+              variables: { input: {
+                branch: { repositoryNameWithOwner: $repo, branchName: "main" },
+                expectedHeadOid: $head,
+                message: { headline: "Version bump [no ci]" },
+                fileChanges: { additions: [ { path: "index.html", contents: $contents } ] }
+              } }
+            }' > "$RUNNER_TEMP/request.json"
 
-          if ! git push; then
-            echo "::error::Direct push to main was rejected. BUMP_VERSION_TOKEN may have expired, been revoked, or its owner removed from main's ruleset bypass list. The version bump was not applied. See CONTRIBUTING.md."
+          if ! gh api graphql --input "$RUNNER_TEMP/request.json" > "$RUNNER_TEMP/response.json"; then
+            cat "$RUNNER_TEMP/response.json"
+            echo "::error::GitHub refused the version bump commit. main may have moved on since this run started, or BUMP_VERSION_TOKEN may have expired, been revoked, or its owner removed from main's ruleset bypass list. The version bump was not applied. See CONTRIBUTING.md."
             exit 1
           fi
+
+          NEW_COMMIT=$(jq -r '.data.createCommitOnBranch.commit.oid // empty' "$RUNNER_TEMP/response.json")
+          if [ -z "$NEW_COMMIT" ]; then
+            cat "$RUNNER_TEMP/response.json"
+            echo "::error::GitHub did not return the new commit. The version bump may not have been applied. See CONTRIBUTING.md."
+            exit 1
+          fi
+
+          VERIFIED=$(gh api "repos/$REPO/commits/$NEW_COMMIT" --jq '.commit.verification.verified')
+          if [ "$VERIFIED" != "true" ]; then
+            echo "::error::The version bump commit $NEW_COMMIT was made, but GitHub does not show it as verified. See CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "Version bump committed and verified: $NEW_COMMIT"
