@@ -13,6 +13,11 @@ async function checkAgeGateShared(page) {
   await page.locator('#disclaimerConfirmShared').check();
 }
 
+async function openSharedPlanIfAsked(page) {
+  const btn = page.getByRole('button', { name: 'Open shared plan' });
+  if (await btn.isVisible()) await btn.click();
+}
+
 async function openChecklist(page) {
   await checkAgeGate(page);
   await page.locator('.start-checklist-link').click();
@@ -132,7 +137,7 @@ function decodeState(encoded) {
 
 async function getShareUrl(page, data) {
   return page.evaluate((d) => {
-    const obj = Object.assign({ v: window.SCHEMA_VERSION }, d);
+    const obj = Object.assign({ pv: window.PLAN_VERSION }, d);
     const bytes = new TextEncoder().encode(JSON.stringify(obj));
     let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
     const fp = window.location.href.split('?')[0];
@@ -962,6 +967,7 @@ test.describe('Be myself Planner', () => {
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
       if (await discCb.isVisible()) await discCb.check();
+      await openSharedPlanIfAsked(page);
       await expect(page.locator('[data-track-id="trk_grcmed_r1"]')).toHaveAttribute('data-state', '2');
       await expect(page.locator('[data-track-id="trk_grc_med"]')).toHaveAttribute('data-state', '2');
     });
@@ -1022,7 +1028,21 @@ test.describe('Be myself Planner', () => {
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
       if (await discCb.isVisible()) await discCb.check();
+      await openSharedPlanIfAsked(page);
       await expect(page.locator('[data-track-id="trk_grcdocs_sd"]')).toHaveAttribute('data-state', '2');
+    });
+
+    test('168. Changing a step status announces the change, and the next step only when it changes', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.waitForTimeout(400);
+      const firstPhaseBtns = page.locator('#planContent > .phase[data-phase-key]').first().locator('.step-state-btn[data-track-id]');
+      await expect(firstPhaseBtns).toHaveCount(1);
+      const btn = firstPhaseBtns.first();
+      const label = await btn.getAttribute('data-step-label');
+      await btn.click();
+      await expect(page.locator('#liveRegion')).toHaveText(`${label} marked as in progress.`);
+      await btn.click();
+      await expect(page.locator('#liveRegion')).toHaveText(new RegExp(`^${label} marked as done\\. Your next step is: Step 2: `));
     });
   });
 
@@ -1030,7 +1050,7 @@ test.describe('Be myself Planner', () => {
     test('15. Shareable link clipboard', async ({ page }) => {
       await openChecklist(page);
       await page.getByLabel(/Deed poll or statutory declaration/).check();
-      await page.getByLabel(/Yes, I plan to apply for one at some point/).check();
+      await page.getByLabel(/Not yet, but I plan to apply for one/).check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await page.evaluate(() => {
         window._shareUrl = null;
@@ -1092,7 +1112,7 @@ test.describe('Be myself Planner', () => {
       await expect(hmrcBtn).toHaveAttribute('data-state', '2');
       const urlStr = await page.evaluate((fp) => {
         const prg = { hmrc: 2 };
-        const ps = { v: window.SCHEMA_VERSION, goal: 'both', reg: 'ew', emp: 'no', prg };
+        const ps = { pv: window.PLAN_VERSION, goal: 'both', reg: 'ew', emp: 'no', prg };
         const url = new URL(fp);
         url.searchParams.set('p', btoa(JSON.stringify(ps)));
         return url.toString();
@@ -1104,7 +1124,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planView')).toBeVisible();
       const restoredBtn = page.locator('#ssb_trk_hmrc');
       await expect(restoredBtn).toHaveAttribute('data-state', '2');
-      await expect(restoredBtn).toHaveAttribute('aria-pressed', 'true');
+      await expect(restoredBtn).toHaveAttribute('aria-label', /: Done\./);
     });
 
     test('34. Progress bleed prevention', async ({ page }) => {
@@ -1133,7 +1153,8 @@ test.describe('Be myself Planner', () => {
       const clip = await page.evaluate(() => window._shareUrl);
       const decoded = decodeState(new URL(clip).searchParams.get('p'));
       expect(decoded.svn).toBe(true);
-      await gotoUntil(page, clip, () => page.evaluate(() => wizardState.svcNone === 'yes'));
+      await navigateUntil(page, async () => { await page.goto(clip); await openSharedPlanIfAsked(page); },
+        () => page.evaluate(() => wizardState.svcNone === 'yes'), 12, 'gotoUntil');
       expect(await page.evaluate(() => wizardState.svcNone)).toBe('yes');
     });
 
@@ -1145,8 +1166,8 @@ test.describe('Be myself Planner', () => {
       await firstBtn.click();
       await expect(firstBtn).toHaveAttribute('data-state', '1');
       await page.waitForTimeout(200);
-      await gotoUntil(page, filePath + '?p=%%%notvalid%%%',
-        () => page.locator('#welcomeOutdated').isVisible());
+      await navigateUntil(page, async () => { await page.goto(filePath + '?p=%%%notvalid%%%'); await openSharedPlanIfAsked(page); },
+        () => page.locator('#welcomeOutdated').isVisible(), 12, 'gotoUntil');
       await expect(page.locator('#welcomeOutdated')).toBeVisible();
       expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
     });
@@ -1170,6 +1191,63 @@ test.describe('Be myself Planner', () => {
         await expect(page.locator('#planView')).toBeVisible();
         expect(await page.evaluate(() => wizardState.region)).toBe(current);
       }
+    });
+
+    test('160. A shared link on a device with a saved plan asks first, and Keep my plan changes nothing', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const firstBtn = page.locator('.step-state-btn[data-track-id]').first();
+      const trackId = await firstBtn.getAttribute('data-track-id');
+      await firstBtn.click();
+      await expect(firstBtn).toHaveAttribute('data-state', '1');
+      await page.waitForTimeout(200);
+      const url = await getShareUrl(page, { goal: 'name', reg: 's', emp: 'no', dl: 'none', pass: 'none' });
+      await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
+      await expect(page.locator('#planView')).toBeHidden();
+      expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId), 'the prompt alone must not touch saved progress').toBe('1');
+      await page.getByRole('button', { name: 'Keep my plan' }).click();
+      await expect(page.locator('#welcomeSharedReplace')).toBeHidden();
+      await expect(page.locator('#welcomeNormal')).toBeVisible();
+      expect(new URL(page.url()).searchParams.has('p')).toBe(false);
+      expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
+      expect(await page.evaluate(() => JSON.parse(localStorage.getItem('wizardState')).region)).toBe('e');
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await expect(page.locator(`[data-track-id="${trackId}"]`)).toHaveAttribute('data-state', '1');
+    });
+
+    test('161. Open shared plan replaces the saved plan and its progress', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const firstBtn = page.locator('.step-state-btn[data-track-id]').first();
+      await firstBtn.click();
+      await expect(firstBtn).toHaveAttribute('data-state', '1');
+      await page.waitForTimeout(200);
+      const url = await getShareUrl(page, { goal: 'name', reg: 's', emp: 'no', dl: 'none', pass: 'none' });
+      await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
+      await page.getByRole('button', { name: 'Open shared plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      expect(await page.evaluate(() => wizardState.region)).toBe('s');
+      expect(await page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('st_')))).toEqual([]);
+    });
+
+    test('162. Saved plans and links are only out of date when the plan version rises, not on every deploy', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.waitForTimeout(200);
+      const setVersion = (app) => page.evaluate(a => localStorage.setItem('appState', JSON.stringify(a)), app);
+      const pv = await page.evaluate(() => window.PLAN_VERSION);
+      await setVersion({ planGenerated: true, planVersion: pv, schemaVersion: 1 });
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      await expect(page.locator('#welcomeOutdated')).toBeHidden();
+      await setVersion({ planGenerated: true, planVersion: pv - 1 });
+      await reloadUntil(page, () => page.locator('#welcomeOutdated').isVisible());
+      await expect(page.locator('#welcomeNormal')).toBeHidden();
+      await setVersion({ planGenerated: true, schemaVersion: await page.evaluate(() => window.SCHEMA_VERSION) });
+      await reloadUntil(page, () => page.locator('#welcomeOutdated').isVisible());
+      const current = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'no' });
+      await gotoUntil(page, current, () => page.locator('#welcomeSharedReplace').isVisible());
+      await page.getByRole('button', { name: 'Open shared plan' }).click();
+      await expect(page.locator('#planView'), 'a link carrying the current plan version opens straight to the plan').toBeVisible();
     });
   });
 
@@ -1698,7 +1776,7 @@ test.describe('Be myself Planner', () => {
     test('122. A shared link\'s custom order round-trips through loadUrlParams', async ({ page }) => {
       const urlStr = await page.evaluate((fp) => {
         const ps = {
-          v: window.SCHEMA_VERSION, goal: 'both', reg: 'e', emp: 'needs_update', dbs: true,
+          pv: window.PLAN_VERSION, goal: 'both', reg: 'e', emp: 'needs_update', dbs: true,
           ord: { ph: ['deedpoll', 'work', 'health', 'civic', 'documents'], it: { work: ['dbs', 'hr'] } },
         };
         const url = new URL(fp);
@@ -1866,20 +1944,22 @@ test.describe('Be myself Planner', () => {
       await expect(focusBtn).toHaveAttribute('aria-pressed', 'false');
     });
 
-    test('108. Step-state button aria-pressed is correct across all four cycle states', async ({ page }) => {
+    test('108. Step-state button label names the status across all four cycle states', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkEmployedNeeds').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       const btn = page.locator('.step-state-btn[data-track-id]').first();
-      await expect(btn).toHaveAttribute('aria-pressed', 'false');
+      await expect(btn).not.toHaveAttribute('aria-pressed', /.*/);
+      await expect(btn).toHaveAttribute('aria-label', /: Not started\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'true');
+      await expect(btn).toHaveAttribute('aria-label', /: In progress\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'true');
+      await expect(btn).toHaveAttribute('aria-label', /: Done\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'true');
+      await expect(btn).toHaveAttribute('aria-label', /: Not needed\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'false');
+      await expect(btn).toHaveAttribute('aria-label', /: Not started\./);
+      await expect(btn).not.toHaveAttribute('aria-pressed', /.*/);
     });
 
     test('109. Warning banners use role="alert"', async ({ page }) => {
@@ -2126,9 +2206,64 @@ test.describe('Be myself Planner', () => {
       const summary = page.getByText('More information about: Services to update');
       await summary.click();
       await expect(page.locator('#svc_detail_landreg')).toBeAttached();
-      const phase = page.locator('#svc_detail_landreg').locator('xpath=ancestor::div[contains(@class,"phase")]');
+      const phase = page.locator('#svc_detail_landreg').locator('xpath=ancestor::section[contains(@class,"phase")]');
       const [scrollHeight, clientHeight] = await phase.evaluate(el => [el.scrollHeight, el.clientHeight]);
       expect(scrollHeight).toBeLessThanOrEqual(clientHeight + 1);
+    });
+
+    test('163. Opening a link inside a dialog with the keyboard keeps the dialog open, and the backdrop still closes it', async ({ page }) => {
+      await page.context().route(/^https?:/, r => r.abort());
+      await page.locator('#dlgSupport').evaluate(d => d.showModal());
+      await page.locator('#dlgSupport a[href*="transactual"]').focus();
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(200);
+      expect(await page.locator('#dlgSupport').evaluate(d => d.open)).toBe(true);
+      await page.mouse.click(5, 5);
+      expect(await page.locator('#dlgSupport').evaluate(d => d.open)).toBe(false);
+    });
+
+    test('164. The usage guide toolbar legend is readable by screen readers', async ({ page }) => {
+      await page.locator('#dlgUsage').evaluate(d => d.showModal());
+      const hiddenText = await page.locator('#dlgUsage .legend-toolbar').evaluateAll(els =>
+        els.flatMap(el => Array.from(el.querySelectorAll('strong')).filter(s => s.closest('[aria-hidden="true"]')).map(s => s.textContent)));
+      expect(hiddenText).toEqual([]);
+      await expect(page.locator('#dlgUsage').getByText('This link contains sensitive information')).toBeVisible();
+      await expect(page.locator('#dlgUsage')).toContainText('pressing Esc twice within a second');
+    });
+
+    test('165. Every checklist question with choices is a group named by its question', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkEmployedNeeds').check();
+      const orphans = await page.locator('#checklistView input[type="radio"], #chkGoalName, #chkGoalGender, .chk-service').evaluateAll(inputs =>
+        inputs.filter(i => {
+          const fs = i.closest('fieldset.chk-section');
+          const legend = fs && fs.querySelector(':scope > legend.chk-q');
+          return !legend || !legend.textContent.trim();
+        }).map(i => i.id));
+      expect(orphans).toEqual([]);
+      await expect(page.getByRole('group', { name: 'Where do you live?' })).toBeVisible();
+      await expect(page.getByRole('group', { name: /What is the status of your passport/ })).toBeVisible();
+    });
+
+    test('166. The age kickout takes focus, and Go back returns it to Start here', async ({ page }) => {
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await page.locator('#wizardForm').getByLabel('No', { exact: true }).check();
+      await page.getByRole('button', { name: /Continue/ }).click();
+      await expect(page.locator('#ageKickout h2')).toBeFocused();
+      await page.locator('#ageKickout').getByRole('button', { name: 'Go back' }).click();
+      await expect(page.locator('#startWizardBtn')).toBeFocused();
+    });
+
+    test('167. A checkbox action runs once per click', async ({ page }) => {
+      await openChecklist(page);
+      await page.evaluate(() => {
+        window.__calls = 0;
+        const original = window.ACTIONS.handleSvcAll;
+        window.ACTIONS.handleSvcAll = (...a) => { window.__calls++; return original(...a); };
+      });
+      await page.locator('label:has(#chkSvcAll)').click();
+      expect(await page.evaluate(() => window.__calls)).toBe(1);
+      await expect(page.locator('#chkSvcBanks')).toBeChecked();
     });
   });
 
@@ -2302,6 +2437,7 @@ test.describe('Be myself Planner', () => {
           ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
         const gatesNotYetAnsweredInThisBrowser = await page.locator('#ageConfirmShared').isVisible();
         if (gatesNotYetAnsweredInThisBrowser) await checkAgeGateShared(page);
+        await openSharedPlanIfAsked(page);
         await expect(page.locator('#planView')).toBeVisible();
       };
 
@@ -2544,6 +2680,28 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkEmployedUpdated')).toBeChecked();
       await page.evaluate(() => { window.wizardState.employment = 'no'; window.renderChecklist(); });
       await expect(page.locator('#chkEmployedNo')).toBeChecked();
+    });
+
+    test('169. Cost badges are green for free, yellow for small and medium cost, and red for higher cost', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', stu: true, dp: false,
+        dl: 'needs_update', pass: 'needs_update', grc: true, bc: true, srv: 'banks' });
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      const tone = { 'Free': 'success', 'Small cost': 'simultaneous', 'Medium cost': 'simultaneous', 'Higher cost': 'urgent' };
+      const badge = { success: 'badge-green', simultaneous: 'badge-yellow', urgent: 'badge-red' };
+      const found = await page.locator('#planContent .item-badge').evaluateAll(els => els
+        .filter(el => el.textContent.includes('Approximate cost'))
+        .map(el => el.classList.contains('split-badge')
+          ? { split: Array.from(el.querySelectorAll('[aria-hidden="true"]')).map(s => [s.textContent, s.style.color]) }
+          : { label: el.lastChild.textContent, cls: el.className }));
+      expect(found.length).toBeGreaterThan(5);
+      for (const f of found) {
+        if (f.split) for (const [text, colour] of f.split) expect(colour, text).toBe(`var(--${tone[text]})`);
+        else expect(f.cls, f.label).toContain(badge[tone[f.label]]);
+      }
+      await expect(page.locator('li[data-item-id="trk_grc_docs"] .item-badge.badge-yellow', { hasText: 'Approximate cost' })).toHaveText('Approximate cost: Small cost');
     });
   });
 

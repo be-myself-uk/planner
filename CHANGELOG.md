@@ -15,8 +15,26 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ## [Unreleased]
 
+### Information
+
+- The step-by-step note on name-change documents in Scotland wrongly said a statutory declaration is made through the National Records of Scotland. It now says a statutory declaration is more commonly used in Scotland, and that a free deed poll is accepted by most organisations.
+- Two GRC steps showed "Small cost" in green, which is used for free. Small and medium costs are now always yellow, and higher costs red.
+
+### Wording
+
+- The GRC question and its answers, and the qualifications question, now read the same in the step-by-step questions and the checklist. In Northern Ireland, Council Tax is now called Rates (Land & Property Services) wherever it appears.
+- The DBS, AccessNI and Disclosure Scotland checkboxes said "select no" where there is nothing to select. They now say to leave the box unticked.
+- The Privacy panel now says that "New plan" keeps your light or dark mode choice.
+
 ### Code
 
+- Opening a shared link on a device that already has a plan now asks first. You can open the shared plan, which replaces yours and its progress, or keep your own.
+- A saved plan or shared link is now only called out of date when a change could affect your answers or plan, not after every update to the site.
+- Opening a link inside a panel with the keyboard no longer closes the panel.
+- Screen readers now hear when a step's status changes. This was being replaced straight away by "Your next step is", which is now only read out when the next step changes.
+- The usage guide's toolbar list is now read out by screen readers, including the warning that a copied link contains sensitive information.
+- Each checklist question is now read out with its answers by screen readers.
+- Answering no to the age or disclaimer question now moves focus to the message that explains why, and "Go back" returns it to "Start here".
 - A printed or saved plan now lists each link on its own line with its full web address after it, since you cannot click a link on paper. A step heading is no longer left stranded at the foot of a page, and a single step is not split across two. The tip about the status boxes and the "Don't show this again" button no longer print either.
 
 ### Layout
