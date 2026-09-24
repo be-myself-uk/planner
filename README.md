@@ -63,7 +63,7 @@ If you already have an action plan, use the Copy link button first to keep it. T
 
 - No personal data is collected or sent anywhere
 - Answers and progress are stored only in your browser's localStorage
-- You can delete everything at any time by clicking "New plan", or by clearing your browser's site data (clearing your browsing history alone does not clear localStorage)
+- Clicking "New plan" deletes your answers, plan, and progress, but keeps your light or dark mode choice. Clearing your browser's site data deletes everything (clearing your browsing history alone does not clear localStorage)
 - A Cloudflare security cookie may be set by the hosting provider to protect against automated attacks; it is not used for tracking
 
 > ⚠️ A shareable link holds your answers in the address itself, including immigration status, employment situation, and GRC intentions. Only share one with people you trust.

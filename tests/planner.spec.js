@@ -13,6 +13,11 @@ async function checkAgeGateShared(page) {
   await page.locator('#disclaimerConfirmShared').check();
 }
 
+async function openSharedPlanIfAsked(page) {
+  const btn = page.getByRole('button', { name: 'Open shared plan' });
+  if (await btn.isVisible()) await btn.click();
+}
+
 async function openChecklist(page) {
   await checkAgeGate(page);
   await page.locator('.start-checklist-link').click();
@@ -132,7 +137,7 @@ function decodeState(encoded) {
 
 async function getShareUrl(page, data) {
   return page.evaluate((d) => {
-    const obj = Object.assign({ v: window.SCHEMA_VERSION }, d);
+    const obj = Object.assign({ pv: window.PLAN_VERSION }, d);
     const bytes = new TextEncoder().encode(JSON.stringify(obj));
     let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
     const fp = window.location.href.split('?')[0];
@@ -547,8 +552,8 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkGoalName').check();
       await page.locator('#chkGoalGender').uncheck();
       await expect(page.locator('#wrapBirthCertName')).toBeHidden();
-      // name-only plus an England birth leaves the whole section empty, so it hides
-      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
+      await expect(page.locator('#wrapSectionLongterm'),
+        'name-only plus an England birth leaves the whole section empty, so it hides').toBeHidden();
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
       await expect(page.locator('#wrapSectionLongterm')).toBeVisible();
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
@@ -762,7 +767,6 @@ test.describe('Be myself Planner', () => {
         expect(s.rendered).toBe(s.source.replace(/\s+/g, ' ').trim());
       }
 
-      // the wizard renders the same strings, so the two views cannot drift apart
       const inWizard = await page.evaluate(() => {
         const seen = {};
         questions.forEach(q => {
@@ -772,7 +776,8 @@ test.describe('Be myself Planner', () => {
         return seen;
       });
       for (const key of ['goal', 'visa', 'employment', 'student', 'vehicle', 'services']) {
-        expect(inWizard[key], `${key} note not found in any wizard question`).toBe(true);
+        expect(inWizard[key],
+          `${key} note not found in any wizard question, so the two views have drifted apart`).toBe(true);
       }
     });
 
@@ -824,17 +829,17 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wrapSectionBasics .chk-q').first())
         .toContainText('What do you need to update on your documents?');
 
-      // the Scotland-only birth certificate question joins the same section, it does not open a new one
       await page.locator('input[name="chkBirthRegion"][value="s"]').check();
       ls = await labels();
-      expect(ls.map(l => l.replace(/^\d+\.\s*/, ''))).toEqual(
+      expect(ls.map(l => l.replace(/^\d+\.\s*/, '')),
+        'the Scotland-only birth certificate question joins the same section, it does not open a new one').toEqual(
         ['About you', 'Your current documents', 'Your situation', 'Long-term goals']);
       await expect(page.locator('#wrapBirthCertName')).toBeVisible();
 
-      // with nothing long-term left to ask, the section hides rather than showing an empty heading
       await page.locator('input[name="chkBirthRegion"][value="e"]').check();
       await page.locator('#chkGoalGender').uncheck();
-      await expect(page.locator('#wrapSectionLongterm')).toBeHidden();
+      await expect(page.locator('#wrapSectionLongterm'),
+        'with nothing long-term left to ask, the section hides rather than showing an empty heading').toBeHidden();
       expect(await labels()).toHaveLength(3);
     });
 
@@ -962,6 +967,7 @@ test.describe('Be myself Planner', () => {
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
       if (await discCb.isVisible()) await discCb.check();
+      await openSharedPlanIfAsked(page);
       await expect(page.locator('[data-track-id="trk_grcmed_r1"]')).toHaveAttribute('data-state', '2');
       await expect(page.locator('[data-track-id="trk_grc_med"]')).toHaveAttribute('data-state', '2');
     });
@@ -1022,7 +1028,21 @@ test.describe('Be myself Planner', () => {
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
       if (await discCb.isVisible()) await discCb.check();
+      await openSharedPlanIfAsked(page);
       await expect(page.locator('[data-track-id="trk_grcdocs_sd"]')).toHaveAttribute('data-state', '2');
+    });
+
+    test('168. Changing a step status announces the change, and the next step only when it changes', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.waitForTimeout(400);
+      const firstPhaseBtns = page.locator('#planContent > .phase[data-phase-key]').first().locator('.step-state-btn[data-track-id]');
+      await expect(firstPhaseBtns).toHaveCount(1);
+      const btn = firstPhaseBtns.first();
+      const label = await btn.getAttribute('data-step-label');
+      await btn.click();
+      await expect(page.locator('#liveRegion')).toHaveText(`${label} marked as in progress.`);
+      await btn.click();
+      await expect(page.locator('#liveRegion')).toHaveText(new RegExp(`^${label} marked as done\\. Your next step is: Step 2: `));
     });
   });
 
@@ -1030,7 +1050,7 @@ test.describe('Be myself Planner', () => {
     test('15. Shareable link clipboard', async ({ page }) => {
       await openChecklist(page);
       await page.getByLabel(/Deed poll or statutory declaration/).check();
-      await page.getByLabel(/Yes, I plan to apply for one at some point/).check();
+      await page.getByLabel(/Not yet, but I plan to apply for one/).check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await page.evaluate(() => {
         window._shareUrl = null;
@@ -1092,7 +1112,7 @@ test.describe('Be myself Planner', () => {
       await expect(hmrcBtn).toHaveAttribute('data-state', '2');
       const urlStr = await page.evaluate((fp) => {
         const prg = { hmrc: 2 };
-        const ps = { v: window.SCHEMA_VERSION, goal: 'both', reg: 'ew', emp: 'no', prg };
+        const ps = { pv: window.PLAN_VERSION, goal: 'both', reg: 'ew', emp: 'no', prg };
         const url = new URL(fp);
         url.searchParams.set('p', btoa(JSON.stringify(ps)));
         return url.toString();
@@ -1104,7 +1124,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planView')).toBeVisible();
       const restoredBtn = page.locator('#ssb_trk_hmrc');
       await expect(restoredBtn).toHaveAttribute('data-state', '2');
-      await expect(restoredBtn).toHaveAttribute('aria-pressed', 'true');
+      await expect(restoredBtn).toHaveAttribute('aria-label', /: Done\./);
     });
 
     test('34. Progress bleed prevention', async ({ page }) => {
@@ -1133,7 +1153,8 @@ test.describe('Be myself Planner', () => {
       const clip = await page.evaluate(() => window._shareUrl);
       const decoded = decodeState(new URL(clip).searchParams.get('p'));
       expect(decoded.svn).toBe(true);
-      await gotoUntil(page, clip, () => page.evaluate(() => wizardState.svcNone === 'yes'));
+      await navigateUntil(page, async () => { await page.goto(clip); await openSharedPlanIfAsked(page); },
+        () => page.evaluate(() => wizardState.svcNone === 'yes'), 12, 'gotoUntil');
       expect(await page.evaluate(() => wizardState.svcNone)).toBe('yes');
     });
 
@@ -1145,8 +1166,8 @@ test.describe('Be myself Planner', () => {
       await firstBtn.click();
       await expect(firstBtn).toHaveAttribute('data-state', '1');
       await page.waitForTimeout(200);
-      await gotoUntil(page, filePath + '?p=%%%notvalid%%%',
-        () => page.locator('#welcomeOutdated').isVisible());
+      await navigateUntil(page, async () => { await page.goto(filePath + '?p=%%%notvalid%%%'); await openSharedPlanIfAsked(page); },
+        () => page.locator('#welcomeOutdated').isVisible(), 12, 'gotoUntil');
       await expect(page.locator('#welcomeOutdated')).toBeVisible();
       expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
     });
@@ -1170,6 +1191,88 @@ test.describe('Be myself Planner', () => {
         await expect(page.locator('#planView')).toBeVisible();
         expect(await page.evaluate(() => wizardState.region)).toBe(current);
       }
+    });
+
+    test('160. A shared link on a device with a saved plan asks first, and Keep my plan changes nothing', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const firstBtn = page.locator('.step-state-btn[data-track-id]').first();
+      const trackId = await firstBtn.getAttribute('data-track-id');
+      await firstBtn.click();
+      await expect(firstBtn).toHaveAttribute('data-state', '1');
+      await page.waitForTimeout(200);
+      const url = await getShareUrl(page, { goal: 'name', reg: 's', emp: 'no', dl: 'none', pass: 'none' });
+      await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
+      await expect(page.locator('#planView')).toBeHidden();
+      expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId), 'the prompt alone must not touch saved progress').toBe('1');
+      await page.getByRole('button', { name: 'Keep my plan' }).click();
+      await expect(page.locator('#welcomeSharedReplace')).toBeHidden();
+      await expect(page.locator('#welcomeNormal')).toBeVisible();
+      expect(new URL(page.url()).searchParams.has('p')).toBe(false);
+      expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
+      expect(await page.evaluate(() => JSON.parse(localStorage.getItem('wizardState')).region)).toBe('e');
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await expect(page.locator(`[data-track-id="${trackId}"]`)).toHaveAttribute('data-state', '1');
+    });
+
+    test('161. Open shared plan replaces the saved plan and its progress', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const firstBtn = page.locator('.step-state-btn[data-track-id]').first();
+      await firstBtn.click();
+      await expect(firstBtn).toHaveAttribute('data-state', '1');
+      await page.waitForTimeout(200);
+      const url = await getShareUrl(page, { goal: 'name', reg: 's', emp: 'no', dl: 'none', pass: 'none' });
+      await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
+      await page.getByRole('button', { name: 'Open shared plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      expect(await page.evaluate(() => wizardState.region)).toBe('s');
+      expect(await page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('st_')))).toEqual([]);
+    });
+
+    test('162. Saved plans and links are only out of date when the plan version rises, not on every deploy', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.waitForTimeout(200);
+      const setVersion = (app) => page.evaluate(a => localStorage.setItem('appState', JSON.stringify(a)), app);
+      const pv = await page.evaluate(() => window.PLAN_VERSION);
+      await setVersion({ planGenerated: true, planVersion: pv, schemaVersion: 1 });
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      await expect(page.locator('#welcomeOutdated')).toBeHidden();
+      await setVersion({ planGenerated: true, planVersion: pv - 1 });
+      await reloadUntil(page, () => page.locator('#welcomeOutdated').isVisible());
+      await expect(page.locator('#welcomeNormal')).toBeHidden();
+      await setVersion({ planGenerated: true, schemaVersion: await page.evaluate(() => window.SCHEMA_VERSION) });
+      await reloadUntil(page, () => page.locator('#welcomeOutdated').isVisible());
+      const current = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'no' });
+      await gotoUntil(page, current, () => page.locator('#welcomeSharedReplace').isVisible());
+      await page.getByRole('button', { name: 'Open shared plan' }).click();
+      await expect(page.locator('#planView'), 'a link carrying the current plan version opens straight to the plan').toBeVisible();
+    });
+
+    test('170. A shared link keeps an already-updated work answer and its DBS step', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'updated', dbs: true });
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#planView'), 'a link the planner made itself must not read as out of date').toBeVisible();
+      expect(await page.evaluate(() => wizardState.employment)).toBe('updated');
+      await expect(page.locator('li[data-item-id="trk_dbs"]')).toHaveCount(1);
+    });
+
+    test('171. An opened shared plan does not keep the old plan\'s custom order or Focus mode', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const firstKey = await page.locator('#planContent > .phase[data-phase-key]').first().getAttribute('data-phase-key');
+      await page.locator(`.phase[data-phase-key="${firstKey}"] .phase-move-group .tmpl-move-down`).click();
+      await page.locator('#focusToggleBtn').click();
+      await page.waitForTimeout(200);
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', dbs: true });
+      await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
+      await page.getByRole('button', { name: 'Open shared plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('#planContent > .phase[data-phase-key]').first()).toHaveAttribute('data-phase-key', firstKey);
+      await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'false');
+      await expect(page.locator('#resetOrderBtn')).toBeHidden();
     });
   });
 
@@ -1436,8 +1539,8 @@ test.describe('Be myself Planner', () => {
       await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
       await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
 
-      // each route stands on its own, so neither points at the other
-      await expect(irish).not.toContainText('described first below');
+      await expect(irish,
+        'each route stands on its own, so neither points at the other').not.toContainText('described first below');
       await expect(grc).not.toContainText('described below alongside');
     });
 
@@ -1698,7 +1801,7 @@ test.describe('Be myself Planner', () => {
     test('122. A shared link\'s custom order round-trips through loadUrlParams', async ({ page }) => {
       const urlStr = await page.evaluate((fp) => {
         const ps = {
-          v: window.SCHEMA_VERSION, goal: 'both', reg: 'e', emp: 'needs_update', dbs: true,
+          pv: window.PLAN_VERSION, goal: 'both', reg: 'e', emp: 'needs_update', dbs: true,
           ord: { ph: ['deedpoll', 'work', 'health', 'civic', 'documents'], it: { work: ['dbs', 'hr'] } },
         };
         const url = new URL(fp);
@@ -1866,20 +1969,22 @@ test.describe('Be myself Planner', () => {
       await expect(focusBtn).toHaveAttribute('aria-pressed', 'false');
     });
 
-    test('108. Step-state button aria-pressed is correct across all four cycle states', async ({ page }) => {
+    test('108. Step-state button label names the status across all four cycle states', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkEmployedNeeds').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       const btn = page.locator('.step-state-btn[data-track-id]').first();
-      await expect(btn).toHaveAttribute('aria-pressed', 'false');
+      await expect(btn).not.toHaveAttribute('aria-pressed', /.*/);
+      await expect(btn).toHaveAttribute('aria-label', /: Not started\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'true');
+      await expect(btn).toHaveAttribute('aria-label', /: In progress\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'true');
+      await expect(btn).toHaveAttribute('aria-label', /: Done\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'true');
+      await expect(btn).toHaveAttribute('aria-label', /: Not needed\./);
       await btn.click();
-      await expect(btn).toHaveAttribute('aria-pressed', 'false');
+      await expect(btn).toHaveAttribute('aria-label', /: Not started\./);
+      await expect(btn).not.toHaveAttribute('aria-pressed', /.*/);
     });
 
     test('109. Warning banners use role="alert"', async ({ page }) => {
@@ -2126,9 +2231,172 @@ test.describe('Be myself Planner', () => {
       const summary = page.getByText('More information about: Services to update');
       await summary.click();
       await expect(page.locator('#svc_detail_landreg')).toBeAttached();
-      const phase = page.locator('#svc_detail_landreg').locator('xpath=ancestor::div[contains(@class,"phase")]');
+      const phase = page.locator('#svc_detail_landreg').locator('xpath=ancestor::section[contains(@class,"phase")]');
       const [scrollHeight, clientHeight] = await phase.evaluate(el => [el.scrollHeight, el.clientHeight]);
       expect(scrollHeight).toBeLessThanOrEqual(clientHeight + 1);
+    });
+
+    test('163. Opening a link inside a dialog with the keyboard keeps the dialog open, and the backdrop still closes it', async ({ page }) => {
+      await page.context().route(/^https?:/, r => r.abort());
+      await page.locator('#dlgSupport').evaluate(d => d.showModal());
+      await page.locator('#dlgSupport a[href*="transactual"]').focus();
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(200);
+      expect(await page.locator('#dlgSupport').evaluate(d => d.open)).toBe(true);
+      await page.mouse.click(5, 5);
+      expect(await page.locator('#dlgSupport').evaluate(d => d.open)).toBe(false);
+    });
+
+    test('164. The usage guide toolbar legend is readable by screen readers', async ({ page }) => {
+      await page.locator('#dlgUsage').evaluate(d => d.showModal());
+      const hiddenText = await page.locator('#dlgUsage .legend-toolbar').evaluateAll(els =>
+        els.flatMap(el => Array.from(el.querySelectorAll('strong')).filter(s => s.closest('[aria-hidden="true"]')).map(s => s.textContent)));
+      expect(hiddenText).toEqual([]);
+      await expect(page.locator('#dlgUsage').getByText('This link contains sensitive information')).toBeVisible();
+      await expect(page.locator('#dlgUsage')).toContainText('pressing Esc twice within a second');
+    });
+
+    test('165. Every checklist question with choices is a group named by its question', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkEmployedNeeds').check();
+      const orphans = await page.locator('#checklistView input[type="radio"], #chkGoalName, #chkGoalGender, .chk-service').evaluateAll(inputs =>
+        inputs.filter(i => {
+          const fs = i.closest('fieldset.chk-section');
+          const legend = fs && fs.querySelector(':scope > legend.chk-q');
+          return !legend || !legend.textContent.trim();
+        }).map(i => i.id));
+      expect(orphans).toEqual([]);
+      await expect(page.getByRole('group', { name: 'Where do you live?' })).toBeVisible();
+      await expect(page.getByRole('group', { name: /What is the status of your passport/ })).toBeVisible();
+    });
+
+    test('166. The age kickout takes focus, and Go back returns it to Start here', async ({ page }) => {
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await page.locator('#wizardForm').getByLabel('No', { exact: true }).check();
+      await page.getByRole('button', { name: /Continue/ }).click();
+      await expect(page.locator('#ageKickout h2')).toBeFocused();
+      await page.locator('#ageKickout').getByRole('button', { name: 'Go back' }).click();
+      await expect(page.locator('#startWizardBtn')).toBeFocused();
+    });
+
+    test('167. A checkbox action runs once per click', async ({ page }) => {
+      await openChecklist(page);
+      await page.evaluate(() => {
+        window.__calls = 0;
+        const original = window.ACTIONS.handleSvcAll;
+        window.ACTIONS.handleSvcAll = (...a) => { window.__calls++; return original(...a); };
+      });
+      await page.locator('label:has(#chkSvcAll)').click();
+      expect(await page.evaluate(() => window.__calls)).toBe(1);
+      await expect(page.locator('#chkSvcBanks')).toBeChecked();
+    });
+
+    test('172. Steps hidden by Focus mode cannot be reached with Tab, and focus moves on to a visible step', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.locator('#focusToggleBtn').click();
+      const btn = page.locator('.step-state-btn[data-track-id]').first();
+      const id = await btn.getAttribute('data-track-id');
+      await btn.click();
+      await btn.click();
+      await expect(btn).toBeFocused();
+      await expect(page.locator(`li[data-item-id="${id}"]`)).toHaveClass(/collapsed-step/, { timeout: 5000 });
+      await expect(btn).toBeHidden();
+      const focused = await page.evaluate(() => ({ id: document.activeElement.id, hidden: !!document.activeElement.closest('.collapsed-step, .collapsed-phase, .collapsed-svc') }));
+      expect(focused.hidden, 'focus must not be left on a hidden step').toBe(false);
+      expect(focused.id).toMatch(/^ssb_trk_/);
+      await page.locator('#controlBarCard .ub-icon-btn[tabindex="0"]').focus();
+      for (let i = 0; i < 12; i++) {
+        await page.keyboard.press('Tab');
+        expect(await page.evaluate(() => !!document.activeElement.closest('.collapsed-step, .collapsed-phase, .collapsed-svc')),
+          'Tab must skip steps hidden by Focus mode').toBe(false);
+      }
+    });
+
+    test('173. Printing in Focus mode shows only the steps Focus mode still shows', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.locator('#focusToggleBtn').click();
+      const btn = page.locator('.step-state-btn[data-track-id]').first();
+      const id = await btn.getAttribute('data-track-id');
+      await btn.click();
+      await btn.click();
+      await expect(page.locator(`li[data-item-id="${id}"]`)).toHaveClass(/collapsed-step/, { timeout: 5000 });
+      await page.emulateMedia({ media: 'print' });
+      await expect(page.locator(`li[data-item-id="${id}"]`)).toBeHidden();
+      await expect(page.locator('.step-state-btn[data-track-id]').nth(1)).toBeVisible();
+    });
+
+    test('175. The sticky toolbar and checklist bar never cover the focused item', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await openMultiPhasePlan(page);
+      await page.waitForTimeout(600);
+      const overlap = () => page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || el.closest('#controlBar, #checklistStickyBar')) return 0;
+        const a = el.getBoundingClientRect();
+        return ['controlBar', 'checklistStickyBar'].reduce((sum, id) => {
+          const bar = document.getElementById(id);
+          if (!bar || !bar.offsetHeight) return sum;
+          const r = bar.getBoundingClientRect();
+          return sum + Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top));
+        }, 0);
+      });
+      await page.locator('.footer a').first().focus();
+      for (let i = 0; i < 40; i++) {
+        await page.keyboard.press('Shift+Tab');
+        expect(await overlap(), 'moving back up the plan').toBe(0);
+      }
+      await page.locator('#ubMakeChangesBtn').click();
+      await expect(page.locator('#checklistStickyBar')).toBeVisible();
+      await page.locator('#checklistIntroText').focus();
+      for (let i = 0; i < 40; i++) {
+        await page.keyboard.press('Tab');
+        expect(await overlap(), 'moving down the checklist').toBe(0);
+      }
+    });
+
+    test('176. A greyed-out option shows everyone why, and names the reason for screen readers', async ({ page }) => {
+      await openChecklist(page);
+      for (const [input, note] of [['#chkPassportUpdated', '#lock-passport-reason'], ['#chkDrivingLicenceUpdated', '#lock-driving-reason'], ['#chkVisaUpdated', '#lock-visa-reason']]) {
+        await expect(page.locator(input)).toBeDisabled();
+        await expect(page.locator(note)).toBeVisible();
+        await expect(page.locator(input)).toHaveAttribute('aria-describedby', note.slice(1));
+      }
+      await expect(page.locator('#lock-passport-reason')).toHaveText(/deed poll or statutory declaration/);
+      await page.getByLabel(/Deed poll or statutory declaration/).check();
+      await expect(page.locator('#lock-passport-reason')).toBeHidden();
+      await expect(page.locator('#chkPassportUpdated')).not.toHaveAttribute('aria-describedby', /.*/);
+
+      await page.goto(filePath);
+      await openWizard(page);
+      for (let i = 0; i < 30 && !(await page.locator('#wizardForm').getByText('What is the status of your passport?').isVisible()); i++) {
+        const deed = page.locator('#wizardForm').getByText('Do you have a deed poll');
+        if (await deed.isVisible()) { await page.locator('#wizardForm').getByLabel('No', { exact: true }).check(); await page.locator('#wizardNextBtn').click(); continue; }
+        await wizardNext(page);
+      }
+      const locked = page.locator('#wizardForm input[type="radio"]:disabled');
+      await expect(locked).toHaveCount(1);
+      const noteId = await locked.getAttribute('aria-describedby');
+      await expect(page.locator(`#${noteId}`)).toBeVisible();
+      await expect(page.locator(`#${noteId}`)).toHaveText(/deed poll or statutory declaration/);
+    });
+
+    test('177. Every link that opens a new tab says so, and link icons are not read aloud', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', dbs: true, stu: true, dp: false,
+        dl: 'needs_update', pass: 'needs_update', grc: true, bc: true, dwp: true, veh: true,
+        srv: 'banks,insurance,council,utilities,electoral,cra,landlord,dentist,pension,mortgage,mobile,profbody,landreg' });
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      const silent = await page.evaluate(() => Array.from(document.querySelectorAll('a[target="_blank"]')).filter(a => {
+        const text = a.textContent + (a.classList.contains('links') ? getComputedStyle(a, '::after').content : '');
+        return !text.includes('opens in a new tab');
+      }).map(a => a.href));
+      expect(silent).toEqual([]);
+      const spokenIcons = await page.evaluate(() => Array.from(document.querySelectorAll('a')).filter(a =>
+        Array.from(a.childNodes).some(n => n.nodeType === 3 && n.textContent.includes('🔗'))).map(a => a.href));
+      expect(spokenIcons).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.lang), 'UK spelling and pronunciation').toBe('en-GB');
     });
   });
 
@@ -2170,9 +2438,9 @@ test.describe('Be myself Planner', () => {
     test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
       await openChecklist(page);
 
-      // touching nothing leaves the switch at the first question, as before
       await page.getByRole('button', { name: 'Switch view' }).click();
-      await expect(page.locator('#wizardStepFieldset legend'))
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'touching nothing leaves the switch at the first question, as before')
         .toContainText('What do you need to update on your documents?');
 
       await page.getByRole('button', { name: 'Switch view' }).click();
@@ -2187,9 +2455,9 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => window.step)).toBeGreaterThan(furthest);
       expect(['passport', 'visa']).toContain(resumed);
 
-      // Back still walks through the questions the checklist already answered
       await page.locator('#wizardBackBtn').click();
-      expect(await page.evaluate(() => questions[window.step].id)).toBe('driving');
+      expect(await page.evaluate(() => questions[window.step].id),
+        'Back still walks through the questions the checklist already answered').toBe('driving');
     });
 
     test('148. Every checklist input maps back to the question that owns it', async ({ page }) => {
@@ -2214,8 +2482,8 @@ test.describe('Be myself Planner', () => {
     test('149. A question note sits below its question, never beside it', async ({ page }) => {
       await openChecklist(page);
 
-      // .chk-q--flex laid its children out in a row, so a note landed next to the question
-      expect(await page.locator('.chk-q--flex').count()).toBe(0);
+      expect(await page.locator('.chk-q--flex').count(),
+        '.chk-q--flex laid its children out in a row, so a note landed next to the question').toBe(0);
 
       const boxes = await page.locator('#wrapVisa').evaluate(el => {
         const p = el.querySelector('.chk-q');
@@ -2240,7 +2508,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planView')).toBeVisible();
       const inSession = await page.evaluate(() => window.step);
 
-      await page.reload();
+      await reloadUntil(page, () => page.getByRole('button', { name: 'Continue my plan' }).isVisible());
       await page.getByRole('button', { name: 'Continue my plan' }).click();
       await page.getByRole('button', { name: /Edit plan/ }).click();
 
@@ -2250,11 +2518,10 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wizardStepFieldset legend'))
         .toContainText('What do you need to update on your documents?');
 
-      // every question it can land on is one that currently applies
       expect(await page.evaluate(() => {
         const q = questions[window.step];
         return !q.cond || q.cond();
-      })).toBe(true);
+      }), 'every question it can land on is one that currently applies').toBe(true);
       expect(inSession).toBeGreaterThan(0);
     });
 
@@ -2273,24 +2540,24 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
       await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
 
-      // and it still splits into two phases when a GRC is wanted as well
       await page.getByRole('button', { name: /Edit plan/ }).click();
       await page.locator('#chkGRCYes').check();
       await page.getByRole('button', { name: /Update my action plan|Show my action plan/ }).click();
-      await expect(page.locator('.phase[data-phase-key="final_irish"]')).toHaveCount(1);
+      await expect(page.locator('.phase[data-phase-key="final_irish"]'),
+        'it still splits into two phases when a GRC is wanted as well').toHaveCount(1);
       await expect(page.locator('.phase[data-phase-key="final_grc"]')).toHaveCount(1);
     });
 
     test('152. Declining the Irish route leaves the other Northern Ireland content alone', async ({ page }) => {
-      // bornInNI also selects the GRONI birth-certificate variant and its cost line,
-      // which must not be gated on the Irish route question
       await openChecklist(page);
       await page.locator('input[name="chkBirthRegion"][value="ni"]').check();
       await page.locator('#chkBirthCertName').check();
       await expect(page.locator('#chkIrishRoute')).not.toBeChecked();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
 
-      await expect(page.locator('#planContent')).toContainText('Birth certificate name recording (GRONI)');
+      await expect(page.locator('#planContent'),
+        'bornInNI also selects the GRONI birth-certificate variant and its cost line, which must not be gated on the Irish route question')
+        .toContainText('Birth certificate name recording (GRONI)');
       await expect(page.locator('#planContent')).toContainText('GRONI name recording');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
     });
@@ -2301,8 +2568,9 @@ test.describe('Be myself Planner', () => {
       const open = async (data) => {
         await gotoUntil(page, await getShareUrl(page, data), () => page.evaluate(() =>
           ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
-        // a shared link asks for the gates once; a second one in the same browser does not
-        if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+        const gatesNotYetAnsweredInThisBrowser = await page.locator('#ageConfirmShared').isVisible();
+        if (gatesNotYetAnsweredInThisBrowser) await checkAgeGateShared(page);
+        await openSharedPlanIfAsked(page);
         await expect(page.locator('#planView')).toBeVisible();
       };
 
@@ -2310,9 +2578,9 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => wizardState.irishRoute)).toBe('yes');
       await expect(page.locator('#planContent')).toContainText('Irish passport (Good Friday Agreement route)');
 
-      // a link made before the field existed carries no answer, so it decodes to no
       await open(base);
-      expect(await page.evaluate(() => wizardState.irishRoute)).toBe('no');
+      expect(await page.evaluate(() => wizardState.irishRoute),
+        'a link made before the field existed carries no answer, so it decodes to no').toBe('no');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport (Good Friday Agreement route)');
     });
 
@@ -2343,34 +2611,34 @@ test.describe('Be myself Planner', () => {
       expect(order.slice(0, 3)).toEqual(['planSummaryBox', 'titlesInfoBox', 'trackTipBox']);
       expect(order[3]).toMatch(/^phase:/);
 
-      // the tip carries class="phase" but holds no steps, so nothing counts it as one
       expect(await page.evaluate(() =>
-        document.getElementById('trackTipBox').querySelectorAll('.step-state-btn').length)).toBe(0);
+        document.getElementById('trackTipBox').querySelectorAll('.step-state-btn').length),
+        'the tip carries class="phase" but holds no steps, so nothing counts it as one').toBe(0);
 
-      // dismissing the titles panel leaves the tip adjacent to the summary
       await page.locator('#titlesInfoBox summary').click();
       await page.locator('#titlesInfoBox').getByRole('button', { name: "Don't show this again" }).click();
       const after = await page.evaluate(() =>
         [...document.getElementById('planContent').children].map(el => el.id).filter(Boolean));
-      expect(after).toEqual(['planSummaryBox', 'trackTipBox']);
+      expect(after,
+        'dismissing the titles panel leaves the tip adjacent to the summary').toEqual(['planSummaryBox', 'trackTipBox']);
     });
 
     test('156. The usage guide and About dialog describe what the site actually does', async ({ page }) => {
       await page.getByRole('button', { name: 'Usage guide' }).click();
       const guide = page.locator('#dlgUsage');
 
-      // every toolbar button that can appear has a legend entry
-      await expect(guide).toContainText('Reset order');
+      await expect(guide,
+        'every toolbar button that can appear has a legend entry').toContainText('Reset order');
       await expect(guide).toContainText('Reset progress');
       await expect(guide).toContainText('Focus mode');
       await expect(guide).toContainText('Copy link');
 
-      // reordering exists on every plan, so the guide has to mention it
-      await expect(guide).toContainText('Reset order');
+      await expect(guide,
+        'reordering exists on every plan, so the guide has to mention it').toContainText('Reset order');
       await expect(guide.locator('text=/▲ and ▼/')).toHaveCount(1);
 
-      // Esc has needed two presses since the quick-exit change
-      await expect(guide).toContainText('press twice within a second');
+      await expect(guide,
+        'Esc has needed two presses since the quick-exit change').toContainText('press twice within a second');
       await expect(guide).not.toContainText('Quick exit: leaves the page immediately');
 
       await page.locator('#dlgUsage').getByRole('button', { name: 'Close' }).click();
@@ -2379,22 +2647,20 @@ test.describe('Be myself Planner', () => {
       const dl = about.locator('#offlineDownloadBtn');
       await expect(dl).toHaveAttribute('download', 'bemyself.html');
       await expect(dl).toHaveAttribute('href', '/');
-      // a saved copy is opened from the filesystem, where that link goes nowhere
-      expect(await page.evaluate(() => location.protocol)).toBe('file:');
+      expect(await page.evaluate(() => location.protocol),
+        'a saved copy is opened from the filesystem, where that link goes nowhere').toBe('file:');
       await expect(dl).toBeHidden();
 
-      // the README carries the same questions; the two drifted apart once before
       const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8');
       const inReadme = [...readme.matchAll(/^### (.+)$/gm)].map(m => m[1].trim());
       const inDialog = await about.evaluate(el => [...el.querySelectorAll('h3')].map(h => h.textContent.trim()));
       const shared = inDialog.filter(q => inReadme.includes(q));
-      expect(shared.length).toBeGreaterThan(5);
+      expect(shared.length,
+        'the README carries the same questions; the two drifted apart once before').toBeGreaterThan(5);
       expect(inReadme.filter(q => shared.includes(q))).toEqual(shared);
     });
 
     test('157. Every dialog keeps its content inside its scrollable body', async ({ page }) => {
-      // reordering blocks inside a dialog can carry the body's closing tag with them,
-      // which leaves a section rendering full-bleed outside the padded container
       const strays = await page.evaluate(() =>
         [...document.querySelectorAll('dialog')].map(d => {
           const body = d.querySelector('.dialog-body');
@@ -2406,9 +2672,10 @@ test.describe('Be myself Planner', () => {
               .map(el => (el.textContent || '').trim().slice(0, 40)),
           };
         }).filter(d => d.outside.length));
-      expect(strays).toEqual([]);
+      expect(strays,
+        "reordering blocks inside a dialog can carry the body's closing tag with them, leaving a section rendering full-bleed outside the padded container")
+        .toEqual([]);
 
-      // and the rendered geometry agrees, for the dialog that was actually broken
       await page.getByRole('button', { name: 'What is this?' }).click();
       const fits = await page.evaluate(() => {
         const body = document.querySelector('#dlgAbout .dialog-body');
@@ -2418,7 +2685,8 @@ test.describe('Be myself Planner', () => {
           return r.left >= bb.left && r.right <= bb.right;
         });
       });
-      expect(fits).toBe(true);
+      expect(fits,
+        'and the rendered geometry agrees, for the dialog that was actually broken').toBe(true);
     });
 
     test('158. Strikethrough means not needed, in the services list as everywhere else', async ({ page }) => {
@@ -2435,10 +2703,12 @@ test.describe('Be myself Planner', () => {
 
       await btns.nth(0).click();
       await btns.nth(0).click();
-      expect(await detailOf(0)).toEqual({ state: '2', strike: 'none' });   // done
+      expect(await detailOf(0), 'state 2 is done, and done is not crossed out')
+        .toEqual({ state: '2', strike: 'none' });
 
       await btns.nth(0).click();
-      expect(await detailOf(0)).toEqual({ state: '3', strike: 'line-through' });  // not needed
+      expect(await detailOf(0), 'state 3 is not needed, and only not needed is crossed out')
+        .toEqual({ state: '3', strike: 'line-through' });
     });
 
     test('159. Printing shows where each link goes, since paper cannot be clicked', async ({ page }) => {
@@ -2455,14 +2725,12 @@ test.describe('Be myself Planner', () => {
       const printed = await first.evaluate(a => getComputedStyle(a, '::after').content);
       expect(printed).toContain(href);
 
-      // long URLs must not push a step's box off the page
       await page.evaluate(() => document.querySelectorAll('#planContent details').forEach(d => { d.open = true; }));
       const overflowing = await page.evaluate(() =>
         [...document.querySelectorAll('#planContent .details-body, #planContent .phase')]
           .filter(d => d.scrollWidth > d.clientWidth + 1).length);
-      expect(overflowing).toBe(0);
+      expect(overflowing, "long URLs must not push a step's box off the page").toBe(0);
 
-      // nothing you could only click belongs on paper
       const chrome = await page.evaluate(() => {
         const shown = (el) => {
           const s = getComputedStyle(el);
@@ -2474,18 +2742,17 @@ test.describe('Be myself Planner', () => {
         return {
           tip: count('#trackTipBox'), dismiss: count('#planSummaryBox button'),
           move: count('.item-move-btn'), drag: count('.item-drag-handle'),
-          // the status boxes stay: on paper they are something to tick by hand
           status: count('.step-state-btn'), footer: count('.plan-print-footer'),
         };
       });
-      expect(chrome.tip).toBe(0);
+      expect(chrome.tip, 'nothing you could only click belongs on paper').toBe(0);
       expect(chrome.dismiss).toBe(0);
       expect(chrome.move).toBe(0);
       expect(chrome.drag).toBe(0);
-      expect(chrome.status).toBeGreaterThan(0);
+      expect(chrome.status,
+        'the status boxes stay: on paper they are something to tick by hand').toBeGreaterThan(0);
       expect(chrome.footer).toBe(1);
 
-      // each link gets its own line, and a step heading is never left at the foot of a page
       const layout = await page.evaluate(() => {
         const g = getComputedStyle;
         return {
@@ -2494,7 +2761,8 @@ test.describe('Be myself Planner', () => {
           itemBreakInside: g(document.querySelector('#planView li.plan-item')).breakInside,
         };
       });
-      expect(layout.linkDisplay).toBe('block');
+      expect(layout.linkDisplay,
+        'each link gets its own line, and a step heading is never left at the foot of a page').toBe('block');
       expect(layout.headerBreakAfter).toBe('avoid');
       expect(layout.itemBreakInside).toBe('avoid');
       await page.emulateMedia({ media: 'screen' });
@@ -2545,6 +2813,50 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkEmployedUpdated')).toBeChecked();
       await page.evaluate(() => { window.wizardState.employment = 'no'; window.renderChecklist(); });
       await expect(page.locator('#chkEmployedNo')).toBeChecked();
+    });
+
+    test('169. Cost badges are green for free, yellow for small and medium cost, and red for higher cost', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', stu: true, dp: false,
+        dl: 'needs_update', pass: 'needs_update', grc: true, bc: true, srv: 'banks' });
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      const tone = { 'Free': 'success', 'Small cost': 'simultaneous', 'Medium cost': 'simultaneous', 'Higher cost': 'urgent' };
+      const badge = { success: 'badge-green', simultaneous: 'badge-yellow', urgent: 'badge-red' };
+      const found = await page.locator('#planContent .item-badge').evaluateAll(els => els
+        .filter(el => el.textContent.includes('Approximate cost'))
+        .map(el => el.classList.contains('split-badge')
+          ? { split: Array.from(el.querySelectorAll('[aria-hidden="true"]')).map(s => [s.textContent, s.style.color]) }
+          : { label: el.lastChild.textContent, cls: el.className }));
+      expect(found.length).toBeGreaterThan(5);
+      for (const f of found) {
+        if (f.split) for (const [text, colour] of f.split) expect(colour, text).toBe(`var(--${tone[text]})`);
+        else expect(f.cls, f.label).toContain(badge[tone[f.label]]);
+      }
+      await expect(page.locator('li[data-item-id="trk_grc_docs"] .item-badge.badge-yellow', { hasText: 'Approximate cost' })).toHaveText('Approximate cost: Small cost');
+    });
+
+    test('174. The security policy still lets the page talk to its own site', async ({ page }) => {
+      const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
+      expect(csp, 'Cloudflare adds a check that posts to /cdn-cgi on this site, which connect-src \'none\' blocks').toContain("connect-src 'self'");
+      for (const d of ["base-uri 'none'", "form-action 'none'", "object-src 'none'"]) expect(csp).toContain(d);
+    });
+
+    test('178. Download this page saves the page without what the host adds to it', async ({ page }) => {
+      const original = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const origin = 'https://bemyself.test';
+      const served = original
+        .replace('<body>\n', `<body><a href="${origin}/cdn-cgi/content?id=x" aria-hidden="true" style="display:none"></a>\n`)
+        .replace('</script>\n</body>', "</script>\n<script>(function(){var s='/cdn-cgi/challenge-platform/scripts/jsd/main.js';})();</script></body>");
+      expect(served).not.toBe(original);
+      await page.route(`${origin}/**`, route => route.fulfill({ status: 200, contentType: 'text/html', body: served }));
+      await page.goto(`${origin}/`);
+      await page.locator('#dlgAbout').evaluate(d => d.showModal());
+      const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#offlineDownloadBtn').click()]);
+      expect(download.suggestedFilename()).toBe('bemyself.html');
+      const saved = fs.readFileSync(await download.path(), 'utf8');
+      expect(saved, 'the saved copy must match the published file byte for byte').toBe(original);
     });
   });
 
