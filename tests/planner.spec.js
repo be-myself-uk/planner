@@ -1249,6 +1249,31 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Open shared plan' }).click();
       await expect(page.locator('#planView'), 'a link carrying the current plan version opens straight to the plan').toBeVisible();
     });
+
+    test('170. A shared link keeps an already-updated work answer and its DBS step', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'updated', dbs: true });
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#planView'), 'a link the planner made itself must not read as out of date').toBeVisible();
+      expect(await page.evaluate(() => wizardState.employment)).toBe('updated');
+      await expect(page.locator('li[data-item-id="trk_dbs"]')).toHaveCount(1);
+    });
+
+    test('171. An opened shared plan does not keep the old plan\'s custom order or Focus mode', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const firstKey = await page.locator('#planContent > .phase[data-phase-key]').first().getAttribute('data-phase-key');
+      await page.locator(`.phase[data-phase-key="${firstKey}"] .phase-move-group .tmpl-move-down`).click();
+      await page.locator('#focusToggleBtn').click();
+      await page.waitForTimeout(200);
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', dbs: true });
+      await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
+      await page.getByRole('button', { name: 'Open shared plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('#planContent > .phase[data-phase-key]').first()).toHaveAttribute('data-phase-key', firstKey);
+      await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'false');
+      await expect(page.locator('#resetOrderBtn')).toBeHidden();
+    });
   });
 
   test.describe('Plan generation & content accuracy', () => {
@@ -2265,6 +2290,40 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => window.__calls)).toBe(1);
       await expect(page.locator('#chkSvcBanks')).toBeChecked();
     });
+
+    test('172. Steps hidden by Focus mode cannot be reached with Tab, and focus moves on to a visible step', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.locator('#focusToggleBtn').click();
+      const btn = page.locator('.step-state-btn[data-track-id]').first();
+      const id = await btn.getAttribute('data-track-id');
+      await btn.click();
+      await btn.click();
+      await expect(btn).toBeFocused();
+      await expect(page.locator(`li[data-item-id="${id}"]`)).toHaveClass(/collapsed-step/, { timeout: 5000 });
+      await expect(btn).toBeHidden();
+      const focused = await page.evaluate(() => ({ id: document.activeElement.id, hidden: !!document.activeElement.closest('.collapsed-step, .collapsed-phase, .collapsed-svc') }));
+      expect(focused.hidden, 'focus must not be left on a hidden step').toBe(false);
+      expect(focused.id).toMatch(/^ssb_trk_/);
+      await page.locator('#controlBarCard .ub-icon-btn[tabindex="0"]').focus();
+      for (let i = 0; i < 12; i++) {
+        await page.keyboard.press('Tab');
+        expect(await page.evaluate(() => !!document.activeElement.closest('.collapsed-step, .collapsed-phase, .collapsed-svc')),
+          'Tab must skip steps hidden by Focus mode').toBe(false);
+      }
+    });
+
+    test('173. Printing in Focus mode shows only the steps Focus mode still shows', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.locator('#focusToggleBtn').click();
+      const btn = page.locator('.step-state-btn[data-track-id]').first();
+      const id = await btn.getAttribute('data-track-id');
+      await btn.click();
+      await btn.click();
+      await expect(page.locator(`li[data-item-id="${id}"]`)).toHaveClass(/collapsed-step/, { timeout: 5000 });
+      await page.emulateMedia({ media: 'print' });
+      await expect(page.locator(`li[data-item-id="${id}"]`)).toBeHidden();
+      await expect(page.locator('.step-state-btn[data-track-id]').nth(1)).toBeVisible();
+    });
   });
 
   test.describe('Content integrity', () => {
@@ -2375,7 +2434,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#planView')).toBeVisible();
       const inSession = await page.evaluate(() => window.step);
 
-      await page.reload();
+      await reloadUntil(page, () => page.getByRole('button', { name: 'Continue my plan' }).isVisible());
       await page.getByRole('button', { name: 'Continue my plan' }).click();
       await page.getByRole('button', { name: /Edit plan/ }).click();
 
@@ -2702,6 +2761,12 @@ test.describe('Be myself Planner', () => {
         else expect(f.cls, f.label).toContain(badge[tone[f.label]]);
       }
       await expect(page.locator('li[data-item-id="trk_grc_docs"] .item-badge.badge-yellow', { hasText: 'Approximate cost' })).toHaveText('Approximate cost: Small cost');
+    });
+
+    test('174. The security policy still lets the page talk to its own site', async ({ page }) => {
+      const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
+      expect(csp, 'Cloudflare adds a check that posts to /cdn-cgi on this site, which connect-src \'none\' blocks').toContain("connect-src 'self'");
+      for (const d of ["base-uri 'none'", "form-action 'none'", "object-src 'none'"]) expect(csp).toContain(d);
     });
   });
 

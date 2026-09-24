@@ -87,7 +87,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 156 of them numbered up to 169; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 161 of them numbered up to 174; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 The spec carries no comments. Where an assertion is not self-explanatory, the reason it exists goes in the message argument (`expect(value, 'why this must hold').toBe(...)`), which Playwright prints when the assertion fails, so the reasoning reaches whoever is looking at the failure. Keep new assertions to that pattern.
 
@@ -125,7 +125,7 @@ The file is organised top-to-bottom as: **`<head>`, then CSS (`<style>`), then H
 
 ### 1. `<head>` (lines 1 to 29)
 
-Standard meta tags, Open Graph/Twitter card tags, a JSON-LD `WebApplication` schema block for SEO, a `Content-Security-Policy` meta tag (no external scripts, styles, or fonts allowed, `'self'` only, plus `data:` for the inline SVG favicon; `connect-src`, `base-uri`, `form-action` and `object-src` are all `'none'`, since the page makes no network requests, submits no forms and embeds nothing), and a tiny inline script that sets the dark/light theme before first paint (to avoid a flash of the wrong theme).
+Standard meta tags, Open Graph/Twitter card tags, a JSON-LD `WebApplication` schema block for SEO, a `Content-Security-Policy` meta tag (no external scripts, styles, or fonts allowed, `'self'` only, plus `data:` for the inline SVG favicon; `base-uri`, `form-action` and `object-src` are `'none'`, since the page submits no forms and embeds nothing. `connect-src` must stay `'self'` even though the page itself makes no requests: Cloudflare adds a bot-detection script to the live page that runs in an iframe, inherits this policy, and posts back to `/cdn-cgi/` on the same site. Test 174 checks this), and a tiny inline script that sets the dark/light theme before first paint (to avoid a flash of the wrong theme).
 
 ### 2. CSS (line 27, minified onto a single line inside one `<style>` block)
 
@@ -176,7 +176,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 **Application state**
 - `wizardState`: one plain object holding every answer, used by both the wizard and the checklist. They are two different UIs over the same underlying state, kept in sync in both directions (wizard-answer-driven and checklist-DOM-driven).
 - `isWizardMode`, `step`, `wizardHistory`: wizard-specific navigation state.
-- `focusMode`: whether "Focus mode" (hide completed items) is active.
+- `focusMode`: whether "Focus mode" (hide completed items) is active. A hidden step, phase or service gets `collapsed-step`, `collapsed-phase` or `collapsed-svc`, which fade it out and then set `visibility: hidden` once the animation ends, so it leaves the Tab order and the screen reader's view, not just the screen. If the focused button is hidden, `refreshPlan()` moves focus on to the next visible step. Printing follows Focus mode on purpose: a printed plan shows only the steps still on screen.
 - Progress on individual plan steps is stored separately, per step, as `st_<trackId>` keys directly in `localStorage` (via `getStepState`/`setStepState`), not inside `wizardState`, since progress needs to survive independently of the answers that generated the plan.
 
 **The wizard**
@@ -206,7 +206,7 @@ This is the entire application logic. Key pieces, roughly in the order they appe
 **Sharing and persistence**
 - `encodeState()` / `decodeState()` / `copyShareableLink()`: encode the current answers and progress into the `?p=...` shareable link.
 - `loadUrlParams()` / `handleUrlLoad()` / `handleLegacyUrl()`: the reverse, reconstructing state from a shared link. Read these functions directly in `index.html` if you need the exact data format; it is not reproduced here.
-- `openSharedLink()`: every shared link goes through this. If the device already has a saved plan, it first asks whether to open the shared plan, which replaces the saved plan and its progress, or keep the saved one (`openSharedPlan()` / `keepOwnPlan()`). `restoreSavedApp()` is the welcome back path, shared by page load and "Keep my plan".
+- `openSharedLink()`: every shared link goes through this. If the device already has a saved plan, it first asks whether to open the shared plan, which replaces the saved plan and its progress, or keep the saved one (`openSharedPlan()` / `keepOwnPlan()`). Opening a link also replaces the custom order and Focus mode setting with the link's own, clearing them when the link carries none. `restoreSavedApp()` is the welcome back path, shared by page load and "Keep my plan".
 
 **Everything else**
 - Dialog handling (`closeDialogOnBackdrop`, `openHelp`). A dialog closes on a backdrop click by checking that the click landed on the `<dialog>` itself, not by its coordinates: a keyboard-activated link inside a dialog reports a click at `0,0`, which a coordinate check reads as outside. theme toggling, the "panic button" quick-exit, confetti animation on plan completion, and toolbar keyboard navigation (`initToolbarNav`, arrow-key roving tabindex per the WAI-ARIA toolbar pattern). The `window.onload` bootstrap at the bottom restores saved state, wires up the `checklistView` change listener, and sets the footer's copyright year and last-reviewed date.

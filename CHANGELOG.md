@@ -28,10 +28,12 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Code
 
-- Opening a shared link on a device that already has a plan now asks first. You can open the shared plan, which replaces yours and its progress, or keep your own.
-- A saved plan or shared link is now only called out of date when a change could affect your answers or plan, not after every update to the site.
+- Opening a shared link on a device that already has a plan now asks first. You can open the shared plan, which replaces yours, its progress, its step order, and Focus mode, or keep your own.
+- A shared link from someone who had already updated their work records was treated as out of date, and lost that answer and any DBS step. It now opens normally.
+- A saved plan or shared link is now only called out of date when a change could affect your answers or plan. Until now, every update to the site did this, because one number set both this and the "Last updated" date at the bottom of the page. That date still changes with every update, but a separate plan version, raised only for changes that could affect a plan, now decides whether yours is out of date.
 - Opening a link inside a panel with the keyboard no longer closes the panel.
 - Screen readers now hear when a step's status changes, and hear "Your next step is" only when the next step changes. They now also read the usage guide's toolbar list, including the warning that a copied link contains sensitive information, and read each checklist question together with its answers.
+- Steps hidden by Focus mode can no longer be reached with the Tab key or read by screen readers, and marking the step you are on as done moves you to the next visible one.
 - Answering no to the age or disclaimer question now moves focus to the message that explains why, and "Go back" returns it to "Start here".
 
 ## [September 2026]
