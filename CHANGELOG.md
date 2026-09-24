@@ -15,6 +15,8 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ## [Unreleased]
 
+**Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** This update adds the plan version that decides when that message appears, and plans made before it do not have one yet. Check your answers once, and the message will not come back until a later change could affect your plan.
+
 ### Information
 
 - The step-by-step note on name-change documents in Scotland wrongly said a statutory declaration is made through the National Records of Scotland. It now says a statutory declaration is more commonly used in Scotland, and that a free deed poll is accepted by most organisations.
@@ -34,6 +36,9 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Opening a link inside a panel with the keyboard no longer closes the panel.
 - Screen readers now hear when a step's status changes, and hear "Your next step is" only when the next step changes. They now also read the usage guide's toolbar list, including the warning that a copied link contains sensitive information, and read each checklist question together with its answers.
 - Steps hidden by Focus mode can no longer be reached with the Tab key or read by screen readers, and marking the step you are on as done moves you to the next visible one.
+- Moving through a plan or the checklist with the keyboard no longer hides the item you are on behind the toolbar at the top or the button bar at the bottom.
+- A greyed-out answer now says why it cannot be chosen yet, for everyone rather than only for screen readers.
+- "Download this page" now saves an exact copy of the planner. It used to include extra code added by the site's host, which did nothing offline.
 - Answering no to the age or disclaimer question now moves focus to the message that explains why, and "Go back" returns it to "Start here".
 
 ## [September 2026]

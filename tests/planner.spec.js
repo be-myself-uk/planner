@@ -2324,6 +2324,80 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator(`li[data-item-id="${id}"]`)).toBeHidden();
       await expect(page.locator('.step-state-btn[data-track-id]').nth(1)).toBeVisible();
     });
+
+    test('175. The sticky toolbar and checklist bar never cover the focused item', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await openMultiPhasePlan(page);
+      await page.waitForTimeout(600);
+      const overlap = () => page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body || el.closest('#controlBar, #checklistStickyBar')) return 0;
+        const a = el.getBoundingClientRect();
+        return ['controlBar', 'checklistStickyBar'].reduce((sum, id) => {
+          const bar = document.getElementById(id);
+          if (!bar || !bar.offsetHeight) return sum;
+          const r = bar.getBoundingClientRect();
+          return sum + Math.max(0, Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top));
+        }, 0);
+      });
+      await page.locator('.footer a').first().focus();
+      for (let i = 0; i < 40; i++) {
+        await page.keyboard.press('Shift+Tab');
+        expect(await overlap(), 'moving back up the plan').toBe(0);
+      }
+      await page.locator('#ubMakeChangesBtn').click();
+      await expect(page.locator('#checklistStickyBar')).toBeVisible();
+      await page.locator('#checklistIntroText').focus();
+      for (let i = 0; i < 40; i++) {
+        await page.keyboard.press('Tab');
+        expect(await overlap(), 'moving down the checklist').toBe(0);
+      }
+    });
+
+    test('176. A greyed-out option shows everyone why, and names the reason for screen readers', async ({ page }) => {
+      await openChecklist(page);
+      for (const [input, note] of [['#chkPassportUpdated', '#lock-passport-reason'], ['#chkDrivingLicenceUpdated', '#lock-driving-reason'], ['#chkVisaUpdated', '#lock-visa-reason']]) {
+        await expect(page.locator(input)).toBeDisabled();
+        await expect(page.locator(note)).toBeVisible();
+        await expect(page.locator(input)).toHaveAttribute('aria-describedby', note.slice(1));
+      }
+      await expect(page.locator('#lock-passport-reason')).toHaveText(/deed poll or statutory declaration/);
+      await page.getByLabel(/Deed poll or statutory declaration/).check();
+      await expect(page.locator('#lock-passport-reason')).toBeHidden();
+      await expect(page.locator('#chkPassportUpdated')).not.toHaveAttribute('aria-describedby', /.*/);
+
+      await page.goto(filePath);
+      await openWizard(page);
+      for (let i = 0; i < 30 && !(await page.locator('#wizardForm').getByText('What is the status of your passport?').isVisible()); i++) {
+        const deed = page.locator('#wizardForm').getByText('Do you have a deed poll');
+        if (await deed.isVisible()) { await page.locator('#wizardForm').getByLabel('No', { exact: true }).check(); await page.locator('#wizardNextBtn').click(); continue; }
+        await wizardNext(page);
+      }
+      const locked = page.locator('#wizardForm input[type="radio"]:disabled');
+      await expect(locked).toHaveCount(1);
+      const noteId = await locked.getAttribute('aria-describedby');
+      await expect(page.locator(`#${noteId}`)).toBeVisible();
+      await expect(page.locator(`#${noteId}`)).toHaveText(/deed poll or statutory declaration/);
+    });
+
+    test('177. Every link that opens a new tab says so, and link icons are not read aloud', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', dbs: true, stu: true, dp: false,
+        dl: 'needs_update', pass: 'needs_update', grc: true, bc: true, dwp: true, veh: true,
+        srv: 'banks,insurance,council,utilities,electoral,cra,landlord,dentist,pension,mortgage,mobile,profbody,landreg' });
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      const silent = await page.evaluate(() => Array.from(document.querySelectorAll('a[target="_blank"]')).filter(a => {
+        const text = a.textContent + (a.classList.contains('links') ? getComputedStyle(a, '::after').content : '');
+        return !text.includes('opens in a new tab');
+      }).map(a => a.href));
+      expect(silent).toEqual([]);
+      const spokenIcons = await page.evaluate(() => Array.from(document.querySelectorAll('a')).filter(a =>
+        Array.from(a.childNodes).some(n => n.nodeType === 3 && n.textContent.includes('🔗'))).map(a => a.href));
+      expect(spokenIcons).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.lang), 'UK spelling and pronunciation').toBe('en-GB');
+    });
   });
 
   test.describe('Content integrity', () => {
@@ -2767,6 +2841,22 @@ test.describe('Be myself Planner', () => {
       const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
       expect(csp, 'Cloudflare adds a check that posts to /cdn-cgi on this site, which connect-src \'none\' blocks').toContain("connect-src 'self'");
       for (const d of ["base-uri 'none'", "form-action 'none'", "object-src 'none'"]) expect(csp).toContain(d);
+    });
+
+    test('178. Download this page saves the page without what the host adds to it', async ({ page }) => {
+      const original = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const origin = 'https://bemyself.test';
+      const served = original
+        .replace('<body>\n', `<body><a href="${origin}/cdn-cgi/content?id=x" aria-hidden="true" style="display:none"></a>\n`)
+        .replace('</script>\n</body>', "</script>\n<script>(function(){var s='/cdn-cgi/challenge-platform/scripts/jsd/main.js';})();</script></body>");
+      expect(served).not.toBe(original);
+      await page.route(`${origin}/**`, route => route.fulfill({ status: 200, contentType: 'text/html', body: served }));
+      await page.goto(`${origin}/`);
+      await page.locator('#dlgAbout').evaluate(d => d.showModal());
+      const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#offlineDownloadBtn').click()]);
+      expect(download.suggestedFilename()).toBe('bemyself.html');
+      const saved = fs.readFileSync(await download.path(), 'utf8');
+      expect(saved, 'the saved copy must match the published file byte for byte').toBe(original);
     });
   });
 
