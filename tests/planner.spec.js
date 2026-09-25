@@ -2858,6 +2858,48 @@ test.describe('Be myself Planner', () => {
       const saved = fs.readFileSync(await download.path(), 'utf8');
       expect(saved, 'the saved copy must match the published file byte for byte').toBe(original);
     });
+    test('179. llms.txt passes Lighthouse\'s checks and links only to real pages', async () => {
+      const text = fs.readFileSync(path.resolve('..', 'llms.txt'), 'utf8');
+      expect(text.length, 'Lighthouse fails a file under 50 characters').toBeGreaterThanOrEqual(50);
+      expect(text, 'Lighthouse needs a "# " heading').toMatch(/^\s*#\s+.+/m);
+      expect(text, 'Lighthouse needs at least one Markdown link').toMatch(/\[.+\]\(.+\)/);
+      expect(text.startsWith('---'), 'a leading --- is read as front matter and hides the heading').toBe(false);
+      expect(text).not.toContain('—');
+      const links = [...text.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)].map(m => m[1]);
+      expect(links.length).toBeGreaterThan(0);
+      for (const link of links) {
+        expect(link, 'links must be absolute, since AI tools read this file on its own').toMatch(/^https:\/\//);
+        const url = new URL(link);
+        if (url.hostname === 'github.com') {
+          const file = url.pathname.replace(/^\/be-myself-uk\/planner\/blob\/main\//, '');
+          expect(fs.existsSync(path.resolve('..', file)), `${link} points to a file that is not in the repository`).toBe(true);
+        } else {
+          expect(url.hostname).toBe('bemyself.uk');
+        }
+      }
+    });
+
+    test('180. ai-catalog.json passes Lighthouse\'s catalog schema', async () => {
+      const raw = fs.readFileSync(path.resolve('..', '.well-known', 'ai-catalog.json'), 'utf8');
+      const catalog = JSON.parse(raw);
+      expect(Object.keys(catalog).every(k => ['specVersion', 'host', 'entries'].includes(k)),
+        'the schema rejects any other root field').toBe(true);
+      expect(catalog.specVersion).toBe('1.0');
+      expect(Array.isArray(catalog.entries)).toBe(true);
+      expect('collections' in catalog, 'top-level collections were removed from the spec').toBe(false);
+      if (catalog.host) {
+        expect(Object.keys(catalog.host).every(k => ['displayName', 'identifier', 'documentationUrl', 'logoUrl', 'trustManifest'].includes(k)),
+          'the schema rejects any other host field').toBe(true);
+        expect(typeof catalog.host.displayName).toBe('string');
+        if (catalog.host.documentationUrl) expect(catalog.host.documentationUrl).toMatch(/^https:\/\//);
+      }
+      for (const entry of catalog.entries) {
+        expect(entry.identifier).toMatch(/^urn:air:[^:]+:[^:]+:[^:]+$/);
+        expect(typeof entry.displayName).toBe('string');
+        expect(typeof entry.type).toBe('string');
+        expect(('url' in entry) !== ('data' in entry), 'each entry needs exactly one of url or data').toBe(true);
+      }
+    });
   });
 
 });

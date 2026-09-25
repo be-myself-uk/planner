@@ -41,6 +41,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - "Download this page" now saves an exact copy of the planner. It used to include extra code added by the site's host, which did nothing offline.
 - Answering no to the age or disclaimer question now moves focus to the message that explains why, and "Go back" returns it to "Start here".
 
+### Infrastructure
+
+- Added `llms.txt`, a short plain summary of the planner for AI tools, and an empty `ai-catalog.json` saying the site offers no AI agents or tools. Both are read by Google Lighthouse's new AI agent checks.
+
 ## [September 2026]
 
 - **⚠️ NHS England has brought in a single national waiting list for adult gender services, held by the National Adult Gender Referral Support Service. If you are waiting for a first appointment in England, that service holds your referral separately from your GP record, and you need to tell it about a change of name or other details yourself. Your place on the list is set by your original referral date and does not change when you update your details.**

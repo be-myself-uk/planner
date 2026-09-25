@@ -1,0 +1,27 @@
+# Be myself
+
+> A free, private planner that helps trans and non-binary people in the UK work out the steps to update their name and gender marker on their documents.
+
+Be myself asks a short set of questions about someone's situation: where they live, what documents they have, what they have already updated, and what they want to change. It then builds a step-by-step action plan with instructions and links to official pages. It covers England, Wales, Scotland, and Northern Ireland, people from outside the UK who hold a visa or eVisa, and the Irish passport gender recognition route for people born in Northern Ireland. It is for people aged 16 and over.
+
+The whole planner is a single web page. Nothing anyone enters is sent to a server: answers and progress stay in their own browser. There is no account, no login, and no API.
+
+## The planner
+
+- [Be myself planner](https://bemyself.uk/): answer the questions to get a personal action plan covering deed polls, driving licences, passports, health records, HMRC, criminal record checks, benefits, birth certificates, and Gender Recognition Certificate applications
+
+## About the project
+
+- [README](https://github.com/be-myself-uk/planner/blob/main/README.md): what the planner does, who it is for, privacy, and the disclaimer
+- [Sources](https://github.com/be-myself-uk/planner/blob/main/SOURCES.md): the official sources behind the guidance, and when each was last checked
+- [Changelog](https://github.com/be-myself-uk/planner/blob/main/CHANGELOG.md): what has changed on the site, grouped by month
+
+## Notes for AI tools
+
+- The planner gives general guidance only. It is not legal, medical, financial, or tax advice. Rules and fees change, so point people to the official pages linked in their plan before they apply for anything.
+- A shared plan link holds someone's answers in the address itself, including immigration status, employment situation, and plans for a Gender Recognition Certificate. Treat any such link as private information.
+
+## Optional
+
+- [Contributing guide](https://github.com/be-myself-uk/planner/blob/main/CONTRIBUTING.md): how the site is built and tested, for people who want to suggest changes
+- [Licence](https://github.com/be-myself-uk/planner/blob/main/LICENCE.md): CC BY-NC-SA 4.0
