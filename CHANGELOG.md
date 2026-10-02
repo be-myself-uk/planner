@@ -54,6 +54,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 - The scheduled source check now compares the text of GOV.UK pages too, since GOV.UK only changes a page's update date for major edits.
 - The version bump workflow now keeps the date in `sitemap.xml` current.
+- Every GitHub Action the workflows use is now pinned to an exact commit, with its version noted beside it, so a changed or compromised release tag cannot alter what runs.
 - Added tests for all of the above, including a check that plan text gives costs as labels rather than amounts.
 
 ## [September 2026]
