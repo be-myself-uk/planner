@@ -1394,7 +1394,7 @@ test.describe('Be myself Planner', () => {
       const plan = page.locator('#planContent');
       await expect(plan).toContainText('a written letter asking for the change of gender');
       await page.getByText('More information about: UK passport').click();
-      await expect(plan).toContainText('you will also need to write a letter asking for the change of gender');
+      await expect(plan).toContainText('a letter from you asking for the change of gender');
       await expect(plan.locator('a', { hasText: 'Change of name because of a change of gender' })).toBeVisible();
     });
 
@@ -1416,7 +1416,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.getByText('Credit reference agencies', { exact: true })).toBeVisible();
       await expect(page.locator('#planContent')).toContainText('Experian, Equifax, or TransUnion');
-      await expect(page.locator('#planContent')).toContainText('this only starts the process at the other two');
+      await expect(page.locator('#planContent')).toContainText('it will tell the other two agencies');
       await expect(page.locator('#planContent')).toContainText('Notice of Correction');
       await page.evaluate(() => {
         window._shareUrl = null;
@@ -1736,12 +1736,12 @@ test.describe('Be myself Planner', () => {
       const plan = page.locator('#planContent');
       await expect(plan).not.toContainText('driving licence updated first');
       await expect(plan).toContainText('Evidence needed');
-      await expect(plan).toContainText('dated after your deed poll or statutory declaration');
+      await expect(plan).toContainText('issued after your deed poll or statutory declaration');
       await expect(plan).toContainText('mobile, broadband, or streaming bill');
       await expect(plan).toContainText('a recent bill or letter that already shows your new name is often accepted instead');
     });
 
-    test('92. DVLA gender-only variant does not show name-change evidence text', async ({ page }) => {
+    test('92. The DVLA gender-only text asks for the extra document only when a deed poll or statutory declaration is used', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').uncheck();
       await expect(page.locator('#chkGoalGender')).toBeChecked();
@@ -1750,8 +1750,9 @@ test.describe('Be myself Planner', () => {
       const plan = page.locator('#planContent');
       await expect(plan).toContainText('The DVLA accepts a deed poll, a statutory declaration, or a GRC as evidence for a gender marker change');
       await expect(plan).toContainText('A medical letter is not needed');
+      await expect(plan, 'GOV.UK asks for the extra document whenever a deed poll or statutory declaration is used, even for a gender-only change').toContainText('If you use a deed poll or statutory declaration');
+      await expect(plan).toContainText('UK passport number');
       await expect(plan).not.toContainText('one other document that already shows your new name');
-      await expect(plan).not.toContainText('mobile, broadband, or streaming bill');
     });
 
     test('139. A gender-only plan that asks for a name-change document also gives a step for getting one', async ({ page }) => {
@@ -1839,6 +1840,41 @@ test.describe('Be myself Planner', () => {
       await page.locator('#checklistStickyBar button').click();
       await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
       await expect(page.locator('li[data-item-id="trk_hr"]')).toContainText('once they have seen your deed poll or statutory declaration');
+    });
+
+    test('194. Wales has its own NHS gender marker text, separate from England\'s', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkRegionWales').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const nhs = page.locator('li[data-item-id="trk_nhs"]');
+      await expect(nhs).toContainText('NHS Wales Shared Services Partnership');
+      await expect(nhs, 'the under-18 direction applies to NHS England').not.toContainText('Secretary of State');
+      await expect(nhs, 'PCSE does not handle registration in Wales').not.toContainText('third NHS number');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#checklistStickyBar button').click();
+      await expect(nhs).toContainText('Your NHS number stays the same for a name-only change');
+      await expect(nhs).not.toContainText('NHS Wales Shared Services Partnership');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalGender').check();
+      await page.locator('#chkRegionEW').check();
+      await page.locator('#checklistStickyBar button').click();
+      await expect(nhs).toContainText('third NHS number');
+      await expect(nhs).not.toContainText('NHS Wales Shared Services Partnership');
+    });
+
+    test('195. Northern Ireland GRC plans explain spousal consent, interim certificates and benefits', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkRegionNI').check();
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan, 'spousal consent and interim certificates apply in Northern Ireland too').toContainText('interim GRC');
+      await expect(plan).toContainText('If you are married or in a civil partnership');
+      await expect(plan).toContainText('entitlement to some benefits and pensions');
+      await expect(plan, 'the planner stays out of anti-discrimination law').not.toContainText('Equality Commission');
     });
   });
 
@@ -3152,6 +3188,17 @@ test.describe('Be myself Planner', () => {
         else expect(f.cls, f.label).toContain(badge[tone[f.label]]);
       }
       await expect(page.locator('li[data-item-id="trk_grc_docs"] .item-badge.badge-yellow', { hasText: 'Approximate cost' })).toHaveText('Approximate cost: Small cost');
+    });
+
+    test('196. Costs are shown as labels, with one deliberate exception for an exact fee', async ({ page }) => {
+      const html = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const withAmounts = html.split('\n').filter(l => /[£€]\s?\d/.test(l));
+      expect(withAmounts, 'fees change often, so only the statutory declaration swearing fee is given as an amount').toHaveLength(1);
+      expect(withAmounts[0]).toContain('Statutory declaration for GRC');
+      const { extractContentMap } = require('./content-snapshot-lib');
+      const content = await page.evaluate(extractContentMap);
+      const priced = Object.entries(content).filter(([, text]) => /[£€]\s?\d/.test(text)).map(([key]) => key);
+      expect(priced, 'plan and service text uses Free, Small cost, Medium cost or Higher cost instead').toEqual([]);
     });
 
     test('174. The security policy still lets the page talk to its own site', async ({ page }) => {
