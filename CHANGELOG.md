@@ -42,6 +42,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Quick exit: the "Skip to main content" link no longer adds a step to your browser history, so pressing Back after a quick exit does not bring the planner back. Pressing Esc twice within a second now leaves even while a panel is open, but not if you press another key or click in between. Every panel now has its own Quick exit button, since the one on the toolbar cannot be reached while a panel is open.
 - A step that holds a list, such as the services to update or the GRC evidence, now shows "in progress" as soon as anything in it is started. Clicking the step changes the whole list, but no longer undoes items you have already finished.
 - Criminal record checks are now asked about for everyone living in the UK, not only people with work records to update.
+- Nothing in the checklist is chosen for you any more. It used to start with some answers already selected, such as England, and "No" for work records and a GRC, which were easy to miss. If a question is left unanswered, "Show my action plan" takes you to it and asks you to choose an answer.
 - Screen readers now hear the question or section you are on from the progress bar, no longer hear the usage guide's badge labels twice, and every panel can be scrolled with the keyboard.
 
 ### Layout

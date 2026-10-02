@@ -176,18 +176,19 @@
       <label class="option option-sm" style="margin-top:4px;"><input type="checkbox" id="checklistDisclaimerConfirm" data-action="handleChecklistDisclaimer"> Yes, I understand</label>
     </div>
     <div id="checklistWarning" class="warning-text" role="alert"><span aria-hidden="true">⚠️</span> You cannot continue unless you are aged 16 or over and understand that this is general guidance only.</div>
+    <div id="checklistAnswerWarning" class="warning-text" style="margin:10px 0 0 0;" role="alert"><span aria-hidden="true">⚠️</span> Please choose an answer to this question.</div>
     <fieldset id="wrapSectionBasics" data-section-label="About you" style="border:none;padding:0;margin:0 0 28px 0;">
 
       <legend class="section-title">1. About you</legend>
       <fieldset id="wrapGoal" class="chk-section chk-section--mb">
         <legend class="chk-q">What do you need to update on your documents?<br><em class="note" style="margin-top:2px;" data-note="goal"></em></legend>
-        <label class="option option-sm"><input type="checkbox" id="chkGoalName" checked> My name</label>
-        <label class="option option-sm"><input type="checkbox" id="chkGoalGender" checked> My gender marker (M or F)</label>
+        <label class="option option-sm"><input type="checkbox" id="chkGoalName"> My name</label>
+        <label class="option option-sm"><input type="checkbox" id="chkGoalGender"> My gender marker (M or F)</label>
         <div id="checklistGoalWarning" class="warning-text" style="margin:10px 0 0 0;" role="alert"><span aria-hidden="true">⚠️</span> Please select at least one option for what you need to update on your documents.</div>
       </fieldset>
       <fieldset id="wrapRegion" class="chk-section chk-section--mb">
         <legend class="chk-q">Where do you live?</legend>
-        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="e" checked> England</label>
+        <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionEW" value="e"> England</label>
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionWales" value="w"> Wales</label>
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionScot" value="s"> Scotland</label>
         <label class="option option-sm"><input type="radio" name="chkRegion" id="chkRegionNI" value="ni"> Northern Ireland</label>
@@ -196,7 +197,7 @@
 
       <fieldset id="wrapBirthRegion" class="chk-section chk-section--mb">
         <legend class="chk-q">Where was your birth registered?<br><em class="note" style="margin-top:2px;" data-note="birthRegion"></em></legend>
-        <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionEW"    value="e" checked> England</label>
+        <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionEW"    value="e"> England</label>
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionWales" value="w"> Wales</label>
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionScot"  value="s"> Scotland</label>
         <label class="option option-sm"><input type="radio" name="chkBirthRegion" id="chkBirthRegionNI"   value="ni"> Northern Ireland</label>
@@ -215,19 +216,19 @@
     <label class="checkbox-item" id="wrapHMRC"><input type="checkbox" id="chkHMRC"><span>HMRC and taxes<br><em class="note" style="margin-top:2px;">Tick only if already updated.</em></span></label>
     <fieldset id="wrapDrivingLicence" class="chk-section chk-section--mv">
       <legend class="chk-q">What is the status of your UK driving licence?</legend>
-      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update" checked> It has my old details</label>
+      <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNeeds"   value="needs_update"> It has my old details</label>
       <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceUpdated" value="updated"> <span>It is already updated<em class="note lock-note hidden" id="lock-driving-reason" data-lock="deedpoll"></em></span></label>
       <label class="option option-sm"><input type="radio" name="chkDrivingLicenceOpt" id="chkDrivingLicenceNone"    value="none"> I do not have one</label>
     </fieldset>
     <fieldset id="wrapPassport" class="chk-section chk-section--mv">
       <legend class="chk-q">What is the status of your passport?</legend>
-      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update" checked> It has my old details</label>
+      <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNeeds"   value="needs_update"> It has my old details</label>
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportUpdated" value="updated"> <span>It is already updated<em class="note lock-note hidden" id="lock-passport-reason" data-lock="deedpoll"></em></span></label>
       <label class="option option-sm"><input type="radio" name="chkPassportOpt" id="chkPassportNone"    value="none"> I do not have one</label>
     </fieldset>
     <fieldset id="wrapVisa" class="chk-section chk-section--mv">
       <legend class="chk-q">Do you have a visa or eVisa?<br><em class="note" style="margin-top:2px;" data-note="visa"></em></legend>
-      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNone"    value="none" checked> I do not have one</label>
+      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNone"    value="none"> I do not have one</label>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNeeds"   value="needs_update"> Yes, and it has my old details</label>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaUpdated" value="updated"> <span>Yes, and it is already updated<em class="note lock-note hidden" id="lock-visa-reason" data-lock="visa"></em></span></label>
     </fieldset>
@@ -238,7 +239,7 @@
         <legend class="chk-q">Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="margin-top:2px;" data-note="employment"></em></legend>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNeeds" value="needs_update"> Yes, I need to update my records</label>
         <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedUpdated" value="updated"> I've already updated my records</label>
-        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no" checked> No, I do not have any to update</label>
+        <label class="option option-sm"><input type="radio" name="chkEmployment" id="chkEmployedNo" value="no"> No, I do not have any to update</label>
     </fieldset>
     <label class="checkbox-item hidden" id="wrapDBS"><input type="checkbox" id="chkDBS"><span><span class="label-dbs-dft">I need a DBS check, or I have one on the DBS Update Service<br><em class="note" style="margin-top:2px;">For example, for a job, volunteering role, course, or placement. This includes basic, standard, and enhanced checks. If this does not apply to you, leave this unticked. There is a specific route for trans people that keeps your previous name and gender off the certificate.</em></span><span class="label-dbs-ni">I need an AccessNI check<br><em class="note" style="margin-top:2px;">AccessNI is Northern Ireland's equivalent of the DBS. For example, for a job, volunteering role, course, or placement. If this does not apply to you, leave this unticked. There is a special process for trans people that keeps your previous gender and names from the organisation asking for the check.</em></span><span class="label-dbs-scot">I need a Disclosure Scotland check, or I am a member of the PVG scheme<br><em class="note" style="margin-top:2px;">Disclosure Scotland is Scotland's equivalent of the DBS. For example, for a job, volunteering role, course, or placement. If neither applies to you, leave this unticked. There is a specific process for trans and non-binary people that keeps your previous name off the disclosure your employer sees.</em></span></span></label>
     <label class="checkbox-item" id="wrapDWP"><input type="checkbox" id="chkDWP"><span><span class="label-dwp-dft">I am currently receiving DWP benefits<br><em class="note" style="margin-top:2px;" data-note="dwp"></em></span><span class="label-dwp-ni">I am currently receiving benefits from the Department for Communities (DfC)<br><em class="note" style="margin-top:2px;" data-note="dwpNI"></em></span></span></label>
@@ -270,7 +271,7 @@
       <legend class="section-title">4. Long-term goals</legend>
       <fieldset class="chk-section chk-section--mv" id="wrapGRC">
         <legend class="chk-q">Do you have a Gender Recognition Certificate (GRC), or do you plan to apply for one?</legend>
-        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCNo" value="no" checked> No</label>
+        <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCNo" value="no"> No</label>
         <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCYes" value="yes"> Not yet, but I plan to apply for one</label>
         <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCUpdated" value="updated"> I already have one</label>
       </fieldset>
@@ -1490,6 +1491,7 @@ function setChecklistMode(hasPlan) {
   }
   gel('checklistWarning')?.classList.remove('visible');
   gel('checklistGoalWarning')?.classList.remove('visible');
+  clearAnswerWarning();
   showAdaptiveNoteIfNeeded();
 }
 function startChecklist() {
@@ -1726,29 +1728,21 @@ function updateDerivedState() {
     wizardState.visaUpdated = S.NO;
   }
 }
+function setRadioGroup(name, value) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => { r.checked = value != null && r.value === value; });
+}
 function renderChecklist() {
-  const rv = (wizardState.regionOutsideUK === S.YES) ? 'out' : (wizardState.region || REGION.E);
-  const r = document.querySelector(`input[name="chkRegion"][value="${rv}"]`);
-  if (r) r.checked = true;
-  const brv = (wizardState.birthOutsideUK === S.YES) ? 'out' : (wizardState.birthRegion || REGION.E);
-  const br = document.querySelector(`input[name="chkBirthRegion"][value="${brv}"]`);
-  if (br) br.checked = true;
-  if (wizardState.goal) {
-    gel('chkGoalName').checked   = wizardState.goal === S.BOTH || wizardState.goal === S.NAME;
-    gel('chkGoalGender').checked = wizardState.goal === S.BOTH || wizardState.goal === S.GENDER;
-  }
+  setRadioGroup('chkRegion', wizardState.regionOutsideUK === S.YES ? 'out' : wizardState.region);
+  setRadioGroup('chkBirthRegion', wizardState.birthOutsideUK === S.YES ? 'out' : wizardState.birthRegion);
+  gel('chkGoalName').checked   = wizardState.goal === S.BOTH || wizardState.goal === S.NAME;
+  gel('chkGoalGender').checked = wizardState.goal === S.BOTH || wizardState.goal === S.GENDER;
   CHK_MAP.forEach(([id, prop]) => { const el = gel(id); if (el) el.checked = wizardState[prop] === S.YES; });
-  const docRadio = (name, state) => {
-    const v = state === S.UPDATED ? 'updated' : state === S.NONE ? 'none' : 'needs_update';
-    const el = document.querySelector(`input[name="${name}"][value="${v}"]`);
-    if (el) el.checked = true;
-  };
-  docRadio('chkDrivingLicenceOpt', wizardState.driving);
-  docRadio('chkPassportOpt', wizardState.passport);
-  const vEl = document.querySelector(`input[name="chkVisaOpt"][value="${wizardState.visa || S.NONE}"]`);
-  if (vEl) vEl.checked = true;
-  const grcVal = wizardState.grc === S.UPDATED ? 'updated' : (wizardState.grc === S.YES || wizardState.birthCert === S.YES) ? 'yes' : 'no';
-  document.querySelectorAll('input[name="chkGRCOpt"]').forEach(r => { r.checked = r.value === grcVal; });
+  const docValue = (state) => state == null ? null : state === S.UPDATED ? 'updated' : state === S.NONE ? 'none' : 'needs_update';
+  setRadioGroup('chkDrivingLicenceOpt', docValue(wizardState.driving));
+  setRadioGroup('chkPassportOpt', docValue(wizardState.passport));
+  setRadioGroup('chkVisaOpt', wizardState.visa);
+  const grcVal = wizardState.grc === S.UPDATED ? 'updated' : (wizardState.grc === S.YES || wizardState.birthCert === S.YES) ? 'yes' : wizardState.grc == null ? null : 'no';
+  setRadioGroup('chkGRCOpt', grcVal);
   const selected = Array.isArray(wizardState.services) ? wizardState.services : [];
   Object.entries(SVC_MAP).forEach(([val, id]) => { gel(id).checked = selected.includes(val); });
   const noneBox = gel('chkSvcNone');
@@ -1886,18 +1880,13 @@ function handleSvcAll(allBox) {
 }
 function resetChecklist() {
   wizardState = {
-    region: REGION.E, goal: S.BOTH,
-    citizen: S.NO, employment: S.NO,
+    citizen: S.NO,
     dbs: S.NO, dwp: S.NO,
     student: S.NO, vehicle: S.NO,
-    deedpoll: S.NO, visaUpdated: S.NO, visa: S.NONE,
+    deedpoll: S.NO, visaUpdated: S.NO,
     nhs: S.NO, newGP: S.NO, hmrc: S.NO,
-    driving: S.NEEDS_UPDATE, passport: S.NEEDS_UPDATE,
-    grc: S.NO, birthCertName: S.NO,
-    birthCert: S.NO, birthRegion: REGION.E,
-    birthOutsideUK: S.NO,
-    regionOutsideUK: S.NO,
-    goalParts: ['name','gender'],
+    birthCertName: S.NO,
+    birthCert: S.NO,
     services: [],
     svcNone:  S.NO,
   };
@@ -2285,6 +2274,19 @@ function generateWizardPlan() {
   focusPlan();
   refreshToolbarTabindex();
 }
+const CHK_REQUIRED_GROUPS = [
+  ['wrapRegion', 'chkRegion'],
+  ['wrapBirthRegion', 'chkBirthRegion'],
+  ['wrapDrivingLicence', 'chkDrivingLicenceOpt'],
+  ['wrapPassport', 'chkPassportOpt'],
+  ['wrapVisa', 'chkVisaOpt'],
+  ['wrapEmployment', 'chkEmployment'],
+  ['wrapGRC', 'chkGRCOpt'],
+];
+function clearAnswerWarning() {
+  gel('checklistAnswerWarning')?.classList.remove('visible');
+  document.querySelectorAll('[aria-describedby="checklistAnswerWarning"]').forEach(el => el.removeAttribute('aria-describedby'));
+}
 function generateChecklistPlan() {
   if (!gel('checklistAgeConfirm')?.checked) {
     const cw = gel('checklistWarning');
@@ -2313,6 +2315,23 @@ function generateChecklistPlan() {
     if (gw) gw.classList.add('visible');
     gw?.scrollIntoView({behavior:'smooth', block:'center'});
     announce('Please choose at least one option.');
+    return;
+  }
+  const unanswered = CHK_REQUIRED_GROUPS.find(([wrapId, name]) => {
+    const group = gel(wrapId);
+    return group && group.offsetParent && !document.querySelector(`input[name="${name}"]:checked`);
+  });
+  if (unanswered) {
+    const [wrapId, name] = unanswered;
+    const group = gel(wrapId);
+    const warning = gel('checklistAnswerWarning');
+    group.appendChild(warning);
+    warning.classList.add('visible');
+    group.setAttribute('aria-describedby', 'checklistAnswerWarning');
+    warning.scrollIntoView({behavior:'smooth', block:'center'});
+    group.querySelector(`input[name="${name}"]`)?.focus({preventScroll:true});
+    const legend = group.querySelector('legend');
+    announce('Please answer: ' + (legend ? legend.firstChild.textContent.trim() : ''));
     return;
   }
   V.welcome.classList.add('hidden');
@@ -3434,6 +3453,7 @@ window.onload = () => {
     checklistEl.addEventListener('change', (e) => {
       const cw = gel('checklistWarning'); if (cw) cw.classList.remove('visible');
       const gw = gel('checklistGoalWarning'); if (gw) gw.classList.remove('visible');
+      clearAnswerWarning();
       const touched = questionIdForInput(e.target);
       if (touched) chkTouched.add(touched);
       if (e.target.name === 'chkGRCOpt' && e.target.value === 'no') gel('chkBirthCert').checked = false;
@@ -3450,26 +3470,27 @@ window.onload = () => {
         wizardState.region = region.value === 'out' ? REGION.E : region.value;
       }
       const birthReg = document.querySelector('input[name="chkBirthRegion"]:checked');
-      const brVal = birthReg ? birthReg.value : REGION.E;
-      wizardState.birthOutsideUK = brVal === 'out' ? S.YES : S.NO;
-      wizardState.birthRegion = brVal === 'out' ? REGION.E : brVal;
+      if (birthReg) {
+        wizardState.birthOutsideUK = birthReg.value === 'out' ? S.YES : S.NO;
+        wizardState.birthRegion = birthReg.value === 'out' ? REGION.E : birthReg.value;
+      }
       const goalName   = gel('chkGoalName')?.checked;
       const goalGender = gel('chkGoalGender')?.checked;
       if (goalName && goalGender) wizardState.goal = S.BOTH;
       else if (goalName)          wizardState.goal = S.NAME;
       else if (goalGender)        wizardState.goal = S.GENDER;
-      else                        wizardState.goal = 'none';
+      else if (wizardState.goal !== undefined) wizardState.goal = 'none';
       CHK_MAP.forEach(([id, prop]) => { const el = gel(id); if (el) wizardState[prop] = el.checked ? S.YES : S.NO; });
       const emp = document.querySelector('input[name="chkEmployment"]:checked');
       if (emp) wizardState.employment = emp.value;
       const dlC = document.querySelector('input[name="chkDrivingLicenceOpt"]:checked');
-      wizardState.driving  = dlC ? dlC.value : S.NONE;
+      if (dlC) wizardState.driving = dlC.value;
       const ppC = document.querySelector('input[name="chkPassportOpt"]:checked');
-      wizardState.passport = ppC ? ppC.value : S.NONE;
+      if (ppC) wizardState.passport = ppC.value;
       const vsC = document.querySelector('input[name="chkVisaOpt"]:checked');
-      wizardState.visa = vsC ? vsC.value : S.NONE;
+      if (vsC) wizardState.visa = vsC.value;
       const grcC = document.querySelector('input[name="chkGRCOpt"]:checked');
-      wizardState.grc = grcC ? grcC.value : S.NO;
+      if (grcC) wizardState.grc = grcC.value;
       const none = gel('chkSvcNone')?.checked;
       wizardState.svcNone = none ? S.YES : S.NO;
       wizardState.services = none

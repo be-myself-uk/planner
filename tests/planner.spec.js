@@ -18,11 +18,28 @@ async function openSharedPlanIfAsked(page) {
   if (await btn.isVisible()) await btn.click();
 }
 
-async function openChecklist(page) {
+async function openBlankChecklist(page) {
   await checkAgeGate(page);
   await page.locator('.start-checklist-link').click();
   await page.locator('#checklistAgeConfirm').check();
   await page.locator('#checklistDisclaimerConfirm').check();
+}
+
+async function answerOldDefaults(page) {
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').check();
+  for (const id of ['#chkRegionEW', '#chkBirthRegionEW', '#chkDrivingLicenceNeeds', '#chkPassportNeeds', '#chkVisaNone', '#chkEmployedNo', '#chkGRCNo']) {
+    await page.locator(id).check();
+  }
+  await page.evaluate(() => new Promise(resolve => {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  }));
+}
+
+async function openChecklist(page) {
+  await openBlankChecklist(page);
+  await answerOldDefaults(page);
 }
 
 async function openWizard(page) {
@@ -433,6 +450,7 @@ test.describe('Be myself Planner', () => {
       await expect(note).toBeHidden();
       await page.locator('#checklistAgeConfirm').check();
       await page.locator('#checklistDisclaimerConfirm').check();
+      await answerOldDefaults(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await page.locator('#ubRestartBtn').click();
       await page.getByRole('button', { name: /Confirm/ }).click();
@@ -902,6 +920,79 @@ test.describe('Be myself Planner', () => {
       await expect(firstStep.locator('.item-badge', { hasText: 'Approximate cost' }),
         'the cost depends on the country, so there is no badge').toHaveCount(0);
       await expect(page.locator('li[data-item-id="trk_nhs"], li[data-item-id="trk_newgp"], li[data-item-id="trk_dbs"]')).toHaveCount(0);
+    });
+
+    test('200. A fresh checklist has nothing pre-selected', async ({ page }) => {
+      await openBlankChecklist(page);
+      const checked = await page.evaluate(() => Array.from(document.querySelectorAll('#checklistView input:checked'))
+        .map(i => i.id).filter(id => id !== 'checklistAgeConfirm' && id !== 'checklistDisclaimerConfirm'));
+      expect(checked, 'GOV.UK design guidance advises against pre-selecting answers').toEqual([]);
+      const unset = await page.evaluate(() => ['region', 'birthRegion', 'goal', 'driving', 'passport', 'visa', 'employment', 'grc']
+        .filter(k => window.wizardState[k] !== undefined));
+      expect(unset).toEqual([]);
+    });
+
+    test('201. Show my action plan points to the first unanswered question instead of building a plan', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const warning = page.locator('#wrapRegion #checklistAnswerWarning');
+      await expect(warning).toBeVisible();
+      await expect(warning).toHaveText(/Please choose an answer to this question\./);
+      await expect(warning).toHaveAttribute('role', 'alert');
+      await expect(page.locator('#wrapRegion')).toHaveAttribute('aria-describedby', 'checklistAnswerWarning');
+      await expect(page.locator('#chkRegionEW'), 'focus goes to the group that needs an answer').toBeFocused();
+      await expect(page.locator('#liveRegion')).toHaveText('Please answer: Where do you live?');
+      await expect(page.locator('#planView')).toBeHidden();
+
+      await page.locator('#chkRegionScot').check();
+      await expect(page.locator('#checklistAnswerWarning'), 'the next change clears the warning').toBeHidden();
+      expect(await page.locator('#wrapRegion').getAttribute('aria-describedby')).toBeNull();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#wrapBirthRegion #checklistAnswerWarning')).toBeVisible();
+      await expect(page.locator('#chkBirthRegionEW')).toBeFocused();
+      await expect(page.locator('#planView')).toBeHidden();
+    });
+
+    test('202. Answering one question never fills in another', async ({ page }) => {
+      await openBlankChecklist(page);
+      const groups = ['chkRegion', 'chkBirthRegion', 'chkDrivingLicenceOpt', 'chkPassportOpt', 'chkVisaOpt', 'chkEmployment', 'chkGRCOpt'];
+      const answered = [];
+      for (const name of groups) {
+        await page.locator(`input[name="${name}"]:not([disabled])`).last().check();
+        answered.push(name);
+        const filled = await page.evaluate((names) => names.filter(n => document.querySelector(`input[name="${n}"]:checked`)), groups.filter(g => !answered.includes(g)));
+        expect(filled, `answering ${name} must not choose an answer elsewhere`).toEqual([]);
+        await expect(page.locator('#chkGoalName')).not.toBeChecked();
+        await expect(page.locator('#chkGoalGender')).not.toBeChecked();
+      }
+    });
+
+    test('203. A hidden question is not required', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      for (const id of ['#chkRegionWales', '#chkBirthRegionWales', '#chkDrivingLicenceNone', '#chkPassportNeeds', '#chkVisaNone', '#chkEmployedUpdated']) {
+        await page.locator(id).check();
+      }
+      await expect(page.locator('#wrapGRC'), 'the GRC question is not asked for a name-only change').toBeHidden();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+    });
+
+    test('204. Switching to the step-by-step view and back keeps unanswered questions unanswered', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalGender').check();
+      await page.locator('#chkRegionScot').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardView')).toBeVisible();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#checklistView')).toBeVisible();
+      await expect(page.locator('#chkGoalGender')).toBeChecked();
+      await expect(page.locator('#chkGoalName')).not.toBeChecked();
+      await expect(page.locator('#chkRegionScot')).toBeChecked();
+      const filled = await page.evaluate(() => ['chkBirthRegion', 'chkDrivingLicenceOpt', 'chkPassportOpt', 'chkVisaOpt', 'chkEmployment', 'chkGRCOpt']
+        .filter(n => document.querySelector(`input[name="${n}"]:checked`)));
+      expect(filled, 'the round trip used to fill in England, "none" and "no"').toEqual([]);
     });
 
     test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
@@ -1516,6 +1607,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('.start-checklist-link').click();
       await page.locator('#checklistAgeConfirm').check();
       await page.locator('#checklistDisclaimerConfirm').check();
+      await answerOldDefaults(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#titlesInfoBox')).toBeAttached();
     });
@@ -2789,7 +2881,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
-      await openChecklist(page);
+      await openBlankChecklist(page);
 
       await page.getByRole('button', { name: 'Switch view' }).click();
       await expect(page.locator('#wizardStepFieldset legend'),
@@ -3166,6 +3258,16 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkEmployedUpdated')).toBeChecked();
       await page.evaluate(() => { window.wizardState.employment = 'no'; window.renderChecklist(); });
       await expect(page.locator('#chkEmployedNo')).toBeChecked();
+      await page.evaluate(() => {
+        for (const k of ['region', 'regionOutsideUK', 'birthRegion', 'birthOutsideUK', 'goal', 'driving', 'passport', 'visa', 'employment', 'grc']) delete window.wizardState[k];
+        window.wizardState.birthCert = 'no';
+        window.renderChecklist();
+      });
+      const stillChecked = await page.evaluate(() => ['chkRegion', 'chkBirthRegion', 'chkDrivingLicenceOpt', 'chkPassportOpt', 'chkVisaOpt', 'chkEmployment', 'chkGRCOpt']
+        .filter(n => document.querySelector(`input[name="${n}"]:checked`)));
+      expect(stillChecked, 'an unanswered question shows no answer rather than a default').toEqual([]);
+      await expect(page.locator('#chkGoalName')).not.toBeChecked();
+      await expect(page.locator('#chkGoalGender')).not.toBeChecked();
     });
 
     test('169. Cost badges are green for free, yellow for small and medium cost, and red for higher cost', async ({ page }) => {
