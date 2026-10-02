@@ -26,6 +26,20 @@ There is also guidance for people with a visa or eVisa, and for people born in N
 
 The process for under-16s needs parental consent and follows different steps, which this planner does not cover.
 
+### What does it cover?
+
+Updating your name, your gender marker, or both, on:
+
+- a deed poll or statutory declaration
+- your UK passport, or your home country passport and UK eVisa
+- your driving licence and vehicle logbook (V5C)
+- your NHS or GP record, HMRC and tax records, and benefits
+- DBS, Disclosure Scotland and AccessNI checks
+- work, student and professional records
+- banks, utilities, the electoral register and other services
+- a Gender Recognition Certificate (GRC) and your birth certificate
+- the Irish passport route for people born in Northern Ireland
+
 ### Is my information safe?
 
 Yes. Nothing you enter is sent to a server or stored anywhere outside your own device, unless you share a link to your plan, which holds your answers in its web address. Your progress is saved in your browser so you can come back to it later. See [Privacy](#privacy) below.

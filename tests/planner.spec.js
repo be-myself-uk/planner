@@ -2314,7 +2314,7 @@ test.describe('Be myself Planner', () => {
       await expect(dlg).toBeHidden();
       await page.getByRole('link', { name: 'About' }).click();
       await expect(dlg).toBeVisible();
-      const headings = ['What is this?', 'Who is it for?', 'Is my information safe?', 'Can I use this offline?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
+      const headings = ['What is this?', 'Who is it for?', 'What does it cover?', 'Is my information safe?', 'Can I use this offline?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
       for (const h of headings) {
         await expect(dlg.getByRole('heading', { name: h })).toBeVisible();
       }
@@ -3199,6 +3199,59 @@ test.describe('Be myself Planner', () => {
       const content = await page.evaluate(extractContentMap);
       const priced = Object.entries(content).filter(([, text]) => /[£€]\s?\d/.test(text)).map(([key]) => key);
       expect(priced, 'plan and service text uses Free, Small cost, Medium cost or Higher cost instead').toEqual([]);
+    });
+
+    test('197. Search results and link previews get one title and one description, within length limits', async ({ page }) => {
+      const meta = await page.evaluate(() => {
+        const get = (sel) => document.querySelector(sel)?.getAttribute('content');
+        return {
+          title: document.title,
+          ogTitle: get('meta[property="og:title"]'),
+          twitterTitle: get('meta[name="twitter:title"]'),
+          description: get('meta[name="description"]'),
+          ogDescription: get('meta[property="og:description"]'),
+          twitterDescription: get('meta[name="twitter:description"]'),
+          ogImage: get('meta[property="og:image"]'),
+          twitterImage: get('meta[name="twitter:image"]'),
+          ld: Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(s => s.textContent),
+        };
+      });
+      expect(meta.title.length, 'longer titles are cut off in search results').toBeLessThanOrEqual(60);
+      expect(meta.description.length, 'longer descriptions are cut off in search results').toBeLessThanOrEqual(160);
+      expect(meta.ogTitle).toBe(meta.title);
+      expect(meta.twitterTitle).toBe(meta.title);
+      expect(meta.ogDescription).toBe(meta.description);
+      expect(meta.twitterDescription).toBe(meta.description);
+      expect(meta.ogImage).toBe('https://bemyself.uk/og-image.png');
+      expect(meta.twitterImage).toBe(meta.ogImage);
+      const blocks = meta.ld.map(text => JSON.parse(text));
+      const entries = blocks.flatMap(b => Array.isArray(b) ? b : [b]);
+      const app = entries.find(e => e['@type'] === 'WebApplication');
+      expect(app.applicationCategory, 'a category Google supports for web applications').toBe('ReferenceApplication');
+      expect(app.description).toBe(meta.description);
+      expect(app.image).toBe(meta.ogImage);
+      expect(app.featureList.length).toBeGreaterThan(5);
+      expect(entries.some(e => e['@type'] === 'WebSite' && e.url === 'https://bemyself.uk/')).toBe(true);
+    });
+
+    test('198. The heading names what the planner is for, without a separate paragraph', async ({ page }) => {
+      const h1 = page.getByRole('heading', { level: 1 });
+      await expect(h1).toHaveAccessibleName(/Plan updating your name and gender marker on UK documents/);
+      await expect(page.locator('.hero p'), 'the tagline is part of the h1 now').toHaveCount(0);
+      await openChecklist(page);
+      await expect(page.locator('.hero .hero-tagline')).toBeVisible();
+    });
+
+    test('199. The preview image is a 1200 by 1200 PNG, and the sitemap has a valid date', async () => {
+      const png = fs.readFileSync(path.resolve('..', 'og-image.png'));
+      expect(png.subarray(0, 8).toString('hex'), 'PNG signature').toBe('89504e470d0a1a0a');
+      expect(png.subarray(12, 16).toString('ascii')).toBe('IHDR');
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 1200]);
+      const sitemap = fs.readFileSync(path.resolve('..', 'sitemap.xml'), 'utf8');
+      const lastmod = sitemap.match(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/);
+      expect(lastmod, 'bump-version.yml keeps this date current').not.toBeNull();
+      const date = new Date(lastmod[1] + 'T00:00:00Z');
+      expect(date.toISOString().slice(0, 10)).toBe(lastmod[1]);
     });
 
     test('174. The security policy still lets the page talk to its own site', async ({ page }) => {
