@@ -1044,6 +1044,46 @@ test.describe('Be myself Planner', () => {
       await btn.click();
       await expect(page.locator('#liveRegion')).toHaveText(new RegExp(`^${label} marked as done\\. Your next step is: Step 2: `));
     });
+
+    test('185. A list step shows its list\'s progress, and clicking it never undoes a finished item', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGRCYes').check();
+      await page.locator('#chkSvcBanks').check();
+      await page.locator('#chkSvcInsurance').check();
+      await page.locator('#chkSvcUtilities').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      const svcBtns = page.locator('.step-state-btn[data-svc-parent="trk_services_all"]');
+      await expect(svcBtns).toHaveCount(3);
+      for (let i = 0; i < 2; i++) {
+        await svcBtns.nth(i).click();
+        await svcBtns.nth(i).click();
+      }
+      await expect(page.locator('[data-track-id="trk_services_all"]'),
+        'two of three services done and one not started is progress, not "not started"').toHaveAttribute('data-state', '1');
+
+      const lifeBtns = page.locator('.step-state-btn[data-svc-parent="trk_grc_life"]');
+      await expect(lifeBtns).toHaveCount(8);
+      for (let i = 0; i < 7; i++) {
+        await lifeBtns.nth(i).click();
+        await lifeBtns.nth(i).click();
+      }
+      const lifeParent = page.locator('[data-track-id="trk_grc_life"]');
+      await expect(lifeParent).toHaveAttribute('data-state', '1');
+      await lifeParent.click();
+      await expect(lifeParent).toHaveAttribute('data-state', '2');
+      const lifeStates = await lifeBtns.evaluateAll(els => els.map(e => e.dataset.state));
+      expect(lifeStates,
+        'one click on the group used to copy "in progress" onto all eight, undoing seven finished periods').toEqual(Array(8).fill('2'));
+      expect(await page.evaluate(() => localStorage.getItem('st_trk_grc_life'))).toBe('2');
+
+      const medBtns = page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]');
+      const medParent = page.locator('[data-track-id="trk_grc_med"]');
+      await expect(medParent).toHaveAttribute('data-state', '0');
+      await medParent.click();
+      await expect(medParent).toHaveAttribute('data-state', '1');
+      expect(await medBtns.evaluateAll(els => els.map(e => e.dataset.state))).toEqual(['1', '1']);
+    });
   });
 
   test.describe('Sharing & links', () => {
@@ -1660,6 +1700,46 @@ test.describe('Be myself Planner', () => {
       if (/deed poll|statutory declaration/i.test(text)) {
         await expect(page.locator('#planContent [data-item-id="trk_deedpoll"]')).toHaveCount(1);
       }
+    });
+
+    test('181. The birth certificate step follows where the birth was registered, not where you live', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGRCYes').check();
+      await page.locator('#chkBirthCert').check();
+      let first = true;
+      const build = async (live, born) => {
+        if (!first) await page.locator('#ubMakeChangesBtn').click();
+        await page.locator(live).check();
+        await page.locator(born).check();
+        if (first) await page.getByRole('button', { name: 'Show my action plan' }).click();
+        else await page.locator('#checklistStickyBar button').click();
+        first = false;
+        await expect(page.locator('#planView')).toBeVisible();
+        return page.locator('li[data-item-id="trk_birthcert"]');
+      };
+      const costOf = (item) => item.locator('.item-badge', { hasText: 'Approximate cost' });
+
+      let item = await build('#chkRegionEW', '#chkBirthRegionScot');
+      await expect(item, 'born in Scotland, living in England').toContainText('National Records of Scotland (NRS)');
+      await expect(item).not.toContainText('General Register Office (GRO)');
+      await expect(costOf(item)).toHaveText('Approximate cost: Small cost');
+
+      item = await build('#chkRegionScot', '#chkBirthRegionEW');
+      await expect(item, 'born in England, living in Scotland').toContainText('General Register Office (GRO)');
+      await expect(item).not.toContainText('National Records of Scotland');
+      await expect(costOf(item)).toHaveText('Approximate cost: Small cost');
+      await expect(page.locator('#planSummaryBox')).toContainText('New birth certificate: A fee applies.');
+
+      item = await build('#chkRegionWales', '#chkBirthRegionNI');
+      await expect(item, 'born in Northern Ireland, living in Wales').toContainText('General Register Office for Northern Ireland (GRONI)');
+      await expect(costOf(item)).toHaveText(/Approximate cost: Free to Small cost/);
+      await expect(page.locator('#planSummaryBox')).toContainText('A short certificate is issued free of charge.');
+
+      item = await build('#chkRegionScot', '#chkBirthRegionOut');
+      await expect(item, 'born outside the UK, living in Scotland').toContainText('registered outside the UK');
+      await expect(item).not.toContainText('National Records of Scotland');
+      await expect(costOf(item), 'there is no UK fee to show for a birth registered abroad').toHaveCount(0);
+      await expect(page.locator('#planSummaryBox')).not.toContainText('New birth certificate');
     });
   });
 
@@ -2397,6 +2477,144 @@ test.describe('Be myself Planner', () => {
         Array.from(a.childNodes).some(n => n.nodeType === 3 && n.textContent.includes('🔗'))).map(a => a.href));
       expect(spokenIcons).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.lang), 'UK spelling and pronunciation').toBe('en-GB');
+    });
+
+    test('182. The skip link moves focus to the main content without adding a history entry', async ({ page }) => {
+      const before = await page.evaluate(() => ({ length: history.length, href: location.href }));
+      await page.keyboard.press('Tab');
+      await expect(page.locator('.skip-link')).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(page.locator('#mainContent')).toBeFocused();
+      const after = await page.evaluate(() => ({ length: history.length, href: location.href }));
+      expect(after,
+        'a history entry here means Back after a quick exit brings the planner back').toEqual(before);
+    });
+
+    test('183. Esc twice within a second leaves even with a panel open, but not when something happens in between', async ({ page }) => {
+      const dlg = page.locator('#dlgUsage');
+      await page.getByRole('link', { name: 'Usage guide' }).click();
+      await expect(dlg).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dlg).toBeHidden();
+      await page.keyboard.press('Tab');
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page, 'Esc, Tab, Esc is not two presses in a row').not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+
+      await page.waitForTimeout(1100);
+      await page.keyboard.press('Escape');
+      await page.mouse.click(5, 5);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page, 'Esc, click, Esc is not two presses in a row either').not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+
+      await page.waitForTimeout(1100);
+      await page.getByRole('link', { name: 'Usage guide' }).click();
+      await expect(dlg).toBeVisible();
+      await page.keyboard.press('Escape');
+      await page.keyboard.press('Escape');
+      await expect(page,
+        'the Esc that closes a panel counts, so two presses still leave').toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+    });
+
+    test('184. Every panel has its own Quick exit, big enough to tap, and opens with Close focused', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      const panels = [['About', 'dlgAbout'], ['Privacy', 'dlgPrivacy'], ['Usage guide', 'dlgUsage'], ['Support & feedback', 'dlgSupport'], ['Disclaimer', 'dlgDisclaimer']];
+      for (const [link, id] of panels) {
+        await page.locator('.footer-links').getByRole('link', { name: link, exact: true }).click();
+        const dlg = page.locator('#' + id);
+        await expect(dlg).toBeVisible();
+        await expect(dlg.getByRole('button', { name: 'Close' }),
+          'an accidental Enter on opening must not leave the site').toBeFocused();
+        const exit = dlg.locator('.dialog-header').getByRole('button', { name: 'Quick Exit, leaves this page immediately' });
+        await expect(exit, id).toBeVisible();
+        const box = await exit.boundingBox();
+        expect(box.width, id).toBeGreaterThanOrEqual(44);
+        expect(box.height, id).toBeGreaterThanOrEqual(44);
+        await dlg.getByRole('button', { name: 'Close' }).click();
+        await expect(dlg).toBeHidden();
+      }
+      await page.locator('.footer-links').getByRole('link', { name: 'Privacy', exact: true }).click();
+      await page.locator('#dlgPrivacy').getByRole('button', { name: 'Quick Exit, leaves this page immediately' }).click();
+      await expect(page,
+        'the toolbar button cannot be clicked behind a modal panel').toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+    });
+
+    test('186. On a phone, every plan toolbar button stays inside the toolbar and keeps its size', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const workPhase = page.locator('.phase[data-phase-key="work"]');
+      await workPhase.locator('li.plan-item').first().locator('.item-move-group .tmpl-move-down').click();
+      await expect(page.locator('#resetOrderBtn')).toBeVisible();
+      for (const width of [320, 360, 390]) {
+        await page.setViewportSize({ width, height: 800 });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const boxes = await page.evaluate(() => {
+          const card = document.getElementById('controlBarCard').getBoundingClientRect();
+          return Array.from(document.querySelectorAll('#cbPlanActions button')).filter(b => b.offsetParent).map(b => {
+            const r = b.getBoundingClientRect();
+            return { id: b.id || b.getAttribute('aria-label'), inside: r.left >= card.left - 0.5 && r.right <= card.right + 0.5 && r.top >= card.top - 0.5 && r.bottom <= card.bottom + 0.5, w: r.width, h: r.height };
+          });
+        });
+        expect(boxes.length, `${width}px`).toBe(7);
+        for (const b of boxes) {
+          expect(b.inside, `${b.id} at ${width}px was squashed or cut off by the toolbar`).toBe(true);
+          expect(b.w, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
+          expect(b.h, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
+        }
+      }
+    });
+
+    test('187. Links in panels meet contrast guidelines in light and dark themes', async ({ page }) => {
+      for (const theme of ['light', 'dark']) {
+        const results = await page.evaluate((t) => {
+          document.documentElement.setAttribute('data-theme', t);
+          const rgb = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+          const lum = ([r, g, b]) => {
+            const ch = [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+            return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+          };
+          const bgOf = (el) => {
+            for (let n = el; n; n = n.parentElement) {
+              const c = rgb(getComputedStyle(n).backgroundColor);
+              if (c.length >= 3 && (c.length < 4 || c[3] > 0)) return c;
+            }
+            return [255, 255, 255];
+          };
+          return Array.from(document.querySelectorAll('.dialog-body a:not(.contact-btn)')).map(a => {
+            const l1 = lum(rgb(getComputedStyle(a).color)), l2 = lum(bgOf(a));
+            return { text: a.textContent.trim(), ratio: (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05) };
+          });
+        }, theme);
+        expect(results.length, theme).toBeGreaterThan(5);
+        for (const r of results) {
+          expect(r.ratio, `${r.text} in the ${theme} theme; the browser default blue was 1.99:1 in dark mode`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+
+    test('188. Badges, panel bodies and the progress bar give screen readers what they need', async ({ page }) => {
+      await expect(page.locator('#dlgUsage .item-badge[aria-label]'),
+        'aria-label on a plain span is ignored; the visible Difficulty and Cost labels give the context').toHaveCount(0);
+      const bodies = await page.evaluate(() => Array.from(document.querySelectorAll('dialog')).map(d => {
+        const body = d.querySelector('.dialog-body');
+        const labelId = body.getAttribute('aria-labelledby');
+        const label = labelId && document.getElementById(labelId);
+        return { id: d.id, tabindex: body.getAttribute('tabindex'), role: body.getAttribute('role'), labelId, labelInDialog: !!label && d.contains(label) && label.tagName === 'H2' };
+      }));
+      expect(bodies).toHaveLength(5);
+      for (const b of bodies) {
+        expect(b, 'a scrollable body with nothing focusable in it cannot be scrolled from the keyboard in Safari').toEqual({ id: b.id, tabindex: '0', role: 'region', labelId: b.id + 'Title', labelInDialog: true });
+      }
+
+      await openWizard(page);
+      await expect(page.locator('#controlBarProgress')).toHaveAttribute('aria-valuetext', /^Question \d+ of \d+$/);
+      await page.goto(filePath);
+      await openChecklist(page);
+      const bar = page.locator('#controlBarProgress');
+      await expect(bar).toHaveAttribute('aria-valuetext', /^Section \d+ of \d+: .+/);
+      expect(await bar.getAttribute('aria-valuetext')).toBe(await page.locator('#controlBarProgressText').textContent());
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(bar).toHaveAttribute('aria-valuetext', /^0 of \d+ items done or not needed$/);
     });
   });
 
