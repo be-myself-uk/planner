@@ -20,15 +20,15 @@ It gives general guidance based on current UK processes and does not replace pro
 
 ### Who is it for?
 
-Anyone living in the UK aged 16 or over who wants to update their legal documents to match their gender identity. That includes people changing only their name, only their gender marker, or both.
+Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold, whether they live in the UK, live abroad, or are planning to move to the UK.
 
-There is also guidance for people from outside the UK who hold a visa or eVisa, and for people born in Northern Ireland who may be eligible for the Irish passport gender recognition route.
+There is also guidance for people with a visa or eVisa, and for people born in Northern Ireland who may be eligible for the Irish passport gender recognition route.
 
 The process for under-16s needs parental consent and follows different steps, which this planner does not cover.
 
 ### Is my information safe?
 
-Yes. Nothing you enter is sent to a server or stored anywhere outside your own device. Your progress is saved in your browser so you can come back to it later. See [Privacy](#privacy) below.
+Yes. Nothing you enter is sent to a server or stored anywhere outside your own device, unless you share a link to your plan, which holds your answers in its web address. Your progress is saved in your browser so you can come back to it later. See [Privacy](#privacy) below.
 
 ### Step-by-step or checklist?
 
@@ -55,18 +55,18 @@ If you already have an action plan, use the Copy link button first to keep it. T
 - **A personal action plan**: deed polls, driving licences, health records, HMRC, criminal record checks, benefits, birth certificates, and GRC applications, each with an estimated cost, difficulty, and time
 - **Progress tracking**: mark each step as not started, in progress, done, or not needed, with a Focus mode that hides what is finished, and reorder the plan to suit you by dragging steps or using the up and down arrows
 - **Save, share, or print**: your plan is saved on your device; copy a link to continue elsewhere or hand to someone you trust, print a paper or PDF copy, or download the whole planner to use offline
-- **Private by design**: nothing is sent to a server, and a quick-exit button is there if you need to leave the page in a hurry
+- **Private by design**: nothing you enter is sent to a server while you use the planner, and a quick-exit button is there if you need to leave the page in a hurry
 - **Accessible**: full keyboard and screen reader support, light and dark mode, and works from a small phone up to a desktop
 - **Free**: no account, no login, and it works offline as a single downloadable page
 
 ## Privacy
 
-- No personal data is collected or sent anywhere
+- No personal data is collected, and nothing you enter is sent anywhere while you use the planner
 - Answers and progress are stored only in your browser's localStorage
 - Clicking "New plan" deletes your answers, plan, and progress, but keeps your light or dark mode choice. Clearing your browser's site data deletes everything (clearing your browsing history alone does not clear localStorage)
 - A Cloudflare security cookie may be set by the hosting provider to protect against automated attacks; it is not used for tracking
 
-> ⚠️ A shareable link holds your answers in the address itself, including immigration status, employment situation, and GRC intentions. Only share one with people you trust.
+> ⚠️ A shareable link holds your answers in the address itself, including immigration status, employment situation, and GRC intentions. When anyone opens it, the address, including your answers, is sent to the hosting provider, as with any web address. Only share one with people you trust.
 
 ## Disclaimer
 
