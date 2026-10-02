@@ -516,11 +516,19 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wrapVisa')).toBeVisible();
       await expect(page.locator('#wrapVisa .chk-q')).toContainText('Do you have a visa or eVisa?');
       await expect(page.locator('#chkVisaNone')).toBeChecked();
-      await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
-      await page.getByLabel(/Yes, I need to update my records/).check();
-      await expect(page.locator('#wrapDBS')).toBeVisible();
-      await expect(page.locator('#wrapDWP')).toBeVisible();
+      for (const region of ['#chkRegionEW', '#chkRegionWales', '#chkRegionScot', '#chkRegionNI']) {
+        await page.locator(region).check();
+        for (const emp of ['#chkEmployedNo', '#chkEmployedNeeds', '#chkEmployedUpdated']) {
+          await page.locator(emp).check();
+          await expect(page.locator('#wrapDBS'),
+            `${region} with ${emp}: job seekers and prospective students need a check most, so it does not depend on work records`).toBeVisible();
+          await expect(page.locator('#wrapDWP')).toBeVisible();
+        }
+      }
+      await page.locator('#chkRegionOut').check();
+      await expect(page.locator('#wrapDBS'), 'DBS, Disclosure Scotland and AccessNI checks are for people in the UK').toBeHidden();
+      await page.locator('#chkRegionEW').check();
       await page.getByLabel(/I've already updated my records/).check();
       await expect(page.locator('#wrapDBS')).toBeVisible();
       await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
@@ -856,6 +864,44 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkVisaNone').check();
       expect(await page.evaluate(() => [wizardState.visa, wizardState.citizen, wizardState.visaUpdated]))
         .toEqual(['none', 'no', 'no']);
+    });
+
+    test('189. A criminal record check step is offered without work records to update, in every nation', async ({ page }) => {
+      await openChecklist(page);
+      await expect(page.locator('#chkEmployedNo')).toBeChecked();
+      await page.locator('#chkDBS').check();
+      let first = true;
+      for (const [region, title] of [['#chkRegionEW', 'DBS checks'], ['#chkRegionWales', 'DBS checks'], ['#chkRegionScot', 'Disclosure Scotland checks'], ['#chkRegionNI', 'AccessNI checks']]) {
+        if (!first) await page.locator('#ubMakeChangesBtn').click();
+        await page.locator(region).check();
+        if (first) await page.getByRole('button', { name: 'Show my action plan' }).click();
+        else await page.locator('#checklistStickyBar button').click();
+        first = false;
+        await expect(page.locator('li[data-item-id="trk_dbs"] .tmpl-title'), region).toHaveText(title);
+        await expect(page.locator('li[data-item-id="trk_hr"]'), 'no work records, so no HR step').toHaveCount(0);
+      }
+    });
+
+    test('190. People living outside the UK get benefits, the electoral register and the overseas deed poll rule', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkRegionOut').check();
+      await expect(page.locator('#wrapDWP'), 'British people abroad can still get a UK State Pension').toBeVisible();
+      await expect(page.locator('#wrapNHS')).toBeHidden();
+      await expect(page.locator('#wrapNewGP')).toBeHidden();
+      await expect(page.locator('#wrapDBS')).toBeHidden();
+      await expect(page.locator('#chkSvcElectoral'), 'overseas voters can register').toBeVisible();
+      await expect(page.locator('#chkSvcCouncil')).toBeHidden();
+      await page.locator('#chkDWP').check();
+      await page.locator('#chkSvcElectoral').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('li[data-item-id="trk_dwp"]')).toContainText('International Pension Centre');
+      await expect(page.locator('#svc_detail_electoral')).toContainText('overseas voter');
+      await expect(page.locator('#svc_detail_electoral')).not.toContainText('local council');
+      const firstStep = page.locator('li[data-item-id="trk_deedpoll"]');
+      await expect(firstStep).toContainText('permanent resident overseas');
+      await expect(firstStep.locator('.item-badge', { hasText: 'Approximate cost' }),
+        'the cost depends on the country, so there is no badge').toHaveCount(0);
+      await expect(page.locator('li[data-item-id="trk_nhs"], li[data-item-id="trk_newgp"], li[data-item-id="trk_dbs"]')).toHaveCount(0);
     });
 
     test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
@@ -1314,6 +1360,23 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'false');
       await expect(page.locator('#resetOrderBtn')).toBeHidden();
     });
+
+    test('193. A link made before plan version 2 opens as out of date, with its answers filled in', async ({ page }) => {
+      const url = await getShareUrl(page, { pv: 1, goal: 'both', reg: 's', emp: 'needs_update', dbs: true, stu: true, dl: 'needs_update', pass: 'none' });
+      await page.evaluate(() => localStorage.clear());
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#welcomeOutdated'),
+        'version 2 changed which questions apply, so older links ask for a recheck').toBeVisible();
+      await page.getByRole('button', { name: 'Review my answers' }).click();
+      await expect(page.locator('#checklistView')).toBeVisible();
+      await expect(page.locator('#chkRegionScot')).toBeChecked();
+      await expect(page.locator('#chkEmployedNeeds')).toBeChecked();
+      await expect(page.locator('#chkDBS')).toBeChecked();
+      await expect(page.locator('#chkStudent')).toBeChecked();
+      await expect(page.locator('#chkPassportNone')).toBeChecked();
+    });
   });
 
   test.describe('Plan generation & content accuracy', () => {
@@ -1740,6 +1803,42 @@ test.describe('Be myself Planner', () => {
       await expect(item).not.toContainText('National Records of Scotland');
       await expect(costOf(item), 'there is no UK fee to show for a birth registered abroad').toHaveCount(0);
       await expect(page.locator('#planSummaryBox')).not.toContainText('New birth certificate');
+    });
+
+    test('191. Changing only the gender marker starts with a gender-change document in every region', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalName').uncheck();
+      await page.locator('#chkEmployedNeeds').check();
+      let first = true;
+      for (const region of ['#chkRegionEW', '#chkRegionWales', '#chkRegionScot', '#chkRegionNI', '#chkRegionOut']) {
+        if (!first) await page.locator('#ubMakeChangesBtn').click();
+        await page.locator(region).check();
+        if (first) await page.getByRole('button', { name: 'Show my action plan' }).click();
+        else await page.locator('#checklistStickyBar button').click();
+        first = false;
+        await expect(page.getByRole('heading', { name: 'Step 1: Your gender-change document' }), region).toBeVisible();
+        const firstStep = page.locator('li[data-item-id="trk_deedpoll"]');
+        await expect(firstStep.locator('.tmpl-title'), region).toHaveText('Statutory declaration');
+        await expect(firstStep, 'the deed poll text records a name change, which is not what this person is doing').toContainText('formal statement confirming your change of gender');
+        await expect(firstStep).not.toContainText('records your name change');
+        const hr = page.locator('li[data-item-id="trk_hr"]');
+        await expect(hr, region).toContainText('once you tell them you have changed gender');
+        await expect(hr).not.toContainText('deed poll');
+      }
+    });
+
+    test('192. Name and both plans keep the name-change document and work wording', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkEmployedNeeds').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
+      await expect(page.locator('li[data-item-id="trk_deedpoll"] .tmpl-title')).toHaveText('Unenrolled deed poll');
+      await expect(page.locator('li[data-item-id="trk_hr"]')).toContainText('once they have seen your deed poll or statutory declaration');
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#checklistStickyBar button').click();
+      await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
+      await expect(page.locator('li[data-item-id="trk_hr"]')).toContainText('once they have seen your deed poll or statutory declaration');
     });
   });
 
