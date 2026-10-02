@@ -4,14 +4,15 @@ using each entry's own "Last verified" date as the baseline. No separate
 state file: SOURCES.md is the only source of truth, for both the list of
 sources and the last-checked date.
 
-Scope is deliberately GOV.UK only. Every gov.uk page exposes a reliable
-public_updated_at timestamp for exactly what changed, with a plain JSON
-API call, no scraping. Most non-GOV.UK sources are covered separately by
-tests/source-content-check.js (the source-content-watch job), which
-renders each page with Playwright and diffs its extracted article text
-instead, since no non-GOV.UK site offers an equivalent change API. A
-small number of sites that block automated fetches outright stay on
-manual review; see KNOWN_BLOCKED_DOMAINS in tests/source-snapshot-lib.js.
+Scope is deliberately GOV.UK only. Every gov.uk page exposes a
+public_updated_at timestamp through a plain JSON API call, no scraping,
+but GOV.UK only changes it for major edits, so a minor edit to a page
+can leave it untouched. Every source, GOV.UK pages included, is
+therefore also covered by tests/source-content-check.js (the
+source-content-watch job), which renders each page with Playwright and
+diffs its extracted article text. A small number of sites that block
+automated fetches outright stay on manual review; see
+KNOWN_BLOCKED_DOMAINS in tests/source-snapshot-lib.js.
 
 An entry is only checked if its "Last verified" field already holds a
 real ISO 8601 date; entries still marked "pending" are skipped, since

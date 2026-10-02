@@ -106,7 +106,7 @@ function diffLines(before, after) {
 }
 
 function writeReport(changed, errors) {
-  const lines = ['# Possible source changes (non-GOV.UK)\n'];
+  const lines = ['# Possible source changes (page text, including GOV.UK)\n'];
   lines.push(
     'Automated check comparing each source\'s extracted article text (via Mozilla\'s ' +
     'Readability, the Firefox Reader View engine) against the last committed snapshot. ' +
