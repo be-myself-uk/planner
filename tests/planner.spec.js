@@ -18,11 +18,28 @@ async function openSharedPlanIfAsked(page) {
   if (await btn.isVisible()) await btn.click();
 }
 
-async function openChecklist(page) {
+async function openBlankChecklist(page) {
   await checkAgeGate(page);
   await page.locator('.start-checklist-link').click();
   await page.locator('#checklistAgeConfirm').check();
   await page.locator('#checklistDisclaimerConfirm').check();
+}
+
+async function answerOldDefaults(page) {
+  await page.locator('#chkGoalName').check();
+  await page.locator('#chkGoalGender').check();
+  for (const id of ['#chkRegionEW', '#chkBirthRegionEW', '#chkDrivingLicenceNeeds', '#chkPassportNeeds', '#chkVisaNone', '#chkEmployedNo', '#chkGRCNo']) {
+    await page.locator(id).check();
+  }
+  await page.evaluate(() => new Promise(resolve => {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  }));
+}
+
+async function openChecklist(page) {
+  await openBlankChecklist(page);
+  await answerOldDefaults(page);
 }
 
 async function openWizard(page) {
@@ -433,6 +450,7 @@ test.describe('Be myself Planner', () => {
       await expect(note).toBeHidden();
       await page.locator('#checklistAgeConfirm').check();
       await page.locator('#checklistDisclaimerConfirm').check();
+      await answerOldDefaults(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await page.locator('#ubRestartBtn').click();
       await page.getByRole('button', { name: /Confirm/ }).click();
@@ -516,11 +534,19 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#wrapVisa')).toBeVisible();
       await expect(page.locator('#wrapVisa .chk-q')).toContainText('Do you have a visa or eVisa?');
       await expect(page.locator('#chkVisaNone')).toBeChecked();
-      await expect(page.locator('#wrapDBS')).toBeHidden();
       await expect(page.locator('#wrapDWP')).toBeVisible();
-      await page.getByLabel(/Yes, I need to update my records/).check();
-      await expect(page.locator('#wrapDBS')).toBeVisible();
-      await expect(page.locator('#wrapDWP')).toBeVisible();
+      for (const region of ['#chkRegionEW', '#chkRegionWales', '#chkRegionScot', '#chkRegionNI']) {
+        await page.locator(region).check();
+        for (const emp of ['#chkEmployedNo', '#chkEmployedNeeds', '#chkEmployedUpdated']) {
+          await page.locator(emp).check();
+          await expect(page.locator('#wrapDBS'),
+            `${region} with ${emp}: job seekers and prospective students need a check most, so it does not depend on work records`).toBeVisible();
+          await expect(page.locator('#wrapDWP')).toBeVisible();
+        }
+      }
+      await page.locator('#chkRegionOut').check();
+      await expect(page.locator('#wrapDBS'), 'DBS, Disclosure Scotland and AccessNI checks are for people in the UK').toBeHidden();
+      await page.locator('#chkRegionEW').check();
       await page.getByLabel(/I've already updated my records/).check();
       await expect(page.locator('#wrapDBS')).toBeVisible();
       await page.getByLabel(/Deed poll or statutory declaration/).uncheck();
@@ -858,6 +884,117 @@ test.describe('Be myself Planner', () => {
         .toEqual(['none', 'no', 'no']);
     });
 
+    test('189. A criminal record check step is offered without work records to update, in every nation', async ({ page }) => {
+      await openChecklist(page);
+      await expect(page.locator('#chkEmployedNo')).toBeChecked();
+      await page.locator('#chkDBS').check();
+      let first = true;
+      for (const [region, title] of [['#chkRegionEW', 'DBS checks'], ['#chkRegionWales', 'DBS checks'], ['#chkRegionScot', 'Disclosure Scotland checks'], ['#chkRegionNI', 'AccessNI checks']]) {
+        if (!first) await page.locator('#ubMakeChangesBtn').click();
+        await page.locator(region).check();
+        if (first) await page.getByRole('button', { name: 'Show my action plan' }).click();
+        else await page.locator('#checklistStickyBar button').click();
+        first = false;
+        await expect(page.locator('li[data-item-id="trk_dbs"] .tmpl-title'), region).toHaveText(title);
+        await expect(page.locator('li[data-item-id="trk_hr"]'), 'no work records, so no HR step').toHaveCount(0);
+      }
+    });
+
+    test('190. People living outside the UK get benefits, the electoral register and the overseas deed poll rule', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkRegionOut').check();
+      await expect(page.locator('#wrapDWP'), 'British people abroad can still get a UK State Pension').toBeVisible();
+      await expect(page.locator('#wrapNHS')).toBeHidden();
+      await expect(page.locator('#wrapNewGP')).toBeHidden();
+      await expect(page.locator('#wrapDBS')).toBeHidden();
+      await expect(page.locator('#chkSvcElectoral'), 'overseas voters can register').toBeVisible();
+      await expect(page.locator('#chkSvcCouncil')).toBeHidden();
+      await page.locator('#chkDWP').check();
+      await page.locator('#chkSvcElectoral').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('li[data-item-id="trk_dwp"]')).toContainText('International Pension Centre');
+      await expect(page.locator('#svc_detail_electoral')).toContainText('overseas voter');
+      await expect(page.locator('#svc_detail_electoral')).not.toContainText('local council');
+      const firstStep = page.locator('li[data-item-id="trk_deedpoll"]');
+      await expect(firstStep).toContainText('permanent resident overseas');
+      await expect(firstStep.locator('.item-badge', { hasText: 'Approximate cost' }),
+        'the cost depends on the country, so there is no badge').toHaveCount(0);
+      await expect(page.locator('li[data-item-id="trk_nhs"], li[data-item-id="trk_newgp"], li[data-item-id="trk_dbs"]')).toHaveCount(0);
+    });
+
+    test('200. A fresh checklist has nothing pre-selected', async ({ page }) => {
+      await openBlankChecklist(page);
+      const checked = await page.evaluate(() => Array.from(document.querySelectorAll('#checklistView input:checked'))
+        .map(i => i.id).filter(id => id !== 'checklistAgeConfirm' && id !== 'checklistDisclaimerConfirm'));
+      expect(checked, 'GOV.UK design guidance advises against pre-selecting answers').toEqual([]);
+      const unset = await page.evaluate(() => ['region', 'birthRegion', 'goal', 'driving', 'passport', 'visa', 'employment', 'grc']
+        .filter(k => window.wizardState[k] !== undefined));
+      expect(unset).toEqual([]);
+    });
+
+    test('201. Show my action plan points to the first unanswered question instead of building a plan', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const warning = page.locator('#wrapRegion #checklistAnswerWarning');
+      await expect(warning).toBeVisible();
+      await expect(warning).toHaveText(/Please choose an answer to this question\./);
+      await expect(warning).toHaveAttribute('role', 'alert');
+      await expect(page.locator('#wrapRegion')).toHaveAttribute('aria-describedby', 'checklistAnswerWarning');
+      await expect(page.locator('#chkRegionEW'), 'focus goes to the group that needs an answer').toBeFocused();
+      await expect(page.locator('#liveRegion')).toHaveText('Please answer: Where do you live?');
+      await expect(page.locator('#planView')).toBeHidden();
+
+      await page.locator('#chkRegionScot').check();
+      await expect(page.locator('#checklistAnswerWarning'), 'the next change clears the warning').toBeHidden();
+      expect(await page.locator('#wrapRegion').getAttribute('aria-describedby')).toBeNull();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#wrapBirthRegion #checklistAnswerWarning')).toBeVisible();
+      await expect(page.locator('#chkBirthRegionEW')).toBeFocused();
+      await expect(page.locator('#planView')).toBeHidden();
+    });
+
+    test('202. Answering one question never fills in another', async ({ page }) => {
+      await openBlankChecklist(page);
+      const groups = ['chkRegion', 'chkBirthRegion', 'chkDrivingLicenceOpt', 'chkPassportOpt', 'chkVisaOpt', 'chkEmployment', 'chkGRCOpt'];
+      const answered = [];
+      for (const name of groups) {
+        await page.locator(`input[name="${name}"]:not([disabled])`).last().check();
+        answered.push(name);
+        const filled = await page.evaluate((names) => names.filter(n => document.querySelector(`input[name="${n}"]:checked`)), groups.filter(g => !answered.includes(g)));
+        expect(filled, `answering ${name} must not choose an answer elsewhere`).toEqual([]);
+        await expect(page.locator('#chkGoalName')).not.toBeChecked();
+        await expect(page.locator('#chkGoalGender')).not.toBeChecked();
+      }
+    });
+
+    test('203. A hidden question is not required', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      for (const id of ['#chkRegionWales', '#chkBirthRegionWales', '#chkDrivingLicenceNone', '#chkPassportNeeds', '#chkVisaNone', '#chkEmployedUpdated']) {
+        await page.locator(id).check();
+      }
+      await expect(page.locator('#wrapGRC'), 'the GRC question is not asked for a name-only change').toBeHidden();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+    });
+
+    test('204. Switching to the step-by-step view and back keeps unanswered questions unanswered', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalGender').check();
+      await page.locator('#chkRegionScot').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardView')).toBeVisible();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#checklistView')).toBeVisible();
+      await expect(page.locator('#chkGoalGender')).toBeChecked();
+      await expect(page.locator('#chkGoalName')).not.toBeChecked();
+      await expect(page.locator('#chkRegionScot')).toBeChecked();
+      const filled = await page.evaluate(() => ['chkBirthRegion', 'chkDrivingLicenceOpt', 'chkPassportOpt', 'chkVisaOpt', 'chkEmployment', 'chkGRCOpt']
+        .filter(n => document.querySelector(`input[name="${n}"]:checked`)));
+      expect(filled, 'the round trip used to fill in England, "none" and "no"').toEqual([]);
+    });
+
     test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
       await openChecklist(page);
       await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]')).toBeChecked();
@@ -1043,6 +1180,46 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#liveRegion')).toHaveText(`${label} marked as in progress.`);
       await btn.click();
       await expect(page.locator('#liveRegion')).toHaveText(new RegExp(`^${label} marked as done\\. Your next step is: Step 2: `));
+    });
+
+    test('185. A list step shows its list\'s progress, and clicking it never undoes a finished item', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGRCYes').check();
+      await page.locator('#chkSvcBanks').check();
+      await page.locator('#chkSvcInsurance').check();
+      await page.locator('#chkSvcUtilities').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+
+      const svcBtns = page.locator('.step-state-btn[data-svc-parent="trk_services_all"]');
+      await expect(svcBtns).toHaveCount(3);
+      for (let i = 0; i < 2; i++) {
+        await svcBtns.nth(i).click();
+        await svcBtns.nth(i).click();
+      }
+      await expect(page.locator('[data-track-id="trk_services_all"]'),
+        'two of three services done and one not started is progress, not "not started"').toHaveAttribute('data-state', '1');
+
+      const lifeBtns = page.locator('.step-state-btn[data-svc-parent="trk_grc_life"]');
+      await expect(lifeBtns).toHaveCount(8);
+      for (let i = 0; i < 7; i++) {
+        await lifeBtns.nth(i).click();
+        await lifeBtns.nth(i).click();
+      }
+      const lifeParent = page.locator('[data-track-id="trk_grc_life"]');
+      await expect(lifeParent).toHaveAttribute('data-state', '1');
+      await lifeParent.click();
+      await expect(lifeParent).toHaveAttribute('data-state', '2');
+      const lifeStates = await lifeBtns.evaluateAll(els => els.map(e => e.dataset.state));
+      expect(lifeStates,
+        'one click on the group used to copy "in progress" onto all eight, undoing seven finished periods').toEqual(Array(8).fill('2'));
+      expect(await page.evaluate(() => localStorage.getItem('st_trk_grc_life'))).toBe('2');
+
+      const medBtns = page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]');
+      const medParent = page.locator('[data-track-id="trk_grc_med"]');
+      await expect(medParent).toHaveAttribute('data-state', '0');
+      await medParent.click();
+      await expect(medParent).toHaveAttribute('data-state', '1');
+      expect(await medBtns.evaluateAll(els => els.map(e => e.dataset.state))).toEqual(['1', '1']);
     });
   });
 
@@ -1274,6 +1451,23 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'false');
       await expect(page.locator('#resetOrderBtn')).toBeHidden();
     });
+
+    test('193. A link made before plan version 2 opens as out of date, with its answers filled in', async ({ page }) => {
+      const url = await getShareUrl(page, { pv: 1, goal: 'both', reg: 's', emp: 'needs_update', dbs: true, stu: true, dl: 'needs_update', pass: 'none' });
+      await page.evaluate(() => localStorage.clear());
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await expect(page.locator('#welcomeOutdated'),
+        'version 2 changed which questions apply, so older links ask for a recheck').toBeVisible();
+      await page.getByRole('button', { name: 'Review my answers' }).click();
+      await expect(page.locator('#checklistView')).toBeVisible();
+      await expect(page.locator('#chkRegionScot')).toBeChecked();
+      await expect(page.locator('#chkEmployedNeeds')).toBeChecked();
+      await expect(page.locator('#chkDBS')).toBeChecked();
+      await expect(page.locator('#chkStudent')).toBeChecked();
+      await expect(page.locator('#chkPassportNone')).toBeChecked();
+    });
   });
 
   test.describe('Plan generation & content accuracy', () => {
@@ -1291,7 +1485,7 @@ test.describe('Be myself Planner', () => {
       const plan = page.locator('#planContent');
       await expect(plan).toContainText('a written letter asking for the change of gender');
       await page.getByText('More information about: UK passport').click();
-      await expect(plan).toContainText('you will also need to write a letter asking for the change of gender');
+      await expect(plan).toContainText('a letter from you asking for the change of gender');
       await expect(plan.locator('a', { hasText: 'Change of name because of a change of gender' })).toBeVisible();
     });
 
@@ -1313,7 +1507,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.getByText('Credit reference agencies', { exact: true })).toBeVisible();
       await expect(page.locator('#planContent')).toContainText('Experian, Equifax, or TransUnion');
-      await expect(page.locator('#planContent')).toContainText('this only starts the process at the other two');
+      await expect(page.locator('#planContent')).toContainText('it will tell the other two agencies');
       await expect(page.locator('#planContent')).toContainText('Notice of Correction');
       await page.evaluate(() => {
         window._shareUrl = null;
@@ -1413,6 +1607,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('.start-checklist-link').click();
       await page.locator('#checklistAgeConfirm').check();
       await page.locator('#checklistDisclaimerConfirm').check();
+      await answerOldDefaults(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#titlesInfoBox')).toBeAttached();
     });
@@ -1633,12 +1828,12 @@ test.describe('Be myself Planner', () => {
       const plan = page.locator('#planContent');
       await expect(plan).not.toContainText('driving licence updated first');
       await expect(plan).toContainText('Evidence needed');
-      await expect(plan).toContainText('dated after your deed poll or statutory declaration');
+      await expect(plan).toContainText('issued after your deed poll or statutory declaration');
       await expect(plan).toContainText('mobile, broadband, or streaming bill');
       await expect(plan).toContainText('a recent bill or letter that already shows your new name is often accepted instead');
     });
 
-    test('92. DVLA gender-only variant does not show name-change evidence text', async ({ page }) => {
+    test('92. The DVLA gender-only text asks for the extra document only when a deed poll or statutory declaration is used', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').uncheck();
       await expect(page.locator('#chkGoalGender')).toBeChecked();
@@ -1647,8 +1842,9 @@ test.describe('Be myself Planner', () => {
       const plan = page.locator('#planContent');
       await expect(plan).toContainText('The DVLA accepts a deed poll, a statutory declaration, or a GRC as evidence for a gender marker change');
       await expect(plan).toContainText('A medical letter is not needed');
+      await expect(plan, 'GOV.UK asks for the extra document whenever a deed poll or statutory declaration is used, even for a gender-only change').toContainText('If you use a deed poll or statutory declaration');
+      await expect(plan).toContainText('UK passport number');
       await expect(plan).not.toContainText('one other document that already shows your new name');
-      await expect(plan).not.toContainText('mobile, broadband, or streaming bill');
     });
 
     test('139. A gender-only plan that asks for a name-change document also gives a step for getting one', async ({ page }) => {
@@ -1660,6 +1856,117 @@ test.describe('Be myself Planner', () => {
       if (/deed poll|statutory declaration/i.test(text)) {
         await expect(page.locator('#planContent [data-item-id="trk_deedpoll"]')).toHaveCount(1);
       }
+    });
+
+    test('181. The birth certificate step follows where the birth was registered, not where you live', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGRCYes').check();
+      await page.locator('#chkBirthCert').check();
+      let first = true;
+      const build = async (live, born) => {
+        if (!first) await page.locator('#ubMakeChangesBtn').click();
+        await page.locator(live).check();
+        await page.locator(born).check();
+        if (first) await page.getByRole('button', { name: 'Show my action plan' }).click();
+        else await page.locator('#checklistStickyBar button').click();
+        first = false;
+        await expect(page.locator('#planView')).toBeVisible();
+        return page.locator('li[data-item-id="trk_birthcert"]');
+      };
+      const costOf = (item) => item.locator('.item-badge', { hasText: 'Approximate cost' });
+
+      let item = await build('#chkRegionEW', '#chkBirthRegionScot');
+      await expect(item, 'born in Scotland, living in England').toContainText('National Records of Scotland (NRS)');
+      await expect(item).not.toContainText('General Register Office (GRO)');
+      await expect(costOf(item)).toHaveText('Approximate cost: Small cost');
+
+      item = await build('#chkRegionScot', '#chkBirthRegionEW');
+      await expect(item, 'born in England, living in Scotland').toContainText('General Register Office (GRO)');
+      await expect(item).not.toContainText('National Records of Scotland');
+      await expect(costOf(item)).toHaveText('Approximate cost: Small cost');
+      await expect(page.locator('#planSummaryBox')).toContainText('New birth certificate: A fee applies.');
+
+      item = await build('#chkRegionWales', '#chkBirthRegionNI');
+      await expect(item, 'born in Northern Ireland, living in Wales').toContainText('General Register Office for Northern Ireland (GRONI)');
+      await expect(costOf(item)).toHaveText(/Approximate cost: Free to Small cost/);
+      await expect(page.locator('#planSummaryBox')).toContainText('A short certificate is issued free of charge.');
+
+      item = await build('#chkRegionScot', '#chkBirthRegionOut');
+      await expect(item, 'born outside the UK, living in Scotland').toContainText('registered outside the UK');
+      await expect(item).not.toContainText('National Records of Scotland');
+      await expect(costOf(item), 'there is no UK fee to show for a birth registered abroad').toHaveCount(0);
+      await expect(page.locator('#planSummaryBox')).not.toContainText('New birth certificate');
+    });
+
+    test('191. Changing only the gender marker starts with a gender-change document in every region', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalName').uncheck();
+      await page.locator('#chkEmployedNeeds').check();
+      let first = true;
+      for (const region of ['#chkRegionEW', '#chkRegionWales', '#chkRegionScot', '#chkRegionNI', '#chkRegionOut']) {
+        if (!first) await page.locator('#ubMakeChangesBtn').click();
+        await page.locator(region).check();
+        if (first) await page.getByRole('button', { name: 'Show my action plan' }).click();
+        else await page.locator('#checklistStickyBar button').click();
+        first = false;
+        await expect(page.getByRole('heading', { name: 'Step 1: Your gender-change document' }), region).toBeVisible();
+        const firstStep = page.locator('li[data-item-id="trk_deedpoll"]');
+        await expect(firstStep.locator('.tmpl-title'), region).toHaveText('Statutory declaration');
+        await expect(firstStep, 'the deed poll text records a name change, which is not what this person is doing').toContainText('formal statement confirming your change of gender');
+        await expect(firstStep).not.toContainText('records your name change');
+        const hr = page.locator('li[data-item-id="trk_hr"]');
+        await expect(hr, region).toContainText('once you tell them you have changed gender');
+        await expect(hr).not.toContainText('deed poll');
+      }
+    });
+
+    test('192. Name and both plans keep the name-change document and work wording', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkEmployedNeeds').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
+      await expect(page.locator('li[data-item-id="trk_deedpoll"] .tmpl-title')).toHaveText('Unenrolled deed poll');
+      await expect(page.locator('li[data-item-id="trk_hr"]')).toContainText('once they have seen your deed poll or statutory declaration');
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#checklistStickyBar button').click();
+      await expect(page.getByRole('heading', { name: 'Step 1: Your name-change document' })).toBeVisible();
+      await expect(page.locator('li[data-item-id="trk_hr"]')).toContainText('once they have seen your deed poll or statutory declaration');
+    });
+
+    test('194. Wales has its own NHS gender marker text, separate from England\'s', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkRegionWales').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const nhs = page.locator('li[data-item-id="trk_nhs"]');
+      await expect(nhs).toContainText('NHS Wales Shared Services Partnership');
+      await expect(nhs, 'the under-18 direction applies to NHS England').not.toContainText('Secretary of State');
+      await expect(nhs, 'PCSE does not handle registration in Wales').not.toContainText('third NHS number');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#checklistStickyBar button').click();
+      await expect(nhs).toContainText('Your NHS number stays the same for a name-only change');
+      await expect(nhs).not.toContainText('NHS Wales Shared Services Partnership');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalGender').check();
+      await page.locator('#chkRegionEW').check();
+      await page.locator('#checklistStickyBar button').click();
+      await expect(nhs).toContainText('third NHS number');
+      await expect(nhs).not.toContainText('NHS Wales Shared Services Partnership');
+    });
+
+    test('195. Northern Ireland GRC plans explain spousal consent, interim certificates and benefits', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkRegionNI').check();
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan, 'spousal consent and interim certificates apply in Northern Ireland too').toContainText('interim GRC');
+      await expect(plan).toContainText('If you are married or in a civil partnership');
+      await expect(plan).toContainText('entitlement to some benefits and pensions');
+      await expect(plan, 'the planner stays out of anti-discrimination law').not.toContainText('Equality Commission');
     });
   });
 
@@ -2099,7 +2406,7 @@ test.describe('Be myself Planner', () => {
       await expect(dlg).toBeHidden();
       await page.getByRole('link', { name: 'About' }).click();
       await expect(dlg).toBeVisible();
-      const headings = ['What is this?', 'Who is it for?', 'Is my information safe?', 'Can I use this offline?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
+      const headings = ['What is this?', 'Who is it for?', 'What does it cover?', 'Is my information safe?', 'Can I use this offline?', 'How does it work?', 'Step-by-step or checklist?', 'Is this legal advice?', 'How do I save or share my plan?'];
       for (const h of headings) {
         await expect(dlg.getByRole('heading', { name: h })).toBeVisible();
       }
@@ -2398,6 +2705,144 @@ test.describe('Be myself Planner', () => {
       expect(spokenIcons).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.lang), 'UK spelling and pronunciation').toBe('en-GB');
     });
+
+    test('182. The skip link moves focus to the main content without adding a history entry', async ({ page }) => {
+      const before = await page.evaluate(() => ({ length: history.length, href: location.href }));
+      await page.keyboard.press('Tab');
+      await expect(page.locator('.skip-link')).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(page.locator('#mainContent')).toBeFocused();
+      const after = await page.evaluate(() => ({ length: history.length, href: location.href }));
+      expect(after,
+        'a history entry here means Back after a quick exit brings the planner back').toEqual(before);
+    });
+
+    test('183. Esc twice within a second leaves even with a panel open, but not when something happens in between', async ({ page }) => {
+      const dlg = page.locator('#dlgUsage');
+      await page.getByRole('link', { name: 'Usage guide' }).click();
+      await expect(dlg).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dlg).toBeHidden();
+      await page.keyboard.press('Tab');
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page, 'Esc, Tab, Esc is not two presses in a row').not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+
+      await page.waitForTimeout(1100);
+      await page.keyboard.press('Escape');
+      await page.mouse.click(5, 5);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(200);
+      await expect(page, 'Esc, click, Esc is not two presses in a row either').not.toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+
+      await page.waitForTimeout(1100);
+      await page.getByRole('link', { name: 'Usage guide' }).click();
+      await expect(dlg).toBeVisible();
+      await page.keyboard.press('Escape');
+      await page.keyboard.press('Escape');
+      await expect(page,
+        'the Esc that closes a panel counts, so two presses still leave').toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+    });
+
+    test('184. Every panel has its own Quick exit, big enough to tap, and opens with Close focused', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      const panels = [['About', 'dlgAbout'], ['Privacy', 'dlgPrivacy'], ['Usage guide', 'dlgUsage'], ['Support & feedback', 'dlgSupport'], ['Disclaimer', 'dlgDisclaimer']];
+      for (const [link, id] of panels) {
+        await page.locator('.footer-links').getByRole('link', { name: link, exact: true }).click();
+        const dlg = page.locator('#' + id);
+        await expect(dlg).toBeVisible();
+        await expect(dlg.getByRole('button', { name: 'Close' }),
+          'an accidental Enter on opening must not leave the site').toBeFocused();
+        const exit = dlg.locator('.dialog-header').getByRole('button', { name: 'Quick Exit, leaves this page immediately' });
+        await expect(exit, id).toBeVisible();
+        const box = await exit.boundingBox();
+        expect(box.width, id).toBeGreaterThanOrEqual(44);
+        expect(box.height, id).toBeGreaterThanOrEqual(44);
+        await dlg.getByRole('button', { name: 'Close' }).click();
+        await expect(dlg).toBeHidden();
+      }
+      await page.locator('.footer-links').getByRole('link', { name: 'Privacy', exact: true }).click();
+      await page.locator('#dlgPrivacy').getByRole('button', { name: 'Quick Exit, leaves this page immediately' }).click();
+      await expect(page,
+        'the toolbar button cannot be clicked behind a modal panel').toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
+    });
+
+    test('186. On a phone, every plan toolbar button stays inside the toolbar and keeps its size', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const workPhase = page.locator('.phase[data-phase-key="work"]');
+      await workPhase.locator('li.plan-item').first().locator('.item-move-group .tmpl-move-down').click();
+      await expect(page.locator('#resetOrderBtn')).toBeVisible();
+      for (const width of [320, 360, 390]) {
+        await page.setViewportSize({ width, height: 800 });
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const boxes = await page.evaluate(() => {
+          const card = document.getElementById('controlBarCard').getBoundingClientRect();
+          return Array.from(document.querySelectorAll('#cbPlanActions button')).filter(b => b.offsetParent).map(b => {
+            const r = b.getBoundingClientRect();
+            return { id: b.id || b.getAttribute('aria-label'), inside: r.left >= card.left - 0.5 && r.right <= card.right + 0.5 && r.top >= card.top - 0.5 && r.bottom <= card.bottom + 0.5, w: r.width, h: r.height };
+          });
+        });
+        expect(boxes.length, `${width}px`).toBe(7);
+        for (const b of boxes) {
+          expect(b.inside, `${b.id} at ${width}px was squashed or cut off by the toolbar`).toBe(true);
+          expect(b.w, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
+          expect(b.h, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
+        }
+      }
+    });
+
+    test('187. Links in panels meet contrast guidelines in light and dark themes', async ({ page }) => {
+      for (const theme of ['light', 'dark']) {
+        const results = await page.evaluate((t) => {
+          document.documentElement.setAttribute('data-theme', t);
+          const rgb = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+          const lum = ([r, g, b]) => {
+            const ch = [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+            return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+          };
+          const bgOf = (el) => {
+            for (let n = el; n; n = n.parentElement) {
+              const c = rgb(getComputedStyle(n).backgroundColor);
+              if (c.length >= 3 && (c.length < 4 || c[3] > 0)) return c;
+            }
+            return [255, 255, 255];
+          };
+          return Array.from(document.querySelectorAll('.dialog-body a:not(.contact-btn)')).map(a => {
+            const l1 = lum(rgb(getComputedStyle(a).color)), l2 = lum(bgOf(a));
+            return { text: a.textContent.trim(), ratio: (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05) };
+          });
+        }, theme);
+        expect(results.length, theme).toBeGreaterThan(5);
+        for (const r of results) {
+          expect(r.ratio, `${r.text} in the ${theme} theme; the browser default blue was 1.99:1 in dark mode`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+
+    test('188. Badges, panel bodies and the progress bar give screen readers what they need', async ({ page }) => {
+      await expect(page.locator('#dlgUsage .item-badge[aria-label]'),
+        'aria-label on a plain span is ignored; the visible Difficulty and Cost labels give the context').toHaveCount(0);
+      const bodies = await page.evaluate(() => Array.from(document.querySelectorAll('dialog')).map(d => {
+        const body = d.querySelector('.dialog-body');
+        const labelId = body.getAttribute('aria-labelledby');
+        const label = labelId && document.getElementById(labelId);
+        return { id: d.id, tabindex: body.getAttribute('tabindex'), role: body.getAttribute('role'), labelId, labelInDialog: !!label && d.contains(label) && label.tagName === 'H2' };
+      }));
+      expect(bodies).toHaveLength(5);
+      for (const b of bodies) {
+        expect(b, 'a scrollable body with nothing focusable in it cannot be scrolled from the keyboard in Safari').toEqual({ id: b.id, tabindex: '0', role: 'region', labelId: b.id + 'Title', labelInDialog: true });
+      }
+
+      await openWizard(page);
+      await expect(page.locator('#controlBarProgress')).toHaveAttribute('aria-valuetext', /^Question \d+ of \d+$/);
+      await page.goto(filePath);
+      await openChecklist(page);
+      const bar = page.locator('#controlBarProgress');
+      await expect(bar).toHaveAttribute('aria-valuetext', /^Section \d+ of \d+: .+/);
+      expect(await bar.getAttribute('aria-valuetext')).toBe(await page.locator('#controlBarProgressText').textContent());
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(bar).toHaveAttribute('aria-valuetext', /^0 of \d+ items done or not needed$/);
+    });
   });
 
   test.describe('Content integrity', () => {
@@ -2436,7 +2881,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
-      await openChecklist(page);
+      await openBlankChecklist(page);
 
       await page.getByRole('button', { name: 'Switch view' }).click();
       await expect(page.locator('#wizardStepFieldset legend'),
@@ -2813,6 +3258,16 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkEmployedUpdated')).toBeChecked();
       await page.evaluate(() => { window.wizardState.employment = 'no'; window.renderChecklist(); });
       await expect(page.locator('#chkEmployedNo')).toBeChecked();
+      await page.evaluate(() => {
+        for (const k of ['region', 'regionOutsideUK', 'birthRegion', 'birthOutsideUK', 'goal', 'driving', 'passport', 'visa', 'employment', 'grc']) delete window.wizardState[k];
+        window.wizardState.birthCert = 'no';
+        window.renderChecklist();
+      });
+      const stillChecked = await page.evaluate(() => ['chkRegion', 'chkBirthRegion', 'chkDrivingLicenceOpt', 'chkPassportOpt', 'chkVisaOpt', 'chkEmployment', 'chkGRCOpt']
+        .filter(n => document.querySelector(`input[name="${n}"]:checked`)));
+      expect(stillChecked, 'an unanswered question shows no answer rather than a default').toEqual([]);
+      await expect(page.locator('#chkGoalName')).not.toBeChecked();
+      await expect(page.locator('#chkGoalGender')).not.toBeChecked();
     });
 
     test('169. Cost badges are green for free, yellow for small and medium cost, and red for higher cost', async ({ page }) => {
@@ -2835,6 +3290,70 @@ test.describe('Be myself Planner', () => {
         else expect(f.cls, f.label).toContain(badge[tone[f.label]]);
       }
       await expect(page.locator('li[data-item-id="trk_grc_docs"] .item-badge.badge-yellow', { hasText: 'Approximate cost' })).toHaveText('Approximate cost: Small cost');
+    });
+
+    test('196. Costs are shown as labels, with one deliberate exception for an exact fee', async ({ page }) => {
+      const html = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const withAmounts = html.split('\n').filter(l => /[£€]\s?\d/.test(l));
+      expect(withAmounts, 'fees change often, so only the statutory declaration swearing fee is given as an amount').toHaveLength(1);
+      expect(withAmounts[0]).toContain('Statutory declaration for GRC');
+      const { extractContentMap } = require('./content-snapshot-lib');
+      const content = await page.evaluate(extractContentMap);
+      const priced = Object.entries(content).filter(([, text]) => /[£€]\s?\d/.test(text)).map(([key]) => key);
+      expect(priced, 'plan and service text uses Free, Small cost, Medium cost or Higher cost instead').toEqual([]);
+    });
+
+    test('197. Search results and link previews get one title and one description, within length limits', async ({ page }) => {
+      const meta = await page.evaluate(() => {
+        const get = (sel) => document.querySelector(sel)?.getAttribute('content');
+        return {
+          title: document.title,
+          ogTitle: get('meta[property="og:title"]'),
+          twitterTitle: get('meta[name="twitter:title"]'),
+          description: get('meta[name="description"]'),
+          ogDescription: get('meta[property="og:description"]'),
+          twitterDescription: get('meta[name="twitter:description"]'),
+          ogImage: get('meta[property="og:image"]'),
+          twitterImage: get('meta[name="twitter:image"]'),
+          ld: Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(s => s.textContent),
+        };
+      });
+      expect(meta.title.length, 'longer titles are cut off in search results').toBeLessThanOrEqual(60);
+      expect(meta.description.length, 'longer descriptions are cut off in search results').toBeLessThanOrEqual(160);
+      expect(meta.ogTitle).toBe(meta.title);
+      expect(meta.twitterTitle).toBe(meta.title);
+      expect(meta.ogDescription).toBe(meta.description);
+      expect(meta.twitterDescription).toBe(meta.description);
+      expect(meta.ogImage).toBe('https://bemyself.uk/og-image.png');
+      expect(meta.twitterImage).toBe(meta.ogImage);
+      const blocks = meta.ld.map(text => JSON.parse(text));
+      const entries = blocks.flatMap(b => Array.isArray(b) ? b : [b]);
+      const app = entries.find(e => e['@type'] === 'WebApplication');
+      expect(app.applicationCategory, 'a category Google supports for web applications').toBe('ReferenceApplication');
+      expect(app.description).toBe(meta.description);
+      expect(app.image).toBe(meta.ogImage);
+      expect(app.featureList.length).toBeGreaterThan(5);
+      expect(entries.some(e => e['@type'] === 'WebSite' && e.url === 'https://bemyself.uk/')).toBe(true);
+    });
+
+    test('198. The heading names what the planner is for, without a separate paragraph', async ({ page }) => {
+      const h1 = page.getByRole('heading', { level: 1 });
+      await expect(h1).toHaveAccessibleName(/Plan updating your name and gender marker on UK documents/);
+      await expect(page.locator('.hero p'), 'the tagline is part of the h1 now').toHaveCount(0);
+      await openChecklist(page);
+      await expect(page.locator('.hero .hero-tagline')).toBeVisible();
+    });
+
+    test('199. The preview image is a 1200 by 1200 PNG, and the sitemap has a valid date', async () => {
+      const png = fs.readFileSync(path.resolve('..', 'og-image.png'));
+      expect(png.subarray(0, 8).toString('hex'), 'PNG signature').toBe('89504e470d0a1a0a');
+      expect(png.subarray(12, 16).toString('ascii')).toBe('IHDR');
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 1200]);
+      const sitemap = fs.readFileSync(path.resolve('..', 'sitemap.xml'), 'utf8');
+      const lastmod = sitemap.match(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/);
+      expect(lastmod, 'bump-version.yml keeps this date current').not.toBeNull();
+      const date = new Date(lastmod[1] + 'T00:00:00Z');
+      expect(date.toISOString().slice(0, 10)).toBe(lastmod[1]);
     });
 
     test('174. The security policy still lets the page talk to its own site', async ({ page }) => {

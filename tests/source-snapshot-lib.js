@@ -3,8 +3,6 @@ const fs = require('fs');
 const READABILITY_SOURCE = fs.readFileSync(require.resolve('@mozilla/readability/Readability.js'), 'utf8') + '\nwindow.Readability = Readability;';
 
 const EXCLUDED_DOMAINS = new Set([
-  'www.gov.uk',
-  'gov.uk',
   'www.legislation.gov.uk',
   'www.irishstatutebook.ie',
   'www.whatdotheyknow.com',

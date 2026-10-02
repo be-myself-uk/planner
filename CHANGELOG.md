@@ -15,37 +15,52 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ## [Unreleased]
 
-**Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** This update adds the plan version that decides when that message appears, and plans made before it do not have one yet. Check your answers once, and the message will not come back until a later change could affect your plan.
+**Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because criminal record checks are now asked about for everyone in the UK, not only people with work records to update; people living outside the UK are now asked about UK benefits and can add the electoral register; and people changing only their gender marker now get a different first step. Check your answers once, and the message will not come back until a later change could affect your plan.
 
 ### Information
 
-- The step-by-step note on name-change documents in Scotland wrongly said a statutory declaration is made through the National Records of Scotland. It now says a statutory declaration is more commonly used in Scotland, and that a free deed poll is accepted by most organisations.
-- Two GRC steps showed "Small cost" in green, which is used for free. Small and medium costs are now always yellow, and higher costs red.
+- The birth certificate step now follows where your birth was registered, not where you live. Someone born in Scotland and living in England was told the General Register Office would contact them, and the other way round. The step also no longer says a new birth certificate is free: GOV.UK says there is an additional charge, and in Northern Ireland a short certificate is issued free of charge.
+- Corrected the passport consent note for 16 and 17 year olds. It said a court order was needed where there are safeguarding concerns. Instead, HM Passport Office asks for evidence and gets advice from its safeguarding team. The note now lists every exception it considers.
+- The passport step now says that a gender marker change without a GRC also needs evidence that you use your name and gender for all purposes, that someone who knows you may be asked to confirm your identity, and that HM Passport Office phones you if you note a non-binary identity.
+- The Irish passport step's rule on when your two years of proof start again now matches the Passport Service, which also does not accept a deed poll to change the name on an Irish passport. The Irish passport is now shown as a medium cost.
+- The GRC steps said you may not need a GRC if your gender is legally recognised in another country. You still do, but you can use a shorter overseas route. Added what the medical reports must include, that the name on a GRC cannot be changed after it is issued, and that a GRC can change your entitlement to some benefits and pensions, including your partner's. Northern Ireland residents now see the note on marriage, civil partnership and interim GRCs, and the Northern Ireland introduction no longer refers to anti-discrimination law.
+- People changing only their gender marker now get a statutory declaration as their first step, instead of a name-change document, and work guidance that says employers can update payroll records once you tell them you have changed gender.
+- The driving licence step now lists every document GOV.UK accepts as the extra document showing your name, including a UK passport number, and says the document must still be valid. It also now says that a gender-only change made with a deed poll or statutory declaration needs this extra document too.
+- The DBS step now covers basic checks and the DBS Update Service, and marks allowing a few days' notice as community advice. The Disclosure Scotland step now uses the current disclosure levels, says the process is only needed when your employer countersigns your application, explains the male or female choice on the form, and covers the duty for PVG scheme members to report a change within 3 months. The AccessNI step now says a certificate cannot move from one role to another, and marks the advice to make contact before applying as community advice.
+- England's NHS step now says a new NHS number cannot be undone. Wales has its own NHS step, since the guidance written for NHS England does not apply there. The Northern Ireland new GP step no longer promises your correct gender marker from the start.
+- People living outside the UK now get guidance on registering to vote as an overseas voter and on UK benefits and State Pension, and their first step explains that a permanent resident overseas cannot use a deed poll.
+- The HMRC summaries for name-only and name-and-gender plans, and the name-only detail, now mark the advice about restricting access to your records as community advice. Also corrected who can register anonymously on the electoral register, the eVisa guidance, and the credit reference agencies guidance, and added the HM Land Registry note that your previous name stays in earlier editions of the register (it was described in July but missing from the planner). Smaller corrections: Employment and Support Allowance, Council Tax Reduction, hereditary titles, Pearson for BTECs, and how the DVA compares with the DVLA.
 
 ### Wording
 
-- The GRC question and its answers, and the qualifications question, now read the same in the step-by-step questions and the checklist. In Northern Ireland, Council Tax is now called Rates (Land & Property Services) wherever it appears.
-- The DBS, AccessNI and Disclosure Scotland checkboxes said "select no" where there is nothing to select. They now say to leave the box unticked.
-- The Privacy panel now says that "New plan" keeps your light or dark mode choice.
+- The Privacy panel, the "What is this?" panel, and the README now say that a shared plan link holds your answers in its web address, so they reach the website's host when the link is opened.
+- The planner now says more clearly who it is for: anyone aged 16 or over updating UK documents they hold, including people living abroad and people planning to move to the UK.
+- New page title and description for search results and link previews, and the line under the site title is now part of the main heading. The "What is this?" panel has a new "What does it cover?" section.
 
 ### Code
 
-- Opening a shared link on a device that already has a plan now asks first. You can open the shared plan, which replaces yours, its progress, its step order, and Focus mode, or keep your own.
-- A shared link from someone who had already updated their work records was treated as out of date, and lost that answer and any DBS step. It now opens normally.
-- A saved plan or shared link is now only called out of date when a change could affect your answers or plan. Until now, every update to the site did this, because one number set both this and the "Last updated" date at the bottom of the page. That date still changes with every update, but a separate plan version, raised only for changes that could affect a plan, now decides whether yours is out of date.
-- Opening a link inside a panel with the keyboard no longer closes the panel.
-- Screen readers now hear when a step's status changes, and hear "Your next step is" only when the next step changes. They now also read the usage guide's toolbar list, including the warning that a copied link contains sensitive information, and read each checklist question together with its answers.
-- Steps hidden by Focus mode can no longer be reached with the Tab key or read by screen readers, and marking the step you are on as done moves you to the next visible one.
-- Moving through a plan or the checklist with the keyboard no longer hides the item you are on behind the toolbar at the top or the button bar at the bottom.
-- A greyed-out answer now says why it cannot be chosen yet, for everyone rather than only for screen readers.
-- "Download this page" now saves an exact copy of the planner. It used to include extra code added by the site's host, which did nothing offline.
-- Answering no to the age or disclaimer question now moves focus to the message that explains why, and "Go back" returns it to "Start here".
+- Quick exit: the "Skip to main content" link no longer adds a step to your browser history, so pressing Back after a quick exit does not bring the planner back. Pressing Esc twice within a second now leaves even while a panel is open, but not if you press another key or click in between. Every panel now has its own Quick exit button, since the one on the toolbar cannot be reached while a panel is open.
+- A step that holds a list, such as the services to update or the GRC evidence, now shows "in progress" as soon as anything in it is started. Clicking the step changes the whole list, but no longer undoes items you have already finished.
+- Criminal record checks are now asked about for everyone living in the UK, not only people with work records to update.
+- Nothing in the checklist is chosen for you any more. It used to start with some answers already selected, such as England, and "No" for work records and a GRC, which were easy to miss. If a question is left unanswered, "Show my action plan" takes you to it and asks you to choose an answer.
+- Screen readers now hear the question or section you are on from the progress bar, no longer hear the usage guide's badge labels twice, and every panel can be scrolled with the keyboard.
+
+### Layout
+
+- On a phone, the plan toolbar's buttons now wrap onto another row instead of being squashed or hidden.
+- Links in panels now use the site's link colour. In dark mode they were hard to read.
+- Shared links now show a preview image of the transgender and non-binary pride flags.
 
 ### Infrastructure
 
-- Added `llms.txt`, a short plain summary of the planner for AI tools, and an empty `ai-catalog.json` saying the site offers no AI agents or tools. Both are read by Google Lighthouse's new AI agent checks.
+- The scheduled source check now compares the text of GOV.UK pages too, since GOV.UK only changes a page's update date for major edits.
+- The version bump workflow now keeps the date in `sitemap.xml` current.
+- Every GitHub Action the workflows use is now pinned to an exact commit, with its version noted beside it, so a changed or compromised release tag cannot alter what runs.
+- Added tests for all of the above, including a check that plan text gives costs as labels rather than amounts.
 
 ## [September 2026]
+
+**Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** This update adds the plan version that decides when that message appears, and plans made before it do not have one yet. Check your answers once, and the message will not come back until a later change could affect your plan.
 
 - **⚠️ NHS England has brought in a single national waiting list for adult gender services, held by the National Adult Gender Referral Support Service. If you are waiting for a first appointment in England, that service holds your referral separately from your GP record, and you need to tell it about a change of name or other details yourself. Your place on the list is set by your original referral date and does not change when you update your details.**
 
@@ -56,18 +71,20 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 ### Information
 
 - Split the driving licence step by what you are changing, since someone changing only their gender marker was shown the evidence needed for a name change. Corrected the step and the banks guidance, which said that updating your driving licence first could help if a bank asked for photo ID. That is no longer possible under GOV.UK's current rules, so the step now lists which documents can be used instead.
-- Corrected the passport medical letter requirements to match HM Passport Office's own caseworker guidance, including the need for a handwritten signature and for the medical professional to confirm they know you well enough to make a diagnosis. Also corrected the consent note for 16 and 17 year olds. The exceptions to needing consent are being close to your 18th birthday, both parents having died, or having no contact with one or both parents. Where none of those apply, a court order is needed instead.
+- Corrected the passport medical letter requirements to match HM Passport Office's own caseworker guidance, including the need for a handwritten signature and for the medical professional to confirm they know you well enough to make a diagnosis. Also corrected the consent note for 16 and 17 year olds. The exceptions to needing consent are being close to your 18th birthday, both parents having died, or having no contact with one or both parents.
 - Corrected the Irish passport step. It said an Irish Gender Recognition Certificate was needed first, and told people to apply for an ordinary Irish passport before that. Neither is right if you live in Northern Ireland or anywhere outside Ireland. The route is a statutory declaration plus two years of evidence using your new name, for a first passport as well as a renewal, and applying in your previous name first only resets that two-year clock. The Irish GRC route applies only to people living in Ireland. The wording on what happens to the two-year period if you already hold a passport in your previous name is also corrected.
 - Corrected the Irish passport step's claim that anyone born in Northern Ireland can claim Irish citizenship. Since 1 January 2005 this depends on your parents: one must be a British or Irish citizen, or have lived on the island of Ireland for three of the four years before your birth.
 - Added a "Paperwork for your GRC application" step, since a Gender Recognition Certificate application needs several documents besides the medical reports and two years of evidence. Corrected the GRC medical evidence step: there is no approval scheme for the doctors and clinical psychologists who write the two reports, and the step now describes who can actually write each one.
 - Softened "public record" wording on the Scottish and Northern Ireland birth certificate steps. Neither NRS nor NI Direct uses that phrasing. What is supported, and what the planner now says, is that the change is permanent and any future certified copy shows both names.
 - Added a note to the health record steps, for all four nations, explaining that updating your details with your GP may not update them with other services you use. The same applies if you are given a new NHS number, CHI number, or Health and Care Number. The England steps now include the National Adult Gender Referral Support Service, and the Wales steps the Welsh Gender Service, both with links to their change-of-details processes.
 - Reworded the HMRC gender marker guidance to match GOV.UK's own wording ("usually" rather than always automatic), and made clear that restricting your record for privacy is separate from the gender marker change itself. Added a note for 16 and 17 year olds: a National Insurance number is usually sent shortly before your 16th birthday, so the letter may arrive in your old name. The number itself does not need updating, but you can still tell HMRC your new name.
-- Added State Pension to the Northern Ireland benefits question and step, which the Department for Communities administers alongside Universal Credit, Personal Independence Payment (PIP), and Employment Support Allowance (ESA). Tell the Northern Ireland Pension Centre about a name change if you get State Pension or Pension Credit, as your local Jobs & Benefits Office does not handle those. Also removed a claim on the step that updating your details while claiming can cause delays. No source supports it, so it now says the same as the rest of the UK: a change of name or gender can affect how some benefits are administered.
+- Added State Pension to the Northern Ireland benefits question and step, which the Department for Communities administers alongside Universal Credit, Personal Independence Payment (PIP), and Employment Support Allowance (ESA). Tell the Northern Ireland Pension Centre about a name change if you get State Pension or Pension Credit, as your local Jobs & Benefits Office does not handle those. Also changed the note under the Northern Ireland benefits question to say the same as the rest of the UK: a change of name or gender can affect how some benefits are administered. The step still mentions possible delays, marked as community advice, since no official source supports it.
 - Rewrote the credit reference agencies guidance. Contacting one of Experian, Equifax, or TransUnion only starts the process at the other two, it does not complete it, and each still needs its own form and evidence. Added a note that a Notice of Correction can mean lenders review your applications by hand rather than automatically.
 - Added a "Dentist or optician" service item, since these keep their own patient records separately from your GP, and added Housing Benefit to the Council Tax step, since the same council team usually handles both. Retitled the banks item to "Banks, building societies, and financial accounts", making clear it applies to building societies too.
 - Corrected the qualifications step's professional regulator example, which named the Solicitors Regulation Authority as though it covered the whole UK. It only regulates solicitors in England and Wales. Split the step's student finance guidance for Scotland, where SAAS updates your name, gender, and title together on one confidential form, and added a note that some exam boards will waive a replacement certificate fee if asked, even though this is not documented publicly.
 - Removed references pointing at other steps that may not be in your plan. The electoral register and mobile contract items pointed at the credit reference agencies item, which is only there if you chose it.
+- The step-by-step note on name-change documents in Scotland wrongly said a statutory declaration is made through the National Records of Scotland. It now says a statutory declaration is more commonly used in Scotland, and that a free deed poll is accepted by most organisations.
+- Two GRC steps showed "Small cost" in green, which is used for free. Small and medium costs are now always yellow, and higher costs red.
 
 ### Wording
 
@@ -75,6 +92,9 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Renamed two step titles that had not changed since launch. "The final step" is now "Legal gender recognition", and "The basics" is now "Your name-change document".
 - Shortened the notes under the deed poll, birth registration, visa, NHS record, and HMRC questions, and made them say why each is being asked.
 - Spelled out several abbreviations the first time they appear in a step, rather than assuming you had read a different step first: CHI, HSCNI, PCSE, TENI, SAAS, and the GMC and HCPC medical regulators. The driving licence step's list of eight acceptable documents is now two short lists instead of one long sentence.
+- The GRC question and its answers, and the qualifications question, now read the same in the step-by-step questions and the checklist. In Northern Ireland, Council Tax is now called Rates (Land & Property Services) wherever it appears.
+- The DBS, AccessNI and Disclosure Scotland checkboxes said "select no" where there is nothing to select. They now say to leave the box unticked.
+- The Privacy panel now says that "New plan" keeps your light or dark mode choice.
 
 ### Code
 
@@ -88,6 +108,16 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The Esc key now needs two presses within a second to leave the site, and the usage guide's keyboard list says so. The red Quick exit button still works with one click.
 - Added a countdown to the restart and reset-progress buttons, so you can see the warning that a screen reader already announced. Added a short, dismissible note explaining that later checklist sections change based on your region and goal, so a section disappearing is not a fault, and an explanation, shown when a shared link is broken or out of date, that the all-in-one checklist has been opened instead of the step-by-step questions.
 - Fixed the "?" keyboard shortcut for the help dialog not working while a checkbox or radio button had focus, the toolbar's arrow-key order on narrow screens, where a button on the second row could be reached before one still on the first, and the checklist not showing a group's tick straight away when restored from a saved plan or a shared link.
+- Opening a shared link on a device that already has a plan now asks first. You can open the shared plan, which replaces yours, its progress, its step order, and Focus mode, or keep your own.
+- A shared link from someone who had already updated their work records was treated as out of date, and lost that answer and any DBS step. It now opens normally.
+- A saved plan or shared link is now only called out of date when a change could affect your answers or plan. Until now, every update to the site did this, because one number set both this and the "Last updated" date at the bottom of the page. That date still changes with every update, but a separate plan version, raised only for changes that could affect a plan, now decides whether yours is out of date.
+- Opening a link inside a panel with the keyboard no longer closes the panel.
+- Screen readers now hear when a step's status changes, and hear "Your next step is" only when the next step changes. They now also read the usage guide's toolbar list, including the warning that a copied link contains sensitive information, and read each checklist question together with its answers.
+- Steps hidden by Focus mode can no longer be reached with the Tab key or read by screen readers, and marking the step you are on as done moves you to the next visible one.
+- Moving through a plan or the checklist with the keyboard no longer hides the item you are on behind the toolbar at the top or the button bar at the bottom.
+- A greyed-out answer now says why it cannot be chosen yet, for everyone rather than only for screen readers.
+- "Download this page" now saves an exact copy of the planner. It used to include extra code added by the site's host, which did nothing offline.
+- Answering no to the age or disclaimer question now moves focus to the message that explains why, and "Go back" returns it to "Start here".
 
 ### Layout
 
@@ -110,6 +140,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Rebuilt `bump-version.yml`. It ran on every pull request merged into `main` or `preview`, tried to push directly, and fell back to opening a pull request when that was rejected. That fallback could not complete, because this repository does not allow GitHub Actions to open pull requests, so every run since July left an abandoned branch nobody could merge. It now runs only on a push to `main` that changes `index.html`, pushes with a token that works, and fails loudly if that push is rejected.
 - Removed the path filter from `playwright.yml`. Once the suite became a required check on `main`, the filter meant a pull request touching only documentation could never satisfy it, leaving the pull request stuck.
 - Added notes to the GitHub issue templates pointing at the project's constraints and sourcing expectations.
+- Added `llms.txt`, a short plain summary of the planner for AI tools, and an empty `ai-catalog.json` saying the site offers no AI agents or tools. Both are read by Google Lighthouse's new AI agent checks.
 
 ## [July 2026]
 
