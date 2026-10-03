@@ -719,7 +719,7 @@ test.describe('Be myself Planner', () => {
     test('102. Wizard GRC question offers "already have one" and is still shown after answering birthCert yes', async ({ page }) => {
       await openWizard(page);
       await page.evaluate(() => {
-        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], citizen:'no', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'none', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'yes' });
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], citizen:'no', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'none', visa:'none', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', birthCertName:'no', birthCert:'yes' });
         step = questions.findIndex(q => q.id === 'grc');
         renderWizard(false);
       });
@@ -995,13 +995,103 @@ test.describe('Be myself Planner', () => {
       expect(filled, 'the round trip used to fill in England, "none" and "no"').toEqual([]);
     });
 
-    test('80. Checklist defaults fail safe: driving licence and passport steps included', async ({ page }) => {
-      await openChecklist(page);
-      await expect(page.locator('input[name="chkDrivingLicenceOpt"][value="needs_update"]')).toBeChecked();
-      await expect(page.locator('input[name="chkPassportOpt"][value="needs_update"]')).toBeChecked();
+    test('80. An unanswered driving licence question stops the plan in the checklist and is asked after switching view', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      await page.locator('#chkGoalGender').check();
+      for (const id of ['#chkRegionEW', '#chkBirthRegionEW', '#chkVisaNone', '#chkEmployedNo', '#chkGRCNo']) {
+        await page.locator(id).check();
+      }
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await expect(page.getByRole('heading', { name: /Identity documents/ })).toBeVisible();
+      await expect(page.locator('#wrapDrivingLicence #checklistAnswerWarning'),
+        'the driving licence is the first unanswered question on the page').toBeVisible();
+      await expect(page.locator('#planView')).toBeHidden();
+
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'the checklist never answered the driving licence, so the wizard must ask it')
+        .toContainText('What is the status of your UK driving licence?');
+    });
+
+    test('205. Switching view after answering the questions before and after the documents still asks about the driving licence, passport and visa', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      await page.locator('#chkGoalGender').check();
+      await page.locator('#chkRegionEW').check();
+      await page.locator('#chkBirthRegionEW').check();
+      await page.locator('#chkEmployedNo').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'the wizard used to open at the DBS question and never ask about the driving licence')
+        .toContainText('What is the status of your UK driving licence?');
+
+      await page.locator('input[name="ans"][value="needs_update"]').check();
+      await page.getByRole('button', { name: /Continue/ }).click();
+      await expect(page.locator('#wizardStepFieldset legend')).toContainText('What is the status of your passport?');
+      await page.locator('input[name="ans"][value="needs_update"]').check();
+      await page.getByRole('button', { name: /Continue/ }).click();
+      await expect(page.locator('#wizardStepFieldset legend')).toContainText('Do you have a visa or eVisa?');
+      await page.locator('input[name="ans"][value="none"]').check();
+      await page.getByRole('button', { name: /Continue/ }).click();
+
+      for (let i = 0; i < 20 && !(await page.locator('#planView').isVisible()); i++) {
+        if (await page.evaluate(() => questions[window.step].id) === 'grc') {
+          await page.locator('input[name="ans"][value="no"]').check();
+        }
+        await page.getByRole('button', { name: /Continue|Show my plan/ }).click();
+      }
+      await expect(page.locator('#planView')).toBeVisible();
       await expect(page.locator('#planContent')).toContainText('Driving licence');
+      await expect(page.locator('#planContent')).toContainText('UK passport');
+    });
+
+    test('206. Switching view with only the GRC question answered starts at the goal question', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGRCNo').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'the wizard used to open at its last question, so one answer built a plan with no goal or region')
+        .toContainText('What do you need to update on your documents?');
+    });
+
+    test('207. A fresh checklist does not inherit where an earlier visit to the wizard left off', async ({ page }) => {
+      await openWizard(page);
+      for (let i = 0; i < 4; i++) await wizardNext(page);
+      expect(await page.evaluate(() => window.step)).toBeGreaterThan(0);
+      await page.getByRole('button', { name: 'Back to start' }).click();
+      await openBlankChecklist(page);
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'startChecklist() used to keep the old step, so the wizard opened where the earlier visit stopped')
+        .toContainText('What do you need to update on your documents?');
+    });
+
+    test('208. Switching view without the age and disclaimer confirmations starts at the age question', async ({ page }) => {
+      await page.locator('.start-checklist-link').click();
+      await page.locator('#chkRegionEW').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'a plan must never be built without the age and disclaimer confirmations')
+        .toContainText('Are you aged 16 or over?');
+    });
+
+    test('209. The wizard asks an unanswered question instead of building the plan', async ({ page }) => {
+      await openWizard(page);
+      await page.evaluate(() => {
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], citizen:'no', deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', visa:'none', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', grc:'no', birthCertName:'no', birthCert:'no' });
+        let last = questions.length - 1;
+        while (questions[last].cond && !questions[last].cond()) last--;
+        step = last;
+        renderWizard(false);
+        delete wizardState.passport;
+      });
+      const answer = page.locator('input[name="ans"]:checked');
+      if (await answer.count() === 0) await page.locator('input[name="ans"]:not([disabled])').first().check();
+      await page.getByRole('button', { name: /Continue|Show my plan/ }).click();
+      await expect(page.locator('#wizardStepFieldset legend'),
+        'the passport answer is missing, so it is asked again rather than leaving the passport out of the plan')
+        .toContainText('What is the status of your passport?');
+      await expect(page.locator('#planView')).toBeHidden();
     });
   });
 
@@ -1220,6 +1310,21 @@ test.describe('Be myself Planner', () => {
       await medParent.click();
       await expect(medParent).toHaveAttribute('data-state', '1');
       expect(await medBtns.evaluateAll(els => els.map(e => e.dataset.state))).toEqual(['1', '1']);
+    });
+
+    test('211. A plan with nothing to track tells screen readers so from the progress bar', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      for (const id of ['#chkRegionEW', '#chkBirthRegionEW', '#chkDeedPoll', '#chkNHS', '#chkHMRC', '#chkDrivingLicenceUpdated', '#chkPassportUpdated', '#chkVisaNone', '#chkEmployedNo', '#chkSvcNone']) {
+        await page.locator(id).check();
+      }
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).toContainText('Nothing left to do!');
+      const bar = page.locator('#controlBarProgress');
+      await expect(bar, 'the bar used to keep the checklist position, such as "Section 3 of 3"').toHaveAttribute('aria-label', 'Plan progress');
+      await expect(bar).toHaveAttribute('aria-valuetext', 'No steps to track');
+      await expect(bar).toHaveAttribute('aria-valuenow', '100');
+      expect(await page.locator('#controlBarProgressFill').evaluate(el => el.style.width)).toBe('100%');
     });
   });
 
@@ -2843,6 +2948,54 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(bar).toHaveAttribute('aria-valuetext', /^0 of \d+ items done or not needed$/);
     });
+
+    test('210. On a small phone, the unanswered question, its warning and its first option are all in view below the toolbar', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 568 });
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalName').check();
+      await page.locator('#chkGoalGender').check();
+      for (const id of ['#chkRegionEW', '#chkBirthRegionEW', '#chkDrivingLicenceNeeds', '#chkPassportNeeds', '#chkVisaNone', '#chkGRCNo']) {
+        await page.locator(id).check();
+      }
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const warning = page.locator('#wrapEmployment #checklistAnswerWarning');
+      await expect(warning).toBeVisible();
+      await expect(page.locator('#chkEmployedNeeds')).toBeFocused();
+      await page.waitForTimeout(300);
+      const boxes = await page.evaluate(() => {
+        const rect = el => { const r = el.getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; };
+        const sticky = document.getElementById('checklistStickyBar');
+        const stickyTop = sticky && sticky.offsetParent ? sticky.getBoundingClientRect().top : window.innerHeight;
+        return {
+          toolbarBottom: document.getElementById('controlBar').getBoundingClientRect().bottom,
+          floor: Math.min(window.innerHeight, stickyTop),
+          legend: rect(document.querySelector('#wrapEmployment > legend')),
+          warning: rect(document.getElementById('checklistAnswerWarning')),
+          option: rect(document.activeElement),
+        };
+      });
+      for (const name of ['legend', 'warning', 'option']) {
+        expect(boxes[name].top, `the ${name} must not sit under the sticky toolbar`).toBeGreaterThanOrEqual(boxes.toolbarBottom - 1);
+        expect(boxes[name].bottom, `the ${name} must be fully on screen`).toBeLessThanOrEqual(boxes.floor + 1);
+      }
+    });
+
+    test('212. The usage guide explains how to type the help shortcut', async ({ page }) => {
+      await page.locator('#dlgUsage').evaluate(d => d.showModal());
+      await expect(page.locator('#dlgUsage .legend-toolbar').first(),
+        'on UK and US keyboards a question mark needs Shift, so pressing / alone does nothing')
+        .toContainText('holding Shift and pressing /');
+      await expect(page.locator('#dlgUsage .shortcut-table')).toContainText('(usually Shift + /)');
+    });
+
+    test('213. Shift and / opens the usage guide, but not while Ctrl is held', async ({ page }) => {
+      const dlg = page.locator('#dlgUsage');
+      await page.keyboard.press('Control+Shift+Slash');
+      await page.waitForTimeout(200);
+      await expect(dlg, 'a shortcut with Ctrl, Alt or Cmd belongs to the browser or the system').toBeHidden();
+      await page.keyboard.press('Shift+Slash');
+      await expect(dlg).toBeVisible();
+    });
   });
 
   test.describe('Content integrity', () => {
@@ -2880,7 +3033,7 @@ test.describe('Be myself Planner', () => {
       expect(after.unresolved).toEqual([]);
     });
 
-    test('147. Switching to the step-by-step view resumes past the checklist answers, not at the first question', async ({ page }) => {
+    test('147. Switching to the step-by-step view resumes at the first unanswered question, otherwise past the checklist answers', async ({ page }) => {
       await openBlankChecklist(page);
 
       await page.getByRole('button', { name: 'Switch view' }).click();
@@ -2893,12 +3046,18 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkDeedPoll').check();
       await page.locator('#chkHMRC').check();
       await page.locator('input[name="chkDrivingLicenceOpt"][value="none"]').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
+      expect(await page.evaluate(() => questions[window.step].id),
+        'the goal is still unanswered, so it is asked before anything the checklist answered later').toBe('goalParts');
 
       await page.getByRole('button', { name: 'Switch view' }).click();
-      const resumed = await page.evaluate(() => questions[window.step].id);
+      await page.locator('#chkGoalName').check();
+      await page.locator('#chkGoalGender').check();
+      await page.locator('input[name="chkBirthRegion"][value="s"]').check();
+      await page.getByRole('button', { name: 'Switch view' }).click();
       const furthest = await page.evaluate(() => questions.findIndex(q => q.id === 'driving'));
       expect(await page.evaluate(() => window.step)).toBeGreaterThan(furthest);
-      expect(['passport', 'visa']).toContain(resumed);
+      expect(['passport', 'visa']).toContain(await page.evaluate(() => questions[window.step].id));
 
       await page.locator('#wizardBackBtn').click();
       expect(await page.evaluate(() => questions[window.step].id),

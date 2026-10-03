@@ -336,7 +336,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Toolbar</h3>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Always shown</p>
     <div class="legend-toolbar" style="margin-bottom:12px;">
-      <span class="legend-tb-icon" aria-hidden="true">?</span><span><strong>Usage guide:</strong> opens this dialog. Also triggered by pressing <kbd>?</kbd>.</span>
+      <span class="legend-tb-icon" aria-hidden="true">?</span><span><strong>Usage guide:</strong> opens this dialog. You can also open it by typing a question mark (<kbd>?</kbd>), which on most keyboards means holding <kbd>Shift</kbd> and pressing <kbd>/</kbd>.</span>
       <span class="legend-tb-icon" aria-hidden="true">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
       <span class="legend-tb-icon" aria-hidden="true">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and replaces it in your tab's history, so the back button will not return here. The visit may still appear in your browser's saved history. The same button is at the top of every panel like this one, and pressing <kbd>Esc</kbd> twice within a second does the same.</span>
     </div>
@@ -394,7 +394,7 @@
         <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
         <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this dialog</td></tr>
         <tr><td><kbd>Esc</kbd> <kbd>Esc</kbd></td><td>Quick exit: press twice within a second to leave the page</td></tr>
-        <tr><td><kbd>?</kbd></td><td>Open usage guide</td></tr>
+        <tr><td><kbd>?</kbd> (usually <kbd>Shift</kbd> + <kbd>/</kbd>)</td><td>Open usage guide</td></tr>
       </tbody>
     </table>
     <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:8px;margin-bottom:0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Works with screen readers.</p>
@@ -1496,6 +1496,7 @@ function setChecklistMode(hasPlan) {
 }
 function startChecklist() {
   isWizardMode = false;
+  step = 0; wizardHistory = []; wizardSeen = new Set(); chkTouched = new Set();
   resetChecklist();
   V.start.classList.add('hidden');
   document.getElementById('ageKickout')?.classList.add('hidden');
@@ -1599,7 +1600,7 @@ function toggleMode() {
     document.body.classList.add('wizard-active');
     let resume = step;
     questions.forEach((q, i) => { if (chkTouched.has(q.id) && i >= resume) resume = i + 1; });
-    step = resume;
+    step = Math.min(resume, firstUnansweredStep(true));
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
     if (step >= questions.length) step = questions.length - 1;
     wizardHistory = computeHistoryUpTo(step);
@@ -1893,6 +1894,16 @@ function resetChecklist() {
   renderChecklist();
   updateLocks();
 }
+const REQUIRED_ANSWER_IDS = ['goalParts', 'region', 'birthRegion', 'driving', 'passport', 'visa', 'employment', 'grc'];
+function isUnanswered(id) {
+  if (id === 'goalParts') return !wizardState.goal || wizardState.goal === 'none';
+  return wizardState[id] === undefined || wizardState[id] === null;
+}
+function firstUnansweredStep(includeConfirmations) {
+  const i = questions.findIndex(q => (!q.cond || q.cond()) &&
+    ((includeConfirmations && (q.id === 'age' || q.id === 'disclaimer')) || (REQUIRED_ANSWER_IDS.includes(q.id) && isUnanswered(q.id))));
+  return i === -1 ? questions.length : i;
+}
 function computeHistoryUpTo(targetStep) {
   const hist = [];
   for (let s = 0; s <= targetStep && s < questions.length; s++) {
@@ -2058,7 +2069,13 @@ function renderWizard(skipForward = true) {
   if (skipForward) {
     while (step < questions.length && questions[step].cond && !questions[step].cond()) step++;
   }
-  if (step >= questions.length) { generateWizardPlan(); return; }
+  if (step >= questions.length) {
+    const gap = firstUnansweredStep(false);
+    if (gap >= questions.length) { generateWizardPlan(); return; }
+    step = gap;
+    wizardHistory = computeHistoryUpTo(step);
+    announce('Please answer this question before your plan is built.');
+  }
   if (wizardHistory[wizardHistory.length - 1] !== step) wizardHistory.push(step);
   const q = questions[step];
   const qText = typeof q.q === 'function' ? q.q() : q.q;
@@ -2325,11 +2342,11 @@ function generateChecklistPlan() {
     const [wrapId, name] = unanswered;
     const group = gel(wrapId);
     const warning = gel('checklistAnswerWarning');
-    group.appendChild(warning);
+    group.querySelector(':scope > legend').after(warning);
     warning.classList.add('visible');
     group.setAttribute('aria-describedby', 'checklistAnswerWarning');
-    warning.scrollIntoView({behavior:'smooth', block:'center'});
-    group.querySelector(`input[name="${name}"]`)?.focus({preventScroll:true});
+    group.scrollIntoView({block:'start'});
+    group.querySelector(`input[name="${name}"]`)?.focus();
     const legend = group.querySelector('legend');
     announce('Please answer: ' + (legend ? legend.firstChild.textContent.trim() : ''));
     return;
@@ -3144,7 +3161,13 @@ function updateNextStep() {
 }
 function refreshPlan(leadMsg) {
   const btns = document.querySelectorAll('.step-state-btn[data-track-id]');
-  if (!btns.length) return;
+  if (!btns.length) {
+    const emptyFill = gel('controlBarProgressFill');
+    if (emptyFill) emptyFill.style.width = '100%';
+    const emptyBar = gel('controlBarProgress');
+    if (emptyBar) { emptyBar.setAttribute('aria-valuenow', 100); emptyBar.setAttribute('aria-label', 'Plan progress'); emptyBar.setAttribute('aria-valuetext', 'No steps to track'); }
+    return;
+  }
   let completed = 0;
   btns.forEach(btn => {
     const s = getStepState(btn.dataset.trackId);
@@ -3438,7 +3461,7 @@ window.onload = () => {
     const ae0 = document.activeElement;
     const isTextEntryField = ae0.tagName === 'TEXTAREA' ||
       (ae0.tagName === 'INPUT' && !['checkbox', 'radio'].includes(ae0.type));
-    if (e.key === '?' && !isTextEntryField) {
+    if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey && !isTextEntryField) {
       e.preventDefault();
       if (!document.querySelector('dialog[open]')) { openHelp(); return; }
     }
