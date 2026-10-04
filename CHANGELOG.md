@@ -36,6 +36,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The Privacy panel, the "What is this?" panel, and the README now say that a shared plan link holds your answers in its web address, so they reach the website's host when the link is opened.
 - The planner now says more clearly who it is for: anyone aged 16 or over updating UK documents they hold, including people living abroad and people planning to move to the UK.
 - New page title and description for search results and link previews, and the line under the site title is now part of the main heading. The "What is this?" panel has a new "What does it cover?" section.
+- The usage guide now explains that the help shortcut is the question mark, typed with Shift on most keyboards. The shortcut no longer reacts when Ctrl, Alt or Cmd is held.
 
 ### Code
 
@@ -44,18 +45,22 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Criminal record checks are now asked about for everyone living in the UK, not only people with work records to update.
 - Nothing in the checklist is chosen for you any more. It used to start with some answers already selected, such as England, and "No" for work records and a GRC, which were easy to miss. If a question is left unanswered, "Show my action plan" takes you to it and asks you to choose an answer.
 - Screen readers now hear the question or section you are on from the progress bar, no longer hear the usage guide's badge labels twice, and every panel can be scrolled with the keyboard.
+- Switching from the checklist to the step-by-step view now starts at the first question you have not answered, and a plan is never built while a question is unanswered. Before, it could skip questions and leave steps such as your driving licence and passport out of your plan.
+- When you press "Show my action plan" with a question unanswered, the message now appears under the question itself, and on small screens the question and its first option stay in view.
+- Screen readers no longer hear an old checklist position from the progress bar when a plan has nothing left to track.
 
 ### Layout
 
 - On a phone, the plan toolbar's buttons now wrap onto another row instead of being squashed or hidden.
 - Links in panels now use the site's link colour. In dark mode they were hard to read.
-- Shared links now show a preview image of the transgender and non-binary pride flags.
+- Shared links now show a wide preview image with the site's title and tagline, and the labels UK specific, Free and private, No tracking and No sign-up, over the transgender and non-binary pride flags.
 
 ### Infrastructure
 
 - The scheduled source check now compares the text of GOV.UK pages too, since GOV.UK only changes a page's update date for major edits.
 - The version bump workflow now keeps the date in `sitemap.xml` current.
 - Every GitHub Action the workflows use is now pinned to an exact commit, with its version noted beside it, so a changed or compromised release tag cannot alter what runs.
+- The scheduled source check now removes cookie banners before reading a page, ignores changes in spacing, compares PDFs by their file fingerprint, skips site home pages, and shows the part of a long line that changed. Running it by hand on main with "write_source_snapshots" ticked now commits the new snapshot.
 - Added tests for all of the above, including a check that plan text gives costs as labels rather than amounts.
 
 ## [September 2026]

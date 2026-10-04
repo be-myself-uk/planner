@@ -201,7 +201,7 @@ test.describe('Be myself Planner', () => {
       await expect(usageBtn).toBeHidden();
     });
 
-    test('2. Age gate — wizard Q1', async ({ page }) => {
+    test('2. Age gate: wizard Q1', async ({ page }) => {
       await page.getByRole('button', { name: 'Start here' }).click();
       await expect(page.locator('#wizardView')).toBeVisible();
       const qText = await page.locator('#wizardStepFieldset legend, #wizardStepFieldset .chk-q, #wizardOptionsGroup').first().textContent();
@@ -211,7 +211,7 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => localStorage.getItem('ageConfirmed'))).toBe('true');
     });
 
-    test('2b. Disclaimer gate — wizard Q2', async ({ page }) => {
+    test('2b. Disclaimer gate: wizard Q2', async ({ page }) => {
       await page.getByRole('button', { name: 'Start here' }).click();
       await page.locator('input[name=ans][value=yes]').check();
       await page.getByRole('button', { name: 'Continue' }).click();
@@ -3553,7 +3553,7 @@ test.describe('Be myself Planner', () => {
       expect(text, 'Lighthouse needs a "# " heading').toMatch(/^\s*#\s+.+/m);
       expect(text, 'Lighthouse needs at least one Markdown link').toMatch(/\[.+\]\(.+\)/);
       expect(text.startsWith('---'), 'a leading --- is read as front matter and hides the heading').toBe(false);
-      expect(text).not.toContain('—');
+      expect(text).not.toContain('\u2014');
       const links = [...text.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)].map(m => m[1]);
       expect(links.length).toBeGreaterThan(0);
       for (const link of links) {
