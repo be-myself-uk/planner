@@ -93,7 +93,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 201 of them numbered up to 214; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 210 of them numbered up to 223; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 The `openChecklist()` helper opens the checklist and then answers what used to be pre-selected (`answerOldDefaults()`), so most tests start from the same situation they always did; a test about unanswered questions starts from `openBlankChecklist()` instead.
 
@@ -140,6 +140,8 @@ Standard meta tags, Open Graph/Twitter card tags (including the `og-image.png` p
 The entire block is one long minified line, so search for a selector or property rather than a line number.
 
 All styling lives here: no separate stylesheet, no CSS framework. Organised loosely by component: toolbar/icon buttons, dialogs, phase cards, checklist/wizard question cards, badges (difficulty/cost), footer, print styles (`@media print`), and responsive breakpoints (`@media (max-width:600px)` and `400px`) for mobile. Dark mode is done via CSS custom properties (`--bg-card`, `--text`, etc.) swapped by a `data-theme` attribute on `<html>`, not a separate stylesheet.
+
+Answer boxes only show their hover style inside `@media (hover:hover)`, so it never sticks on a touchscreen, and `@media (pointer:coarse)` holds touchscreen-only rules such as the bigger move arrows. Buttons, panel headings and answer boxes can't be selected as text (`user-select:none`, plus the `-webkit-` form for Safari); questions, guidance and plan text stay selectable. Every tip that can be hidden uses a `.tip-close` ✕ button. A fold-out panel puts its ✕ after its `<details>`, inside a `.tip-box` wrapper that carries the panel's id, because a button can't go inside `<summary>`.
 
 ### 3. HTML body (lines ~40 to ~525)
 

@@ -37,6 +37,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The planner now says more clearly who it is for: anyone aged 16 or over updating UK documents they hold, including people living abroad and people planning to move to the UK.
 - New page title and description for search results and link previews, and the line under the site title is now part of the main heading. The "What is this?" panel has a new "What does it cover?" section.
 - The usage guide now explains that the help shortcut is the question mark, typed with Shift on most keyboards. The shortcut no longer reacts when Ctrl, Alt or Cmd is held.
+- The usage guide now says you can hover over the community advice symbol on a computer. It used to tell everyone to hover, which you cannot do on a phone.
 
 ### Code
 
@@ -54,6 +55,13 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - On a phone, the plan toolbar's buttons now wrap onto another row instead of being squashed or hidden.
 - Links in panels now use the site's link colour. In dark mode they were hard to read.
 - Shared links now show a wide preview image with the site's title and tagline, and the labels UK specific, Free and private, No tracking and No sign-up, over the transgender and non-binary pride flags.
+- The step-by-step view's Back button is now a plain button beside Continue, so it is easier to see and to tap. It was a small link above the question.
+- Every tip you can hide now has the same plain ✕ button. "Did you know about titles?" and "Estimated time and costs" can be hidden without opening them first. The ✕ on the warning that progress cannot be saved is bigger, and no longer turns dark blue under the mouse.
+- Ticked answers are now shaded, so you can see your choices at a glance. On touchscreens, the last answer you tapped no longer stays highlighted after you untick it.
+- Double-clicking a button or an answer no longer highlights its text. On phones, tapping one no longer makes it flash, and tapping a button twice quickly no longer zooms the page.
+- On touchscreens, the arrows for moving steps are bigger.
+- Buttons now use the same font as the rest of the page.
+- The line under the site title no longer leaves its last word alone on the second line.
 
 ### Infrastructure
 
