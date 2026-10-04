@@ -3111,6 +3111,106 @@ test.describe('Be myself Planner', () => {
       expect(await close.evaluate(el => getComputedStyle(el).backgroundColor),
         'the general button hover turned it into a dark blue square').toBe('rgba(0, 0, 0, 0)');
     });
+
+    test('219. A ticked answer is highlighted, and on a touchscreen the last answer tapped does not stay highlighted', async ({ page, browser }) => {
+      const colour = (p, index) => p.locator('#wizardForm .option').nth(index).evaluate(el => getComputedStyle(el).backgroundColor);
+      const resolve = (p, name) => p.evaluate(n => {
+        const probe = document.createElement('div');
+        probe.style.background = `var(${n})`;
+        document.body.append(probe);
+        const value = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return value;
+      }, name);
+      const toGoal = async p => {
+        await openWizard(p);
+        while (await p.locator('#wizardForm .multi-opt').count() === 0) await wizardNext(p);
+      };
+
+      await toGoal(page);
+      const tint = await resolve(page, '--info-bg');
+      const card = await resolve(page, '--bg-card');
+      const hover = await resolve(page, '--bg-details-hover');
+      await page.locator('#wizardForm .option').nth(0).click();
+      await page.mouse.move(0, 0);
+      await expect.poll(() => colour(page, 0), { message: 'a ticked answer keeps its highlight after the mouse moves away' }).toBe(tint);
+      await page.locator('#wizardForm .option').nth(1).hover();
+      await expect.poll(() => colour(page, 1), { message: 'with a mouse, hovering still highlights an answer' }).toBe(hover);
+
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+      try {
+        const phone = await context.newPage();
+        await phone.addInitScript(() => localStorage.setItem('disclaimerSeen', '1'));
+        await phone.goto(filePath);
+        await toGoal(phone);
+        const options = phone.locator('#wizardForm .option');
+        await options.nth(0).tap();
+        await options.nth(1).tap();
+        await options.nth(0).tap();
+        await expect.poll(() => colour(phone, 0), { message: 'the last answer tapped used to stay grey after being unticked' }).toBe(card);
+        await expect.poll(() => colour(phone, 1)).toBe(tint);
+      } finally {
+        await context.close();
+      }
+    });
+
+    test('220. On a touchscreen the move arrows are big enough to tap, and unchanged with a mouse', async ({ page, browser }) => {
+      const sizes = p => p.locator('.item-move-btn').evaluateAll(els => els
+        .filter(el => el.offsetParent)
+        .map(el => { const r = el.getBoundingClientRect(); return [r.width, r.height]; }));
+      await openMultiPhasePlan(page);
+      const mouse = await sizes(page);
+      expect(mouse.length).toBeGreaterThan(0);
+      expect(mouse.every(([w, h]) => w === 26 && h === 26), 'a mouse is precise, so the compact size stays').toBe(true);
+      const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+      try {
+        const phone = await context.newPage();
+        await phone.addInitScript(() => localStorage.setItem('disclaimerSeen', '1'));
+        await phone.goto(filePath);
+        await openMultiPhasePlan(phone);
+        const touch = await sizes(phone);
+        expect(touch.length).toBeGreaterThan(0);
+        expect(touch.every(([w, h]) => w >= 36 && h >= 36), 'the arrows sit 2px apart, so 26px was easy to miss with a finger').toBe(true);
+      } finally {
+        await context.close();
+      }
+    });
+
+    test('221. The tagline is balanced across its lines', async ({ page }) => {
+      const tagline = await page.locator('.hero .hero-tagline').evaluate(el => {
+        const style = getComputedStyle(el);
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return { wrap: style.textWrapStyle || style.textWrap, widths: [...range.getClientRects()].map(r => r.width) };
+      });
+      expect(tagline.wrap).toContain('balance');
+      if (tagline.widths.length > 1) {
+        expect(Math.min(...tagline.widths) / Math.max(...tagline.widths),
+          'the second line used to hold only "documents"').toBeGreaterThan(0.6);
+      }
+    });
+
+    test('222. The usage guide does not ask people on phones to hover', async ({ page }) => {
+      await page.locator('#dlgUsage').evaluate(d => d.showModal());
+      const guide = page.locator('#dlgUsage');
+      await expect(guide).toContainText('On a computer, you can hover over the symbol to read this reminder.');
+      await expect(guide, 'phones cannot hover').not.toContainText('Hover over the symbol');
+    });
+
+    test('223. Buttons use the same font as the text around them', async ({ page }) => {
+      const fonts = await page.evaluate(() => {
+        const font = el => getComputedStyle(el).fontFamily;
+        return {
+          body: font(document.body),
+          button: font(document.getElementById('startWizardBtn')),
+          toolbar: font(document.querySelector('.ub-icon-btn')),
+          skipLink: font(document.querySelector('.skip-link')),
+        };
+      });
+      for (const name of ['button', 'toolbar', 'skipLink']) {
+        expect(fonts[name], `${name} used sans-serif while the page used the system font`).toBe(fonts.body);
+      }
+    });
   });
 
   test.describe('Content integrity', () => {
