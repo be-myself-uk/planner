@@ -10,6 +10,7 @@ const SNAPSHOT_FILE = path.join(__dirname, 'source-content-snapshots.json');
 const REPORT_FILE = path.join(REPO_ROOT, 'source-content-report.md');
 const RETRY_DELAY_MS = 3000;
 const BETWEEN_REQUESTS_MS = 1000;
+const SNAPSHOT_FORMAT = 2;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -29,8 +30,8 @@ async function main() {
 
   if (!write && !fs.existsSync(SNAPSHOT_FILE)) {
     console.error(`${SNAPSHOT_FILE} is missing, so there is no baseline to compare against.`);
-    console.error('Run `npm run generate-source-snapshots` (needs real network access; the');
-    console.error('workflow_dispatch "write_source_snapshots" input can produce it in CI) and commit the result.');
+    console.error('Run the Check Content workflow by hand on main with "write_source_snapshots" ticked:');
+    console.error('it regenerates the snapshot and commits it.');
     process.exit(1);
   }
 
@@ -43,6 +44,7 @@ async function main() {
   const nextSnapshot = {};
   const changed = [];
   const errors = [];
+  let withoutBaseline = 0;
 
   for (const [i, entry] of targets.entries()) {
     process.stderr.write(`[${i + 1}/${targets.length}] ${entry.url} ... `);
@@ -63,11 +65,13 @@ async function main() {
     }
     console.error('ok');
 
-    nextSnapshot[entry.url] = { name: entry.name, section: entry.section, title: result.title, textContent: result.textContent };
+    nextSnapshot[entry.url] = { name: entry.name, section: entry.section, title: result.title, format: SNAPSHOT_FORMAT, textContent: result.textContent };
 
     if (!write) {
       const before = previous[entry.url];
-      if (before && before.textContent !== result.textContent) {
+      if (!before || before.format !== SNAPSHOT_FORMAT) {
+        withoutBaseline++;
+      } else if (before.textContent !== result.textContent) {
         changed.push({ ...entry, before: before.textContent, after: result.textContent });
       }
     }
@@ -84,7 +88,7 @@ async function main() {
     return;
   }
 
-  console.error(`checked=${targets.length}`);
+  console.error(`checked=${targets.length} without_baseline=${withoutBaseline}`);
   console.error(`changed=${changed.length} errors=${errors.length}`);
 
   if (changed.length || errors.length) {
@@ -105,22 +109,39 @@ function diffLines(before, after) {
   return { removed, added };
 }
 
+function firstDifference(a, b) {
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i++;
+  return i;
+}
+
+function excerpts(lines, otherLines) {
+  return lines.slice(0, 10).map((line) => {
+    const partner = otherLines.find((other) => firstDifference(line, other) >= 20);
+    const start = partner ? Math.max(0, firstDifference(line, partner) - 60) : 0;
+    const text = line.slice(start, start + 200).replace(/`/g, "'");
+    return (start > 0 ? '…' : '') + text + (start + 200 < line.length ? '…' : '');
+  });
+}
+
 function writeReport(changed, errors) {
-  const lines = ['# Possible source changes (non-GOV.UK)\n'];
+  const lines = ['# Possible source changes (page text, including GOV.UK)\n'];
   lines.push(
-    'Automated check comparing each source\'s extracted article text (via Mozilla\'s ' +
-    'Readability, the Firefox Reader View engine) against the last committed snapshot. ' +
-    'A listing here means the extracted text differs. Review the source, then run ' +
-    '`npm run generate-source-snapshots` in `tests/` to update the snapshot, whether or ' +
-    'not the change affected the planner.\n'
+    'Automated check comparing each source\'s page text (extracted with Mozilla\'s ' +
+    'Readability, the Firefox Reader View engine, after removing cookie banners) against ' +
+    'the last committed snapshot. PDFs are compared by file fingerprint. A listing here ' +
+    'means the text differs. Review each source. Then, whether or not the change affected ' +
+    'the planner, run the Check Content workflow by hand on main with ' +
+    '"write_source_snapshots" ticked: it commits a new snapshot. Until then, every run ' +
+    'reports the same changes again.\n'
   );
   if (changed.length) {
     lines.push('## Possibly changed since last snapshot\n');
     for (const c of changed) {
       const { removed, added } = diffLines(c.before, c.after);
       lines.push(`- **${c.name}** (${c.section})\n  <${c.url}>\n  Status: ${c.status}`);
-      if (removed.length) lines.push('  Removed:\n' + removed.slice(0, 10).map((l) => `  - \`${l.slice(0, 200)}\``).join('\n'));
-      if (added.length) lines.push('  Added:\n' + added.slice(0, 10).map((l) => `  + \`${l.slice(0, 200)}\``).join('\n'));
+      if (removed.length) lines.push('  Removed:\n' + excerpts(removed, added).map((l) => `  - \`${l}\``).join('\n'));
+      if (added.length) lines.push('  Added:\n' + excerpts(added, removed).map((l) => `  + \`${l}\``).join('\n'));
       lines.push('');
     }
   }

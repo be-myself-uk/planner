@@ -2,9 +2,9 @@
 
 > A free, private planner that helps trans and non-binary people in the UK work out the steps to update their name and gender marker on their documents.
 
-Be myself asks a short set of questions about someone's situation: where they live, what documents they have, what they have already updated, and what they want to change. It then builds a step-by-step action plan with instructions and links to official pages. It covers England, Wales, Scotland, and Northern Ireland, people from outside the UK who hold a visa or eVisa, and the Irish passport gender recognition route for people born in Northern Ireland. It is for people aged 16 and over.
+Be myself asks a short set of questions about someone's situation: where they live, what documents they have, what they have already updated, and what they want to change. It then builds a step-by-step action plan with instructions and links to official pages. It covers England, Wales, Scotland, and Northern Ireland, people living abroad or planning to move to the UK (including people with a visa or eVisa), and the Irish passport gender recognition route for people born in Northern Ireland. It is for people aged 16 and over.
 
-The whole planner is a single web page. Nothing anyone enters is sent to a server: answers and progress stay in their own browser. There is no account, no login, and no API.
+The whole planner is a single web page. Nothing anyone enters is sent to a server while they use it: answers and progress stay in their own browser. The exception is a shared plan link, which carries the answers in its web address, so they reach the host when the link is opened. There is no account, no login, and no API.
 
 ## The planner
 

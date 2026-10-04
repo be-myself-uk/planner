@@ -14,40 +14,44 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: main
           fetch-depth: 0
           token: ${{ secrets.BUMP_VERSION_TOKEN }}
 
-      - name: Update SCHEMA_VERSION in index.html
+      - name: Update SCHEMA_VERSION in index.html and the sitemap date
         run: |
           CURRENT_TIME=$(date +%s)
+          TODAY=$(date -u +%F)
 
           sed -i -E "s/const SCHEMA_VERSION = [0-9]+;/const SCHEMA_VERSION = $CURRENT_TIME;/g" index.html
+          sed -i -E "s#<lastmod>[0-9]{4}-[0-9]{2}-[0-9]{2}</lastmod>#<lastmod>$TODAY</lastmod>#" sitemap.xml
 
       - name: Commit the version bump through the GitHub API
         env:
           GH_TOKEN: ${{ secrets.BUMP_VERSION_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          if git diff --quiet -- index.html; then
+          if git diff --quiet -- index.html sitemap.xml; then
             echo "No changes to commit."
             exit 0
           fi
 
           base64 -w0 index.html > "$RUNNER_TEMP/index.b64"
+          base64 -w0 sitemap.xml > "$RUNNER_TEMP/sitemap.b64"
           jq -n \
             --arg repo "$REPO" \
             --arg head "$(git rev-parse HEAD)" \
             --rawfile contents "$RUNNER_TEMP/index.b64" \
+            --rawfile sitemap "$RUNNER_TEMP/sitemap.b64" \
             '{
               query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
               variables: { input: {
                 branch: { repositoryNameWithOwner: $repo, branchName: "main" },
                 expectedHeadOid: $head,
                 message: { headline: "Version bump [no ci]" },
-                fileChanges: { additions: [ { path: "index.html", contents: $contents } ] }
+                fileChanges: { additions: [ { path: "index.html", contents: $contents }, { path: "sitemap.xml", contents: $sitemap } ] }
               } }
             }' > "$RUNNER_TEMP/request.json"
 
