@@ -3810,7 +3810,7 @@ test.describe('Be myself Planner', () => {
       const entries = [
         { name: 'Home page', url: 'https://www.nhsinform.scot/', lastVerified: '2026-10-01' },
         { name: 'Guidance page', url: 'https://www.nhsinform.scot/healthy-living/screening/', lastVerified: '2026-10-01' },
-        { name: 'Form', url: 'https://www.saas.gov.uk/files/485/saas-change-of-name-gender-title.pdf', lastVerified: '2026-10-01' },
+        { name: 'Form', url: 'https://www.experian.co.uk/consumer/product-factsheets/GRA-Welcome-Pack-2018.pdf', lastVerified: '2026-10-01' },
       ];
       expect(sourcesToCheck(entries).map(e => e.name),
         'a home page changes all the time and carries no specific guidance').toEqual(['Guidance page', 'Form']);

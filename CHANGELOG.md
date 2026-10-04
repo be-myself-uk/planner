@@ -13,7 +13,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [Unreleased]
+## [October 2026]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because criminal record checks are now asked about for everyone in the UK, not only people with work records to update; people living outside the UK are now asked about UK benefits and can add the electoral register; and people changing only their gender marker now get a different first step. Check your answers once, and the message will not come back until a later change could affect your plan.
 
@@ -69,6 +69,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The version bump workflow now keeps the date in `sitemap.xml` current.
 - Every GitHub Action the workflows use is now pinned to an exact commit, with its version noted beside it, so a changed or compromised release tag cannot alter what runs.
 - The scheduled source check now removes cookie banners before reading a page, ignores changes in spacing, compares PDFs by their file fingerprint, skips site home pages, and shows the part of a long line that changed. Running it by hand on main with "write_source_snapshots" ticked now commits the new snapshot.
+- The scheduled link check works again. Since the "Download this page" link was added in September, it stopped with an error on that link and never reported broken links. The SAAS pages are now checked by hand, since SAAS refuses the scheduled source check.
 - Added tests for all of the above, including a check that plan text gives costs as labels rather than amounts.
 
 ## [September 2026]

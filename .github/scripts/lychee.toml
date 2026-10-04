@@ -12,3 +12,5 @@ user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 timeout = 30
 max_retries = 3
+
+root_dir = "."

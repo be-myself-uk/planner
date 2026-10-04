@@ -12,6 +12,7 @@ const EXCLUDED_DOMAINS = new Set([
 const KNOWN_BLOCKED_DOMAINS = new Set([
   'kb.ros.gov.uk',
   'www.electoralcommission.org.uk',
+  'www.saas.gov.uk',
 ]);
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
