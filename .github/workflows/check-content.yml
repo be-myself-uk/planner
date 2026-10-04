@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       write_source_snapshots:
-        description: "source-content-watch: regenerate tests/source-content-snapshots.json instead of checking it, and upload the result as a build artifact (download and commit it yourself: this workflow has no repo push access). Use after adding a source or confirming a flagged change needs no fix; leave unchecked for a normal manual run."
+        description: "source-content-watch: regenerate tests/source-content-snapshots.json instead of checking it. Run on main, it commits the new snapshot to main (using BUMP_VERSION_TOKEN); on any other branch it only uploads it as a build artifact. Use after reviewing a source-changed issue, whether or not anything needed fixing, or after adding a source. Leave unchecked for a normal manual run."
         type: boolean
         default: false
 
@@ -135,8 +135,41 @@ jobs:
         if: inputs.write_source_snapshots == true
         run: node source-content-check.js --write
 
+      - name: Commit the regenerated snapshot to main
+        if: inputs.write_source_snapshots == true && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.BUMP_VERSION_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          if git diff --quiet -- source-content-snapshots.json; then
+            echo "The snapshot has not changed."
+            exit 0
+          fi
+
+          base64 -w0 source-content-snapshots.json > "$RUNNER_TEMP/snapshot.b64"
+          jq -n \
+            --arg repo "$REPO" \
+            --arg head "$(git rev-parse HEAD)" \
+            --rawfile contents "$RUNNER_TEMP/snapshot.b64" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
+              variables: { input: {
+                branch: { repositoryNameWithOwner: $repo, branchName: "main" },
+                expectedHeadOid: $head,
+                message: { headline: "Update the source snapshots [skip ci]" },
+                fileChanges: { additions: [ { path: "tests/source-content-snapshots.json", contents: $contents } ] }
+              } }
+            }' > "$RUNNER_TEMP/request.json"
+
+          if ! gh api graphql --input "$RUNNER_TEMP/request.json" > "$RUNNER_TEMP/response.json"; then
+            cat "$RUNNER_TEMP/response.json"
+            echo "::error::GitHub refused the snapshot commit. main may have moved on since this run started, or BUMP_VERSION_TOKEN may have expired or been revoked. The new snapshot is attached to this run as an artifact. See CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "Snapshot committed: $(jq -r '.data.createCommitOnBranch.commit.oid // empty' "$RUNNER_TEMP/response.json")"
+
       - name: Upload regenerated snapshot
-        if: inputs.write_source_snapshots == true
+        if: always() && inputs.write_source_snapshots == true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: source-content-snapshots

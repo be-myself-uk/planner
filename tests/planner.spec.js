@@ -3578,6 +3578,19 @@ test.describe('Be myself Planner', () => {
         expect(('url' in entry) !== ('data' in entry), 'each entry needs exactly one of url or data').toBe(true);
       }
     });
+
+    test('214. The source check skips site home pages, keeps PDFs, and ignores changes to spacing', async () => {
+      const { sourcesToCheck, normaliseText } = require('./source-snapshot-lib');
+      const entries = [
+        { name: 'Home page', url: 'https://www.nhsinform.scot/', lastVerified: '2026-10-01' },
+        { name: 'Guidance page', url: 'https://www.nhsinform.scot/healthy-living/screening/', lastVerified: '2026-10-01' },
+        { name: 'Form', url: 'https://www.saas.gov.uk/files/485/saas-change-of-name-gender-title.pdf', lastVerified: '2026-10-01' },
+      ];
+      expect(sourcesToCheck(entries).map(e => e.name),
+        'a home page changes all the time and carries no specific guidance').toEqual(['Guidance page', 'Form']);
+      expect(normaliseText('            Read more about\u00a0AAA   screening\n        \n\nNext line  '),
+        'issues #1, #5 and #9 were full of lines that differed only in spacing').toBe('Read more about AAA screening\nNext line');
+    });
   });
 
 });
