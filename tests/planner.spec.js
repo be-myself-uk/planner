@@ -1721,12 +1721,13 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       const box = page.locator('#planSummaryBox');
+      const panel = box.locator('details');
       await expect(box).toBeAttached();
-      await expect(box).toHaveAttribute('open', '');
+      await expect(panel).toHaveAttribute('open', '');
       await box.locator('summary').click();
-      await expect(box).not.toHaveAttribute('open', '');
+      await expect(panel).not.toHaveAttribute('open', '');
       await box.locator('summary').click();
-      await expect(box).toHaveAttribute('open', '');
+      await expect(panel).toHaveAttribute('open', '');
       await box.getByRole('button', { name: "Don't show this again" }).click();
       await expect(box).toHaveCount(0);
       expect(await page.evaluate(() => localStorage.getItem('planSummaryDismissed'))).toBe('1');
@@ -2995,6 +2996,120 @@ test.describe('Be myself Planner', () => {
       await expect(dlg, 'a shortcut with Ctrl, Alt or Cmd belongs to the browser or the system').toBeHidden();
       await page.keyboard.press('Shift+Slash');
       await expect(dlg).toBeVisible();
+    });
+
+    test('215. Answers, buttons and panel headings are not highlighted by a double-click or a tap, but questions can still be selected', async ({ page }) => {
+      await openWizard(page);
+      const point = await page.evaluate(() => {
+        const label = document.querySelector('#wizardForm .option');
+        const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT, { acceptNode: n => (n.textContent.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP) });
+        const range = document.createRange();
+        range.selectNodeContents(walker.nextNode());
+        const r = range.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      });
+      await page.mouse.dblclick(point.x, point.y);
+      expect(await page.evaluate(() => getSelection().toString().trim()),
+        'double-clicking an answer used to highlight its text').toBe('');
+      const styles = await page.evaluate(() => {
+        document.body.insertAdjacentHTML('beforeend', '<details id="headingProbe"><summary>Heading</summary></details>');
+        const read = el => { const s = getComputedStyle(el); return { select: s.userSelect, touch: s.touchAction, flash: s.webkitTapHighlightColor }; };
+        return {
+          answer: read(document.querySelector('#wizardForm .option')),
+          button: read(document.getElementById('wizardNextBtn')),
+          heading: read(document.querySelector('#headingProbe summary')),
+          question: getComputedStyle(document.querySelector('#wizardStepFieldset legend')).userSelect,
+        };
+      });
+      for (const name of ['answer', 'button', 'heading']) {
+        expect(styles[name].select, name).toBe('none');
+        expect(styles[name].touch, `${name}: two quick taps must not zoom the page`).toBe('manipulation');
+        expect(styles[name].flash, `${name}: no coloured flash when tapped`).toBe('rgba(0, 0, 0, 0)');
+      }
+      expect(styles.question, 'questions and guidance stay selectable, so people can copy them').not.toBe('none');
+    });
+
+    test('216. Back is a plain button beside Continue, big enough to tap, and still goes back', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await openWizard(page);
+      const legend = page.locator('#wizardStepFieldset legend');
+      const first = (await legend.textContent()).trim();
+      await wizardNext(page);
+      await expect(legend).not.toHaveText(first);
+      const layout = await page.evaluate(() => {
+        const back = document.getElementById('wizardBackBtn');
+        const next = document.getElementById('wizardNextBtn');
+        const b = back.getBoundingClientRect();
+        const n = next.getBoundingClientRect();
+        const s = getComputedStyle(back);
+        return {
+          sameRow: back.parentElement === next.parentElement && back.nextElementSibling === next,
+          offset: Math.abs((b.top + b.bottom) / 2 - (n.top + n.bottom) / 2),
+          height: b.height,
+          backWidth: b.width,
+          nextWidth: n.width,
+          underline: s.textDecorationLine,
+          background: s.backgroundColor,
+          nextBackground: getComputedStyle(next).backgroundColor,
+        };
+      });
+      expect(layout.sameRow, 'Back sits just before Continue, in the same row').toBe(true);
+      expect(layout.offset).toBeLessThanOrEqual(1);
+      expect(layout.height, 'the old link was 16px tall on a phone').toBeGreaterThanOrEqual(40);
+      expect(layout.nextWidth, 'on a phone Continue fills the rest of the row').toBeGreaterThan(layout.backWidth);
+      expect(layout.underline).toBe('none');
+      expect(layout.background, 'Continue stays the only coloured button').not.toBe(layout.nextBackground);
+      await page.getByRole('button', { name: '← Back' }).click();
+      await expect(legend).toHaveText(first);
+    });
+
+    test('217. Every tip is dismissed with the same plain ✕, and a closed panel can be dismissed without opening it', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const dismissers = await page.evaluate(() => [...document.querySelectorAll('[data-action^="dismiss"]')]
+        .filter(b => b.dataset.action !== 'dismissBanner')
+        .map(b => ({ action: b.dataset.action, shared: b.classList.contains('tip-close'), title: b.title })));
+      expect(dismissers.length).toBe(5);
+      for (const d of dismissers) {
+        expect(d.shared, `${d.action} uses the shared ✕ style`).toBe(true);
+        expect(d.title, `${d.action}: a ✕ removes the tip for good, so its tooltip says so`).toBe("Don't show this again");
+      }
+      const primary = await page.locator('#wizardNextBtn').evaluate(el => getComputedStyle(el).backgroundColor);
+      const looks = await page.locator('#planContent .tip-close').evaluateAll(els => els.map(el => {
+        const r = el.getBoundingClientRect();
+        return { width: r.width, height: r.height, background: getComputedStyle(el).backgroundColor, text: el.textContent.trim() };
+      }));
+      expect(looks.length).toBe(3);
+      for (const look of looks) {
+        expect(look.text).toBe('✕');
+        expect(look.width).toBeGreaterThanOrEqual(40);
+        expect(look.height).toBeGreaterThanOrEqual(40);
+        expect(look.background).toBe(looks[0].background);
+        expect(look.background, 'dismissing a tip is not the main action, so it is not blue').not.toBe(primary);
+      }
+      await expect(page.locator('#planContent'), 'the old text buttons are gone').not.toContainText("Don't show this again");
+      const titles = page.locator('#titlesInfoBox');
+      await expect(titles.locator('details')).not.toHaveAttribute('open', '');
+      expect(await titles.evaluate(el => {
+        const s = el.querySelector('summary').getBoundingClientRect();
+        const b = el.querySelector('.tip-close').getBoundingClientRect();
+        return b.top >= s.top && b.bottom <= s.bottom;
+      }), 'the ✕ sits on the panel heading, so it works while the panel is closed').toBe(true);
+      await titles.getByRole('button', { name: "Don't show this again" }).click();
+      await expect(titles).toHaveCount(0);
+      expect(await page.evaluate(() => localStorage.getItem('titlesInfoDismissed'))).toBe('1');
+    });
+
+    test("218. The save warning's ✕ is big enough to tap and stays plain under the mouse", async ({ page }) => {
+      await openWizard(page);
+      await page.evaluate(() => document.getElementById('saveWarnBanner').classList.remove('hidden'));
+      const close = page.getByRole('button', { name: 'Dismiss save warning' });
+      const box = await close.boundingBox();
+      expect(box.width).toBeGreaterThanOrEqual(40);
+      expect(box.height).toBeGreaterThanOrEqual(40);
+      await close.hover();
+      await page.waitForTimeout(600);
+      expect(await close.evaluate(el => getComputedStyle(el).backgroundColor),
+        'the general button hover turned it into a dark blue square').toBe('rgba(0, 0, 0, 0)');
     });
   });
 
