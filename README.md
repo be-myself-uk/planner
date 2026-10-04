@@ -1,6 +1,6 @@
 # 🏳️‍⚧️ Be myself
 
-A free, private tool that helps trans and non-binary people in the UK work out the steps they need to take to update their name and gender marker on their documents.
+A free, private planner that helps trans and non-binary people in the UK work out the steps they need to take to update their name and gender marker on their documents.
 
 **Live site:** [bemyself.uk](https://bemyself.uk/)
 
