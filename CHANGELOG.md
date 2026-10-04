@@ -13,7 +13,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [Unreleased]
+## [October 2026]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because criminal record checks are now asked about for everyone in the UK, not only people with work records to update; people living outside the UK are now asked about UK benefits and can add the electoral register; and people changing only their gender marker now get a different first step. Check your answers once, and the message will not come back until a later change could affect your plan.
 
