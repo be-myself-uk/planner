@@ -13,7 +13,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [October 2026]
+## [Unreleased]
 
 ### Wording
 
