@@ -3723,7 +3723,7 @@ test.describe('Be myself Planner', () => {
 
     test('198. The heading names what the planner is for, without a separate paragraph', async ({ page }) => {
       const h1 = page.getByRole('heading', { level: 1 });
-      await expect(h1).toHaveAccessibleName(/Plan updating your name and gender marker on UK documents/);
+      await expect(h1).toHaveAccessibleName(/Make your UK documents match who you are/);
       await expect(page.locator('.hero p'), 'the tagline is part of the h1 now').toHaveCount(0);
       await openChecklist(page);
       await expect(page.locator('.hero .hero-tagline')).toBeVisible();
