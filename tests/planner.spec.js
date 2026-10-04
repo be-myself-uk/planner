@@ -3474,6 +3474,11 @@ test.describe('Be myself Planner', () => {
           twitterDescription: get('meta[name="twitter:description"]'),
           ogImage: get('meta[property="og:image"]'),
           twitterImage: get('meta[name="twitter:image"]'),
+          twitterCard: get('meta[name="twitter:card"]'),
+          ogImageWidth: get('meta[property="og:image:width"]'),
+          ogImageHeight: get('meta[property="og:image:height"]'),
+          ogImageAlt: get('meta[property="og:image:alt"]'),
+          twitterImageAlt: get('meta[name="twitter:image:alt"]'),
           ld: Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(s => s.textContent),
         };
       });
@@ -3485,6 +3490,12 @@ test.describe('Be myself Planner', () => {
       expect(meta.twitterDescription).toBe(meta.description);
       expect(meta.ogImage).toBe('https://bemyself.uk/og-image.png');
       expect(meta.twitterImage).toBe(meta.ogImage);
+      expect(meta.twitterCard, 'the image is wide, and a plain summary card crops it to a small square').toBe('summary_large_image');
+      const png = fs.readFileSync(path.resolve('..', 'og-image.png'));
+      expect([meta.ogImageWidth, meta.ogImageHeight], 'the declared size must match the PNG itself')
+        .toEqual([String(png.readUInt32BE(16)), String(png.readUInt32BE(20))]);
+      expect(meta.ogImageAlt).toBeTruthy();
+      expect(meta.twitterImageAlt).toBe(meta.ogImageAlt);
       const blocks = meta.ld.map(text => JSON.parse(text));
       const entries = blocks.flatMap(b => Array.isArray(b) ? b : [b]);
       const app = entries.find(e => e['@type'] === 'WebApplication');
@@ -3503,11 +3514,11 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('.hero .hero-tagline')).toBeVisible();
     });
 
-    test('199. The preview image is a 1200 by 1200 PNG, and the sitemap has a valid date', async () => {
+    test('199. The preview image is a 1200 by 630 PNG, and the sitemap has a valid date', async () => {
       const png = fs.readFileSync(path.resolve('..', 'og-image.png'));
       expect(png.subarray(0, 8).toString('hex'), 'PNG signature').toBe('89504e470d0a1a0a');
       expect(png.subarray(12, 16).toString('ascii')).toBe('IHDR');
-      expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 1200]);
+      expect([png.readUInt32BE(16), png.readUInt32BE(20)], 'the usual size for wide link previews').toEqual([1200, 630]);
       const sitemap = fs.readFileSync(path.resolve('..', 'sitemap.xml'), 'utf8');
       const lastmod = sitemap.match(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/);
       expect(lastmod, 'bump-version.yml keeps this date current').not.toBeNull();
