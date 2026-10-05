@@ -17,7 +17,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Wording
 
-- New site tagline, "Make your UK documents match who you are", now also the page title for search results and link previews, with a matching description and preview image. The site is now called a planner everywhere.
+- New site tagline, "Change your name and gender marker in the UK", now also the page title for search results and link previews, with a matching description and preview image. The site is now called a planner everywhere.
 
 ## [October 2026]
 
