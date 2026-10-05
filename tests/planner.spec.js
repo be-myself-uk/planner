@@ -3723,10 +3723,23 @@ test.describe('Be myself Planner', () => {
 
     test('198. The heading names what the planner is for, without a separate paragraph', async ({ page }) => {
       const h1 = page.getByRole('heading', { level: 1 });
-      await expect(h1).toHaveAccessibleName(/Make your UK documents match who you are/);
+      await expect(h1).toHaveAccessibleName(/Change your name and gender marker in the UK/);
       await expect(page.locator('.hero p'), 'the tagline is part of the h1 now').toHaveCount(0);
       await openChecklist(page);
       await expect(page.locator('.hero .hero-tagline')).toBeVisible();
+    });
+
+    test('224. The page title is the site name followed by the heading line, within search length limits', async ({ page }) => {
+      const line = (await page.locator('.hero .hero-tagline').textContent()).trim();
+      const title = 'Be myself: ' + (/^[A-Z]{2,}\b/.test(line) ? line : line[0].toLowerCase() + line.slice(1));
+      expect(await page.title(), 'the page title and the heading line must say the same thing').toBe(title);
+      expect(title.length, 'titles of 50 to 60 characters fill the space search results give them').toBeGreaterThanOrEqual(50);
+      expect(title.length, 'longer titles are cut off in search results').toBeLessThanOrEqual(60);
+      const alt = await page.locator('meta[property="og:image:alt"]').getAttribute('content');
+      expect(alt.startsWith(title + '.'), 'the preview image shows the heading line, so its alt text starts with the title').toBe(true);
+      const site = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map(s => JSON.parse(s.textContent)).flat().find(e => e['@type'] === 'WebSite'));
+      expect(site.alternateName, 'Google may not use a common phrase as a site name, so the domain is given as the fallback').toBe('bemyself.uk');
     });
 
     test('199. The preview image is a 1200 by 630 PNG, and the sitemap has a valid date', async () => {
