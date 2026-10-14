@@ -6,6 +6,7 @@ labels: ''
 assignees: ''
 
 ---
+<!-- Issues are public: anyone can read them, and they show your GitHub username. Leave out personal details, and do not paste a link to your plan, because it contains your answers. -->
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]

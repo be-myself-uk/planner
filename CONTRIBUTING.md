@@ -70,7 +70,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 │   │   ├── playwright.yml         : runs the test suite on every push/PR to main or preview
 │   │   ├── bump-version.yml       : auto-updates the "last reviewed" date whenever index.html changes on main
 │   │   └── check-content.yml      : scheduled broken-link scan, GOV.UK source-change scan, and source text-drift scan, GOV.UK pages included (three independent jobs), opens an issue per finding
-│   └── ISSUE_TEMPLATE/            : bug report / feature request / question templates
+│   └── ISSUE_TEMPLATE/            : bug report / feature request / question templates, each starting with a reminder that issues are public, so people leave out personal details and links to their plans (an HTML comment, so it shows while someone writes the issue but not once it is posted)
 ```
 
 ---
