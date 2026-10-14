@@ -108,6 +108,50 @@ jobs:
           issue-number: ${{ steps.existing.outputs.number }}
           body-path: ./source-watch-report.md
 
+  link-domain-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Check the domains of linked websites
+        id: check
+        run: |
+          set -o pipefail
+          python3 .github/scripts/check_link_domains.py | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check for existing open issue
+        if: steps.check.outputs.changes_detected == 'true'
+        id: existing
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'link-domain',
+              state: 'open'
+            });
+            core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
+
+      - name: Create issue if a linked domain needs checking
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'false'
+        uses: peter-evans/create-issue-from-file@e8ef132d6df98ed982188e460ebb3b5d4ef3a9cd # v5.0.1
+        with:
+          title: "🌐 A linked website's domain needs checking"
+          content-filepath: ./link-domain-report.md
+          labels: link-domain
+
+      - name: Comment on existing issue with the new report
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./link-domain-report.md
+
   source-content-watch:
     runs-on: ubuntu-latest
     defaults:

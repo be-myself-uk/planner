@@ -3787,6 +3787,12 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#dlgAbout')).toContainText('This does not delete your saved plan');
     });
 
+    test('227. The check for lapsed or newly registered link domains passes its self-test', async () => {
+      const { execFileSync } = require('child_process');
+      expect(() => execFileSync('python3', [path.resolve('..', '.github', 'scripts', 'check_link_domains.py'), '--selftest'], { stdio: 'pipe' }),
+        'run python3 .github/scripts/check_link_domains.py --selftest to see which rule failed').not.toThrow();
+    });
+
     test('178. Download this page saves the page without what the host adds to it', async ({ page }) => {
       const original = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
       const origin = 'https://bemyself.test';
