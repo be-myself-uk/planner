@@ -1589,6 +1589,44 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkStudent')).toBeChecked();
       await expect(page.locator('#chkPassportNone')).toBeChecked();
     });
+
+    test('231. A shared link keeps the Irish citizen answer, and links made before it still open', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkVisaIrish').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.evaluate(() => {
+        window._shareUrl = null;
+        navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+      });
+      await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+      await page.waitForFunction(() => window._shareUrl !== null);
+      const clip = await page.evaluate(() => window._shareUrl);
+      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      expect(decoded.ie, 'the new answer travels in its own key, so older links need no change').toBe(true);
+      expect(decoded.nonUK, 'an Irish citizen has no visa or eVisa to update').toBe(false);
+
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(clip);
+      await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+
+      const withoutIrish = await getShareUrl(page, { reg: 'e', goal: 'both', emp: 'no', nonUK: false, visa: false, dp: true, dl: 'none', pass: 'needs_update' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(withoutIrish);
+      await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      await expect(page.locator('[data-track-id="trk_ukpass"]'), 'a link without the new key still gives the UK passport step').toHaveCount(1);
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(0);
+
+      const beforeThisVersion = await getShareUrl(page, { pv: 2, reg: 'e', goal: 'both', emp: 'no', nonUK: false, visa: false, dp: true, dl: 'none', pass: 'needs_update' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(beforeThisVersion);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#welcomeOutdated'), 'a link from before PLAN_VERSION 3 asks for one review instead of breaking').toBeVisible();
+      await page.getByRole('button', { name: 'Review my answers' }).click();
+      await expect(page.locator('#chkVisaNone')).toBeChecked();
+    });
   });
 
   test.describe('Plan generation & content accuracy', () => {
@@ -2089,6 +2127,54 @@ test.describe('Be myself Planner', () => {
       await expect(plan).toContainText('If you are married or in a civil partnership');
       await expect(plan).toContainText('entitlement to some benefits and pensions');
       await expect(plan, 'the planner stays out of anti-discrimination law').not.toContainText('Equality Commission');
+    });
+
+    test('229. An Irish citizen gets the Irish passport step instead of a UK passport, eVisa or home country passport', async ({ page }) => {
+      await openChecklist(page);
+      await expect(page.locator('#chkVisaIrish'), 'Irish citizens need no visa, so this answer is never locked').toBeEnabled();
+      await page.locator('#chkVisaIrish').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+      for (const id of ['trk_ukpass', 'trk_evisa', 'trk_homepass']) {
+        await expect(page.locator(`[data-track-id="${id}"]`), `${id} is for UK passports or visas`).toHaveCount(0);
+      }
+      await expect(page.locator('#planContent')).toContainText('The Passport Service handles Irish passports.');
+      await expect(page.locator('#planSummaryBox')).toContainText('Irish passport:');
+      await expect(page.locator('#planSummaryBox'), 'an Irish passport in a new name needs two years of proof that the name is used')
+        .toContainText('at least two years');
+    });
+
+    test('230. The step-by-step view offers the Irish citizen answer', async ({ page }) => {
+      await openWizard(page);
+      await page.evaluate(() => {
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', grc:'no', birthCertName:'no', birthCert:'no' });
+        step = questions.findIndex(q => q.id === 'visa');
+        renderWizard(false);
+      });
+      const irish = page.locator('input[name="ans"][value="irish"]');
+      await expect(irish).toBeEnabled();
+      await irish.check();
+      for (let i = 0; i < 20 && !(await page.locator('#planView').isVisible()); i++) {
+        await page.getByRole('button', { name: /Continue →|Show my plan →/ }).click();
+      }
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+      await expect(page.locator('[data-track-id="trk_ukpass"]')).toHaveCount(0);
+    });
+
+    test('232. An Irish citizen born in Northern Ireland is not also offered the Good Friday Agreement route', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalGender').check();
+      for (const id of ['#chkRegionNI', '#chkBirthRegionNI', '#chkDrivingLicenceNone', '#chkPassportNeeds', '#chkEmployedNo', '#chkGRCNo']) {
+        await page.locator(id).check();
+      }
+      await expect(page.locator('#wrapIrishRoute')).toBeVisible();
+      await page.locator('#chkIrishRoute').check();
+      await page.locator('#chkVisaIrish').check();
+      await expect(page.locator('#wrapIrishRoute'), 'the Irish citizen answer already gives the Irish passport step').toBeHidden();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+      await expect(page.locator('[data-track-id="trk_irish_passport"]')).toHaveCount(0);
     });
   });
 

@@ -22,7 +22,7 @@ It gives general guidance based on current UK processes and does not replace pro
 
 Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold, whether they live in the UK, live abroad, or are planning to move to the UK.
 
-There is also guidance for people with a visa or eVisa, and for people born in Northern Ireland who may be eligible for the Irish passport gender recognition route.
+There is also guidance for people with a visa or eVisa, for Irish citizens living in the UK, and for people born in Northern Ireland who may be eligible for the Irish passport gender recognition route.
 
 The process for under-16s needs parental consent and follows different steps, which this planner does not cover.
 
@@ -31,7 +31,7 @@ The process for under-16s needs parental consent and follows different steps, wh
 Updating your name, your gender marker, or both, on:
 
 - a deed poll or statutory declaration
-- your UK passport, or your home country passport and UK eVisa
+- your UK passport, your Irish passport, or your home country passport and UK eVisa
 - your driving licence and vehicle logbook (V5C)
 - your NHS or GP record, HMRC and tax records, and benefits
 - DBS, Disclosure Scotland and AccessNI checks

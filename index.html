@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-fIJS5FvPU3bsoucA6m10SKspqXKlltHY1XvPpaGvWr4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-L+sAw1snP7RmVXQdsYg8eHjpRDXOJnXL5oQpMc7Avzc='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -25,7 +25,7 @@
 <meta name="theme-color" content="#5bcefa">
 <meta name="schema-version" content="1791186523">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Be myself","url":"https://bemyself.uk/","description":"Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.","image":"https://bemyself.uk/og-image.png","applicationCategory":"ReferenceApplication","operatingSystem":"Web browser","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"featureList":["a deed poll or statutory declaration","your UK passport, or your home country passport and UK eVisa","your driving licence and vehicle logbook (V5C)","your NHS or GP record, HMRC and tax records, and benefits","DBS, Disclosure Scotland and AccessNI checks","work, student and professional records","banks, utilities, the electoral register and other services","a Gender Recognition Certificate (GRC) and your birth certificate","the Irish passport route for people born in Northern Ireland"]}
+{"@context":"https://schema.org","@type":"WebApplication","name":"Be myself","url":"https://bemyself.uk/","description":"Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.","image":"https://bemyself.uk/og-image.png","applicationCategory":"ReferenceApplication","operatingSystem":"Web browser","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"featureList":["a deed poll or statutory declaration","your UK passport, your Irish passport, or your home country passport and UK eVisa","your driving licence and vehicle logbook (V5C)","your NHS or GP record, HMRC and tax records, and benefits","DBS, Disclosure Scotland and AccessNI checks","work, student and professional records","banks, utilities, the electoral register and other services","a Gender Recognition Certificate (GRC) and your birth certificate","the Irish passport route for people born in Northern Ireland"]}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"Be myself","alternateName":"bemyself.uk","url":"https://bemyself.uk/"}
@@ -228,6 +228,7 @@
     <fieldset id="wrapVisa" class="chk-section chk-section--mv">
       <legend class="chk-q">Do you have a visa or eVisa?<br><em class="note" style="margin-top:2px;" data-note="visa"></em></legend>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNone"    value="none"> I do not have one</label>
+      <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaIrish"   value="irish"> I do not need one, as I am an Irish citizen</label>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaNeeds"   value="needs_update"> Yes, and it has my old details</label>
       <label class="option option-sm"><input type="radio" name="chkVisaOpt" id="chkVisaUpdated" value="updated"> <span>Yes, and it is already updated<em class="note lock-note hidden" id="lock-visa-reason" data-lock="visa"></em></span></label>
     </fieldset>
@@ -303,7 +304,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
     <p>Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold. That includes people living in the UK, people living abroad, and people planning to move to the UK, such as people with a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">What does it cover?</h3>
-    <p>Updating your name, your gender marker, or both, on:</p><ul><li>a deed poll or statutory declaration</li><li>your UK passport, or your home country passport and UK eVisa</li><li>your driving licence and vehicle logbook (V5C)</li><li>your NHS or GP record, HMRC and tax records, and benefits</li><li>DBS, Disclosure Scotland and AccessNI checks</li><li>work, student and professional records</li><li>banks, utilities, the electoral register and other services</li><li>a Gender Recognition Certificate (GRC) and your birth certificate</li><li>the Irish passport route for people born in Northern Ireland</li></ul>
+    <p>Updating your name, your gender marker, or both, on:</p><ul><li>a deed poll or statutory declaration</li><li>your UK passport, your Irish passport, or your home country passport and UK eVisa</li><li>your driving licence and vehicle logbook (V5C)</li><li>your NHS or GP record, HMRC and tax records, and benefits</li><li>DBS, Disclosure Scotland and AccessNI checks</li><li>work, student and professional records</li><li>banks, utilities, the electoral register and other services</li><li>a Gender Recognition Certificate (GRC) and your birth certificate</li><li>the Irish passport route for people born in Northern Ireland</li></ul>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
     <p>Yes. Nothing you enter is sent to a server or stored outside your own device, unless you share a link to your plan: the link holds your answers, and they reach the website's host when it is opened. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button at any time to instantly leave the page, or press Esc twice within a second. This does not delete your saved plan, so on a shared device, use a private window. For full details, see <a href="#" data-action="openFromDialog" data-arg="dlgPrivacy">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
@@ -537,8 +538,8 @@ function decodeState(str) {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 const SCHEMA_VERSION = parseInt(document.querySelector('meta[name="schema-version"]')?.content, 10) || 0;
-const PLAN_VERSION = 2;
-const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
+const PLAN_VERSION = 3;
+const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', IRISH:'irish', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { E:'e', W:'w', S:'s', NI:'ni' };
 const REGION_LEGACY = { ew: REGION.E, wales: REGION.W, scot: REGION.S };
 const resolveRegion = (v) => REGION_LEGACY[v] || v;
@@ -893,6 +894,19 @@ const PLAN_ITEMS = {
     },
     detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change without a GRC, HMPO also asks for a letter from you asking for the change of gender, a letter from a medical professional (such as your GP or a gender specialist) confirming the change is likely to be permanent, and evidence that you use your name and gender for all purposes, such as a bank statement, utility bill or payslip. This applies even if your name is not changing. HMPO may also ask for someone who knows you to confirm your identity, unless it can match your photo to your previous passport. If you already have a GRC, HMPO does not usually ask for these letters or for evidence of use.</p><p><strong>⚠️ Medical letter:</strong> HMPO is strict about what this letter must include. According to HMPO\'s published guidance, it should:</p><ul class="bullet-list"><li>Be written by either a medical professional registered with the General Medical Council (GMC) or the Health and Care Professions Council (HCPC), or a medical professional, in the UK or overseas, who is not registered with either body but who can provide evidence of their qualifications and experience. HMPO gives examples including GPs, gender dysphoria clinicians and specialists, clinical psychologists, consultant psychologists and psychiatrists, practitioner psychologists, and specialist nurses, though this is not a complete list</li><li>Be dated and include the medical professional\'s handwritten signature</li><li>Confirm that the medical professional knows you well enough to make a diagnosis</li><li>State your name and specified gender</li><li>Confirm you use your name and gender for all purposes</li><li>State that your gender change is "likely to be permanent"</li></ul><p>If HMPO rejects a letter from a medical professional who is not registered with the GMC or HCPC, it will ask for a new letter from one who is registered. Treat the wider route as a fallback, not the easiest option.</p><p>The GOV.UK link below has the full requirements.</p><p><strong>⚠️ If you are 16 or 17:</strong> unlike a name-only change, a gender marker change usually needs the consent of everyone with parental responsibility for you. If you cannot get it, send HMPO a letter explaining why, and it will consider an exception. The exceptions include being within two weeks of turning 18 (HMPO holds your application until your birthday), your parents having died, having no contact with one or both parents, and being in contact with your parents but unable to get their consent. Each case is decided individually: HMPO may ask for evidence such as details of your care arrangements or a statutory declaration, and if it issues the passport without consent, your parents can object. If asking for consent would put you at risk, tell HMPO: it will ask for any evidence from the police or another organisation such as social services, and get advice from its safeguarding team. Contact HMPO directly to find out what applies to you.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><p><strong>⚠️ Non-binary marker:</strong> UK passports currently only offer M or F: there is no X or non-binary option. You can still note your identity in a covering letter or in the additional information section of your application. If you do, HMPO will phone you to explain that it can only print M or F, and to ask for your current gender, male or female. If that is different from your last passport, HMPO treats it as a change of gender, which needs the evidence above. If you cannot answer straight away, you have 7 days to call back, or your application may be withdrawn.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name or gender on your passport</a><a href="https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Gender recognition (caseworker guidance)</a><a href="https://www.gov.uk/government/publications/change-of-name-passport-applications-caseworker-guidance/names-change-of-name-passport-applications-accessible#name-change-gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Change of name because of a change of gender (caseworker guidance)</a>',
   },
+  iepass: {
+    difficulty: 'medium', cost: { type:'fixed', value:'Medium cost' },
+    title: 'Irish passport',
+    variants: {
+      gender: {
+        summary: 'If you live outside Ireland, it asks for a statutory declaration that you intend to live in your new gender for the rest of your life, together with two documents from two different sources showing use of your new name over at least two years. It does not accept a deed poll. The link below has the full details.',
+      },
+      name: {
+        summary: 'It does not accept a deed poll to change the name on an Irish passport. Instead, it asks for two documents from two different sources showing that you have used your new name for at least two years, and photo ID in your new name. The link below has the full details.',
+      },
+    },
+    detail: '<p>The Passport Service does not accept a deed poll to change the name on an Irish passport. Instead, it asks for proof that you use your new name in everyday life: two original documents from two different sources, going back at least two years from the date you apply, and valid government-issued photo ID in your new name. If you live outside Ireland, at least one of the documents must be official correspondence from the government of the country you live in. It says a name change like this takes longer to process.</p>\n<p><strong>Changing your gender marker:</strong> If you live in Northern Ireland or anywhere else outside Ireland, the Passport Service also asks for a statutory declaration stating that you have a settled and solemn intention of living in your new gender for the rest of your life, and that you understand the consequences of the application. It only asks for an Irish Gender Recognition Certificate from people who live in Ireland.</p>\n<p><strong>⚠️ If you were recently issued a passport in your previous name:</strong> If you were issued a passport in your previous name during the two years before you apply, your two years of proof start again from the date that passport was issued. The Passport Service may make an exception if that passport was due to expire before you could build up two years, so contact them before applying.</p>\n<p><strong>Note on the Irish GRC:</strong> An Irish Gender Recognition Certificate is a separate route. It is available to people whose birth, adoption, or foreign birth registration is recorded in Ireland, wherever they live, and to people ordinarily resident in Ireland. The TENI link below explains it.</p>\n<p><strong>⚠️ If you are 16 or 17:</strong> the published adult guidance does not say whether these requirements apply to 16 and 17 year olds. If this applies to you, contact the Passport Service before applying to check what you need to do.</p>\n<a href="https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> Irish Passports: Documentary requirements</a>\n<a href="https://teni.ie/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TENI: Gender recognition in Ireland</a>',
+  },
   irish_passport: {
     difficulty: 'medium', cost: { type:'fixed', value:'Medium cost' },
     title: 'Irish passport (Good Friday Agreement route)',
@@ -1135,7 +1149,7 @@ function loadUrlParams(d) {
   wizardState.student     = d.stu   === true ? S.YES : S.NO;
   wizardState.deedpoll    = d.dp    === true ? S.YES : S.NO;
   wizardState.visaUpdated = d.visa  === true ? S.YES : S.NO;
-  wizardState.visa = wizardState.citizen !== S.YES ? S.NONE : (wizardState.visaUpdated === S.YES ? S.UPDATED : S.NEEDS_UPDATE);
+  wizardState.visa = wizardState.citizen !== S.YES ? (d.ie === true ? S.IRISH : S.NONE) : (wizardState.visaUpdated === S.YES ? S.UPDATED : S.NEEDS_UPDATE);
   wizardState.nhs         = d.nhs   === true ? S.YES : S.NO;
   wizardState.hmrc        = d.hmrc  === true ? S.YES : S.NO;
   wizardState.driving     = d.dl   === 'needs_update' ? S.NEEDS_UPDATE : d.dl   === 'none' ? S.NONE : S.UPDATED;
@@ -1264,6 +1278,7 @@ function copyShareableLink() {
     stu:   w.student      === S.YES,
     dp:    w.deedpoll     === S.YES,
     visa:  w.visaUpdated  === S.YES,
+    ie:    w.visa === S.IRISH ? true : undefined,
     nhs:   w.nhs          === S.YES,
     dl:    w.driving  === S.NEEDS_UPDATE ? 'needs_update' : w.driving  === S.UPDATED ? 'updated' : 'none',
     hmrc:  w.hmrc         === S.YES,
@@ -1706,7 +1721,7 @@ function setEmploymentRadio(val) {
 }
 function updateDerivedState() {
   const visa = wizardState.visa || S.NONE;
-  wizardState.citizen     = visa === S.NONE ? S.NO : S.YES;
+  wizardState.citizen     = visa === S.NONE || visa === S.IRISH ? S.NO : S.YES;
   wizardState.visaUpdated = visa === S.UPDATED ? S.YES : S.NO;
 
   const goal     = wizardState.goal || S.BOTH;
@@ -1757,6 +1772,7 @@ function planParamsFromWizard() {
     goal:               wizardState.goal,
     isNonUK:            wizardState.citizen     === S.YES,
     visaAlreadyUpdated: wizardState.visaUpdated === S.YES,
+    isIrish:            wizardState.visa === S.IRISH,
     hasDeedPoll:        wizardState.deedpoll    === S.YES,
     needsNHS:           !isOutsideUK && wizardState.nhs === S.NO && wizardState.newGP !== S.YES,
     newGP:              !isOutsideUK && wizardState.newGP === S.YES,
@@ -1779,6 +1795,7 @@ function planParamsFromWizard() {
     bornInNI:           wizardState.birthRegion === REGION.NI,
     showIrishRoute:     wizardState.birthRegion === REGION.NI
                      && wizardState.goal !== S.NAME
+                     && wizardState.visa !== S.IRISH
                      && wizardState.irishRoute === S.YES,
     bornInScot:         wizardState.birthRegion === REGION.S,
     vehicle:            wizardState.vehicle     === S.YES,
@@ -1919,7 +1936,7 @@ const NOTES = {
   irishRoute: 'People born in Northern Ireland can apply for an Irish passport under the Good Friday Agreement, and Ireland has its own process for the gender marker on it. It gives you a passport in your correct name and gender. It is not a Gender Recognition Certificate and does not change your UK records, so it sits alongside one rather than replacing it. Being born in Northern Ireland does not by itself make you an Irish citizen.',
   deedpollName: 'This is asked to figure out what your first step should be, as most other steps require this.',
   deedpollGender: 'The DVLA, the DVA, and the NHS accept one of these as evidence for a gender marker change. This is asked to figure out what your first step should be.',
-  visa: 'Generally a passport must be updated before updating a visa and it is a separate process.',
+  visa: 'Generally a passport must be updated before updating a visa and it is a separate process. If you are an Irish citizen, choosing "I do not need one, as I am an Irish citizen" gives you the steps for an Irish passport instead of a UK passport.',
   employment: 'This includes paid jobs, volunteer roles, internships, apprenticeships, and student placements. Employers, universities, and background check agencies have processes that keep your previous name private. Select no if this does not apply to you.',
   student: 'For example: university degrees, college certificates, exam board results, professional memberships, or regulated profession registrations such as NMC, GMC, or a legal regulator. If you are a current student, this also covers enrolment records, student ID, and internal university or college systems.',
   vehicle: 'For example, a car, motorbike, or van. The V5C logbook is separate from your driving licence and needs its own update.',
@@ -1997,7 +2014,7 @@ const questions = [
   }},
   { id:'visa', chkName:'chkVisaOpt', q:'Do you have a visa or eVisa?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.visa + '</em>', o:() => {
     const locked = wizardState.passport !== S.UPDATED;
-    return [[S.NONE,'I do not have one'],[S.NEEDS_UPDATE,'Yes, and it has my old details'],[S.UPDATED,'Yes, and it is already updated', locked && 'visa']];
+    return [[S.NONE,'I do not have one'],[S.IRISH,'I do not need one, as I am an Irish citizen'],[S.NEEDS_UPDATE,'Yes, and it has my old details'],[S.UPDATED,'Yes, and it is already updated', locked && 'visa']];
   }},
   { id:'employment', chkName:'chkEmployment', q:'Do you have any employment, volunteering, or student placement records that need updating?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.employment + '</em>', o:() => [
     [S.NEEDS_UPDATE, 'Yes, I need to update my records'],
@@ -2041,7 +2058,7 @@ const questions = [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
   { id:'irishRoute', chk:'chkIrishRoute', wrap:'wrapIrishRoute', q:'Would you like to see the Irish passport route?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.irishRoute + '</em>',
-    cond:() => wizardState.birthRegion === REGION.NI && wizardState.goal !== S.NAME, o:() => [
+    cond:() => wizardState.birthRegion === REGION.NI && wizardState.goal !== S.NAME && wizardState.visa !== S.IRISH, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
   { id:'birthCertName', chk:'chkBirthCertName', wrap:'wrapBirthCertName',
@@ -2458,7 +2475,7 @@ function computePlanMeta(p) {
   const isName    = p.goal === S.NAME;
   const isNI      = p.region === REGION.NI;
   const costs = [];
-  if (p.needsPassport) costs.push(p.isNonUK ? '<strong>Home country passport:</strong> Fees vary by country. Check with your issuing authority for prices.' : isNI ? '<strong>UK passport (if applicable):</strong> A fee applies. Check GOV.UK for prices.' : '<strong>UK passport:</strong> A fee applies. Check GOV.UK for prices.');
+  if (p.needsPassport) costs.push(p.isNonUK ? '<strong>Home country passport:</strong> Fees vary by country. Check with your issuing authority for prices.' : p.isIrish ? (isName ? '<strong>Irish passport:</strong> Standard Irish passport fee applies.' : '<strong>Irish passport:</strong> Standard Irish passport fee applies, plus a small solicitor fee for the statutory declaration.') : isNI ? '<strong>UK passport (if applicable):</strong> A fee applies. Check GOV.UK for prices.' : '<strong>UK passport:</strong> A fee applies. Check GOV.UK for prices.');
   if (p.needsDriving)  costs.push(isNI ? '<strong>DVA driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.' : '<strong>Driving licence:</strong> Updating name and gender is usually free. A photo update may carry a fee.');
   if (p.student)       costs.push('<strong>Replacement certificates:</strong> Costs vary. Some universities issue replacements for free, while some exam boards charge a fee per certificate.');
   if (p.birthCertName && p.bornInScot) costs.push('<strong>Birth certificate name change (Scotland):</strong> A fee applies. Check the NRS website for prices.');
@@ -2485,6 +2502,7 @@ function computePlanMeta(p) {
   else if (hasStep4 && p.hasGRC) timeText = baseText ? `Based on your plan, ${baseText}. Updating your birth certificate with your existing GRC can usually be done within a few weeks.` : 'Updating your birth certificate with your existing GRC can usually be done within a few weeks.';
   else if (hasStep4) timeText = baseText ? `Based on your plan, ${baseText}. The GRC will take 2 or more years on top of this.` : 'Based on your plan, the GRC will take 2 or more years.';
   else if (baseText) timeText = `Based on your plan, ${baseText}.`;
+  if (timeText && p.isIrish && p.needsPassport && !isGender) timeText += ' An Irish passport in a new name needs proof that you have used that name for at least two years.';
   return { isGender, isName, isNI, costs, timeText, hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle };
 }
 const GRC_AGE_NOTE = '<p><strong>⚠️ Minimum age:</strong> You must be 18 or over to apply for a UK GRC. If you are 16 or 17, you can still start gathering the living-proof evidence now, since it needs to cover two years.</p>';
@@ -2690,6 +2708,10 @@ function buildSharedPlan(p) {
         const evisaItem = PLAN_ITEMS.evisa;
         addStep(li('evisa', medium, renderCost(evisaItem.cost), evisaItem.title, evisaItem.summary, evisaItem.detail));
       }
+    } else if (p.needsPassport && p.isIrish) {
+      const iepassItem = PLAN_ITEMS.iepass;
+      const iepassVariant = planItemVariant(iepassItem, (isBoth || isGender) ? 'gender' : 'name');
+      addStep(li('iepass', medium, renderCost(iepassItem.cost), iepassItem.title, `The Passport Service handles Irish passports. ${iepassVariant.summary}`, iepassItem.detail));
     } else if (p.needsPassport) {
       const ukpassItem = PLAN_ITEMS.ukpass;
       const ukpassVariant = planItemVariant(ukpassItem, (isBoth || isGender) ? 'gender' : 'name');
