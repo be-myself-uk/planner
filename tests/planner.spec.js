@@ -158,7 +158,7 @@ async function getShareUrl(page, data) {
     const bytes = new TextEncoder().encode(JSON.stringify(obj));
     let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
     const fp = window.location.href.split('?')[0];
-    return `${fp}?p=${btoa(bin)}`;
+    return `${fp}?p=${encodeURIComponent(btoa(bin))}`;
   }, data);
 }
 
