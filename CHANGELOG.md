@@ -18,6 +18,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 ### Information
 
 - The quick exit help now says that quick exit does not delete your saved plan, and suggests a private window on a shared device.
+- On a plan for changing only your gender marker, the GRC paperwork list now says that name-change documents are only needed if you have changed your name.
 
 ### Code
 

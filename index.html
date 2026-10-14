@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-3ADf6kOIDKeLQc3Vi9vzJBmc28cEpVxQhXo1LE5dAh4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-fIJS5FvPU3bsoucA6m10SKspqXKlltHY1XvPpaGvWr4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -926,7 +926,7 @@ const PLAN_ITEMS = {
         { k: 'sd', label: 'Your statutory declaration' },
         { k: 'bc', label: 'Full birth or adoption certificate' },
         ...(p && (p.goal === S.BOTH || p.goal === S.NAME || p.hasDeedPoll)
-          ? [{ k: 'np', label: 'Deed poll or other name-change documents' }]
+          ? [{ k: 'np', label: p.goal === S.GENDER ? 'Deed poll or other name-change documents, if you have changed your name' : 'Deed poll or other name-change documents' }]
           : []),
         { k: 'mc', label: 'Marriage or civil partnership certificates, if ever married' },
         { k: 'sp', label: 'Your spouse\'s declaration, if staying married' },

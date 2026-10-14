@@ -1228,6 +1228,22 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('[data-track-id="trk_grcdocs_np"]')).toHaveCount(0);
     });
 
+    test('228. On a gender-marker-only plan, the GRC paperwork asks for name-change documents only if the name was changed', async ({ page }) => {
+      const label = () => page.locator('[data-track-id="trk_grcdocs_np"]').getAttribute('data-step-label');
+      await openChecklist(page);
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      expect(await label(), 'a plan that changes the name always needs the name-change documents').toBe('Deed poll or other name-change documents');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalName').uncheck();
+      await page.locator('#chkDeedPoll').check();
+      await page.locator('#checklistStickyBar button').click();
+      expect(await label(),
+        'on a gender-only plan, a yes can mean a gender statutory declaration, and GOV.UK only asks for these documents if the name was changed')
+        .toBe('Deed poll or other name-change documents, if you have changed your name');
+    });
+
     test('134. Evidence ticks clear with Reset progress and survive a share round trip', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGRCYes').check();
