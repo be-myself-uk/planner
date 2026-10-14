@@ -3778,6 +3778,15 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => window.__cspViolations), 'the page runs without breaking its own policy').toEqual([]);
     });
 
+    test('226. The quick exit help says it does not delete the saved plan', async ({ page }) => {
+      await page.getByRole('button', { name: 'Usage guide' }).click();
+      await expect(page.locator('#dlgUsage')).toContainText('It does not delete your saved plan');
+      await expect(page.locator('#dlgUsage')).toContainText('use a private window');
+      await page.locator('#dlgUsage').getByRole('button', { name: 'Close' }).click();
+      await page.getByRole('button', { name: 'What is this?' }).click();
+      await expect(page.locator('#dlgAbout')).toContainText('This does not delete your saved plan');
+    });
+
     test('178. Download this page saves the page without what the host adds to it', async ({ page }) => {
       const original = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
       const origin = 'https://bemyself.test';
