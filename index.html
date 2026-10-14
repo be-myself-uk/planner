@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-3ADf6kOIDKeLQc3Vi9vzJBmc28cEpVxQhXo1LE5dAh4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -23,6 +23,7 @@
 <meta name="twitter:image" content="https://bemyself.uk/og-image.png">
 <meta name="twitter:image:alt" content="Be myself: change your name and gender marker in the UK. UK specific, free and private, no tracking, no sign-up. Shown over the transgender and non-binary pride flags.">
 <meta name="theme-color" content="#5bcefa">
+<meta name="schema-version" content="1791186523">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"Be myself","url":"https://bemyself.uk/","description":"Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.","image":"https://bemyself.uk/og-image.png","applicationCategory":"ReferenceApplication","operatingSystem":"Web browser","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"featureList":["a deed poll or statutory declaration","your UK passport, or your home country passport and UK eVisa","your driving licence and vehicle logbook (V5C)","your NHS or GP record, HMRC and tax records, and benefits","DBS, Disclosure Scotland and AccessNI checks","work, student and professional records","banks, utilities, the electoral register and other services","a Gender Recognition Certificate (GRC) and your birth certificate","the Irish passport route for people born in Northern Ireland"]}
 </script>
@@ -535,7 +536,7 @@ function decodeState(str) {
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-const SCHEMA_VERSION = 1791186523;
+const SCHEMA_VERSION = parseInt(document.querySelector('meta[name="schema-version"]')?.content, 10) || 0;
 const PLAN_VERSION = 2;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { E:'e', W:'w', S:'s', NI:'ni' };

@@ -3760,6 +3760,24 @@ test.describe('Be myself Planner', () => {
       for (const d of ["base-uri 'none'", "form-action 'none'", "object-src 'none'"]) expect(csp).toContain(d);
     });
 
+    test('225. The security policy allows only the page\'s own scripts, by their hashes', async ({ page }) => {
+      const { inlineScriptHashes, scriptSrc } = require('./csp-hash-lib');
+      const html = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const sources = scriptSrc(html);
+      expect(sources, 'the policy must have a script-src').not.toBeNull();
+      expect(sources, 'inline scripts are allowed by hash, not in general').not.toContain("'unsafe-inline'");
+      expect(sources.filter(s => s.startsWith("'sha256-")).sort(),
+        'after editing a script, run: npm run update-csp-hashes').toEqual(inlineScriptHashes(html).sort());
+      await page.addInitScript(() => {
+        window.__cspViolations = [];
+        document.addEventListener('securitypolicyviolation', e => window.__cspViolations.push(`${e.violatedDirective} ${e.blockedURI}`));
+      });
+      await page.reload();
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await expect(page.locator('#wizardView')).toBeVisible();
+      expect(await page.evaluate(() => window.__cspViolations), 'the page runs without breaking its own policy').toEqual([]);
+    });
+
     test('178. Download this page saves the page without what the host adds to it', async ({ page }) => {
       const original = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
       const origin = 'https://bemyself.test';
