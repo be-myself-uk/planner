@@ -6,6 +6,7 @@ labels: ''
 assignees: ''
 
 ---
+<!-- Issues are public: anyone can read them, and they show your GitHub username. Leave out personal details, and do not paste a link to your plan, because it contains your answers. -->
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -21,7 +22,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If applicable, add screenshots to help explain your problem. Crop them to the problem, so they do not show the rest of your plan.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]

@@ -475,6 +475,12 @@ For items with no official source, the links in the general data protection sect
   - Note: Says a physical visa must be replaced with an eVisa, for a fee, if the stay is longer than 6 months and details such as name or gender change. For people with an expired BRP and an eVisa, it lists gender among the details that can be updated online.
   - Last verified: 2026-10-01
 
+- **Home Office: Common Travel Area guidance**
+  - <https://www.gov.uk/government/publications/common-travel-area-guidance/common-travel-area-guidance>
+  - Status: Consulted, not linked in the planner
+  - Note: Says Irish citizens in the UK do not need permission to enter or remain, including a visa or any form of residence permit. This is why the visa question has an answer for Irish citizens, who get the Irish passport step (iepass) instead of the UK passport, home country passport and eVisa steps.
+  - Last verified: 2026-10-14
+
 - **Home Office policy: Use and change of names**
   - <https://www.gov.uk/government/publications/change-of-name-guidance/use-and-change-of-names>
   - Status: Consulted, not linked in the planner
@@ -487,13 +493,13 @@ For items with no official source, the links in the general data protection sect
   - Note: Gives the evidence asked for in that case: official correspondence from the country of nationality (a letter from its embassy or consulate in the UK is enough), plus a GRC or a medical note with evidence of living in the acquired gender for all purposes.
   - Last verified: 2026-10-01
 
-## Irish passport and Irish gender recognition (irish_passport)
+## Irish passport and Irish gender recognition (irish_passport, iepass)
 
 - **Irish Department of Foreign Affairs: Passport documentary requirements**
   - <https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/>
   - Status: Linked in the planner
-  - Note: Under "Change information" > "My gender has now been recognised", the requirements are split by residence, not by first passport versus renewal. For an applicant resident in Northern Ireland or overseas, both a first passport and a renewal require a statutory declaration of settled and solemn intention to live in the new gender for the rest of their life, plus two documents from two different sources showing use of the new name over at least two years; a first application for this residency group also asks for an identity verification form, a full original birth certificate showing parents' names, proof of address within 12 months, and original government-issued photo identification. An Irish Gender Recognition Certificate is listed only for applicants resident in Ireland. The page also states that being issued a passport in the previous name during the reckonable usage period voids that period, and the two years restarts from the date that passport was issued. The planner previously described the GRC as a prerequisite and told users to get an ordinary passport first; both were wrong for the Northern Ireland/overseas resident route and have been corrected. Exceptions may be made where the previous passport was expiring before two years' proof could be built up. The Passport Service does not accept deed polls to change the name on an Irish passport.
-  - Last verified: 2026-10-01
+  - Note: Under "Change information" > "My gender has now been recognised", the requirements are split by residence, not by first passport versus renewal. For an applicant resident in Northern Ireland or overseas, both a first passport and a renewal require a statutory declaration of settled and solemn intention to live in the new gender for the rest of their life, plus two documents from two different sources showing use of the new name over at least two years; a first application for this residency group also asks for an identity verification form, a full original birth certificate showing parents' names, proof of address within 12 months, and original government-issued photo identification. An Irish Gender Recognition Certificate is listed only for applicants resident in Ireland. The page also states that being issued a passport in the previous name during the reckonable usage period voids that period, and the two years restarts from the date that passport was issued. The planner previously described the GRC as a prerequisite and told users to get an ordinary passport first; both were wrong for the Northern Ireland/overseas resident route and have been corrected. Exceptions may be made where the previous passport was expiring before two years' proof could be built up. The Passport Service does not accept deed polls to change the name on an Irish passport. Under "I now use a different name to the one on my passport or birth certificate", a name change by proof of usage needs two original documents from two different sources dating back at least two years from the application, and valid government-issued photo ID in the new name; for someone living outside Ireland, at least one document must be official government correspondence from their country of residence, and the page says this takes longer to process as a complex renewal. These requirements are the source for the Irish passport step (iepass) shown to Irish citizens.
+  - Last verified: 2026-10-14
 
 - **Irish Department of Foreign Affairs: Passport fees**
   - <https://www.ireland.ie/en/dfa/passports/passport-fees/>

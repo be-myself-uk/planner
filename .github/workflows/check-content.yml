@@ -14,6 +14,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
+  contents: read
   issues: write
 
 jobs:
@@ -22,6 +23,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Run Lychee Link Checker
         id: lychee
@@ -66,6 +69,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Check GOV.UK sources against their Last verified date
         id: check
@@ -103,6 +108,50 @@ jobs:
           issue-number: ${{ steps.existing.outputs.number }}
           body-path: ./source-watch-report.md
 
+  link-domain-watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Check the domains of linked websites
+        id: check
+        run: |
+          set -o pipefail
+          python3 .github/scripts/check_link_domains.py | tee -a "$GITHUB_OUTPUT"
+
+      - name: Check for existing open issue
+        if: steps.check.outputs.changes_detected == 'true'
+        id: existing
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'link-domain',
+              state: 'open'
+            });
+            core.setOutput('found', issues.data.length > 0 ? 'true' : 'false');
+            core.setOutput('number', issues.data.length > 0 ? issues.data[0].number : '');
+
+      - name: Create issue if a linked domain needs checking
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'false'
+        uses: peter-evans/create-issue-from-file@e8ef132d6df98ed982188e460ebb3b5d4ef3a9cd # v5.0.1
+        with:
+          title: "🌐 A linked website's domain needs checking"
+          content-filepath: ./link-domain-report.md
+          labels: link-domain
+
+      - name: Comment on existing issue with the new report
+        if: steps.check.outputs.changes_detected == 'true' && steps.existing.outputs.found == 'true'
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        with:
+          issue-number: ${{ steps.existing.outputs.number }}
+          body-path: ./link-domain-report.md
+
   source-content-watch:
     runs-on: ubuntu-latest
     defaults:
@@ -110,6 +159,8 @@ jobs:
         working-directory: tests
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -118,7 +169,7 @@ jobs:
           cache-dependency-path: tests/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -134,39 +185,6 @@ jobs:
       - name: Regenerate source-content-snapshots.json
         if: inputs.write_source_snapshots == true
         run: node source-content-check.js --write
-
-      - name: Commit the regenerated snapshot to main
-        if: inputs.write_source_snapshots == true && github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ secrets.BUMP_VERSION_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          if git diff --quiet -- source-content-snapshots.json; then
-            echo "The snapshot has not changed."
-            exit 0
-          fi
-
-          base64 -w0 source-content-snapshots.json > "$RUNNER_TEMP/snapshot.b64"
-          jq -n \
-            --arg repo "$REPO" \
-            --arg head "$(git rev-parse HEAD)" \
-            --rawfile contents "$RUNNER_TEMP/snapshot.b64" \
-            '{
-              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
-              variables: { input: {
-                branch: { repositoryNameWithOwner: $repo, branchName: "main" },
-                expectedHeadOid: $head,
-                message: { headline: "Update the source snapshots [skip ci]" },
-                fileChanges: { additions: [ { path: "tests/source-content-snapshots.json", contents: $contents } ] }
-              } }
-            }' > "$RUNNER_TEMP/request.json"
-
-          if ! gh api graphql --input "$RUNNER_TEMP/request.json" > "$RUNNER_TEMP/response.json"; then
-            cat "$RUNNER_TEMP/response.json"
-            echo "::error::GitHub refused the snapshot commit. main may have moved on since this run started, or BUMP_VERSION_TOKEN may have expired or been revoked. The new snapshot is attached to this run as an artifact. See CONTRIBUTING.md."
-            exit 1
-          fi
-          echo "Snapshot committed: $(jq -r '.data.createCommitOnBranch.commit.oid // empty' "$RUNNER_TEMP/response.json")"
 
       - name: Upload regenerated snapshot
         if: always() && inputs.write_source_snapshots == true
@@ -212,3 +230,65 @@ jobs:
         with:
           issue-number: ${{ steps.existing.outputs.number }}
           body-path: ./source-content-report.md
+
+  commit-source-snapshots:
+    needs: source-content-watch
+    if: inputs.write_source_snapshots == true && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the committed snapshot only
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: tests/source-content-snapshots.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Download the regenerated snapshot
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: source-content-snapshots
+          path: ${{ runner.temp }}/snapshot
+
+      - name: Commit the regenerated snapshot to main
+        env:
+          GH_TOKEN: ${{ secrets.BUMP_VERSION_TOKEN }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          NEW="$RUNNER_TEMP/snapshot/source-content-snapshots.json"
+          if ! jq -e 'type == "object"' "$NEW" > /dev/null; then
+            echo "::error::The regenerated snapshot is not a JSON object, so it was not committed."
+            exit 1
+          fi
+          if [ "$(stat -c %s "$NEW")" -gt 5000000 ]; then
+            echo "::error::The regenerated snapshot is over 5 MB, so it was not committed."
+            exit 1
+          fi
+          if cmp -s "$NEW" tests/source-content-snapshots.json; then
+            echo "The snapshot has not changed."
+            exit 0
+          fi
+
+          base64 -w0 "$NEW" > "$RUNNER_TEMP/snapshot.b64"
+          jq -n \
+            --arg repo "$REPO" \
+            --arg head "$HEAD_SHA" \
+            --rawfile contents "$RUNNER_TEMP/snapshot.b64" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
+              variables: { input: {
+                branch: { repositoryNameWithOwner: $repo, branchName: "main" },
+                expectedHeadOid: $head,
+                message: { headline: "Update the source snapshots [skip ci]" },
+                fileChanges: { additions: [ { path: "tests/source-content-snapshots.json", contents: $contents } ] }
+              } }
+            }' > "$RUNNER_TEMP/request.json"
+
+          if ! gh api graphql --input "$RUNNER_TEMP/request.json" > "$RUNNER_TEMP/response.json"; then
+            cat "$RUNNER_TEMP/response.json"
+            echo "::error::GitHub refused the snapshot commit. main may have moved on since this run started, or BUMP_VERSION_TOKEN may have expired or been revoked. The new snapshot is attached to this run as an artifact. See CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "Snapshot committed: $(jq -r '.data.createCommitOnBranch.commit.oid // empty' "$RUNNER_TEMP/response.json")"

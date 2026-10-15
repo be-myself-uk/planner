@@ -13,7 +13,28 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [October 2026]
+## [October 2026 /2]
+
+**Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because the visa question now has an answer for Irish citizens, who get a step for their Irish passport instead of a UK passport. Check your answers once, and the message will not come back until a later change could affect your plan.
+
+### Information
+
+- Irish citizens living in the UK can now say so in the visa question. They get a step for their Irish passport, based on the Passport Service's requirements, instead of the UK passport step.
+- The quick exit help now says that quick exit does not delete your saved plan, and suggests a private window on a shared device.
+- On a plan for changing only your gender marker, the GRC paperwork list now says that name-change documents are only needed if you have changed your name.
+
+### Code
+
+- The page's security policy now allows only the page's own two scripts to run.
+
+### Infrastructure
+
+- The workflow token that can commit to main is now kept away from jobs that run outside code, such as installed packages and the pages the source check opens.
+- Workflows now have read-only access by default.
+- A new scheduled check looks for linked websites whose domains have lapsed, are about to be deleted, or were registered in the last year, so the planner does not keep sending people to a domain that may have changed hands.
+- The issue templates now remind people that issues are public.
+
+## [October 2026 /1]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because criminal record checks are now asked about for everyone in the UK, not only people with work records to update; people living outside the UK are now asked about UK benefits and can add the electoral register; and people changing only their gender marker now get a different first step. Check your answers once, and the message will not come back until a later change could affect your plan.
 

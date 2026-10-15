@@ -158,7 +158,7 @@ async function getShareUrl(page, data) {
     const bytes = new TextEncoder().encode(JSON.stringify(obj));
     let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
     const fp = window.location.href.split('?')[0];
-    return `${fp}?p=${btoa(bin)}`;
+    return `${fp}?p=${encodeURIComponent(btoa(bin))}`;
   }, data);
 }
 
@@ -1228,6 +1228,22 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('[data-track-id="trk_grcdocs_np"]')).toHaveCount(0);
     });
 
+    test('228. On a gender-marker-only plan, the GRC paperwork asks for name-change documents only if the name was changed', async ({ page }) => {
+      const label = () => page.locator('[data-track-id="trk_grcdocs_np"]').getAttribute('data-step-label');
+      await openChecklist(page);
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      expect(await label(), 'a plan that changes the name always needs the name-change documents').toBe('Deed poll or other name-change documents');
+
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.locator('#chkGoalName').uncheck();
+      await page.locator('#chkDeedPoll').check();
+      await page.locator('#checklistStickyBar button').click();
+      expect(await label(),
+        'on a gender-only plan, a yes can mean a gender statutory declaration, and GOV.UK only asks for these documents if the name was changed')
+        .toBe('Deed poll or other name-change documents, if you have changed your name');
+    });
+
     test('134. Evidence ticks clear with Reset progress and survive a share round trip', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGRCYes').check();
@@ -1572,6 +1588,44 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkDBS')).toBeChecked();
       await expect(page.locator('#chkStudent')).toBeChecked();
       await expect(page.locator('#chkPassportNone')).toBeChecked();
+    });
+
+    test('231. A shared link keeps the Irish citizen answer, and links made before it still open', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkVisaIrish').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.evaluate(() => {
+        window._shareUrl = null;
+        navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+      });
+      await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+      await page.waitForFunction(() => window._shareUrl !== null);
+      const clip = await page.evaluate(() => window._shareUrl);
+      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      expect(decoded.ie, 'the new answer travels in its own key, so older links need no change').toBe(true);
+      expect(decoded.nonUK, 'an Irish citizen has no visa or eVisa to update').toBe(false);
+
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(clip);
+      await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+
+      const withoutIrish = await getShareUrl(page, { reg: 'e', goal: 'both', emp: 'no', nonUK: false, visa: false, dp: true, dl: 'none', pass: 'needs_update' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(withoutIrish);
+      await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      await expect(page.locator('[data-track-id="trk_ukpass"]'), 'a link without the new key still gives the UK passport step').toHaveCount(1);
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(0);
+
+      const beforeThisVersion = await getShareUrl(page, { pv: 2, reg: 'e', goal: 'both', emp: 'no', nonUK: false, visa: false, dp: true, dl: 'none', pass: 'needs_update' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(beforeThisVersion);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#welcomeOutdated'), 'a link from before PLAN_VERSION 3 asks for one review instead of breaking').toBeVisible();
+      await page.getByRole('button', { name: 'Review my answers' }).click();
+      await expect(page.locator('#chkVisaNone')).toBeChecked();
     });
   });
 
@@ -2073,6 +2127,54 @@ test.describe('Be myself Planner', () => {
       await expect(plan).toContainText('If you are married or in a civil partnership');
       await expect(plan).toContainText('entitlement to some benefits and pensions');
       await expect(plan, 'the planner stays out of anti-discrimination law').not.toContainText('Equality Commission');
+    });
+
+    test('229. An Irish citizen gets the Irish passport step instead of a UK passport, eVisa or home country passport', async ({ page }) => {
+      await openChecklist(page);
+      await expect(page.locator('#chkVisaIrish'), 'Irish citizens need no visa, so this answer is never locked').toBeEnabled();
+      await page.locator('#chkVisaIrish').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+      for (const id of ['trk_ukpass', 'trk_evisa', 'trk_homepass']) {
+        await expect(page.locator(`[data-track-id="${id}"]`), `${id} is for UK passports or visas`).toHaveCount(0);
+      }
+      await expect(page.locator('#planContent')).toContainText('The Passport Service handles Irish passports.');
+      await expect(page.locator('#planSummaryBox')).toContainText('Irish passport:');
+      await expect(page.locator('#planSummaryBox'), 'an Irish passport in a new name needs two years of proof that the name is used')
+        .toContainText('at least two years');
+    });
+
+    test('230. The step-by-step view offers the Irish citizen answer', async ({ page }) => {
+      await openWizard(page);
+      await page.evaluate(() => {
+        Object.assign(wizardState, { region:'e', birthRegion:'e', goal:'both', goalParts:['name','gender'], deedpoll:'yes', nhs:'yes', newGP:'no', hmrc:'yes', driving:'none', passport:'needs_update', employment:'no', dbs:'no', dwp:'no', services:[], svcNone:'yes', vehicle:'no', student:'no', grc:'no', birthCertName:'no', birthCert:'no' });
+        step = questions.findIndex(q => q.id === 'visa');
+        renderWizard(false);
+      });
+      const irish = page.locator('input[name="ans"][value="irish"]');
+      await expect(irish).toBeEnabled();
+      await irish.check();
+      for (let i = 0; i < 20 && !(await page.locator('#planView').isVisible()); i++) {
+        await page.getByRole('button', { name: /Continue →|Show my plan →/ }).click();
+      }
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+      await expect(page.locator('[data-track-id="trk_ukpass"]')).toHaveCount(0);
+    });
+
+    test('232. An Irish citizen born in Northern Ireland is not also offered the Good Friday Agreement route', async ({ page }) => {
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalGender').check();
+      for (const id of ['#chkRegionNI', '#chkBirthRegionNI', '#chkDrivingLicenceNone', '#chkPassportNeeds', '#chkEmployedNo', '#chkGRCNo']) {
+        await page.locator(id).check();
+      }
+      await expect(page.locator('#wrapIrishRoute')).toBeVisible();
+      await page.locator('#chkIrishRoute').check();
+      await page.locator('#chkVisaIrish').check();
+      await expect(page.locator('#wrapIrishRoute'), 'the Irish citizen answer already gives the Irish passport step').toBeHidden();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
+      await expect(page.locator('[data-track-id="trk_irish_passport"]')).toHaveCount(0);
     });
   });
 
@@ -3758,6 +3860,39 @@ test.describe('Be myself Planner', () => {
       const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
       expect(csp, 'Cloudflare adds a check that posts to /cdn-cgi on this site, which connect-src \'none\' blocks').toContain("connect-src 'self'");
       for (const d of ["base-uri 'none'", "form-action 'none'", "object-src 'none'"]) expect(csp).toContain(d);
+    });
+
+    test('225. The security policy allows only the page\'s own scripts, by their hashes', async ({ page }) => {
+      const { inlineScriptHashes, scriptSrc } = require('./csp-hash-lib');
+      const html = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const sources = scriptSrc(html);
+      expect(sources, 'the policy must have a script-src').not.toBeNull();
+      expect(sources, 'inline scripts are allowed by hash, not in general').not.toContain("'unsafe-inline'");
+      expect(sources.filter(s => s.startsWith("'sha256-")).sort(),
+        'after editing a script, run: npm run update-csp-hashes').toEqual(inlineScriptHashes(html).sort());
+      await page.addInitScript(() => {
+        window.__cspViolations = [];
+        document.addEventListener('securitypolicyviolation', e => window.__cspViolations.push(`${e.violatedDirective} ${e.blockedURI}`));
+      });
+      await page.reload();
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await expect(page.locator('#wizardView')).toBeVisible();
+      expect(await page.evaluate(() => window.__cspViolations), 'the page runs without breaking its own policy').toEqual([]);
+    });
+
+    test('226. The quick exit help says it does not delete the saved plan', async ({ page }) => {
+      await page.getByRole('button', { name: 'Usage guide' }).click();
+      await expect(page.locator('#dlgUsage')).toContainText('It does not delete your saved plan');
+      await expect(page.locator('#dlgUsage')).toContainText('use a private window');
+      await page.locator('#dlgUsage').getByRole('button', { name: 'Close' }).click();
+      await page.getByRole('button', { name: 'What is this?' }).click();
+      await expect(page.locator('#dlgAbout')).toContainText('This does not delete your saved plan');
+    });
+
+    test('227. The check for lapsed or newly registered link domains passes its self-test', async () => {
+      const { execFileSync } = require('child_process');
+      expect(() => execFileSync('python3', [path.resolve('..', '.github', 'scripts', 'check_link_domains.py'), '--selftest'], { stdio: 'pipe' }),
+        'run python3 .github/scripts/check_link_domains.py --selftest to see which rule failed').not.toThrow();
     });
 
     test('178. Download this page saves the page without what the host adds to it', async ({ page }) => {
