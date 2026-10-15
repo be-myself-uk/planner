@@ -13,7 +13,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [Unreleased]
+## [October 2026 /2]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because the visa question now has an answer for Irish citizens, who get a step for their Irish passport instead of a UK passport. Check your answers once, and the message will not come back until a later change could affect your plan.
 
@@ -34,7 +34,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - A new scheduled check looks for linked websites whose domains have lapsed, are about to be deleted, or were registered in the last year, so the planner does not keep sending people to a domain that may have changed hands.
 - The issue templates now remind people that issues are public.
 
-## [October 2026]
+## [October 2026 /1]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because criminal record checks are now asked about for everyone in the UK, not only people with work records to update; people living outside the UK are now asked about UK benefits and can add the electoral register; and people changing only their gender marker now get a different first step. Check your answers once, and the message will not come back until a later change could affect your plan.
 
