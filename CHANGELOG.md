@@ -15,6 +15,14 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ## [Unreleased]
 
+### Information
+
+- The waiting list note for adult gender services in England now uses the service's own name, the Gender National Referral Support Service (GNRSS).
+- The England screening note now says that if you have a cervix and your GP record does not say female, NHS England guidance says your GP practice can opt you in to cervical screening invitations.
+- The work step now says that if you hold national security vetting clearance, you must tell United Kingdom Security Vetting (UKSV) about a change of name, but not about a gender change.
+- The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
+- For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
+
 ### Code
 
 - The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.

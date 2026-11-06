@@ -17,6 +17,7 @@ All contributions must respect these constraints:
 - **Simple English**: write for users who may not have English as a first language, or who may be under stress; avoid jargon, long sentences, and overwhelming detail
 - **No exact fees**: describe costs with the labels Free, Small cost, Medium cost and Higher cost, or say a fee applies, because fees change often. The one exception is the statutory declaration swearing fee in the GRC cost summary, which is set by the Commissioners for Oaths (Fees) Order (see SOURCES.md) and is kept on purpose.
 - **General guidance only**: content must not constitute legal, financial, medical, or tax advice; do not reproduce forms or templates, or give step-by-step instructions for filling them in; linking to official forms and established community tools is fine
+- **Sourced**: every official fact needs an official source in `SOURCES.md`. When you add a source or re-verify one, give it a Note that names the planner wording it supports, so anyone can trace a sentence back to where it came from. Every link in `index.html` must also have its own entry in `SOURCES.md`, unless it goes to a community organisation on the short list in the link coverage test, which fails otherwise
 - **Single file**: the application is one self-contained HTML file with no build step, no framework, and no dependencies
 
 **Useful contributions include:**

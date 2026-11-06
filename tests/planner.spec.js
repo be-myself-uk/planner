@@ -1957,14 +1957,70 @@ test.describe('Be myself Planner', () => {
       const referralDate = 'Your place on the list is set by your original referral date.';
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await expect(page.locator('#planContent')).toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).toContainText('Gender National Referral Support Service (GNRSS)');
       expect(await page.locator('#planContent').getByText(referralDate).count()).toBe(1);
       await switchRegion(page, 'w');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
       await switchRegion(page, 's');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
       await switchRegion(page, 'ni');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
+    });
+
+    test('233. The England waiting list note uses the referral service\'s own name', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan).toContainText('held by the Gender National Referral Support Service (GNRSS)');
+      await expect(plan.locator('a[href*="genderreferralservice.nhs.uk"]'), 'the link sits in a collapsed step, so match it by address').toContainText('Gender National Referral Support Service (GNRSS)');
+      await expect(plan, 'the old, unofficial name should be gone').not.toContainText('National Adult Gender Referral');
+    });
+
+    test('234. The cervical screening opt-in sentence is England only', async ({ page }) => {
+      const optIn = 'NHS England guidance says your GP practice can opt you in to cervical screening invitations.';
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).toContainText(optIn);
+      for (const region of ['w', 's', 'ni']) {
+        await switchRegion(page, region);
+        await expect(page.locator('#planContent'), `${region}: the guidance is NHS England's, so it must not appear elsewhere`).not.toContainText(optIn);
+      }
+    });
+
+    test('235. The work step shows the security clearance and payroll notes that fit the goal', async ({ page }) => {
+      const nameVetting = 'says you must tell it about a change of name';
+      const genderVetting = 'it does not ask for a GRC';
+      const payroll = 'If payroll asks for a certificate:';
+      const plan = page.locator('#planContent');
+      const update = async (name, gender) => {
+        await page.locator('#ubMakeChangesBtn').click();
+        await page.locator('#chkGoalName').setChecked(name);
+        await page.locator('#chkGoalGender').setChecked(gender);
+        await page.getByRole('button', { name: 'Update my action plan' }).click();
+      };
+      await openChecklist(page);
+      await page.locator('#chkEmployedNeeds').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(plan).toContainText(nameVetting);
+      await expect(plan).toContainText(payroll);
+      await expect(plan).toContainText('UKSV change of personal circumstances');
+      await update(true, false);
+      await expect(plan).toContainText(nameVetting);
+      await expect(plan, 'the certificate note is about a gender change, so a name-only plan leaves it out').not.toContainText(payroll);
+      await update(false, true);
+      await expect(plan).toContainText(genderVetting);
+      await expect(plan).toContainText(payroll);
+      await expect(plan, 'UKSV only needs to hear about a name change').not.toContainText(nameVetting);
+    });
+
+    test('236. The change of name letters for UK nationals abroad only show for people living outside the UK', async ({ page }) => {
+      const letters = 'publish standard letters for some countries that explain it';
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).not.toContainText(letters);
+      await switchRegion(page, 'out');
+      await expect(page.locator('#planContent')).toContainText(letters);
+      await expect(page.locator('#planContent a[href="https://www.gov.uk/guidance/change-of-name-name-discrepancy-and-naming-children-letters"]')).toContainText('Change of name letters for UK nationals abroad');
     });
 
     test('89b. The Wales gender service waiting list note is Wales only, and is distinct from the England note', async ({ page }) => {
@@ -1972,7 +2028,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('input[name="chkRegion"][value="w"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Welsh Gender Service');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
       await switchRegion(page, 'e');
       await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
       await switchRegion(page, 's');
@@ -3963,6 +4019,20 @@ test.describe('Be myself Planner', () => {
         expect(typeof entry.type).toBe('string');
         expect(('url' in entry) !== ('data' in entry), 'each entry needs exactly one of url or data').toBe(true);
       }
+    });
+
+    test('237. Every link to an official site has its own entry in SOURCES.md', async () => {
+      const community = new Set(['transactual.org.uk', 'github.com', 'www.rainbowmigration.org.uk', 'teni.ie', 'mermaidsuk.org.uk',
+        'genderedintelligence.co.uk', 'freedeedpoll.org.uk', 'www.scottishtrans.org', 'www.reddit.com', 'www.gires.org.uk',
+        'transaid.cymru', 'switchboard.lgbt', 'lgbt.foundation', 'creativecommons.org', 'cliniq.org.uk', 'bemyself.uk']);
+      const norm = u => u.split('#')[0].replace(/\/$/, '');
+      const html = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const sources = fs.readFileSync(path.resolve('..', 'SOURCES.md'), 'utf8');
+      const listed = new Set([...sources.matchAll(/<(https?:\/\/[^>\s]+)>/g)].map(m => norm(m[1])));
+      const links = [...new Set([...html.matchAll(/href="(https?:\/\/[^"]+)"/g)].map(m => norm(m[1])))];
+      expect(links.length, 'the page should have links to check').toBeGreaterThan(50);
+      const missing = links.filter(u => !community.has(new URL(u).hostname) && !listed.has(u));
+      expect(missing, 'add an entry to SOURCES.md for each official link, or add a community organisation\'s host to the list in this test').toEqual([]);
     });
 
     test('214. The source check skips site home pages, keeps PDFs, and ignores changes to spacing', async () => {
