@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-L+sAw1snP7RmVXQdsYg8eHjpRDXOJnXL5oQpMc7Avzc='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-wlraeUbJlrMQ/iam/T8d5GuCa9COM8aBdTVj6Ikdrzs='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -336,7 +336,7 @@
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Toolbar</h3>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">Always shown</p>
     <div class="legend-toolbar" style="margin-bottom:12px;">
-      <span class="legend-tb-icon" aria-hidden="true">?</span><span><strong>Usage guide:</strong> opens this dialog. You can also open it by typing a question mark (<kbd>?</kbd>), which on most keyboards means holding <kbd>Shift</kbd> and pressing <kbd>/</kbd>.</span>
+      <span class="legend-tb-icon" aria-hidden="true">?</span><span><strong>Usage guide:</strong> opens this dialog. You can also open it by pressing <kbd>/</kbd> or typing a question mark (<kbd>?</kbd>).</span>
       <span class="legend-tb-icon" aria-hidden="true">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
       <span class="legend-tb-icon" aria-hidden="true">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and replaces it in your tab's history, so the back button will not return here. The visit may still appear in your browser's saved history. It does not delete your saved plan, so anyone who opens this site in the same browser will see it. On a shared device, use a private window, or use ↺ New plan to delete your plan when you finish. The same button is at the top of every panel like this one, and pressing <kbd>Esc</kbd> twice within a second does the same.</span>
     </div>
@@ -394,7 +394,7 @@
         <tr><td>Click step</td><td>Cycle state: not started → in progress → done → not needed → not started</td></tr>
         <tr><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td>Navigate within this dialog</td></tr>
         <tr><td><kbd>Esc</kbd> <kbd>Esc</kbd></td><td>Quick exit: press twice within a second to leave the page</td></tr>
-        <tr><td><kbd>?</kbd> (usually <kbd>Shift</kbd> + <kbd>/</kbd>)</td><td>Open usage guide</td></tr>
+        <tr><td><kbd>/</kbd> or <kbd>?</kbd></td><td>Open usage guide</td></tr>
       </tbody>
     </table>
     <p style="border-top:1px solid var(--border);padding-top:10px;margin-top:8px;margin-bottom:0;"><strong>Accessibility:</strong> Full keyboard navigation is supported. Tab and Shift+Tab move between interactive elements; arrow keys navigate toolbar buttons. Works with screen readers.</p>
@@ -3480,7 +3480,7 @@ window.onload = () => {
     const ae0 = document.activeElement;
     const isTextEntryField = ae0.tagName === 'TEXTAREA' ||
       (ae0.tagName === 'INPUT' && !['checkbox', 'radio'].includes(ae0.type));
-    if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey && !isTextEntryField) {
+    if ((e.key === '?' || e.key === '/') && !e.ctrlKey && !e.altKey && !e.metaKey && !isTextEntryField) {
       e.preventDefault();
       if (!document.querySelector('dialog[open]')) { openHelp(); return; }
     }

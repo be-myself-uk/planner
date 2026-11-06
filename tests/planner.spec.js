@@ -3086,18 +3086,30 @@ test.describe('Be myself Planner', () => {
     test('212. The usage guide explains how to type the help shortcut', async ({ page }) => {
       await page.locator('#dlgUsage').evaluate(d => d.showModal());
       await expect(page.locator('#dlgUsage .legend-toolbar').first(),
-        'on UK and US keyboards a question mark needs Shift, so pressing / alone does nothing')
-        .toContainText('holding Shift and pressing /');
-      await expect(page.locator('#dlgUsage .shortcut-table')).toContainText('(usually Shift + /)');
+        'on UK and US keyboards a question mark needs Shift, so / alone works too')
+        .toContainText('pressing / or typing a question mark (?)');
+      await expect(page.locator('#dlgUsage .shortcut-table')).toContainText('/ or ?');
     });
 
-    test('213. Shift and / opens the usage guide, but not while Ctrl is held', async ({ page }) => {
+    test('213. / or Shift and / opens the usage guide, but not while Ctrl is held', async ({ page }) => {
       const dlg = page.locator('#dlgUsage');
       await page.keyboard.press('Control+Shift+Slash');
+      await page.keyboard.press('Control+Slash');
       await page.waitForTimeout(200);
       await expect(dlg, 'a shortcut with Ctrl, Alt or Cmd belongs to the browser or the system').toBeHidden();
       await page.keyboard.press('Shift+Slash');
       await expect(dlg).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dlg).toBeHidden();
+      await page.keyboard.press('Slash');
+      await expect(dlg, 'no Shift needed').toBeVisible();
+      await page.keyboard.press('Escape');
+
+      await page.evaluate(() => document.body.appendChild(document.createElement('textarea')).focus());
+      await page.keyboard.press('Slash');
+      await page.waitForTimeout(200);
+      await expect(dlg, 'typing / in a text field types it').toBeHidden();
+      await expect(page.locator('body > textarea')).toHaveValue('/');
     });
 
     test('215. Answers, buttons and panel headings are not highlighted by a double-click or a tap, but questions can still be selected', async ({ page }) => {
