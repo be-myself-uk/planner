@@ -4035,6 +4035,34 @@ test.describe('Be myself Planner', () => {
       expect(missing, 'add an entry to SOURCES.md for each official link, or add a community organisation\'s host to the list in this test').toEqual([]);
     });
 
+    test('238. The source text report pairs each changed line with its new version and says what changed', async () => {
+      const { formatSourceChanges } = require('./source-snapshot-lib');
+      const before = [
+        'Same line',
+        'Registering ‘a charge’ release',
+        'You register release of a charge at Land Registry by',
+        'A document confirming you have paid off your mortgage debt is called ‘a release’.',
+        'This paragraph was taken out completely and has nothing like it below.',
+      ].join('\n');
+      const after = [
+        'Same line',
+        'Registering release of a charge at Land Registry',
+        'You can register release of a charge at Land Registry by',
+        'A document confirming you have paid off your mortgage debt is called a release.',
+        'A brand new paragraph with ```code fences``` in it.',
+      ].join('\n');
+      const report = formatSourceChanges(before, after);
+      expect(report).toContain('3 changed lines: 2 with wording changes, 1 with punctuation, spacing or capitals only. 1 line removed, 1 line added.');
+      expect(report, 'issue #15 listed every old line, then every new line, so small edits were hard to spot').toContain(
+        '  2. added `can`\n     ```diff\n     - You register release of a charge at Land Registry by\n     + You can register release of a charge at Land Registry by\n     ```');
+      expect(report, 'quote marks alone are not a wording change, so the line is folded away').toMatch(
+        /<details><summary>1 line with punctuation, spacing or capitals only<\/summary>[\s\S]*called ‘a release’\.[\s\S]*<\/details>/);
+      expect(report).toContain('**Removed lines**\n\n  ```diff\n  - This paragraph was taken out completely');
+      expect(report, 'page text must not be able to close the code fence').not.toContain('```code');
+      const many = Array.from({ length: 16 }, (_, i) => `Line number ${i} says ‘hello’ here`);
+      expect(formatSourceChanges(many.join('\n'), many.map(l => l.replace(/[‘’]/g, '')).join('\n'))).toContain('  And 1 more.');
+    });
+
     test('214. The source check skips site home pages, keeps PDFs, and ignores changes to spacing', async () => {
       const { sourcesToCheck, normaliseText } = require('./source-snapshot-lib');
       const entries = [

@@ -27,6 +27,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 - The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
 
+### Infrastructure
+
+- The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
+
 ## [October 2026 /2]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because the visa question now has an answer for Irish citizens, who get a step for their Irish passport instead of a UK passport. Check your answers once, and the message will not come back until a later change could affect your plan.
