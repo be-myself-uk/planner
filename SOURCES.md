@@ -256,7 +256,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/dbs-update-service-guide-for-applicants/dbs-update-service-applicant-guide>
   - Status: Linked in the planner
   - Note: Says that after a change of name you must apply for a new DBS check through your organisation, that the name on an Update Service account cannot be changed, and that DBS recommends a new subscription in the new name. Also says that someone who used the sensitive applications route will not have their previous sex and identity shown to others through the Update Service.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-13
 
 ### Scotland
 
@@ -527,7 +527,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/eu-settlement-scheme-caseworker-guidance/eu-settlement-scheme-interim-guidance-gender-identity-and-sex-markers-on-documents-accessible>
   - Status: Consulted, not linked in the planner
   - Note: Gives the evidence asked for in that case: official correspondence from the country of nationality (a letter from its embassy or consulate in the UK is enough), plus a GRC or a medical note with evidence of living in the acquired gender for all purposes.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-13
 
 ## Irish passport and Irish gender recognition (irish_passport, iepass)
 
@@ -580,7 +580,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
   - Status: Linked in the planner
   - Note: The planner's link label previously read "List of approved medical practitioners". This publication is not a list of approved practitioners; there is no approval scheme. The label has been corrected to match the publication's own title.
-  - Last verified: 2026-09-12
+  - Last verified: 2026-11-13
 
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>
