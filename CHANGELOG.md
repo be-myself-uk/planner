@@ -21,6 +21,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The England screening note now says that if you have a cervix and your GP record does not say female, NHS England guidance says your GP practice can opt you in to cervical screening invitations.
 - The work step now says that if you hold national security vetting clearance, you must tell United Kingdom Security Vetting (UKSV) about a change of name, but not about a gender change.
 - The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
+- The UK passport step now explains what HM Passport Office asks for if you have changed your name more than once: evidence for each change, linking your new name back to your last passport or your birth certificate, or a statutory declaration covering all your names if you do not have evidence of every change.
 - For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
 
 ### Wording

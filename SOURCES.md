@@ -48,7 +48,8 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
   - Status: Consulted, not linked in the planner
   - Note: Documents who can witness a statutory declaration: a solicitor, a notary public, a justice of the peace, a commissioner for oaths, a councillor (Scotland only, for documents dated on or after 10 December 2007), officers of the armed services at or above the rank of major or equivalent, and other persons authorised by law to administer an oath. This is the source for the witness list shown for Scotland, including local councillors. Also documents that an overseas deed poll must be accepted, as must an overseas equivalent of a statutory declaration or affidavit where the country allows a change of name and there are no concerns about the document, and that applicants outside the UK who have changed their name may need extra evidence of use, depending on the country.
-  - Last verified: 2026-10-01
+  - Note: Version 28.0, updated 28 August 2026. Says "If the customer has multiple changes to their name, they must provide evidence for each change of name", going back to the birth, adoption, naturalisation or registration certificate for a first passport, or the name on the last passport for a renewal or replacement, and that "We will not accept the evidence if it does not show a clear link between the old and new names." If the customer does not have evidence of every link, "they must provide a statutory declaration", which "must cover all names used" and should say when each name was used, if the information is available. Source for the "If you have changed your name more than once" paragraph in the UK passport step.
+  - Last verified: 2026-11-20
 
 ### Scotland
 

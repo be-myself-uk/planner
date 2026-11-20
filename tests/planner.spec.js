@@ -1669,6 +1669,17 @@ test.describe('Be myself Planner', () => {
       await expect(plan.locator('a', { hasText: 'Change of name because of a change of gender' })).toBeVisible();
     });
 
+    test('241. The UK passport step explains the evidence needed after more than one name change', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalGender').uncheck();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.getByText('More information about: UK passport').click();
+      const step = page.locator('#planContent');
+      await expect(step, 'HMPO asks for evidence of each change, so one recent deed poll may not be enough').toContainText('you must give evidence for each change of name');
+      await expect(step, 'a missing link in the chain is covered by a statutory declaration').toContainText('a statutory declaration that covers all the names you have used');
+      await expect(step, 'the rule is HMPO\'s own, not every organisation\'s').toContainText('Other organisations may ask for different evidence');
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();
