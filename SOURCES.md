@@ -214,7 +214,7 @@ For items with no official source, the links in the general data protection sect
 - **Student Finance England: Updating your personal details**
   - <https://www.gov.uk/guidance/updating-your-personal-details>
   - Status: Consulted (same URL as above; this is the Content API's rendering of it)
-  - Note: Confirms name changes need a signed covering letter plus evidence (birth/marriage certificate, decree, an un-enrolled Change of Name Deed, or statutory declaration), uploaded through the online account. Confirms title and gender changes need no documents or evidence at all — just a phone call, live chat, or letter — and that a gender change is never assumed from a name change alone. This is the source for the "in England, a title or gender change... needs no supporting documents" line.
+  - Note: Confirms name changes need a signed covering letter plus evidence (birth/marriage certificate, decree, an un-enrolled Change of Name Deed, or statutory declaration), uploaded through the online account. Confirms title and gender changes need no documents or evidence at all, just a phone call, live chat, or letter, and that a gender change is never assumed from a name change alone. This is the source for the "in England, a title or gender change... needs no supporting documents" line.
   - Last verified: 2026-09-17
 
 - **Student Finance Wales: Changes to your information or circumstances**
@@ -239,7 +239,7 @@ For items with no official source, the links in the general data protection sect
 - **SAAS: Change of name, gender and title (form)**
   - <https://www.saas.gov.uk/files/485/saas-change-of-name-gender-title.pdf>
   - Status: Linked in the planner
-  - Note: SAAS uses one combined form (sections A-E) for a name, gender, and title change together, emailed to a confidential mailbox (SAAS_Confidential@gov.scot), unlike SFE/SFW/SFNI's separate name/title/gender processes. Accepts a wide range of evidence for Section D, including a birth certificate, marriage/civil partnership certificate, decree nisi/absolute, GRC, statutory declaration or deed poll, passport or driving licence in the new name, or a letter from a doctor, solicitor, local authority, or the student's college/university — a GRC is listed as one option among several, not a requirement. States SAAS deletes/destroys the change-of-details documents from the student's record afterwards. Recommends also updating the Student Loans Company and DWP directly, since SAAS does not do this automatically. This is the source for the whole Scotland branch of the "Student finance" paragraph.
+  - Note: SAAS uses one combined form (sections A-E) for a name, gender, and title change together, emailed to a confidential mailbox (SAAS_Confidential@gov.scot), unlike SFE/SFW/SFNI's separate name/title/gender processes. Accepts a wide range of evidence for Section D, including a birth certificate, marriage/civil partnership certificate, decree nisi/absolute, GRC, statutory declaration or deed poll, passport or driving licence in the new name, or a letter from a doctor, solicitor, local authority, or the student's college/university. A GRC is listed as one option among several, not a requirement. States SAAS deletes/destroys the change-of-details documents from the student's record afterwards. Recommends also updating the Student Loans Company and DWP directly, since SAAS does not do this automatically. This is the source for the whole Scotland branch of the "Student finance" paragraph.
   - Last verified: 2026-09-17
 
 ## Criminal record checks (dbs)

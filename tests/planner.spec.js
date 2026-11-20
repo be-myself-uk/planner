@@ -4075,6 +4075,16 @@ test.describe('Be myself Planner', () => {
       expect(normaliseText('            Read more about\u00a0AAA   screening\n        \n\nNext line  '),
         'issues #1, #5 and #9 were full of lines that differed only in spacing').toBe('Read more about AAA screening\nNext line');
     });
+
+    test('239. No file in the repository uses an em dash or an en dash', async () => {
+      const { execFileSync } = require('child_process');
+      const root = path.resolve('..');
+      const files = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split('\n')
+        .filter(f => f && !/\.png$/.test(f) && f !== 'tests/source-content-snapshots.json');
+      expect(files.length, 'git should list the repository files').toBeGreaterThan(20);
+      const withDashes = files.filter(f => /[\u2013\u2014]/.test(fs.readFileSync(path.join(root, f), 'utf8')));
+      expect(withDashes, 'use a comma, a full stop or brackets instead; the source snapshots are skipped because they quote other sites').toEqual([]);
+    });
   });
 
 });
