@@ -236,13 +236,13 @@ For items with no official source, the links in the general data protection sect
 - **SAAS: Changing your details**
   - <https://www.saas.gov.uk/guides/hints-and-tips/changing-details>
   - Status: Linked in the planner
-  - Last verified: 2026-09-17
+  - Last verified: 2026-11-20
 
 - **SAAS: Change of name, gender and title (form)**
   - <https://www.saas.gov.uk/files/485/saas-change-of-name-gender-title.pdf>
   - Status: Linked in the planner
   - Note: SAAS uses one combined form (sections A-E) for a name, gender, and title change together, emailed to a confidential mailbox (SAAS_Confidential@gov.scot), unlike SFE/SFW/SFNI's separate name/title/gender processes. Accepts a wide range of evidence for Section D, including a birth certificate, marriage/civil partnership certificate, decree nisi/absolute, GRC, statutory declaration or deed poll, passport or driving licence in the new name, or a letter from a doctor, solicitor, local authority, or the student's college/university. A GRC is listed as one option among several, not a requirement. States SAAS deletes/destroys the change-of-details documents from the student's record afterwards. Recommends also updating the Student Loans Company and DWP directly, since SAAS does not do this automatically. This is the source for the whole Scotland branch of the "Student finance" paragraph.
-  - Last verified: 2026-09-17
+  - Last verified: 2026-11-20
 
 ## Criminal record checks (dbs)
 
@@ -252,13 +252,13 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/guidance/transgender-applications>
   - Status: Linked in the planner
   - Note: The sensitive applications route is available for basic, standard and enhanced checks. Applicants should call or email the sensitive applications team before submitting their application. DBS publishes no notice period, so the planner marks allowing a few days as community advice.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **GOV.UK: DBS Update Service applicant guide**
   - <https://www.gov.uk/government/publications/dbs-update-service-guide-for-applicants/dbs-update-service-applicant-guide>
   - Status: Linked in the planner
   - Note: Says that after a change of name you must apply for a new DBS check through your organisation, that the name on an Update Service account cannot be changed, and that DBS recommends a new subscription in the new name. Also says that someone who used the sensitive applications route will not have their previous sex and identity shown to others through the Update Service.
-  - Last verified: 2026-11-13
+  - Last verified: 2026-11-20
 
 ### Scotland
 
@@ -266,13 +266,13 @@ For items with no official source, the links in the general data protection sect
   - <https://www.mygov.scot/transgender-disclosure-application>
   - Status: Linked in the planner
   - Note: Only needed when an employer countersigns; a Level 1 disclosure without a countersignatory does not show previous names. Previous names relating to transgender status are emailed separately, with the application reference number if there is one. Non-binary applicants choose male or female, which does not need to be their legal sex. The disclosure shows only the current name.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **mygov.scot: Manage your PVG membership**
   - <https://www.mygov.scot/manage-pvg>
   - Status: Linked in the planner
   - Note: PVG scheme members must tell Disclosure Scotland about a change of name or gender within 3 months, and not doing so is a criminal offence.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **mygov.scot: Disclosure levels**
   - <https://www.mygov.scot/disclosure-levels>
@@ -285,7 +285,7 @@ For items with no official source, the links in the general data protection sect
 - **NI Direct: Using a criminal record check**
   - <https://www.nidirect.gov.uk/articles/using-criminal-record-check>
   - Status: Linked in the planner
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
   - Note: previously linked to the generic `/contacts/accessni` page, which does not document the transgender sensitive-applications route or the Operations Manager contact; this page does. Documents the special application process for transgender people through AccessNI's Operations Manager, and that a certificate cannot be transferred from one role to another. It does not say the process must be arranged before an online application is submitted, or how previous names appear on a certificate, so the planner marks both as community advice.
 
 ## Driving licence (dvla, dva)
@@ -662,7 +662,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - <https://www.electoralcommission.org.uk/voting-and-elections/register-vote/register-vote-anonymously>
   - Status: Linked in the planner
   - Note: Anyone whose safety, or the safety of someone in their household, could be affected by their name and address being on the register can apply. An application needs a relevant court order or injunction, or an attestation from a qualifying officer such as a police officer of inspector rank or above, or a registered doctor, nurse or midwife. Overseas voters cannot apply online.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
   - <https://www.electoralcommission.org.uk/running-electoral-registration-england/special-category-electors/anonymous-registration/how-should-application-anonymous-registration-be-processed>
@@ -756,7 +756,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **Registers of Scotland: Managing a recorded person's details**
   - <https://kb.ros.gov.uk/rci/managing-an-entry/managing-a-recorded-persons-details>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-11-20
 
 #### Northern Ireland
 
