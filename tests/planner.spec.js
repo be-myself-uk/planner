@@ -1693,6 +1693,23 @@ test.describe('Be myself Planner', () => {
         .toMatch(/community-note[^]*People report that a statutory declaration has traditionally been more common in Scotland/);
     });
 
+    test('243. The GRC step says what a GRC is not needed for, that treatment is not required, and that parenthood does not change', async ({ page }) => {
+      for (const region of ['#chkRegionEW', '#chkRegionNI']) {
+        await page.evaluate(() => localStorage.clear());
+        await page.goto(filePath);
+        await openChecklist(page);
+        await page.locator(region).check();
+        await page.locator('#chkGRCYes').check();
+        await page.getByRole('button', { name: 'Show my action plan' }).click();
+        const plan = page.locator('#planContent');
+        await expect(plan, `${region}: a GRC is not needed before updating ordinary documents`).toContainText('you do not need a GRC to update your driving licence, your passport, or your medical records');
+        await expect(plan, `${region}: GOV.UK says surgery and treatment are not required`).toContainText('You can apply even if you have not had any gender affirming surgery or treatment');
+        await expect(plan, `${region}: Gender Recognition Act 2004, section 12`).toContainText('A GRC does not change your legal status as the father or mother of a child.');
+      }
+      await expect(page.locator('#planContent'), 'the overview says a GRC lets you update a UK-registered marriage certificate, not that it changes automatically')
+        .not.toContainText('certificates will reflect your legal gender');
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();

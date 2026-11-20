@@ -568,8 +568,15 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Apply for a Gender Recognition Certificate**
   - <https://www.gov.uk/apply-gender-recognition-certificate>
   - Status: Linked in the planner
-  - Note: The overview says the name on a certificate cannot be changed after it is issued; that entitlement to some benefits and pensions, including a partner's entitlement to the applicant's pension, may change; that there is an additional charge for a new birth certificate; and that someone recognised in an approved country or territory can use the overseas route, which needs a document proving that recognition instead of medical reports and two years of evidence.
-  - Last verified: 2026-10-01
+  - Note: The overview says the name on a certificate cannot be changed after it is issued; that entitlement to some benefits and pensions, including a partner's entitlement to the applicant's pension, may change; and that there is an additional charge for a new birth certificate. The overseas route is described on the "Who can apply" and "What documents you need" pages, not the overview (see below).
+  - Note: The overview also says "Non-binary genders are not legally recognised in the UK"; that a certificate means you can "update your birth or adoption certificate, if it was registered in the UK" and "update your marriage or civil partnership certificate, if it was registered in the UK"; that "You do not need a certificate to" update your driving licence, your passport, or "your medical records, employments records or your bank account"; and that "It will not change your legal status as the father or mother of a child." Source for the GRC introduction's sentences on what a GRC updates, what it is not needed for, and parenthood.
+  - Last verified: 2026-11-20
+
+- **GOV.UK: Apply for a GRC, who can apply**
+  - <https://www.gov.uk/apply-gender-recognition-certificate/who-can-apply>
+  - Status: Consulted, not linked in the planner
+  - Note: Lists the standard route's requirements: aged 18 or over, diagnosed with gender dysphoria in the UK, living in the affirmed gender for at least 2 years, and intending to live in it for the rest of your life. Says "You can apply even if you have not had any gender affirming surgery or treatments, or you do not plan to have any." For someone with a certificate or similar from an approved country or territory, the only requirements are being 18 or over and having a document showing the affirmed gender is legally recognised there, which is the source for the shorter overseas route not needing the medical reports. Also the source for the minimum age of 18 and for the GRC introduction's sentence on surgery and treatment.
+  - Last verified: 2026-11-20
 
 - **GOV.UK: Apply for a GRC, what documents you need**
   - <https://www.gov.uk/apply-gender-recognition-certificate/what-documents-you-need>
@@ -588,6 +595,12 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>
   - Status: Linked in the planner
   - Last verified: 2026-09-19
+
+- **Gender Recognition Act 2004, section 12**
+  - <https://www.legislation.gov.uk/ukpga/2004/7/section/12>
+  - Status: Consulted, not linked in the planner
+  - Note: Headed "Parenthood". Says that a person's gender becoming the acquired gender under the Act does not affect their status as the father or mother of a child. Supports the GRC introduction's sentence on parenthood, alongside the GOV.UK overview.
+  - Last verified: 2026-11-20
 
 - **Gender Recognition Act 2004, section 21**
   - <https://www.legislation.gov.uk/ukpga/2004/7/section/21>
