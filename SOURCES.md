@@ -100,7 +100,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/cwg2-further-guide-to-paye-and-national-insurance-contributions/2026-to-2027-employer-further-guide-to-paye-and-national-insurance-contributions>
   - Status: Consulted, not linked in the planner
   - Note: Section 1.17 says no verification is needed to change an employee's name, but that an employer can update an employee's gender and title where it is aware of the change "by providing you with a GRC or a new birth certificate". This differs from the public page above, which says an employer can update payroll once the employee tells them. Source for the "If payroll asks for a certificate" paragraph in the work step. The same wording appears in the 2024 to 2025 and 2025 to 2026 editions.
-  - Last verified: 2026-11-06
+  - Last verified: 2026-11-20
 
 - **GOV.UK (UKSV): National Security Vetting, change of personal circumstances**
   - <https://www.gov.uk/government/publications/change-of-personal-circumstances>
