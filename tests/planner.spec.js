@@ -4275,8 +4275,8 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
       await expect(tip).toBeVisible();
-      await expect(tip).toContainText('Privacy information updated.');
-      await tip.getByRole('link', { name: 'Read the Privacy panel' }).click();
+      await expect(tip).toContainText('has been updated. Nothing changes in how you use the planner.');
+      await tip.getByRole('link', { name: 'privacy information' }).click();
       await expect(page.locator('#dlgPrivacy')).toBeVisible();
       await page.keyboard.press('Escape');
       await tip.getByRole('button', { name: 'Dismiss the privacy update notice' }).click();
