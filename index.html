@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-JzHlJ36Ci7nDwuun5rIoC1QtL3EPKeg4xzRALUmsIMw='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-M3Jx/ldjOrL4ykq66f/sYq/yLJg1/9gMMDdZn/LCCAA='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -117,6 +117,10 @@
   <div id="welcomeBackView" class="hidden">
     <div id="sharedLinkUnreadable" class="phase simul hidden" role="alert" style="margin-top:0;margin-bottom:16px;">
       <p style="margin:0;"><span aria-hidden="true">⚠️</span> The shared link could not be read. It may have been cut short when it was copied. Your saved plan has not been changed.</p>
+    </div>
+    <div id="privacyUpdateTip" class="phase info hidden" style="margin:0 0 16px 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <p style="margin:0;"><strong>Privacy information updated.</strong> New shared links no longer send your answers to the website's host, and the Privacy panel now explains more about what happens to your information. <a href="#" data-action="openDialog" data-arg="dlgPrivacy">Read the Privacy panel</a></p>
+      <button class="tip-close" data-action="dismissPrivacyUpdate" aria-label="Dismiss the privacy update notice" title="Don't show this again">✕</button>
     </div>
     <div id="welcomeNormal" class="phase info" style="margin-top:0;margin-bottom:25px;">
       <h2>Welcome back</h2>
@@ -1369,6 +1373,7 @@ function backToStart() {
   try {
     const savedApp = ssg('appState');
     if (savedApp && JSON.parse(savedApp).planGenerated) {
+      refreshPrivacyUpdateTip();
       gel('welcomeNormal').classList.remove('hidden');
       gel('welcomeOutdated').classList.add('hidden');
       V.welcome.classList.remove('hidden');
@@ -1462,7 +1467,7 @@ function keepOwnPlan() {
   gel('welcomeSharedReplace').classList.add('hidden');
   try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
   if (!restoreSavedApp()) { V.welcome.classList.add('hidden'); V.start.classList.remove('hidden'); }
-  V.welcome.querySelector('.phase:not(.hidden) button')?.focus();
+  V.welcome.querySelector('.phase:not(.hidden):not(#privacyUpdateTip) button')?.focus();
 }
 function restoreSavedApp() {
   const savedApp = ssg('appState');
@@ -1476,6 +1481,7 @@ function restoreSavedApp() {
     V.start.classList.add('hidden');
     V.welcome.classList.remove('hidden');
     const outdated = (parseInt(app.planVersion, 10) || 0) < PLAN_VERSION;
+    refreshPrivacyUpdateTip();
     gel('welcomeNormal').classList.toggle('hidden', outdated);
     gel('welcomeOutdated').classList.toggle('hidden', !outdated);
     return true;
@@ -1608,6 +1614,17 @@ function dismissTitlesInfo() {
   sss('titlesInfoDismissed', '1');
   gel('titlesInfoBox')?.remove();
   announce('Tip dismissed.');
+}
+const PRIVACY_UPDATE_UNTIL = '2027-02-01';
+function refreshPrivacyUpdateTip() {
+  const show = ssg('privacyUpdateSeen') !== '1' && Date.now() < Date.parse(PRIVACY_UPDATE_UNTIL);
+  gel('privacyUpdateTip')?.classList.toggle('hidden', !show);
+}
+function dismissPrivacyUpdate() {
+  sss('privacyUpdateSeen', '1');
+  gel('privacyUpdateTip')?.classList.add('hidden');
+  announce('Privacy update notice dismissed.');
+  V.welcome.querySelector('.phase:not(.hidden):not(#privacyUpdateTip) button')?.focus();
 }
 function dismissTrackTip() {
   sss('trackTipDismissed', '1');
@@ -3399,7 +3416,7 @@ const ACTIONS = {
   startWizard, startChecklist, continuePlan, reviewAnswers, backToStart, makeChanges,
   prevWizard, nextWizard, generateChecklistPlan, toggleMode, toggleTheme, toggleFocusMode,
   copyShareableLink, panicExit, hideAgeKickout, hideDisclaimerKickout,
-  dismissWizardEditTip, dismissAdaptiveNote, dismissTitlesInfo, dismissPlanSummary, dismissTrackTip,
+  dismissWizardEditTip, dismissAdaptiveNote, dismissTitlesInfo, dismissPlanSummary, dismissTrackTip, dismissPrivacyUpdate,
   handleSvcItem, handleSvcAll, handleSvcNone,
   confirmRestart, confirmUtilityRestart, confirmResetProgress, confirmResetOrder,
   moveOrderable, downloadPage, openSharedPlan, keepOwnPlan, handleChecklistAge, handleChecklistDisclaimer, checkAgeGateShared,

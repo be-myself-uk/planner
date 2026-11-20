@@ -3397,7 +3397,7 @@ test.describe('Be myself Planner', () => {
       const dismissers = await page.evaluate(() => [...document.querySelectorAll('[data-action^="dismiss"]')]
         .filter(b => b.dataset.action !== 'dismissBanner')
         .map(b => ({ action: b.dataset.action, shared: b.classList.contains('tip-close'), title: b.title })));
-      expect(dismissers.length).toBe(5);
+      expect(dismissers.length, 'five tips, plus the privacy update notice on the welcome back screen').toBe(6);
       for (const d of dismissers) {
         expect(d.shared, `${d.action} uses the shared ✕ style`).toBe(true);
         expect(d.title, `${d.action}: a ✕ removes the tip for good, so its tooltip says so`).toBe("Don't show this again");
@@ -4266,6 +4266,28 @@ test.describe('Be myself Planner', () => {
         expect(text, `${where}: the host's security settings can change without notice`).toMatch(/changed at any time without notice/);
       }
       expect(about, 'the answer to "Is my information safe?" should not start with an unqualified yes').not.toMatch(/Is my information safe\? Yes\./);
+    });
+
+    test('250. Returning visitors see a privacy update notice until they dismiss it or it expires', async ({ page }) => {
+      const tip = page.locator('#privacyUpdateTip');
+      await expect(tip, 'a first visit has no saved plan, so there is nothing to tell them about').toBeHidden();
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      await expect(tip).toBeVisible();
+      await expect(tip).toContainText('Privacy information updated.');
+      await tip.getByRole('link', { name: 'Read the Privacy panel' }).click();
+      await expect(page.locator('#dlgPrivacy')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await tip.getByRole('button', { name: 'Dismiss the privacy update notice' }).click();
+      await expect(tip).toBeHidden();
+      await expect(page.getByRole('button', { name: 'Continue my plan' }), 'focus moves on rather than being lost with the hidden notice').toBeFocused();
+      await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('privacyUpdateSeen') === '1' && !document.getElementById('welcomeNormal').classList.contains('hidden')));
+      await expect(tip, 'a dismissed notice stays dismissed').toBeHidden();
+      await page.evaluate(() => localStorage.removeItem('privacyUpdateSeen'));
+      await page.clock.setFixedTime(new Date('2027-02-01T00:00:00Z'));
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      await expect(tip, 'the notice is temporary and stops showing after its end date').toBeHidden();
     });
   });
 
