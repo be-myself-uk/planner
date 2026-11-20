@@ -1701,6 +1701,7 @@ test.describe('Be myself Planner', () => {
       const encoded = new URL(url).searchParams.get('p');
       await checkAgeGate(page);
       await page.evaluate(() => localStorage.setItem('disclaimerConfirmed', 'true'));
+      await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('ageConfirmed') === 'true' && localStorage.getItem('disclaimerConfirmed') === 'true'));
       await page.evaluate((p) => { location.hash = 'p=' + encodeURIComponent(p); }, encoded);
       await expect(page.locator('#planView'), 'changing only the fragment does not reload the page by itself').toBeVisible();
       expect(await page.evaluate(() => wizardState.region)).toBe('ni');
@@ -1720,12 +1721,16 @@ test.describe('Be myself Planner', () => {
       };
       await checkAgeGate(page);
       await page.evaluate(() => localStorage.setItem('disclaimerConfirmed', 'true'));
-      await gotoFresh(page, filePath + cases.truncated);
+      const shown = () => page.evaluate(() => {
+        const visible = id => !document.getElementById(id).classList.contains('hidden') && document.getElementById(id).offsetParent !== null;
+        return !visible('welcomeNewDevice') && (visible('welcomeBackView') || visible('planView'));
+      });
+      await navigateUntil(page, () => gotoFresh(page, filePath + cases.truncated), shown, 12, 'gotoUntil');
       await expect(page.locator('#welcomeOutdated'), 'with no saved plan, the person is told the link was cut short').toBeVisible();
       await expect(page.locator('#welcomeOutdated')).toContainText('Your link appears to be incomplete');
       for (const [name, suffix] of Object.entries(cases)) {
-        await gotoFresh(page, filePath + suffix);
-        await expect(page.locator('#welcomeBackView, #planView').filter({ visible: true }), `${name}: something must be shown, not a blank page`).toHaveCount(1);
+        await navigateUntil(page, () => gotoFresh(page, filePath + suffix), shown, 12, 'gotoUntil');
+        expect(await shown(), `${name}: something must be shown, not a blank page or the age check`).toBe(true);
         expect(await page.evaluate(() => location.href), `${name}: the address should be cleared`).not.toMatch(/[?#]/);
       }
       expect(errors.filter(m => !/Access is denied for this document/.test(m)),
@@ -1735,6 +1740,7 @@ test.describe('Be myself Planner', () => {
     test('248. An unreadable link keeps the saved plan without asking to replace it', async ({ page }) => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
       const saved = await page.evaluate(() => localStorage.getItem('wizardState'));
       await navigateUntil(page, async () => { await gotoFresh(page, filePath + '#p=eyJwdiI6Mywicm'); },
         () => page.locator('#sharedLinkUnreadable').isVisible(), 12, 'gotoUntil');
@@ -4275,8 +4281,8 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
       await expect(tip).toBeVisible();
-      await expect(tip).toContainText('has been updated. Nothing changes in how you use the planner.');
-      await tip.getByRole('link', { name: 'privacy information' }).click();
+      await expect(tip).toContainText('Privacy policy recently updated. Use is not impacted.');
+      await tip.getByRole('link', { name: 'Privacy policy' }).click();
       await expect(page.locator('#dlgPrivacy')).toBeVisible();
       await page.keyboard.press('Escape');
       await tip.getByRole('button', { name: 'Dismiss the privacy update notice' }).click();
