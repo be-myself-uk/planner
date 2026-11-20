@@ -28,6 +28,8 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Wording
 
+- The Privacy panel, the "What is this?" panel and the README no longer say that no personal information is collected. They now say that the planner sends nothing you enter to a server and has no analytics or tracking, that like any website the host receives technical information such as your IP address, and that the host's security measures can change at any time without notice.
+- The privacy wording now explains that a shared link is not encrypted, so anyone with it can read your answers, and which links send your answers to the host. It also says that New plan keeps a note that you have seen the disclaimer, as well as your light or dark mode choice, and that quick exit does not delete your saved plan, your browser history, anything you have copied, or links you have shared.
 - The planner no longer says that every process for people under 16 needs parental consent. It now says those processes can be different, and may involve parental responsibility, consent or other requirements depending on the document.
 
 ### Code
@@ -43,6 +45,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
 - The two Python scripts that check sources and linked domains no longer carry comments, and the workflows no longer note a version beside each pinned action. The issue templates' reminder that issues are public is now plain text instead of a hidden comment, so it also stays in the posted issue unless you delete it. What the scripts' comments explained is now in CONTRIBUTING.md.
 - A new test checks that no file in the repository uses an em dash or an en dash, and the three that did no longer do.
+- Added tests for the changes above, including new and older shared links, links that cannot be read, a link pasted into an open tab, and what New plan keeps.
 
 ## [October 2026 /2]
 

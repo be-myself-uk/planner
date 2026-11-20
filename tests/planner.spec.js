@@ -4244,6 +4244,29 @@ test.describe('Be myself Planner', () => {
       const withDashes = files.filter(f => /[\u2013\u2014]/.test(fs.readFileSync(path.join(root, f), 'utf8')));
       expect(withDashes, 'use a comma, a full stop or brackets instead; the source snapshots are skipped because they quote other sites').toEqual([]);
     });
+
+    test('249. The privacy wording matches what New plan keeps, and makes no unqualified claims', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.getByRole('button', { name: /Theme: switch to (light|dark) mode/ }).click();
+      await page.locator('#ubRestartBtn').click();
+      await page.getByRole('button', { name: /Confirm/ }).click();
+      await expect(page.locator('#startView')).toBeVisible();
+      const kept = await page.evaluate(() => Object.keys(localStorage).sort());
+      expect(kept, 'the Privacy panel and README name exactly what New plan keeps').toEqual(['disclaimerSeen', 'theme']);
+      const privacy = await page.evaluate(() => document.querySelector('#dlgPrivacy .dialog-body').textContent.replace(/\s+/g, ' '));
+      const about = await page.evaluate(() => document.querySelector('#dlgAbout').textContent.replace(/\s+/g, ' '));
+      const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8').replace(/\s+/g, ' ');
+      for (const [where, text] of Object.entries({ privacy, readme })) {
+        expect(text, `${where}: any host receives request details, so nothing can promise that no personal data is collected`).not.toMatch(/No personal (information|data) is collected/i);
+        expect(text, `${where}: New plan keeps the theme and a note that the disclaimer was seen`).toMatch(/light or dark mode choice and a note that you have seen the disclaimer/);
+        expect(text, `${where}: Base64 is encoding, not encryption`).toMatch(/not encrypted/);
+        expect(text, `${where}: the host receives technical request information`).toContain('IP address');
+        expect(text, `${where}: quick exit hides the page but deletes nothing`).toMatch(/does not delete your saved plan, your browser history, anything you have copied, or any link you have shared/);
+        expect(text, `${where}: the host's security settings can change without notice`).toMatch(/changed at any time without notice/);
+      }
+      expect(about, 'the answer to "Is my information safe?" should not start with an unqualified yes').not.toMatch(/Is my information safe\? Yes\./);
+    });
   });
 
 });

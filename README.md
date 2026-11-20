@@ -42,7 +42,7 @@ Updating your name, your gender marker, or both, on:
 
 ### Is my information safe?
 
-Yes. Nothing you enter is sent to a server or stored anywhere outside your own device, unless you share a link to your plan, which holds your answers in its web address. Your progress is saved in your browser so you can come back to it later. See [Privacy](#privacy) below.
+Nothing you enter is sent to a server while you use the planner. Your answers and progress are saved in your browser on your device, so you can come back to them later. A link to your plan holds your answers in the link itself, and they are not encrypted, so anyone who has the link can read them. See [Privacy](#privacy) below.
 
 ### Step-by-step or checklist?
 
@@ -69,18 +69,19 @@ If you already have an action plan, use the Copy link button first to keep it. T
 - **A personal action plan**: deed polls, driving licences, health records, HMRC, criminal record checks, benefits, birth certificates, and GRC applications, each with an estimated cost, difficulty, and time
 - **Progress tracking**: mark each step as not started, in progress, done, or not needed, with a Focus mode that hides what is finished, and reorder the plan to suit you by dragging steps or using the up and down arrows
 - **Save, share, or print**: your plan is saved on your device; copy a link to continue elsewhere or hand to someone you trust, print a paper or PDF copy, or download the whole planner to use offline
-- **Private by design**: nothing you enter is sent to a server while you use the planner, and a quick-exit button is there if you need to leave the page in a hurry
+- **Private by design**: nothing you enter is sent to a server while you use the planner, and a quick-exit button is there if you need to leave the page in a hurry (it does not delete your saved plan)
 - **Accessible**: full keyboard and screen reader support, light and dark mode, and works from a small phone up to a desktop
 - **Free**: no account, no login, and it works offline as a single downloadable page
 
 ## Privacy
 
-- No personal data is collected, and nothing you enter is sent anywhere while you use the planner
+- The planner works in your browser. It does not send anything you enter to a server, and it has no analytics or tracking
+- Like any website, the host receives technical information when the page is requested, such as your IP address and details of your browser. The host, Cloudflare, may use security measures such as bot protection to protect the site from automated attacks, and may set a cookie for them. These measures can be switched on, switched off or changed at any time without notice
 - Answers and progress are stored only in your browser's localStorage
-- Clicking "New plan" deletes your answers, plan, and progress, but keeps your light or dark mode choice. Clearing your browser's site data deletes everything (clearing your browsing history alone does not clear localStorage)
-- A Cloudflare security cookie may be set by the hosting provider to protect against automated attacks; it is not used for tracking
+- Clicking "New plan" deletes your answers, plan, and progress, but keeps your light or dark mode choice and a note that you have seen the disclaimer, so these can show that the planner has been used in that browser. Clearing your browser's site data deletes everything (clearing your browsing history alone does not clear localStorage)
+- Quick exit leaves the page straight away. It does not delete your saved plan, your browser history, anything you have copied, or any link you have shared
 
-> ⚠️ A shareable link holds your answers in the address itself, including immigration status, employment situation, and GRC intentions. When anyone opens it, the address, including your answers, is sent to the hosting provider, as with any web address. Only share one with people you trust.
+> ⚠️ A shareable link holds your answers in the address itself, including immigration status, employment situation, and GRC intentions. They are encoded, not encrypted, so anyone who has the link can read them, and the link may be kept wherever it is saved or pasted. Links made with Copy link put your answers after a #, which browsers do not send to the host when the link is opened. Older links put them after ?p=, and opening one sends the whole address, including your answers, to the hosting provider, as with any web address. Only share a link with people you trust.
 
 ## Disclaimer
 
