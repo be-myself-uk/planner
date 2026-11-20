@@ -24,7 +24,7 @@ Anyone aged 16 or over who wants to update their name, their gender marker, or b
 
 There is also guidance for people with a visa or eVisa, for Irish citizens living in the UK, and for people born in Northern Ireland who may be eligible for the Irish passport gender recognition route.
 
-The process for under-16s needs parental consent and follows different steps, which this planner does not cover.
+Processes for people under 16 can be different, and may involve parental responsibility, consent or other requirements depending on the document. This planner does not cover them.
 
 ### What does it cover?
 

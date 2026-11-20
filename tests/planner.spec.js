@@ -1093,6 +1093,27 @@ test.describe('Be myself Planner', () => {
         .toContainText('What is the status of your passport?');
       await expect(page.locator('#planView')).toBeHidden();
     });
+
+    test('240. The under-16 wording does not say one consent rule covers every document', async ({ page }) => {
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await page.locator('input[name=ans][value=no]').check();
+      await page.getByRole('button', { name: 'Continue' }).click();
+      await expect(page.locator('#ageKickout')).toBeVisible();
+      const texts = await page.evaluate(() => ({
+        kickout: document.querySelector('#ageKickout').textContent,
+        about: document.querySelector('#dlgAbout').textContent,
+        disclaimer: document.querySelector('#dlgDisclaimer').textContent,
+        wizard: window.questions.find(q => q.id === 'age').q,
+      }));
+      const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8');
+      for (const [where, text] of Object.entries({ ...texts, readme })) {
+        expect(text, `${where}: requirements for under-16s differ by document and organisation, so no single rule applies`).not.toMatch(/(require|need)s? parental (or guardian )?consent/i);
+      }
+      for (const where of ['kickout', 'about', 'disclaimer', 'wizard']) {
+        expect(texts[where], `${where} should still say the planner does not cover under-16s`).toMatch(/does not cover/);
+      }
+      expect(texts.kickout).toContain('may involve parental responsibility, consent or other requirements');
+    });
   });
 
   test.describe('Progress tracking & plan state', () => {

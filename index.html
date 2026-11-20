@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-2k7jOzzkSc2GeuvrJJVCEys13vnluHsXYAEjrqkc9xQ='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-GPD6jpPuPrS8sDiToqjwnUd1hG/2Hw/tHiMXQ3rRYEs='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -98,7 +98,7 @@
   <div id="ageKickout" class="hidden">
     <div class="phase info" style="margin-top:0;">
       <h2 tabindex="-1">This planner is for people aged 16 and over</h2>
-      <p>The legal processes for updating documents for people under 16 require parental or guardian consent and are different from the steps covered here.</p>
+      <p>Processes for people under 16 can be different. Depending on the document and your circumstances, they may involve parental responsibility, consent or other requirements. This planner does not cover them.</p>
       <p>The following organisations support young trans and non-binary people and their families:</p>
       <ul>
         <li><a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a>: support for transgender and gender-diverse children and young people</li>
@@ -302,7 +302,7 @@
     <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
     <p>A free, private planner that helps trans and non-binary people in the UK work out the steps they need to take to update their name and gender marker on their documents.</p><p><strong>Be myself</strong> helps you work out what needs updating so you spend less time navigating confusing paperwork and more time simply <strong>being yourself</strong>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
-    <p>Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold. That includes people living in the UK, people living abroad, and people planning to move to the UK, such as people with a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
+    <p>Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold. That includes people living in the UK, people living abroad, and people planning to move to the UK, such as people with a visa or eVisa. Processes for people under 16 can be different, and may involve parental responsibility, consent or other requirements depending on the document. This planner does not cover them.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">What does it cover?</h3>
     <p>Updating your name, your gender marker, or both, on:</p><ul><li>a deed poll or statutory declaration</li><li>your UK passport, your Irish passport, or your home country passport and UK eVisa</li><li>your driving licence and vehicle logbook (V5C)</li><li>your NHS or GP record, HMRC and tax records, and benefits</li><li>DBS, Disclosure Scotland and AccessNI checks</li><li>work, student and professional records</li><li>banks, utilities, the electoral register and other services</li><li>a Gender Recognition Certificate (GRC) and your birth certificate</li><li>the Irish passport route for people born in Northern Ireland</li></ul>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
@@ -468,7 +468,7 @@
     <p class="disclaimer-muted">This disclaimer opens automatically on your first visit or if starting a new action plan.</p>
     <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">What this is</p>
     <p class="disclaimer-muted">This planner provides general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author. Your action plan is assembled from general information based on your answers and does not take account of your full personal circumstances.</p>
-    <p class="disclaimer-muted">This planner is for people aged 16 and over. The processes for under-16s are different and require parental or guardian consent; this planner does not cover them.</p>
+    <p class="disclaimer-muted">This planner is for people aged 16 and over. Processes for younger people can be different, and may involve parental responsibility, consent or other requirements depending on the document and circumstances. This planner does not cover those processes.</p>
     <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">Using this planner</p>
     <p class="disclaimer-muted">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
     <p class="disclaimer-muted">Links to external websites are provided for convenience. The author is not responsible for their content.</p>
@@ -1951,7 +1951,7 @@ const NOTES = {
   dwpNI: 'For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment and Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.',
 };
 const questions = [
-  { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Under-16s need parental consent and follow a different process.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
+  { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Processes for younger people can be different, and this planner does not cover them.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes'],
     [S.NO,  'No']
   ]},

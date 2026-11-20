@@ -23,6 +23,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
 - For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
 
+### Wording
+
+- The planner no longer says that every process for people under 16 needs parental consent. It now says those processes can be different, and may involve parental responsibility, consent or other requirements depending on the document.
+
 ### Code
 
 - The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
