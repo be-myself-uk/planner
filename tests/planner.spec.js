@@ -1813,6 +1813,13 @@ test.describe('Be myself Planner', () => {
         .not.toContainText('certificates will reflect your legal gender');
     });
 
+    test('251. The Irish GRC note does not rule out everyone living in Northern Ireland or Great Britain', async ({ page }) => {
+      const note = await page.evaluate(() => window.PLAN_ITEMS.irish_passport.detail);
+      expect(note, 'section 9 lets someone whose birth is registered in Ireland apply wherever they live').toContain('even if you live elsewhere');
+      expect(note).toContain('you would generally need to be ordinarily resident in the Republic to qualify');
+      expect(note).not.toContain('does not apply to someone living in Northern Ireland or Great Britain');
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();

@@ -554,8 +554,8 @@ For items with no official source, the links in the general data protection sect
 - **Gender Recognition Act 2015 (Ireland), section 9**
   - <https://www.irishstatutebook.ie/2015/en/act/pub/0025/sec0009.html>
   - Status: Consulted, not linked in the planner
-  - Note: Sets out who may apply for gender recognition: a person whose birth, adoption, or foreign birth is registered in one of the Republic's own registers (regardless of residence), or a person ordinarily resident in the State whose birth is registered elsewhere. Someone born in Northern Ireland and living in Northern Ireland or Great Britain meets neither condition, so the Irish GRC route is usually not available to them at all, not merely an extra step.
-  - Last verified: 2026-09-12
+  - Note: Section 9(1)(a) covers a person "who may or may not be ordinarily resident in the State" and whose birth is in the register of births, whose adoption is in the Adopted Children Register or the register of intercountry adoptions, or whose birth is recorded in a foreign births entry book or the foreign births register. Section 9(1)(b) covers a person "who is ordinarily resident in the State, whose birth did not take place in the State". Section 9(2)(a) sets a minimum age of 18, subject to section 12. Source for the Irish passport step's note that someone whose birth, adoption or foreign birth is registered in the Republic may be eligible even if they live elsewhere, and that someone born in Northern Ireland whose birth or adoption is not registered in Ireland would generally need to be ordinarily resident in the Republic. The planner used to say the Irish GRC does not apply to anyone living in Northern Ireland or Great Britain, which left out section 9(1)(a). The eISB refuses automated fetches, so this text was checked from a copy of the page supplied by the maintainer.
+  - Last verified: 2026-11-20
 
 - **gov.ie (Department of Social Protection): Apply for a Gender Recognition Certificate / Revised Birth Certificate**
   - <https://www.gov.ie/en/department-of-social-protection/services/apply-for-a-gender-recognition-certificate-revised-birth-certificate/>
