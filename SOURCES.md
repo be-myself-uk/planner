@@ -38,6 +38,12 @@ For items with no official source, the links in the general data protection sect
   - Note: States that a permanent resident overseas cannot change their name by deed poll. Source for the first step shown to people living outside the UK.
   - Last verified: 2026-10-01
 
+- **GOV.UK (FCDO): Change of name, name discrepancy and naming children letters**
+  - <https://www.gov.uk/guidance/change-of-name-name-discrepancy-and-naming-children-letters>
+  - Status: Linked in the planner
+  - Note: Says British embassies, high commissions and consulates provide standard letters explaining UK law to local authorities abroad, that a change of name letter can be given instead of a change of name certificate, and that letters exist only for the countries listed. Source for the change of name letters paragraph in the deed poll step for people living outside the UK. The page also gives a fee for stamped and signed versions, which the planner leaves out under the no exact fees rule.
+  - Last verified: 2026-11-06
+
 - **HM Passport Office caseworker guidance: Names, evidence to change a name**
   - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
   - Status: Consulted, not linked in the planner
@@ -89,6 +95,18 @@ For items with no official source, the links in the general data protection sect
   - Status: Linked in the planner
   - Note: Documents reporting name and gender changes in separate Full Payment Submissions, the risk of duplicate payroll records and a higher PAYE bill, and National Insurance category changes. It also says an employer can update payroll records with the new gender and title once the employee tells them they have changed gender, which is the source for the gender-only wording.
   - Last verified: 2026-10-01
+
+- **HMRC: CWG2, further guide to PAYE and National Insurance contributions (2026 to 2027)**
+  - <https://www.gov.uk/government/publications/cwg2-further-guide-to-paye-and-national-insurance-contributions/2026-to-2027-employer-further-guide-to-paye-and-national-insurance-contributions>
+  - Status: Consulted, not linked in the planner
+  - Note: Section 1.17 says no verification is needed to change an employee's name, but that an employer can update an employee's gender and title where it is aware of the change "by providing you with a GRC or a new birth certificate". This differs from the public page above, which says an employer can update payroll once the employee tells them. Source for the "If payroll asks for a certificate" paragraph in the work step. The same wording appears in the 2024 to 2025 and 2025 to 2026 editions.
+  - Last verified: 2026-11-06
+
+- **GOV.UK (UKSV): National Security Vetting, change of personal circumstances**
+  - <https://www.gov.uk/government/publications/change-of-personal-circumstances>
+  - Status: Linked in the planner
+  - Note: Says clearance holders must report a change of name, including by deed poll or statutory declaration, using a change of personal circumstances form, and that "If you have changed your gender, there is currently no need to update UKSV" and a GRC is not required. Source for the security clearance paragraphs in the work step.
+  - Last verified: 2026-11-06
 
 ## HMRC and taxes (hmrc)
 
@@ -238,7 +256,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/dbs-update-service-guide-for-applicants/dbs-update-service-applicant-guide>
   - Status: Linked in the planner
   - Note: Says that after a change of name you must apply for a new DBS check through your organisation, that the name on an Update Service account cannot be changed, and that DBS recommends a new subscription in the new name. Also says that someone who used the sensitive applications route will not have their previous sex and identity shown to others through the Update Service.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-13
 
 ### Scotland
 
@@ -351,10 +369,28 @@ For items with no official source, the links in the general data protection sect
   - Status: Linked in the planner
   - Last verified: 2026-09-03
 
-- **NHS Arden and GEM CSU: National Adult Gender Referral Support Service**
+- **NHS England: Operational guidance for transgender and non-binary opt in (cervical screening)**
+  - <https://www.gov.uk/government/publications/operational-guidance-for-transgender-and-non-binary-opt-in/nhs-cervical-screening-programme-operational-guidance-for-transgender-and-non-binary-opt-in>
+  - Status: Consulted, not linked in the planner
+  - Note: England only, written for GP practices, published 17 September 2026. Sets out how a practice opts a person with a cervix whose gender marker is not female in to cervical screening invitations, from age 24.5, by sending a form to Cervical Screening Administration Services. Source for the last sentence of the England screening note. Not linked because it is staff guidance; the planner links the public screening page above instead.
+  - Last verified: 2026-11-06
+
+- **NHS England: Ceasing and deferring people from the NHS Cervical Screening Programme**
+  - <https://www.gov.uk/government/publications/cervical-screening-removing-women-from-routine-invitations/ceasing-and-deferring-women-from-the-nhs-cervical-screening-programme>
+  - Status: Consulted, not linked in the planner
+  - Note: Section 3.3 says people registered as male, including trans men, do not receive cervical screening invitations, trans men registered as female do, and a person can withdraw without giving a reason. Supports the England screening note.
+  - Last verified: 2026-11-06
+
+- **NHS England: Cervical screening Call and Recall policy and operational guidance**
+  - <https://www.gov.uk/government/publications/cervical-screening-call-and-recall-administration-best-practice/cervical-screening-call-and-recall>
+  - Status: Consulted, not linked in the planner
+  - Note: Says every person with a cervix in the age range is eligible whatever their gender marker, that anyone registered as female is included automatically, and that someone with a cervix not registered as female can ask to be added. Supports the England screening note.
+  - Last verified: 2026-11-06
+
+- **NHS Arden and GEM CSU: Gender National Referral Support Service (GNRSS)**
   - <https://adult.genderreferralservice.nhs.uk/faq>
   - Status: Linked in the planner
-  - Note: England only, for people aged 18 or over registered with a GP in England. Documents the single national waiting list for adult gender services, that a person's position is set by their original referral date to their chosen clinic, and that a person who changes their name must tell the referral service directly as well as their GP practice. Existing clinic referrals were still being transferred onto the national list at the time of verification, so this arrangement is expected to change. Not to be confused with the Gender Dysphoria National Referral Support Service (GDNRSS), which handles surgical referrals across the United Kingdom.
+  - Note: England only, for people aged 18 or over registered with a GP in England. The site names the service the Gender National Referral Support Service (GNRSS), which is the name the planner uses. Documents the single national waiting list for adult gender services, that a person's position is set by their original referral date to their chosen clinic, and that a person who changes their name must tell the referral service directly as well as their GP practice. Existing clinic referrals were still being transferred onto the national list at the time of verification, so this arrangement is expected to change. Not to be confused with the Gender Dysphoria National Referral Support Service (GDNRSS), which handles surgical referrals across the United Kingdom.
   - Last verified: 2026-09-03
 
 ### Wales
@@ -362,7 +398,7 @@ For items with no official source, the links in the general data protection sect
 - **NHS Wales: Welsh Gender Service, update your details**
   - <https://gender.wales/update-details/>
   - Status: Linked in the planner
-  - Note: Wales-only. Documents that a change of name, address, contact information, or GP is reported to the Welsh Gender Service (WGS) directly by a form emailed to WGS, separately from a person's GP record. Not the National Adult Gender Referral Support Service, which is England-only. The site lists two different phone numbers for WGS across its own pages (029 2183 6619 on the homepage/contact page, 029 2183 6612 on this page); the planner does not repeat either number, only the link, to avoid going stale.
+  - Note: Wales-only. Documents that a change of name, address, contact information, or GP is reported to the Welsh Gender Service (WGS) directly by a form emailed to WGS, separately from a person's GP record. Not the Gender National Referral Support Service (GNRSS), which is England-only. The site lists two different phone numbers for WGS across its own pages (029 2183 6619 on the homepage/contact page, 029 2183 6612 on this page); the planner does not repeat either number, only the link, to avoid going stale.
   - Last verified: 2026-09-11
 
 - **Welsh Government: How to apply for official documents as a transgender person**
@@ -491,7 +527,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/eu-settlement-scheme-caseworker-guidance/eu-settlement-scheme-interim-guidance-gender-identity-and-sex-markers-on-documents-accessible>
   - Status: Consulted, not linked in the planner
   - Note: Gives the evidence asked for in that case: official correspondence from the country of nationality (a letter from its embassy or consulate in the UK is enough), plus a GRC or a medical note with evidence of living in the acquired gender for all purposes.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-13
 
 ## Irish passport and Irish gender recognition (irish_passport, iepass)
 
@@ -544,7 +580,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria>
   - Status: Linked in the planner
   - Note: The planner's link label previously read "List of approved medical practitioners". This publication is not a list of approved practitioners; there is no approval scheme. The label has been corrected to match the publication's own title.
-  - Last verified: 2026-09-12
+  - Last verified: 2026-11-13
 
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>

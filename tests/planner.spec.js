@@ -1957,14 +1957,70 @@ test.describe('Be myself Planner', () => {
       const referralDate = 'Your place on the list is set by your original referral date.';
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await expect(page.locator('#planContent')).toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).toContainText('Gender National Referral Support Service (GNRSS)');
       expect(await page.locator('#planContent').getByText(referralDate).count()).toBe(1);
       await switchRegion(page, 'w');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
       await switchRegion(page, 's');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
       await switchRegion(page, 'ni');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
+    });
+
+    test('233. The England waiting list note uses the referral service\'s own name', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const plan = page.locator('#planContent');
+      await expect(plan).toContainText('held by the Gender National Referral Support Service (GNRSS)');
+      await expect(plan.locator('a[href*="genderreferralservice.nhs.uk"]'), 'the link sits in a collapsed step, so match it by address').toContainText('Gender National Referral Support Service (GNRSS)');
+      await expect(plan, 'the old, unofficial name should be gone').not.toContainText('National Adult Gender Referral');
+    });
+
+    test('234. The cervical screening opt-in sentence is England only', async ({ page }) => {
+      const optIn = 'NHS England guidance says your GP practice can opt you in to cervical screening invitations.';
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).toContainText(optIn);
+      for (const region of ['w', 's', 'ni']) {
+        await switchRegion(page, region);
+        await expect(page.locator('#planContent'), `${region}: the guidance is NHS England's, so it must not appear elsewhere`).not.toContainText(optIn);
+      }
+    });
+
+    test('235. The work step shows the security clearance and payroll notes that fit the goal', async ({ page }) => {
+      const nameVetting = 'says you must tell it about a change of name';
+      const genderVetting = 'it does not ask for a GRC';
+      const payroll = 'If payroll asks for a certificate:';
+      const plan = page.locator('#planContent');
+      const update = async (name, gender) => {
+        await page.locator('#ubMakeChangesBtn').click();
+        await page.locator('#chkGoalName').setChecked(name);
+        await page.locator('#chkGoalGender').setChecked(gender);
+        await page.getByRole('button', { name: 'Update my action plan' }).click();
+      };
+      await openChecklist(page);
+      await page.locator('#chkEmployedNeeds').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(plan).toContainText(nameVetting);
+      await expect(plan).toContainText(payroll);
+      await expect(plan).toContainText('UKSV change of personal circumstances');
+      await update(true, false);
+      await expect(plan).toContainText(nameVetting);
+      await expect(plan, 'the certificate note is about a gender change, so a name-only plan leaves it out').not.toContainText(payroll);
+      await update(false, true);
+      await expect(plan).toContainText(genderVetting);
+      await expect(plan).toContainText(payroll);
+      await expect(plan, 'UKSV only needs to hear about a name change').not.toContainText(nameVetting);
+    });
+
+    test('236. The change of name letters for UK nationals abroad only show for people living outside the UK', async ({ page }) => {
+      const letters = 'publish standard letters for some countries that explain it';
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planContent')).not.toContainText(letters);
+      await switchRegion(page, 'out');
+      await expect(page.locator('#planContent')).toContainText(letters);
+      await expect(page.locator('#planContent a[href="https://www.gov.uk/guidance/change-of-name-name-discrepancy-and-naming-children-letters"]')).toContainText('Change of name letters for UK nationals abroad');
     });
 
     test('89b. The Wales gender service waiting list note is Wales only, and is distinct from the England note', async ({ page }) => {
@@ -1972,7 +2028,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('input[name="chkRegion"][value="w"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Welsh Gender Service');
-      await expect(page.locator('#planContent')).not.toContainText('National Adult Gender Referral Support Service');
+      await expect(page.locator('#planContent')).not.toContainText('Gender National Referral Support Service (GNRSS)');
       await switchRegion(page, 'e');
       await expect(page.locator('#planContent')).not.toContainText('Welsh Gender Service');
       await switchRegion(page, 's');
@@ -3086,18 +3142,30 @@ test.describe('Be myself Planner', () => {
     test('212. The usage guide explains how to type the help shortcut', async ({ page }) => {
       await page.locator('#dlgUsage').evaluate(d => d.showModal());
       await expect(page.locator('#dlgUsage .legend-toolbar').first(),
-        'on UK and US keyboards a question mark needs Shift, so pressing / alone does nothing')
-        .toContainText('holding Shift and pressing /');
-      await expect(page.locator('#dlgUsage .shortcut-table')).toContainText('(usually Shift + /)');
+        'on UK and US keyboards a question mark needs Shift, so / alone works too')
+        .toContainText('pressing / or typing a question mark (?)');
+      await expect(page.locator('#dlgUsage .shortcut-table')).toContainText('/ or ?');
     });
 
-    test('213. Shift and / opens the usage guide, but not while Ctrl is held', async ({ page }) => {
+    test('213. / or Shift and / opens the usage guide, but not while Ctrl is held', async ({ page }) => {
       const dlg = page.locator('#dlgUsage');
       await page.keyboard.press('Control+Shift+Slash');
+      await page.keyboard.press('Control+Slash');
       await page.waitForTimeout(200);
       await expect(dlg, 'a shortcut with Ctrl, Alt or Cmd belongs to the browser or the system').toBeHidden();
       await page.keyboard.press('Shift+Slash');
       await expect(dlg).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dlg).toBeHidden();
+      await page.keyboard.press('Slash');
+      await expect(dlg, 'no Shift needed').toBeVisible();
+      await page.keyboard.press('Escape');
+
+      await page.evaluate(() => document.body.appendChild(document.createElement('textarea')).focus());
+      await page.keyboard.press('Slash');
+      await page.waitForTimeout(200);
+      await expect(dlg, 'typing / in a text field types it').toBeHidden();
+      await expect(page.locator('body > textarea')).toHaveValue('/');
     });
 
     test('215. Answers, buttons and panel headings are not highlighted by a double-click or a tap, but questions can still be selected', async ({ page }) => {
@@ -3951,6 +4019,48 @@ test.describe('Be myself Planner', () => {
         expect(typeof entry.type).toBe('string');
         expect(('url' in entry) !== ('data' in entry), 'each entry needs exactly one of url or data').toBe(true);
       }
+    });
+
+    test('237. Every link to an official site has its own entry in SOURCES.md', async () => {
+      const community = new Set(['transactual.org.uk', 'github.com', 'www.rainbowmigration.org.uk', 'teni.ie', 'mermaidsuk.org.uk',
+        'genderedintelligence.co.uk', 'freedeedpoll.org.uk', 'www.scottishtrans.org', 'www.reddit.com', 'www.gires.org.uk',
+        'transaid.cymru', 'switchboard.lgbt', 'lgbt.foundation', 'creativecommons.org', 'cliniq.org.uk', 'bemyself.uk']);
+      const norm = u => u.split('#')[0].replace(/\/$/, '');
+      const html = fs.readFileSync(path.resolve('..', 'index.html'), 'utf8');
+      const sources = fs.readFileSync(path.resolve('..', 'SOURCES.md'), 'utf8');
+      const listed = new Set([...sources.matchAll(/<(https?:\/\/[^>\s]+)>/g)].map(m => norm(m[1])));
+      const links = [...new Set([...html.matchAll(/href="(https?:\/\/[^"]+)"/g)].map(m => norm(m[1])))];
+      expect(links.length, 'the page should have links to check').toBeGreaterThan(50);
+      const missing = links.filter(u => !community.has(new URL(u).hostname) && !listed.has(u));
+      expect(missing, 'add an entry to SOURCES.md for each official link, or add a community organisation\'s host to the list in this test').toEqual([]);
+    });
+
+    test('238. The source text report pairs each changed line with its new version and says what changed', async () => {
+      const { formatSourceChanges } = require('./source-snapshot-lib');
+      const before = [
+        'Same line',
+        'Registering ‘a charge’ release',
+        'You register release of a charge at Land Registry by',
+        'A document confirming you have paid off your mortgage debt is called ‘a release’.',
+        'This paragraph was taken out completely and has nothing like it below.',
+      ].join('\n');
+      const after = [
+        'Same line',
+        'Registering release of a charge at Land Registry',
+        'You can register release of a charge at Land Registry by',
+        'A document confirming you have paid off your mortgage debt is called a release.',
+        'A brand new paragraph with ```code fences``` in it.',
+      ].join('\n');
+      const report = formatSourceChanges(before, after);
+      expect(report).toContain('3 changed lines: 2 with wording changes, 1 with punctuation, spacing or capitals only. 1 line removed, 1 line added.');
+      expect(report, 'issue #15 listed every old line, then every new line, so small edits were hard to spot').toContain(
+        '  2. added `can`\n     ```diff\n     - You register release of a charge at Land Registry by\n     + You can register release of a charge at Land Registry by\n     ```');
+      expect(report, 'quote marks alone are not a wording change, so the line is folded away').toMatch(
+        /<details><summary>1 line with punctuation, spacing or capitals only<\/summary>[\s\S]*called ‘a release’\.[\s\S]*<\/details>/);
+      expect(report).toContain('**Removed lines**\n\n  ```diff\n  - This paragraph was taken out completely');
+      expect(report, 'page text must not be able to close the code fence').not.toContain('```code');
+      const many = Array.from({ length: 16 }, (_, i) => `Line number ${i} says ‘hello’ here`);
+      expect(formatSourceChanges(many.join('\n'), many.map(l => l.replace(/[‘’]/g, '')).join('\n'))).toContain('  And 1 more.');
     });
 
     test('214. The source check skips site home pages, keeps PDFs, and ignores changes to spacing', async () => {
