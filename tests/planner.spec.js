@@ -1820,6 +1820,19 @@ test.describe('Be myself Planner', () => {
       expect(note).not.toContain('does not apply to someone living in Northern Ireland or Great Britain');
     });
 
+    test('252. The Scotland screening note follows NHS Inform on when invitations still arrive', async ({ page }) => {
+      const notes = await page.evaluate(() => ({
+        record: window.PLAN_ITEMS.nhs.regions.scot.variants.gender.detail,
+        newGP: window.PLAN_ITEMS.newgp.regions.scot.detail,
+      }));
+      for (const [where, text] of Object.entries(notes)) {
+        expect(text, `${where}: a CHI change after 14 June 2015 still brings automatic invitations, so the date matters`).toContain('after 14 June 2015, you should still be invited automatically for the screening your body needs');
+        expect(text, `${where}: people who moved from England or Wales may not be picked up`).toContain('moved to Scotland from elsewhere, including England and Wales');
+        expect(text, `${where}: NHS Inform names who to contact for each programme`).toContain('contact your GP practice for cervical screening, or your local screening service for breast or AAA screening');
+        expect(text).not.toContain('Changing your CHI gender marker may affect which invitations you receive');
+      }
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();

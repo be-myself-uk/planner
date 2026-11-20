@@ -426,8 +426,8 @@ For items with no official source, the links in the general data protection sect
 - **NHS Inform: Registering with a GP practice**
   - <https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/>
   - Status: Linked in the planner
-  - Note: Covers GP registration only. It does not document the gender marker change process; the NSS FOI response below does.
-  - Last verified: 2026-09-13
+  - Note: Covers GP registration only. It does not document the gender marker change process; the NSS FOI response below does. Checked on 20 November 2026 from a copy of the page supplied by the maintainer, since NHS Inform refuses automated fetches.
+  - Last verified: 2026-11-20
 
 - **NHS National Services Scotland FOI release FOI-000084: Requirements for processing a change of gender and title**
   - <https://www.nss.nhs.scot/publications/foi-000084-requirements-for-processing-a-change-of-gender-and-title/foi-000084-requirements-for-processing-a-change-of-gender-and-title-html/>
@@ -438,7 +438,8 @@ For items with no official source, the links in the general data protection sect
 - **NHS Inform: Screening information for the transgender community**
   - <https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/>
   - Status: Linked in the planner
-  - Last verified: 2026-09-13
+  - Note: Last updated 15 September 2026. Says "All NHS screening programmes in Scotland identify people who are eligible for screening through their CHI number", which "identifies you as male or female". For each programme it says people who changed their CHI number to reflect their gender after 14 June 2015 are automatically invited, including, for example, trans women for cervical screening, which they do not need, and that people who changed it on or before 14 June 2015 are not automatically invited. It also says "It isn't always possible to identify people who've moved to Scotland as transgender", including from England and Wales, and to contact "your local screening service for AAA screening or breast screening" or "your GP practice for cervical screening" about a missed invitation. Source for the screening note in the Scotland health record and new GP steps. NHS Inform refuses automated fetches, so this text was checked from a copy of the page supplied by the maintainer.
+  - Last verified: 2026-11-20
 
 - **NHS Inform Scotland (main site)**
   - <https://www.nhsinform.scot/>
