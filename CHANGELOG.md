@@ -32,6 +32,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 ### Code
 
+- New shared plan links carry your answers after a # in the web address instead of after a ?. Browsers do not send the part after a # to the website's host, so opening a new link no longer sends your answers to the host. The answers are still not encrypted, so anyone with the link can read them. Older links still open as before.
+- When you open a shared link, the planner now removes your answers from the address bar straight away, before it asks you to confirm your age, so they do not stay in the address bar or in that page's history entry. If you reload the page before the plan opens, open the link again.
+- A shared link that cannot be read, for example because it was cut short when it was copied, no longer offers to replace your saved plan. The planner now says the link could not be read and keeps your plan. A link with an unexpected value can no longer leave the page blank.
+- Pasting a shared link into a tab that already has the planner open now opens the shared plan.
 - The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
 
 ### Infrastructure

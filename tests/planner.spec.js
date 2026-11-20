@@ -152,6 +152,17 @@ function decodeState(encoded) {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 
+async function gotoFresh(page, url) {
+  await page.goto('about:blank');
+  await page.goto(url);
+}
+
+function sharedPlanData(link) {
+  const url = new URL(link);
+  const fromHash = new URLSearchParams(url.hash.replace(/^#/, '')).get('p');
+  return decodeState(fromHash || url.searchParams.get('p'));
+}
+
 async function getShareUrl(page, data) {
   return page.evaluate((d) => {
     const obj = Object.assign({ pv: window.PLAN_VERSION }, d);
@@ -1210,7 +1221,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      await page.goto(clip);
+      await gotoFresh(page, clip);
       const ageCb = page.locator('#ageConfirmShared');
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
@@ -1287,7 +1298,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('#resetProgressBtn').click();
       await expect(page.locator('[data-track-id="trk_grcdocs_sd"]')).toHaveAttribute('data-state', '0');
 
-      await page.goto(clip);
+      await gotoFresh(page, clip);
       const ageCb = page.locator('#ageConfirmShared');
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
@@ -1378,8 +1389,9 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      expect(clip).toContain('?p=');
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      expect(clip, 'new links carry the plan in the fragment, which is not sent to the host').toContain('#p=');
+      expect(clip).not.toContain('?p=');
+      const decoded = sharedPlanData(clip);
       expect(decoded.goal).toBe('both');
       expect(decoded.dp).toBe(true);
       expect(decoded.grc).toBe(true);
@@ -1470,9 +1482,9 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      const decoded = sharedPlanData(clip);
       expect(decoded.svn).toBe(true);
-      await navigateUntil(page, async () => { await page.goto(clip); await openSharedPlanIfAsked(page); },
+      await navigateUntil(page, async () => { await gotoFresh(page, clip); await openSharedPlanIfAsked(page); },
         () => page.evaluate(() => wizardState.svcNone === 'yes'), 12, 'gotoUntil');
       expect(await page.evaluate(() => wizardState.svcNone)).toBe('yes');
     });
@@ -1486,8 +1498,9 @@ test.describe('Be myself Planner', () => {
       await expect(firstBtn).toHaveAttribute('data-state', '1');
       await page.waitForTimeout(200);
       await navigateUntil(page, async () => { await page.goto(filePath + '?p=%%%notvalid%%%'); await openSharedPlanIfAsked(page); },
-        () => page.locator('#welcomeOutdated').isVisible(), 12, 'gotoUntil');
-      await expect(page.locator('#welcomeOutdated')).toBeVisible();
+        () => page.locator('#sharedLinkUnreadable').isVisible(), 12, 'gotoUntil');
+      await expect(page.locator('#sharedLinkUnreadable'), 'an unreadable link no longer offers to replace the saved plan').toBeVisible();
+      await expect(page.locator('#welcomeSharedReplace')).toBeHidden();
       expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
     });
 
@@ -1622,12 +1635,12 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      const decoded = sharedPlanData(clip);
       expect(decoded.ie, 'the new answer travels in its own key, so older links need no change').toBe(true);
       expect(decoded.nonUK, 'an Irish citizen has no visa or eVisa to update').toBe(false);
 
       await page.evaluate(() => localStorage.clear());
-      await page.goto(clip);
+      await gotoFresh(page, clip);
       await checkAgeGateShared(page);
       await openSharedPlanIfAsked(page);
       await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
@@ -1647,6 +1660,90 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#welcomeOutdated'), 'a link from before PLAN_VERSION 3 asks for one review instead of breaking').toBeVisible();
       await page.getByRole('button', { name: 'Review my answers' }).click();
       await expect(page.locator('#chkVisaNone')).toBeChecked();
+    });
+
+    test('244. A copied link puts the plan after #, and opening it loads the plan and clears the address', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByLabel(/Deed poll or statutory declaration/).check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.evaluate(() => {
+        window._shareUrl = null;
+        navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+      });
+      await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+      await page.waitForFunction(() => window._shareUrl !== null);
+      const clip = await page.evaluate(() => window._shareUrl);
+      const link = new URL(clip);
+      expect(link.search, 'the query string is sent to the host when the link is opened, so it must stay empty').toBe('');
+      expect(link.hash).toMatch(/^#p=/);
+      expect(sharedPlanData(clip).dp).toBe(true);
+      await page.evaluate(() => localStorage.clear());
+      await gotoFresh(page, clip);
+      expect(await page.evaluate(() => location.href), 'the answers leave the address bar and history as soon as the link is read, before the age check').not.toMatch(/[?#]/);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      expect(await page.evaluate(() => wizardState.deedpoll)).toBe('yes');
+    });
+
+    test('245. An older ?p= link still opens, and its address is cleared before the age check', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'name', reg: 's', emp: 'no', dl: 'none', pass: 'none' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(url);
+      await expect(page.locator('#welcomeNewDevice')).toBeVisible();
+      expect(await page.evaluate(() => location.href), 'the shared answers should not wait in the address bar while the gate is shown').not.toMatch(/[?#]/);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      expect(await page.evaluate(() => wizardState.region)).toBe('s');
+    });
+
+    test('246. A #p= link pasted into an already open planner loads it', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'name', reg: 'ni', emp: 'no', dl: 'none', pass: 'none' });
+      const encoded = new URL(url).searchParams.get('p');
+      await checkAgeGate(page);
+      await page.evaluate(() => localStorage.setItem('disclaimerConfirmed', 'true'));
+      await page.evaluate((p) => { location.hash = 'p=' + encodeURIComponent(p); }, encoded);
+      await expect(page.locator('#planView'), 'changing only the fragment does not reload the page by itself').toBeVisible();
+      expect(await page.evaluate(() => wizardState.region)).toBe('ni');
+      expect(await page.evaluate(() => location.href)).not.toMatch(/[?#]/);
+    });
+
+    test('247. Unreadable shared links never break the page, and the address is cleared', async ({ page }) => {
+      const errors = [];
+      page.on('pageerror', e => errors.push(e.message));
+      const enc = o => Buffer.from(JSON.stringify(o)).toString('base64');
+      const cases = {
+        truncated: '#p=eyJwdiI6Mywicm',
+        notAnObject: '#p=' + encodeURIComponent(enc(7)),
+        nullValue: '?p=' + encodeURIComponent(enc(null)),
+        servicesNotText: '#p=' + encodeURIComponent(enc({ pv: 3, reg: 'e', goal: 'both', emp: 'no', dl: 'none', pass: 'none', srv: 5 })),
+        tooLong: '#p=' + 'A'.repeat(60000),
+      };
+      await checkAgeGate(page);
+      await page.evaluate(() => localStorage.setItem('disclaimerConfirmed', 'true'));
+      await gotoFresh(page, filePath + cases.truncated);
+      await expect(page.locator('#welcomeOutdated'), 'with no saved plan, the person is told the link was cut short').toBeVisible();
+      await expect(page.locator('#welcomeOutdated')).toContainText('Your link appears to be incomplete');
+      for (const [name, suffix] of Object.entries(cases)) {
+        await gotoFresh(page, filePath + suffix);
+        await expect(page.locator('#welcomeBackView, #planView').filter({ visible: true }), `${name}: something must be shown, not a blank page`).toHaveCount(1);
+        expect(await page.evaluate(() => location.href), `${name}: the address should be cleared`).not.toMatch(/[?#]/);
+      }
+      expect(errors.filter(m => !/Access is denied for this document/.test(m)),
+        'a link whose services value was not text used to stop the page with an error; the filtered message comes from the test\'s own about:blank page').toEqual([]);
+    });
+
+    test('248. An unreadable link keeps the saved plan without asking to replace it', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const saved = await page.evaluate(() => localStorage.getItem('wizardState'));
+      await navigateUntil(page, async () => { await gotoFresh(page, filePath + '#p=eyJwdiI6Mywicm'); },
+        () => page.locator('#sharedLinkUnreadable').isVisible(), 12, 'gotoUntil');
+      await expect(page.locator('#welcomeSharedReplace'), 'there is nothing to open, so there is nothing to replace the plan with').toBeHidden();
+      await expect(page.locator('#welcomeNormal')).toBeVisible();
+      expect(await page.evaluate(() => localStorage.getItem('wizardState'))).toBe(saved);
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('#sharedLinkUnreadable'), 'the notice belongs to that one visit, so it must not come back with the welcome screen').toHaveClass(/\bhidden\b/);
     });
   });
 
@@ -1737,7 +1834,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      const decoded = sharedPlanData(clip);
       expect(decoded.srv.split(',')).toContain('cra');
     });
 

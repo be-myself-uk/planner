@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-vxPFE5mSlf1R+N7ZoCahJkvCKS1DQMD5ZeK9k+TKAb4='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-JzHlJ36Ci7nDwuun5rIoC1QtL3EPKeg4xzRALUmsIMw='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -115,6 +115,9 @@
     </div>
   </div>
   <div id="welcomeBackView" class="hidden">
+    <div id="sharedLinkUnreadable" class="phase simul hidden" role="alert" style="margin-top:0;margin-bottom:16px;">
+      <p style="margin:0;"><span aria-hidden="true">⚠️</span> The shared link could not be read. It may have been cut short when it was copied. Your saved plan has not been changed.</p>
+    </div>
     <div id="welcomeNormal" class="phase info" style="margin-top:0;margin-bottom:25px;">
       <h2>Welcome back</h2>
       <p>Your plan is saved on this device.</p>
@@ -533,7 +536,8 @@ function encodeState(obj) {
   return btoa(bin);
 }
 function decodeState(str) {
-  const bin = atob(str);
+  if (typeof str !== 'string' || !str || str.length > SHARE_LINK_MAX_LENGTH) throw new Error('Unreadable link');
+  const bin = atob(str.replace(/ /g, '+'));
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
@@ -580,6 +584,8 @@ const SERVICES = [
 ];
 const SVC_MAP = Object.fromEntries(SERVICES.map(s => [s.key, s.id]));
 const SHARE_PROGRESS_LIMIT = 200;
+const SHARE_LINK_MAX_LENGTH = 50000;
+let pendingShareParams = null;
 
 const GRC_MED_EVIDENCE = {
   idPrefix: 'grcmed',
@@ -1171,7 +1177,7 @@ function loadUrlParams(d) {
   if (wizardState.birthOutsideUK === S.YES) wizardState.birthRegion = REGION.E;
   wizardState.vehicle     = d.veh   === true ? S.YES : S.NO;
   const validSvcKeys = Object.keys(SVC_MAP);
-  wizardState.services    = (d.srv || '').split(',').filter(s => validSvcKeys.includes(s));
+  wizardState.services    = (typeof d.srv === 'string' ? d.srv : '').split(',').filter(s => validSvcKeys.includes(s));
   wizardState.svcNone     = d.svn === true ? S.YES : S.NO;
   if (d.prg && typeof d.prg === 'object') {
     Object.entries(d.prg).slice(0, SHARE_PROGRESS_LIMIT).forEach(([key, state]) => {
@@ -1201,8 +1207,8 @@ function handleUrlLoad(params) {
   isWizardMode = false;
   V.wizard.classList.add('hidden');
   updateLocks();
-  let d;
-  try { d = decodeState(params.get('p') || ''); } catch(e) { d = null; }
+  const d = readSharedPlan(params);
+  clearShareFromUrl();
   if (!d) {
     V.plan.classList.add('hidden');
     document.body.classList.remove('plan-ready','wizard-active');
@@ -1270,7 +1276,7 @@ function handleLegacyUrl(params) {
 }
 function copyShareableLink() {
   const w = wizardState;
-  const url = new URL(window.location.href.split('?')[0]);
+  const url = new URL(window.location.href.split(/[?#]/)[0]);
   const ps = {
     pv: PLAN_VERSION,
     reg:   w.region || REGION.E,
@@ -1316,7 +1322,7 @@ function copyShareableLink() {
     };
   }
   if (focusMode) ps.fm = 1;
-  url.searchParams.set('p', encodeState(ps));
+  url.hash = 'p=' + encodeURIComponent(encodeState(ps));
   const text = url.toString();
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
@@ -1348,6 +1354,7 @@ function setNavControls(display) {
 }
 
 function backToStart() {
+  gel('sharedLinkUnreadable')?.classList.add('hidden');
   V.wizard.classList.add('hidden');
   V.checklist.classList.add('hidden');
   setNavControls('none');
@@ -1399,17 +1406,46 @@ function checkAgeGateShared() {
   const cbDisc = gel('checklistDisclaimerConfirm');
   if (cbDisc) cbDisc.checked = true;
   gel('welcomeNewDevice').classList.add('hidden');
-  openSharedLink(new URLSearchParams(window.location.search));
+  openSharedLink(shareParams());
+}
+function readSharedPlan(params) {
+  try {
+    const d = decodeState(params.get('p'));
+    return d && typeof d === 'object' && !Array.isArray(d) ? d : null;
+  } catch(e) { return null; }
+}
+function readShareParams() {
+  const fromHash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  if (fromHash.has('p')) return new URLSearchParams({ p: fromHash.get('p') });
+  const fromQuery = new URLSearchParams(window.location.search);
+  return fromQuery.has('p') || fromQuery.has('goal') ? fromQuery : null;
+}
+function clearShareFromUrl() {
+  try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+}
+function reloadForSharedHash() {
+  if (new URLSearchParams(window.location.hash.replace(/^#/, '')).has('p')) window.location.reload();
+}
+function shareParams() {
+  return pendingShareParams || new URLSearchParams();
 }
 function hasSavedPlan() {
   try { return !!JSON.parse(ssg('appState') || 'null')?.planGenerated; } catch(e) { return false; }
 }
 function loadSharedLink(params) {
+  pendingShareParams = null;
   if (params.has('p')) handleUrlLoad(params);
   else if (params.has('goal')) handleLegacyUrl(params);
 }
 function openSharedLink(params) {
   if (!hasSavedPlan()) { loadSharedLink(params); return; }
+  if (params.has('p') && !readSharedPlan(params)) {
+    pendingShareParams = null;
+    clearShareFromUrl();
+    restoreSavedApp();
+    gel('sharedLinkUnreadable')?.classList.remove('hidden');
+    return;
+  }
   V.start.classList.add('hidden');
   V.welcome.classList.remove('hidden');
   gel('welcomeNormal').classList.add('hidden');
@@ -1417,9 +1453,10 @@ function openSharedLink(params) {
 }
 function openSharedPlan() {
   gel('welcomeSharedReplace').classList.add('hidden');
-  loadSharedLink(new URLSearchParams(window.location.search));
+  loadSharedLink(shareParams());
 }
 function keepOwnPlan() {
+  pendingShareParams = null;
   gel('welcomeSharedReplace').classList.add('hidden');
   try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
   if (!restoreSavedApp()) { V.welcome.classList.add('hidden'); V.start.classList.remove('hidden'); }
@@ -1525,6 +1562,7 @@ function startChecklist() {
   setChecklistMode(false);
 }
 function continuePlan() {
+  gel('sharedLinkUnreadable')?.classList.add('hidden');
   V.welcome.classList.add('hidden');
   setNavControls('none');
   renderChecklist();
@@ -1552,7 +1590,7 @@ function openChecklist() {
   showAdaptiveNoteIfNeeded();
   refreshToolbarTabindex();
 }
-function reviewAnswers() { openChecklist(); }
+function reviewAnswers() { gel('sharedLinkUnreadable')?.classList.add('hidden'); openChecklist(); }
 
 function dismissWizardEditTip() {
   const tip = gel('wizardEditTip');
@@ -1697,6 +1735,8 @@ function resetPlanOrder() {
 
 function restartApp() {
   fadeOutConfetti();
+  pendingShareParams = null;
+  gel('sharedLinkUnreadable')?.classList.add('hidden');
   _saveWarnShown = false;
   const swb = gel('saveWarnBanner'); if (swb) swb.classList.add('hidden');
   [V.plan, V.wizard, V.checklist, V.welcome].forEach(v => v.classList.add('hidden'));
@@ -3547,19 +3587,11 @@ window.onload = () => {
       updateLocks();
     });
   }
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('p')) {
-    V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
-      V.welcome.classList.remove('hidden');
-      gel('welcomeNormal').classList.add('hidden');
-      gel('welcomeNewDevice').classList.remove('hidden');
-      return;
-    }
-    openSharedLink(params);
-    return;
-  }
-  if (params.has('goal')) {
+  window.addEventListener('hashchange', reloadForSharedHash);
+  const params = readShareParams();
+  if (params) {
+    pendingShareParams = params;
+    clearShareFromUrl();
     V.start.classList.add('hidden');
     if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
       V.welcome.classList.remove('hidden');
