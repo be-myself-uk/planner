@@ -1680,6 +1680,19 @@ test.describe('Be myself Planner', () => {
       await expect(step, 'the rule is HMPO\'s own, not every organisation\'s').toContainText('Other organisations may ask for different evidence');
     });
 
+    test('242. The deed poll steps do not promise that every organisation accepts an unenrolled deed poll', async ({ page }) => {
+      const steps = await page.evaluate(() => Object.fromEntries(['default', 'scot', 'ni'].map(r => {
+        const leaf = window.PLAN_ITEMS.deedpoll.regions[r];
+        return [r, leaf.summary + leaf.detail];
+      })));
+      for (const [region, text] of Object.entries(steps)) {
+        expect(text, `${region}: GOV.UK says some organisations may only accept an enrolled deed poll`).toContain('may only accept an enrolled deed poll');
+        expect(text, `${region}: no official source says an unenrolled deed poll is accepted everywhere`).not.toMatch(/equally valid|just as valid|widely accepted by organisations across the UK|accepted for name changes by most organisations/);
+      }
+      expect(steps.scot, 'what is more common in Scotland is reported experience, so it carries the community advice marker')
+        .toMatch(/community-note[^]*People report that a statutory declaration has traditionally been more common in Scotland/);
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();

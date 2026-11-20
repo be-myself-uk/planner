@@ -22,6 +22,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The work step now says that if you hold national security vetting clearance, you must tell United Kingdom Security Vetting (UKSV) about a change of name, but not about a gender change.
 - The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
 - The UK passport step now explains what HM Passport Office asks for if you have changed your name more than once: evidence for each change, linking your new name back to your last passport or your birth certificate, or a statutory declaration covering all your names if you do not have evidence of every change.
+- The deed poll steps now say what GOV.UK says: some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll, so check before you rely on one. The Scotland and Northern Ireland steps no longer say an unenrolled deed poll is equally valid or accepted by most organisations, which no official source says, and the Scotland step now marks the point that statutory declarations are more common there as community advice.
 - For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
 
 ### Wording
