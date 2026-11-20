@@ -6,7 +6,7 @@ labels: ''
 assignees: ''
 
 ---
-<!-- Issues are public: anyone can read them, and they show your GitHub username. Leave out personal details, and do not paste a link to your plan, because it contains your answers. -->
+Issues are public: anyone can read them, and they show your GitHub username. Leave out personal details, and do not paste a link to your plan, because it contains your answers.
 
 **Describe the bug**
 A clear and concise description of what the bug is.

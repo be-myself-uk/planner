@@ -30,6 +30,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 ### Infrastructure
 
 - The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
+- The two Python scripts that check sources and linked domains no longer carry comments, and the workflows no longer note a version beside each pinned action. The issue templates' reminder that issues are public is now plain text instead of a hidden comment, so it also stays in the posted issue unless you delete it. What the scripts' comments explained is now in CONTRIBUTING.md.
 
 ## [October 2026 /2]
 
