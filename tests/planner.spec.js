@@ -1833,6 +1833,29 @@ test.describe('Be myself Planner', () => {
       }
     });
 
+    test('253. Every panel splits its sections with ruled headings in the same way', async ({ page }) => {
+      const panels = await page.evaluate(() => ['dlgAbout', 'dlgUsage', 'dlgPrivacy', 'dlgSupport', 'dlgDisclaimer'].map(id => {
+        const dlg = document.getElementById(id);
+        dlg.showModal();
+        const body = dlg.querySelector('.dialog-body');
+        const headings = [...body.querySelectorAll('h3')].map(h => ({
+          text: h.textContent.trim(),
+          ruled: getComputedStyle(h).borderTopStyle === 'solid',
+          first: h === body.firstElementChild,
+        }));
+        dlg.close();
+        return { id, headings };
+      }));
+      for (const { id, headings } of panels) {
+        for (const h of headings.filter(h => !h.first)) {
+          expect(h.ruled, `${id}: "${h.text}" starts a new section, so it has the rule above it like the other panels`).toBe(true);
+        }
+      }
+      const names = Object.fromEntries(panels.map(p => [p.id, p.headings.map(h => h.text)]));
+      expect(names.dlgPrivacy).toEqual(['What the planner does', 'What the host receives', 'Shared links', 'On this device', 'Quick exit']);
+      expect(names.dlgDisclaimer, 'these were styled paragraphs, so screen readers could not jump between them').toEqual(['What this is', 'Using this planner', 'Legal terms']);
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();

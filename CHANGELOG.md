@@ -43,6 +43,10 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - Until the end of January 2027, the welcome back screen shows a short notice that the privacy information has been updated, linking to the Privacy panel. It goes away for good when you dismiss it.
 - The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
 
+### Layout
+
+- The Privacy and Disclaimer panels now split their sections with headings and a line above each, like the other panels. Screen readers can now jump between those sections too.
+
 ### Infrastructure
 
 - The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
