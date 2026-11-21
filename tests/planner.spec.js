@@ -152,6 +152,17 @@ function decodeState(encoded) {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 
+async function gotoFresh(page, url) {
+  await page.goto('about:blank');
+  await page.goto(url);
+}
+
+function sharedPlanData(link) {
+  const url = new URL(link);
+  const fromHash = new URLSearchParams(url.hash.replace(/^#/, '')).get('p');
+  return decodeState(fromHash || url.searchParams.get('p'));
+}
+
 async function getShareUrl(page, data) {
   return page.evaluate((d) => {
     const obj = Object.assign({ pv: window.PLAN_VERSION }, d);
@@ -1093,6 +1104,27 @@ test.describe('Be myself Planner', () => {
         .toContainText('What is the status of your passport?');
       await expect(page.locator('#planView')).toBeHidden();
     });
+
+    test('240. The under-16 wording does not say one consent rule covers every document', async ({ page }) => {
+      await page.getByRole('button', { name: 'Start here' }).click();
+      await page.locator('input[name=ans][value=no]').check();
+      await page.getByRole('button', { name: 'Continue' }).click();
+      await expect(page.locator('#ageKickout')).toBeVisible();
+      const texts = await page.evaluate(() => ({
+        kickout: document.querySelector('#ageKickout').textContent,
+        about: document.querySelector('#dlgAbout').textContent,
+        disclaimer: document.querySelector('#dlgDisclaimer').textContent,
+        wizard: window.questions.find(q => q.id === 'age').q,
+      }));
+      const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8');
+      for (const [where, text] of Object.entries({ ...texts, readme })) {
+        expect(text, `${where}: requirements for under-16s differ by document and organisation, so no single rule applies`).not.toMatch(/(require|need)s? parental (or guardian )?consent/i);
+      }
+      for (const where of ['kickout', 'about', 'disclaimer', 'wizard']) {
+        expect(texts[where], `${where} should still say the planner does not cover under-16s`).toMatch(/does not cover/);
+      }
+      expect(texts.kickout).toContain('may involve parental responsibility, consent or other requirements');
+    });
   });
 
   test.describe('Progress tracking & plan state', () => {
@@ -1189,7 +1221,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      await page.goto(clip);
+      await gotoFresh(page, clip);
       const ageCb = page.locator('#ageConfirmShared');
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
@@ -1266,7 +1298,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('#resetProgressBtn').click();
       await expect(page.locator('[data-track-id="trk_grcdocs_sd"]')).toHaveAttribute('data-state', '0');
 
-      await page.goto(clip);
+      await gotoFresh(page, clip);
       const ageCb = page.locator('#ageConfirmShared');
       if (await ageCb.isVisible()) await ageCb.check();
       const discCb = page.locator('#disclaimerConfirmShared');
@@ -1357,8 +1389,9 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      expect(clip).toContain('?p=');
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      expect(clip, 'new links carry the plan in the fragment, which is not sent to the host').toContain('#p=');
+      expect(clip).not.toContain('?p=');
+      const decoded = sharedPlanData(clip);
       expect(decoded.goal).toBe('both');
       expect(decoded.dp).toBe(true);
       expect(decoded.grc).toBe(true);
@@ -1449,9 +1482,9 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      const decoded = sharedPlanData(clip);
       expect(decoded.svn).toBe(true);
-      await navigateUntil(page, async () => { await page.goto(clip); await openSharedPlanIfAsked(page); },
+      await navigateUntil(page, async () => { await gotoFresh(page, clip); await openSharedPlanIfAsked(page); },
         () => page.evaluate(() => wizardState.svcNone === 'yes'), 12, 'gotoUntil');
       expect(await page.evaluate(() => wizardState.svcNone)).toBe('yes');
     });
@@ -1465,8 +1498,9 @@ test.describe('Be myself Planner', () => {
       await expect(firstBtn).toHaveAttribute('data-state', '1');
       await page.waitForTimeout(200);
       await navigateUntil(page, async () => { await page.goto(filePath + '?p=%%%notvalid%%%'); await openSharedPlanIfAsked(page); },
-        () => page.locator('#welcomeOutdated').isVisible(), 12, 'gotoUntil');
-      await expect(page.locator('#welcomeOutdated')).toBeVisible();
+        () => page.locator('#sharedLinkUnreadable').isVisible(), 12, 'gotoUntil');
+      await expect(page.locator('#sharedLinkUnreadable'), 'an unreadable link no longer offers to replace the saved plan').toBeVisible();
+      await expect(page.locator('#welcomeSharedReplace')).toBeHidden();
       expect(await page.evaluate(id => localStorage.getItem('st_' + id), trackId)).toBe('1');
     });
 
@@ -1601,12 +1635,12 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      const decoded = sharedPlanData(clip);
       expect(decoded.ie, 'the new answer travels in its own key, so older links need no change').toBe(true);
       expect(decoded.nonUK, 'an Irish citizen has no visa or eVisa to update').toBe(false);
 
       await page.evaluate(() => localStorage.clear());
-      await page.goto(clip);
+      await gotoFresh(page, clip);
       await checkAgeGateShared(page);
       await openSharedPlanIfAsked(page);
       await expect(page.locator('[data-track-id="trk_iepass"]')).toHaveCount(1);
@@ -1627,6 +1661,96 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Review my answers' }).click();
       await expect(page.locator('#chkVisaNone')).toBeChecked();
     });
+
+    test('244. A copied link puts the plan after #, and opening it loads the plan and clears the address', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByLabel(/Deed poll or statutory declaration/).check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.evaluate(() => {
+        window._shareUrl = null;
+        navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+      });
+      await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+      await page.waitForFunction(() => window._shareUrl !== null);
+      const clip = await page.evaluate(() => window._shareUrl);
+      const link = new URL(clip);
+      expect(link.search, 'the query string is sent to the host when the link is opened, so it must stay empty').toBe('');
+      expect(link.hash).toMatch(/^#p=/);
+      expect(sharedPlanData(clip).dp).toBe(true);
+      await page.evaluate(() => localStorage.clear());
+      await gotoFresh(page, clip);
+      expect(await page.evaluate(() => location.href), 'the answers leave the address bar and history as soon as the link is read, before the age check').not.toMatch(/[?#]/);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      expect(await page.evaluate(() => wizardState.deedpoll)).toBe('yes');
+    });
+
+    test('245. An older ?p= link still opens, and its address is cleared before the age check', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'name', reg: 's', emp: 'no', dl: 'none', pass: 'none' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(url);
+      await expect(page.locator('#welcomeNewDevice')).toBeVisible();
+      expect(await page.evaluate(() => location.href), 'the shared answers should not wait in the address bar while the gate is shown').not.toMatch(/[?#]/);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      expect(await page.evaluate(() => wizardState.region)).toBe('s');
+    });
+
+    test('246. A #p= link pasted into an already open planner loads it', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'name', reg: 'ni', emp: 'no', dl: 'none', pass: 'none' });
+      const encoded = new URL(url).searchParams.get('p');
+      await checkAgeGate(page);
+      await page.evaluate(() => localStorage.setItem('disclaimerConfirmed', 'true'));
+      await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('ageConfirmed') === 'true' && localStorage.getItem('disclaimerConfirmed') === 'true'));
+      await page.evaluate((p) => { location.hash = 'p=' + encodeURIComponent(p); }, encoded);
+      await expect(page.locator('#planView'), 'changing only the fragment does not reload the page by itself').toBeVisible();
+      expect(await page.evaluate(() => wizardState.region)).toBe('ni');
+      expect(await page.evaluate(() => location.href)).not.toMatch(/[?#]/);
+    });
+
+    test('247. Unreadable shared links never break the page, and the address is cleared', async ({ page }) => {
+      const errors = [];
+      page.on('pageerror', e => errors.push(e.message));
+      const enc = o => Buffer.from(JSON.stringify(o)).toString('base64');
+      const cases = {
+        truncated: '#p=eyJwdiI6Mywicm',
+        notAnObject: '#p=' + encodeURIComponent(enc(7)),
+        nullValue: '?p=' + encodeURIComponent(enc(null)),
+        servicesNotText: '#p=' + encodeURIComponent(enc({ pv: 3, reg: 'e', goal: 'both', emp: 'no', dl: 'none', pass: 'none', srv: 5 })),
+        tooLong: '#p=' + 'A'.repeat(60000),
+      };
+      await checkAgeGate(page);
+      await page.evaluate(() => localStorage.setItem('disclaimerConfirmed', 'true'));
+      const shown = () => page.evaluate(() => {
+        const visible = id => !document.getElementById(id).classList.contains('hidden') && document.getElementById(id).offsetParent !== null;
+        return !visible('welcomeNewDevice') && (visible('welcomeBackView') || visible('planView'));
+      });
+      await navigateUntil(page, () => gotoFresh(page, filePath + cases.truncated), shown, 12, 'gotoUntil');
+      await expect(page.locator('#welcomeOutdated'), 'with no saved plan, the person is told the link was cut short').toBeVisible();
+      await expect(page.locator('#welcomeOutdated')).toContainText('Your link appears to be incomplete');
+      for (const [name, suffix] of Object.entries(cases)) {
+        await navigateUntil(page, () => gotoFresh(page, filePath + suffix), shown, 12, 'gotoUntil');
+        expect(await shown(), `${name}: something must be shown, not a blank page or the age check`).toBe(true);
+        expect(await page.evaluate(() => location.href), `${name}: the address should be cleared`).not.toMatch(/[?#]/);
+      }
+      expect(errors.filter(m => !/Access is denied for this document/.test(m)),
+        'a link whose services value was not text used to stop the page with an error; the filtered message comes from the test\'s own about:blank page').toEqual([]);
+    });
+
+    test('248. An unreadable link keeps the saved plan without asking to replace it', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      const saved = await page.evaluate(() => localStorage.getItem('wizardState'));
+      await navigateUntil(page, async () => { await gotoFresh(page, filePath + '#p=eyJwdiI6Mywicm'); },
+        () => page.locator('#sharedLinkUnreadable').isVisible(), 12, 'gotoUntil');
+      await expect(page.locator('#welcomeSharedReplace'), 'there is nothing to open, so there is nothing to replace the plan with').toBeHidden();
+      await expect(page.locator('#welcomeNormal')).toBeVisible();
+      expect(await page.evaluate(() => localStorage.getItem('wizardState'))).toBe(saved);
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('#sharedLinkUnreadable'), 'the notice belongs to that one visit, so it must not come back with the welcome screen').toHaveClass(/\bhidden\b/);
+    });
   });
 
   test.describe('Plan generation & content accuracy', () => {
@@ -1646,6 +1770,104 @@ test.describe('Be myself Planner', () => {
       await page.getByText('More information about: UK passport').click();
       await expect(plan).toContainText('a letter from you asking for the change of gender');
       await expect(plan.locator('a', { hasText: 'Change of name because of a change of gender' })).toBeVisible();
+    });
+
+    test('241. The UK passport step explains the evidence needed after more than one name change', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalGender').uncheck();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.getByText('More information about: UK passport').click();
+      const step = page.locator('#planContent');
+      await expect(step, 'HMPO asks for evidence of each change, so one recent deed poll may not be enough').toContainText('you must give evidence for each change of name');
+      await expect(step, 'a missing link in the chain is covered by a statutory declaration').toContainText('a statutory declaration that covers all the names you have used');
+      await expect(step, 'the rule is HMPO\'s own, not every organisation\'s').toContainText('Other organisations may ask for different evidence');
+    });
+
+    test('242. The deed poll steps do not promise that every organisation accepts an unenrolled deed poll', async ({ page }) => {
+      const steps = await page.evaluate(() => Object.fromEntries(['default', 'scot', 'ni'].map(r => {
+        const leaf = window.PLAN_ITEMS.deedpoll.regions[r];
+        return [r, leaf.summary + leaf.detail];
+      })));
+      for (const [region, text] of Object.entries(steps)) {
+        expect(text, `${region}: GOV.UK says some organisations may only accept an enrolled deed poll`).toContain('may only accept an enrolled deed poll');
+        expect(text, `${region}: no official source says an unenrolled deed poll is accepted everywhere`).not.toMatch(/equally valid|just as valid|widely accepted by organisations across the UK|accepted for name changes by most organisations/);
+      }
+      expect(steps.scot, 'what is more common in Scotland is reported experience, so it carries the community advice marker')
+        .toMatch(/community-note[^]*People report that a statutory declaration has traditionally been more common in Scotland/);
+    });
+
+    test('243. The GRC step says what a GRC is not needed for, that treatment is not required, and that parenthood does not change', async ({ page }) => {
+      for (const region of ['#chkRegionEW', '#chkRegionNI']) {
+        await page.evaluate(() => localStorage.clear());
+        await page.goto(filePath);
+        await openChecklist(page);
+        await page.locator(region).check();
+        await page.locator('#chkGRCYes').check();
+        await page.getByRole('button', { name: 'Show my action plan' }).click();
+        const plan = page.locator('#planContent');
+        await expect(plan, `${region}: a GRC is not needed before updating ordinary documents`).toContainText('you do not need a GRC to update your driving licence, your passport, or your medical records');
+        await expect(plan, `${region}: GOV.UK says surgery and treatment are not required`).toContainText('You can apply even if you have not had any gender affirming surgery or treatment');
+        await expect(plan, `${region}: Gender Recognition Act 2004, section 12`).toContainText('A GRC does not change your legal status as the father or mother of a child.');
+      }
+      await expect(page.locator('#planContent'), 'the overview says a GRC lets you update a UK-registered marriage certificate, not that it changes automatically')
+        .not.toContainText('certificates will reflect your legal gender');
+    });
+
+    test('251. The Irish GRC note does not rule out everyone living in Northern Ireland or Great Britain', async ({ page }) => {
+      const note = await page.evaluate(() => window.PLAN_ITEMS.irish_passport.detail);
+      expect(note, 'section 9 lets someone whose birth is registered in Ireland apply wherever they live').toContain('even if you live elsewhere');
+      expect(note).toContain('you would generally need to be ordinarily resident in the Republic to qualify');
+      expect(note).not.toContain('does not apply to someone living in Northern Ireland or Great Britain');
+    });
+
+    test('252. The Scotland screening note follows NHS Inform on when invitations still arrive', async ({ page }) => {
+      const notes = await page.evaluate(() => ({
+        record: window.PLAN_ITEMS.nhs.regions.scot.variants.gender.detail,
+        newGP: window.PLAN_ITEMS.newgp.regions.scot.detail,
+      }));
+      for (const [where, text] of Object.entries(notes)) {
+        expect(text, `${where}: a CHI change after 14 June 2015 still brings automatic invitations, so the date matters`).toContain('after 14 June 2015, you should still be invited automatically for the screening your body needs');
+        expect(text, `${where}: people who moved from England or Wales may not be picked up`).toContain('moved to Scotland from elsewhere, including England and Wales');
+        expect(text, `${where}: NHS Inform names who to contact for each programme`).toContain('contact your GP practice for cervical screening, or your local screening service for breast or AAA screening');
+        expect(text).not.toContain('Changing your CHI gender marker may affect which invitations you receive');
+      }
+    });
+
+    test('253. Every panel splits its sections with ruled headings in the same way', async ({ page }) => {
+      const panels = await page.evaluate(() => ['dlgAbout', 'dlgUsage', 'dlgPrivacy', 'dlgSupport', 'dlgDisclaimer'].map(id => {
+        const dlg = document.getElementById(id);
+        dlg.showModal();
+        const body = dlg.querySelector('.dialog-body');
+        const headings = [...body.querySelectorAll('h3')].map(h => ({
+          text: h.textContent.trim(),
+          ruled: getComputedStyle(h).borderTopStyle === 'solid',
+          first: h === body.firstElementChild,
+        }));
+        dlg.close();
+        return { id, headings };
+      }));
+      for (const { id, headings } of panels) {
+        for (const h of headings.filter(h => !h.first)) {
+          expect(h.ruled, `${id}: "${h.text}" starts a new section, so it has the rule above it like the other panels`).toBe(true);
+        }
+      }
+      const names = Object.fromEntries(panels.map(p => [p.id, p.headings.map(h => h.text)]));
+      expect(names.dlgPrivacy).toEqual(['What the planner does', 'What the host receives', 'Shared links', 'On this device', 'Quick exit']);
+      expect(names.dlgDisclaimer, 'these were styled paragraphs, so screen readers could not jump between them').toEqual(['What this is', 'Using this planner', 'Legal terms']);
+    });
+
+    test('254. The changelog lists every release at the top, linked to its heading', async () => {
+      const log = fs.readFileSync(path.resolve('..', 'CHANGELOG.md'), 'utf8');
+      const releases = [...log.matchAll(/^## \[(.+)\]$/gm)].map(m => m[1]);
+      expect(releases.length).toBeGreaterThan(10);
+      const slug = name => name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s/g, '-');
+      expect(slug('October 2026 /2'), 'GitHub drops the brackets and the slash, as its own anchors on main show').toBe('october-2026-2');
+      const list = log.slice(log.indexOf('Releases:'), log.indexOf('\n## ['));
+      const entries = [...list.matchAll(/^- \[(.+)\]\(#(.+)\)$/gm)].map(m => ({ name: m[1], anchor: m[2] }));
+      expect(entries.map(e => e.name), 'add each new release to the list at the top, newest first').toEqual(releases);
+      for (const e of entries) {
+        expect(e.anchor, `${e.name} links to the anchor GitHub gives its heading`).toBe(slug(e.name));
+      }
     });
 
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
@@ -1675,7 +1897,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Copy link to this plan' }).click();
       await page.waitForFunction(() => window._shareUrl !== null);
       const clip = await page.evaluate(() => window._shareUrl);
-      const decoded = decodeState(new URL(clip).searchParams.get('p'));
+      const decoded = sharedPlanData(clip);
       expect(decoded.srv.split(',')).toContain('cra');
     });
 
@@ -3238,7 +3460,7 @@ test.describe('Be myself Planner', () => {
       const dismissers = await page.evaluate(() => [...document.querySelectorAll('[data-action^="dismiss"]')]
         .filter(b => b.dataset.action !== 'dismissBanner')
         .map(b => ({ action: b.dataset.action, shared: b.classList.contains('tip-close'), title: b.title })));
-      expect(dismissers.length).toBe(5);
+      expect(dismissers.length, 'five tips, plus the privacy update notice on the welcome back screen').toBe(6);
       for (const d of dismissers) {
         expect(d.shared, `${d.action} uses the shared ✕ style`).toBe(true);
         expect(d.title, `${d.action}: a ✕ removes the tip for good, so its tooltip says so`).toBe("Don't show this again");
@@ -4074,6 +4296,61 @@ test.describe('Be myself Planner', () => {
         'a home page changes all the time and carries no specific guidance').toEqual(['Guidance page', 'Form']);
       expect(normaliseText('            Read more about\u00a0AAA   screening\n        \n\nNext line  '),
         'issues #1, #5 and #9 were full of lines that differed only in spacing').toBe('Read more about AAA screening\nNext line');
+    });
+
+    test('239. No file in the repository uses an em dash or an en dash', async () => {
+      const { execFileSync } = require('child_process');
+      const root = path.resolve('..');
+      const files = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split('\n')
+        .filter(f => f && !/\.png$/.test(f) && f !== 'tests/source-content-snapshots.json');
+      expect(files.length, 'git should list the repository files').toBeGreaterThan(20);
+      const withDashes = files.filter(f => /[\u2013\u2014]/.test(fs.readFileSync(path.join(root, f), 'utf8')));
+      expect(withDashes, 'use a comma, a full stop or brackets instead; the source snapshots are skipped because they quote other sites').toEqual([]);
+    });
+
+    test('249. The privacy wording matches what New plan keeps, and makes no unqualified claims', async ({ page }) => {
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await page.getByRole('button', { name: /Theme: switch to (light|dark) mode/ }).click();
+      await page.locator('#ubRestartBtn').click();
+      await page.getByRole('button', { name: /Confirm/ }).click();
+      await expect(page.locator('#startView')).toBeVisible();
+      const kept = await page.evaluate(() => Object.keys(localStorage).sort());
+      expect(kept, 'the Privacy panel and README name exactly what New plan keeps').toEqual(['disclaimerSeen', 'theme']);
+      const privacy = await page.evaluate(() => document.querySelector('#dlgPrivacy .dialog-body').textContent.replace(/\s+/g, ' '));
+      const about = await page.evaluate(() => document.querySelector('#dlgAbout').textContent.replace(/\s+/g, ' '));
+      const readme = fs.readFileSync(path.resolve('..', 'README.md'), 'utf8').replace(/\s+/g, ' ');
+      for (const [where, text] of Object.entries({ privacy, readme })) {
+        expect(text, `${where}: any host receives request details, so nothing can promise that no personal data is collected`).not.toMatch(/No personal (information|data) is collected/i);
+        expect(text, `${where}: New plan keeps the theme and a note that the disclaimer was seen`).toMatch(/light or dark mode choice and a note that you have seen the disclaimer/);
+        expect(text, `${where}: Base64 is encoding, not encryption`).toMatch(/not encrypted/);
+        expect(text, `${where}: the host receives technical request information`).toContain('IP address');
+        expect(text, `${where}: quick exit hides the page but deletes nothing`).toMatch(/does not delete your saved plan, your browser history, anything you have copied, or any link you have shared/);
+        expect(text, `${where}: the host's security settings can change without notice`).toMatch(/changed at any time without notice/);
+      }
+      expect(about, 'the answer to "Is my information safe?" should not start with an unqualified yes').not.toMatch(/Is my information safe\? Yes\./);
+    });
+
+    test('250. Returning visitors see a privacy update notice until they dismiss it or it expires', async ({ page }) => {
+      const tip = page.locator('#privacyUpdateTip');
+      await expect(tip, 'a first visit has no saved plan, so there is nothing to tell them about').toBeHidden();
+      await openChecklist(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      await expect(tip).toBeVisible();
+      await expect(tip).toContainText('Privacy policy recently updated. Use is not impacted.');
+      await tip.getByRole('link', { name: 'Privacy policy' }).click();
+      await expect(page.locator('#dlgPrivacy')).toBeVisible();
+      await page.keyboard.press('Escape');
+      await tip.getByRole('button', { name: 'Dismiss the privacy update notice' }).click();
+      await expect(tip).toBeHidden();
+      await expect(page.getByRole('button', { name: 'Continue my plan' }), 'focus moves on rather than being lost with the hidden notice').toBeFocused();
+      await reloadUntil(page, () => page.evaluate(() => localStorage.getItem('privacyUpdateSeen') === '1' && !document.getElementById('welcomeNormal').classList.contains('hidden')));
+      await expect(tip, 'a dismissed notice stays dismissed').toBeHidden();
+      await page.evaluate(() => localStorage.removeItem('privacyUpdateSeen'));
+      await page.clock.setFixedTime(new Date('2027-02-01T00:00:00Z'));
+      await reloadUntil(page, () => page.locator('#welcomeNormal').isVisible());
+      await expect(tip, 'the notice is temporary and stops showing after its end date').toBeHidden();
     });
   });
 

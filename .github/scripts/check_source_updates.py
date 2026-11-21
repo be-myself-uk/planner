@@ -1,28 +1,3 @@
-"""
-Checks GOV.UK sources listed in SOURCES.md against the GOV.UK Content API,
-using each entry's own "Last verified" date as the baseline. No separate
-state file: SOURCES.md is the only source of truth, for both the list of
-sources and the last-checked date.
-
-Scope is deliberately GOV.UK only. Every gov.uk page exposes a
-public_updated_at timestamp through a plain JSON API call, no scraping,
-but GOV.UK only changes it for major edits, so a minor edit to a page
-can leave it untouched. Every source, GOV.UK pages included, is
-therefore also covered by tests/source-content-check.js (the
-source-content-watch job), which renders each page with Playwright and
-diffs its extracted article text. A small number of sites that block
-automated fetches outright stay on manual review; see
-KNOWN_BLOCKED_DOMAINS in tests/source-snapshot-lib.js.
-
-An entry is only checked if its "Last verified" field already holds a
-real ISO 8601 date; entries still marked "pending" are skipped, since
-there is no baseline yet to compare against, not flagged.
-
-This is a trigger for review, not a verdict: a flagged source may not
-need any change to index.html, and the planner content should be checked
-against what actually changed on the page, not assumed from the date
-alone.
-"""
 import json
 import re
 import subprocess
@@ -40,7 +15,6 @@ SENTINEL = "\n__STATUS__:"
 
 
 def parse_sources(text):
-    """Return a list of dicts: name, url, section, status, last_verified."""
     entries = []
     section = ""
     current = {}
@@ -234,12 +208,6 @@ SELFTEST_FIXTURE = """\
 
 
 def run_selftest():
-    """Parses a small fixture covering both known SOURCES.md formats and
-    asserts the parser handles each field correctly. Run by hand after
-    changing SOURCES.md's structure: `python3 check_source_updates.py --selftest`.
-    Not run automatically in CI, to keep the scheduled workflow fast; this
-    exists so a format change can be checked before it reaches a scheduled run.
-    """
     entries = parse_sources(SELFTEST_FIXTURE)
     assert len(entries) == 5, f"expected 5 entries, got {len(entries)}"
 

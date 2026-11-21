@@ -36,7 +36,8 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/change-name-deed-poll>
   - Status: Linked in the planner
   - Note: States that a permanent resident overseas cannot change their name by deed poll. Source for the first step shown to people living outside the UK.
-  - Last verified: 2026-10-01
+  - Note: Says "Some organisations (such as some banks, mobile phone companies or energy providers) may only accept an enrolled deed poll to change your name on their records", and its unenrolled deed poll page says "Some organisations may not accept a deed poll you've made yourself as proof of your new name." Source for that caveat in the deed poll steps for England and Wales, Scotland and Northern Ireland. The page names no territorial scope beyond saying there are different rules for people born in Scotland, so the Scotland and Northern Ireland steps say the guidance is written for England and Wales. Also says "If you're 16 or over, you can make a deed poll yourself".
+  - Last verified: 2026-11-20
 
 - **GOV.UK (FCDO): Change of name, name discrepancy and naming children letters**
   - <https://www.gov.uk/guidance/change-of-name-name-discrepancy-and-naming-children-letters>
@@ -48,7 +49,8 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible>
   - Status: Consulted, not linked in the planner
   - Note: Documents who can witness a statutory declaration: a solicitor, a notary public, a justice of the peace, a commissioner for oaths, a councillor (Scotland only, for documents dated on or after 10 December 2007), officers of the armed services at or above the rank of major or equivalent, and other persons authorised by law to administer an oath. This is the source for the witness list shown for Scotland, including local councillors. Also documents that an overseas deed poll must be accepted, as must an overseas equivalent of a statutory declaration or affidavit where the country allows a change of name and there are no concerns about the document, and that applicants outside the UK who have changed their name may need extra evidence of use, depending on the country.
-  - Last verified: 2026-10-01
+  - Note: Version 28.0, updated 28 August 2026. Says "If the customer has multiple changes to their name, they must provide evidence for each change of name", going back to the birth, adoption, naturalisation or registration certificate for a first passport, or the name on the last passport for a renewal or replacement, and that "We will not accept the evidence if it does not show a clear link between the old and new names." If the customer does not have evidence of every link, "they must provide a statutory declaration", which "must cover all names used" and should say when each name was used, if the information is available. Source for the "If you have changed your name more than once" paragraph in the UK passport step. It also lists an unenrolled deed poll among the evidence it accepts, as long as it is signed in the old and new names, witnessed, dated and contemporaneous, which is the source for the deed poll steps in Scotland and Northern Ireland saying HM Passport Office accepts one.
+  - Last verified: 2026-11-20
 
 ### Scotland
 
@@ -100,7 +102,7 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/cwg2-further-guide-to-paye-and-national-insurance-contributions/2026-to-2027-employer-further-guide-to-paye-and-national-insurance-contributions>
   - Status: Consulted, not linked in the planner
   - Note: Section 1.17 says no verification is needed to change an employee's name, but that an employer can update an employee's gender and title where it is aware of the change "by providing you with a GRC or a new birth certificate". This differs from the public page above, which says an employer can update payroll once the employee tells them. Source for the "If payroll asks for a certificate" paragraph in the work step. The same wording appears in the 2024 to 2025 and 2025 to 2026 editions.
-  - Last verified: 2026-11-06
+  - Last verified: 2026-11-20
 
 - **GOV.UK (UKSV): National Security Vetting, change of personal circumstances**
   - <https://www.gov.uk/government/publications/change-of-personal-circumstances>
@@ -214,7 +216,7 @@ For items with no official source, the links in the general data protection sect
 - **Student Finance England: Updating your personal details**
   - <https://www.gov.uk/guidance/updating-your-personal-details>
   - Status: Consulted (same URL as above; this is the Content API's rendering of it)
-  - Note: Confirms name changes need a signed covering letter plus evidence (birth/marriage certificate, decree, an un-enrolled Change of Name Deed, or statutory declaration), uploaded through the online account. Confirms title and gender changes need no documents or evidence at all — just a phone call, live chat, or letter — and that a gender change is never assumed from a name change alone. This is the source for the "in England, a title or gender change... needs no supporting documents" line.
+  - Note: Confirms name changes need a signed covering letter plus evidence (birth/marriage certificate, decree, an un-enrolled Change of Name Deed, or statutory declaration), uploaded through the online account. Confirms title and gender changes need no documents or evidence at all, just a phone call, live chat, or letter, and that a gender change is never assumed from a name change alone. This is the source for the "in England, a title or gender change... needs no supporting documents" line.
   - Last verified: 2026-09-17
 
 - **Student Finance Wales: Changes to your information or circumstances**
@@ -234,13 +236,13 @@ For items with no official source, the links in the general data protection sect
 - **SAAS: Changing your details**
   - <https://www.saas.gov.uk/guides/hints-and-tips/changing-details>
   - Status: Linked in the planner
-  - Last verified: 2026-09-17
+  - Last verified: 2026-11-20
 
 - **SAAS: Change of name, gender and title (form)**
   - <https://www.saas.gov.uk/files/485/saas-change-of-name-gender-title.pdf>
   - Status: Linked in the planner
-  - Note: SAAS uses one combined form (sections A-E) for a name, gender, and title change together, emailed to a confidential mailbox (SAAS_Confidential@gov.scot), unlike SFE/SFW/SFNI's separate name/title/gender processes. Accepts a wide range of evidence for Section D, including a birth certificate, marriage/civil partnership certificate, decree nisi/absolute, GRC, statutory declaration or deed poll, passport or driving licence in the new name, or a letter from a doctor, solicitor, local authority, or the student's college/university — a GRC is listed as one option among several, not a requirement. States SAAS deletes/destroys the change-of-details documents from the student's record afterwards. Recommends also updating the Student Loans Company and DWP directly, since SAAS does not do this automatically. This is the source for the whole Scotland branch of the "Student finance" paragraph.
-  - Last verified: 2026-09-17
+  - Note: SAAS uses one combined form (sections A-E) for a name, gender, and title change together, emailed to a confidential mailbox (SAAS_Confidential@gov.scot), unlike SFE/SFW/SFNI's separate name/title/gender processes. Accepts a wide range of evidence for Section D, including a birth certificate, marriage/civil partnership certificate, decree nisi/absolute, GRC, statutory declaration or deed poll, passport or driving licence in the new name, or a letter from a doctor, solicitor, local authority, or the student's college/university. A GRC is listed as one option among several, not a requirement. States SAAS deletes/destroys the change-of-details documents from the student's record afterwards. Recommends also updating the Student Loans Company and DWP directly, since SAAS does not do this automatically. This is the source for the whole Scotland branch of the "Student finance" paragraph.
+  - Last verified: 2026-11-20
 
 ## Criminal record checks (dbs)
 
@@ -250,13 +252,13 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/guidance/transgender-applications>
   - Status: Linked in the planner
   - Note: The sensitive applications route is available for basic, standard and enhanced checks. Applicants should call or email the sensitive applications team before submitting their application. DBS publishes no notice period, so the planner marks allowing a few days as community advice.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **GOV.UK: DBS Update Service applicant guide**
   - <https://www.gov.uk/government/publications/dbs-update-service-guide-for-applicants/dbs-update-service-applicant-guide>
   - Status: Linked in the planner
   - Note: Says that after a change of name you must apply for a new DBS check through your organisation, that the name on an Update Service account cannot be changed, and that DBS recommends a new subscription in the new name. Also says that someone who used the sensitive applications route will not have their previous sex and identity shown to others through the Update Service.
-  - Last verified: 2026-11-13
+  - Last verified: 2026-11-20
 
 ### Scotland
 
@@ -264,13 +266,13 @@ For items with no official source, the links in the general data protection sect
   - <https://www.mygov.scot/transgender-disclosure-application>
   - Status: Linked in the planner
   - Note: Only needed when an employer countersigns; a Level 1 disclosure without a countersignatory does not show previous names. Previous names relating to transgender status are emailed separately, with the application reference number if there is one. Non-binary applicants choose male or female, which does not need to be their legal sex. The disclosure shows only the current name.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **mygov.scot: Manage your PVG membership**
   - <https://www.mygov.scot/manage-pvg>
   - Status: Linked in the planner
   - Note: PVG scheme members must tell Disclosure Scotland about a change of name or gender within 3 months, and not doing so is a criminal offence.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **mygov.scot: Disclosure levels**
   - <https://www.mygov.scot/disclosure-levels>
@@ -283,7 +285,7 @@ For items with no official source, the links in the general data protection sect
 - **NI Direct: Using a criminal record check**
   - <https://www.nidirect.gov.uk/articles/using-criminal-record-check>
   - Status: Linked in the planner
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
   - Note: previously linked to the generic `/contacts/accessni` page, which does not document the transgender sensitive-applications route or the Operations Manager contact; this page does. Documents the special application process for transgender people through AccessNI's Operations Manager, and that a certificate cannot be transferred from one role to another. It does not say the process must be arranged before an online application is submitted, or how previous names appear on a certificate, so the planner marks both as community advice.
 
 ## Driving licence (dvla, dva)
@@ -424,8 +426,8 @@ For items with no official source, the links in the general data protection sect
 - **NHS Inform: Registering with a GP practice**
   - <https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/>
   - Status: Linked in the planner
-  - Note: Covers GP registration only. It does not document the gender marker change process; the NSS FOI response below does.
-  - Last verified: 2026-09-13
+  - Note: Covers GP registration only. It does not document the gender marker change process; the NSS FOI response below does. Checked on 20 November 2026 from a copy of the page supplied by the maintainer, since NHS Inform refuses automated fetches.
+  - Last verified: 2026-11-20
 
 - **NHS National Services Scotland FOI release FOI-000084: Requirements for processing a change of gender and title**
   - <https://www.nss.nhs.scot/publications/foi-000084-requirements-for-processing-a-change-of-gender-and-title/foi-000084-requirements-for-processing-a-change-of-gender-and-title-html/>
@@ -436,7 +438,8 @@ For items with no official source, the links in the general data protection sect
 - **NHS Inform: Screening information for the transgender community**
   - <https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/>
   - Status: Linked in the planner
-  - Last verified: 2026-09-13
+  - Note: Last updated 15 September 2026. Says "All NHS screening programmes in Scotland identify people who are eligible for screening through their CHI number", which "identifies you as male or female". For each programme it says people who changed their CHI number to reflect their gender after 14 June 2015 are automatically invited, including, for example, trans women for cervical screening, which they do not need, and that people who changed it on or before 14 June 2015 are not automatically invited. It also says "It isn't always possible to identify people who've moved to Scotland as transgender", including from England and Wales, and to contact "your local screening service for AAA screening or breast screening" or "your GP practice for cervical screening" about a missed invitation. Source for the screening note in the Scotland health record and new GP steps. NHS Inform refuses automated fetches, so this text was checked from a copy of the page supplied by the maintainer.
+  - Last verified: 2026-11-20
 
 - **NHS Inform Scotland (main site)**
   - <https://www.nhsinform.scot/>
@@ -552,8 +555,8 @@ For items with no official source, the links in the general data protection sect
 - **Gender Recognition Act 2015 (Ireland), section 9**
   - <https://www.irishstatutebook.ie/2015/en/act/pub/0025/sec0009.html>
   - Status: Consulted, not linked in the planner
-  - Note: Sets out who may apply for gender recognition: a person whose birth, adoption, or foreign birth is registered in one of the Republic's own registers (regardless of residence), or a person ordinarily resident in the State whose birth is registered elsewhere. Someone born in Northern Ireland and living in Northern Ireland or Great Britain meets neither condition, so the Irish GRC route is usually not available to them at all, not merely an extra step.
-  - Last verified: 2026-09-12
+  - Note: Section 9(1)(a) covers a person "who may or may not be ordinarily resident in the State" and whose birth is in the register of births, whose adoption is in the Adopted Children Register or the register of intercountry adoptions, or whose birth is recorded in a foreign births entry book or the foreign births register. Section 9(1)(b) covers a person "who is ordinarily resident in the State, whose birth did not take place in the State". Section 9(2)(a) sets a minimum age of 18, subject to section 12. Source for the Irish passport step's note that someone whose birth, adoption or foreign birth is registered in the Republic may be eligible even if they live elsewhere, and that someone born in Northern Ireland whose birth or adoption is not registered in Ireland would generally need to be ordinarily resident in the Republic. The planner used to say the Irish GRC does not apply to anyone living in Northern Ireland or Great Britain, which left out section 9(1)(a). The eISB refuses automated fetches, so this text was checked from a copy of the page supplied by the maintainer.
+  - Last verified: 2026-11-20
 
 - **gov.ie (Department of Social Protection): Apply for a Gender Recognition Certificate / Revised Birth Certificate**
   - <https://www.gov.ie/en/department-of-social-protection/services/apply-for-a-gender-recognition-certificate-revised-birth-certificate/>
@@ -566,8 +569,15 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Apply for a Gender Recognition Certificate**
   - <https://www.gov.uk/apply-gender-recognition-certificate>
   - Status: Linked in the planner
-  - Note: The overview says the name on a certificate cannot be changed after it is issued; that entitlement to some benefits and pensions, including a partner's entitlement to the applicant's pension, may change; that there is an additional charge for a new birth certificate; and that someone recognised in an approved country or territory can use the overseas route, which needs a document proving that recognition instead of medical reports and two years of evidence.
-  - Last verified: 2026-10-01
+  - Note: The overview says the name on a certificate cannot be changed after it is issued; that entitlement to some benefits and pensions, including a partner's entitlement to the applicant's pension, may change; and that there is an additional charge for a new birth certificate. The overseas route is described on the "Who can apply" and "What documents you need" pages, not the overview (see below).
+  - Note: The overview also says "Non-binary genders are not legally recognised in the UK"; that a certificate means you can "update your birth or adoption certificate, if it was registered in the UK" and "update your marriage or civil partnership certificate, if it was registered in the UK"; that "You do not need a certificate to" update your driving licence, your passport, or "your medical records, employments records or your bank account"; and that "It will not change your legal status as the father or mother of a child." Source for the GRC introduction's sentences on what a GRC updates, what it is not needed for, and parenthood.
+  - Last verified: 2026-11-20
+
+- **GOV.UK: Apply for a GRC, who can apply**
+  - <https://www.gov.uk/apply-gender-recognition-certificate/who-can-apply>
+  - Status: Consulted, not linked in the planner
+  - Note: Lists the standard route's requirements: aged 18 or over, diagnosed with gender dysphoria in the UK, living in the affirmed gender for at least 2 years, and intending to live in it for the rest of your life. Says "You can apply even if you have not had any gender affirming surgery or treatments, or you do not plan to have any." For someone with a certificate or similar from an approved country or territory, the only requirements are being 18 or over and having a document showing the affirmed gender is legally recognised there, which is the source for the shorter overseas route not needing the medical reports. Also the source for the minimum age of 18 and for the GRC introduction's sentence on surgery and treatment.
+  - Last verified: 2026-11-20
 
 - **GOV.UK: Apply for a GRC, what documents you need**
   - <https://www.gov.uk/apply-gender-recognition-certificate/what-documents-you-need>
@@ -586,6 +596,12 @@ For items with no official source, the links in the general data protection sect
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>
   - Status: Linked in the planner
   - Last verified: 2026-09-19
+
+- **Gender Recognition Act 2004, section 12**
+  - <https://www.legislation.gov.uk/ukpga/2004/7/section/12>
+  - Status: Consulted, not linked in the planner
+  - Note: Headed "Parenthood". Says that a person's gender becoming the acquired gender under the Act does not affect their status as the father or mother of a child. Supports the GRC introduction's sentence on parenthood, alongside the GOV.UK overview.
+  - Last verified: 2026-11-20
 
 - **Gender Recognition Act 2004, section 21**
   - <https://www.legislation.gov.uk/ukpga/2004/7/section/21>
@@ -646,7 +662,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
   - <https://www.electoralcommission.org.uk/voting-and-elections/register-vote/register-vote-anonymously>
   - Status: Linked in the planner
   - Note: Anyone whose safety, or the safety of someone in their household, could be affected by their name and address being on the register can apply. An application needs a relevant court order or injunction, or an attestation from a qualifying officer such as a police officer of inspector rank or above, or a registered doctor, nurse or midwife. Overseas voters cannot apply online.
-  - Last verified: 2026-10-01
+  - Last verified: 2026-11-20
 
 - **Electoral Commission guidance for Electoral Registration Officers: processing anonymous registration applications**
   - <https://www.electoralcommission.org.uk/running-electoral-registration-england/special-category-electors/anonymous-registration/how-should-application-anonymous-registration-be-processed>
@@ -740,7 +756,7 @@ Once a GRC has been granted, the relevant register office (GRO, NRS, or GRONI) i
 - **Registers of Scotland: Managing a recorded person's details**
   - <https://kb.ros.gov.uk/rci/managing-an-entry/managing-a-recorded-persons-details>
   - Status: Linked in the planner
-  - Last verified: 2026-07-13
+  - Last verified: 2026-11-20
 
 #### Northern Ireland
 

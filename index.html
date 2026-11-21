@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-2k7jOzzkSc2GeuvrJJVCEys13vnluHsXYAEjrqkc9xQ='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-pqHyLBVIwO48XF1gGHwb65PHtjpUh/dr5I5rcJkSsgw='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -98,7 +98,7 @@
   <div id="ageKickout" class="hidden">
     <div class="phase info" style="margin-top:0;">
       <h2 tabindex="-1">This planner is for people aged 16 and over</h2>
-      <p>The legal processes for updating documents for people under 16 require parental or guardian consent and are different from the steps covered here.</p>
+      <p>Processes for people under 16 can be different. Depending on the document and your circumstances, they may involve parental responsibility, consent or other requirements. This planner does not cover them.</p>
       <p>The following organisations support young trans and non-binary people and their families:</p>
       <ul>
         <li><a href="https://mermaidsuk.org.uk/" target="_blank" rel="noopener noreferrer">Mermaids<span class="visually-hidden"> (opens in a new tab)</span></a>: support for transgender and gender-diverse children and young people</li>
@@ -115,6 +115,13 @@
     </div>
   </div>
   <div id="welcomeBackView" class="hidden">
+    <div id="sharedLinkUnreadable" class="phase simul hidden" role="alert" style="margin-top:0;margin-bottom:16px;">
+      <p style="margin:0;"><span aria-hidden="true">⚠️</span> The shared link could not be read. It may have been cut short when it was copied. Your saved plan has not been changed.</p>
+    </div>
+    <div id="privacyUpdateTip" class="phase info hidden" style="margin:0 0 16px 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <p style="margin:0;"><a href="#" data-action="openDialog" data-arg="dlgPrivacy">Privacy policy</a> recently updated. Use is not impacted.</p>
+      <button class="tip-close" data-action="dismissPrivacyUpdate" aria-label="Dismiss the privacy update notice" title="Don't show this again">✕</button>
+    </div>
     <div id="welcomeNormal" class="phase info" style="margin-top:0;margin-bottom:25px;">
       <h2>Welcome back</h2>
       <p>Your plan is saved on this device.</p>
@@ -302,11 +309,11 @@
     <h3 style="margin:0 0 6px 0;font-size:1em;">What is this?</h3>
     <p>A free, private planner that helps trans and non-binary people in the UK work out the steps they need to take to update their name and gender marker on their documents.</p><p><strong>Be myself</strong> helps you work out what needs updating so you spend less time navigating confusing paperwork and more time simply <strong>being yourself</strong>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Who is it for?</h3>
-    <p>Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold. That includes people living in the UK, people living abroad, and people planning to move to the UK, such as people with a visa or eVisa. People under 16 need parental consent and follow a different process, which this planner does not cover.</p>
+    <p>Anyone aged 16 or over who wants to update their name, their gender marker, or both on UK documents they hold. That includes people living in the UK, people living abroad, and people planning to move to the UK, such as people with a visa or eVisa. Processes for people under 16 can be different, and may involve parental responsibility, consent or other requirements depending on the document. This planner does not cover them.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">What does it cover?</h3>
     <p>Updating your name, your gender marker, or both, on:</p><ul><li>a deed poll or statutory declaration</li><li>your UK passport, your Irish passport, or your home country passport and UK eVisa</li><li>your driving licence and vehicle logbook (V5C)</li><li>your NHS or GP record, HMRC and tax records, and benefits</li><li>DBS, Disclosure Scotland and AccessNI checks</li><li>work, student and professional records</li><li>banks, utilities, the electoral register and other services</li><li>a Gender Recognition Certificate (GRC) and your birth certificate</li><li>the Irish passport route for people born in Northern Ireland</li></ul>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Is my information safe?</h3>
-    <p>Yes. Nothing you enter is sent to a server or stored outside your own device, unless you share a link to your plan: the link holds your answers, and they reach the website's host when it is opened. Your progress is saved in your browser so you can return to it later. Press the red ⚠️ button at any time to instantly leave the page, or press Esc twice within a second. This does not delete your saved plan, so on a shared device, use a private window. For full details, see <a href="#" data-action="openFromDialog" data-arg="dlgPrivacy">Privacy</a>.</p>
+    <p>Nothing you enter is sent to a server while you use the planner. Your answers and progress are saved in your browser on this device, so you can return to them later. A link to your plan holds your answers in the link itself, and they are not encrypted, so anyone who has the link can read them. Press the red ⚠️ button at any time to instantly leave the page, or press Esc twice within a second. This does not delete your saved plan, so on a shared device, use a private window. For full details, see <a href="#" data-action="openFromDialog" data-arg="dlgPrivacy">Privacy</a>.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">How does it work?</h3>
     <p>You answer a short set of questions about your situation: what documents you already have, what you have already updated, and what you want to do. The planner builds a step-by-step action plan with links to the relevant official pages.</p>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Step-by-step or checklist?</h3>
@@ -338,7 +345,7 @@
     <div class="legend-toolbar" style="margin-bottom:12px;">
       <span class="legend-tb-icon" aria-hidden="true">?</span><span><strong>Usage guide:</strong> opens this dialog. You can also open it by pressing <kbd>/</kbd> or typing a question mark (<kbd>?</kbd>).</span>
       <span class="legend-tb-icon" aria-hidden="true">☀️</span><span><strong>Theme:</strong> switches between light and dark appearance. Follows your device setting by default.</span>
-      <span class="legend-tb-icon" aria-hidden="true">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and replaces it in your tab's history, so the back button will not return here. The visit may still appear in your browser's saved history. It does not delete your saved plan, so anyone who opens this site in the same browser will see it. On a shared device, use a private window, or use ↺ New plan to delete your plan when you finish. The same button is at the top of every panel like this one, and pressing <kbd>Esc</kbd> twice within a second does the same.</span>
+      <span class="legend-tb-icon" aria-hidden="true">⚠️</span><span><strong>Quick exit:</strong> leaves this page immediately and replaces it in your tab's history, so the back button will not return here. The visit may still appear in your browser's saved history. It does not delete your saved plan, so anyone who opens this site in the same browser will see it, and it does not clear anything you have copied or any link you have shared. On a shared device, use a private window, or use ↺ New plan to delete your plan when you finish. The same button is at the top of every panel like this one, and pressing <kbd>Esc</kbd> twice within a second does the same.</span>
     </div>
     <p style="margin:0 0 8px 0;font-size:0.9em;color:var(--text-muted);">When creating a plan</p>
     <div class="legend-toolbar" style="margin-bottom:12px;">
@@ -352,7 +359,7 @@
       <span class="legend-tb-icon" aria-hidden="true">🧹</span><span><strong>Reset progress:</strong> unticks all checkboxes but keeps your plan and answers intact.</span>
       <span class="legend-tb-icon" aria-hidden="true">🔀</span><span><strong>Reset order:</strong> appears once you have moved something, and puts the steps back in their suggested order.</span>
       <span class="legend-tb-icon" aria-hidden="true">👁️</span><span><strong>Focus mode:</strong> hides items you have marked as done or not needed, so you can focus on what remains.</span>
-      <span class="legend-tb-icon" aria-hidden="true">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation.</span>
+      <span class="legend-tb-icon" aria-hidden="true">🔗</span><span><strong>Copy link:</strong> copies a shareable link to your plan. ⚠️ This link contains sensitive information such as your immigration status and employment situation. It is not encrypted, so anyone who has it can read your answers.</span>
       <span class="legend-tb-icon" aria-hidden="true">🖨️</span><span><strong>Print:</strong> opens your browser's print dialog. Saves your current progress and expands all detail sections.</span>
     </div>
     <h3 style="border-top:1px solid var(--border);padding-top:10px;">Action plan</h3>
@@ -410,9 +417,16 @@
     </div>
   </div>
   <div class="dialog-body" tabindex="0" role="region" aria-labelledby="dlgPrivacyTitle">
-    <p>No personal information is collected, and nothing you enter is sent to a server while you use the planner. It runs entirely in your browser.</p><p>The one exception is a shared plan link. A link made with Copy link holds your answers in its web address, so when anyone opens it, that address, including your answers, is sent to the website's host, as with any web address. Only share a link with people you trust.</p>
-    <p>To let you return to your plan later, progress is saved on the device you are using. Clicking "New plan" deletes your answers, your plan, and your progress, but keeps your light or dark mode choice. Clearing your browser's site data deletes everything.</p>
-    <p>Cloudflare, the hosting provider, may apply a security check to protect the site from automated attacks. This is not used for tracking or analytics.</p>
+    <h3 style="margin:0 0 6px 0;font-size:1em;">What the planner does</h3>
+    <p>The planner works in your browser. It does not send anything you enter to a server, and it has no analytics or tracking.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">What the host receives</h3>
+    <p>Like any website, the host receives technical information when the page is requested, such as your IP address and details of your browser. The host is Cloudflare. It may use security measures, such as bot protection, to protect the site from automated attacks, and may set a cookie for them. These measures can be switched on, switched off or changed at any time without notice.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Shared links</h3>
+    <p>A link made with Copy link holds your answers in its web address, after the #. Browsers do not send that part to the host when the link is opened, but your answers are not encrypted. Anyone who has the link can read them, and the link may be kept wherever it is saved or pasted, such as your browser history or a message. Older links have ?p= in the address instead, and opening one sends your answers to the host, as with any web address. When a link is opened, the planner removes your answers from the address bar. Only share a link with people you trust.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">On this device</h3>
+    <p>To let you return to your plan later, your answers and progress are saved in your browser. Clicking "New plan" deletes your answers, your plan, and your progress, but keeps your light or dark mode choice and a note that you have seen the disclaimer, so these can show that the planner has been used in this browser. Clearing your browser's site data deletes everything.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Quick exit</h3>
+    <p>Quick exit leaves the page straight away. It does not delete your saved plan, your browser history, anything you have copied, or any link you have shared. On a shared device, use a private window.</p>
   </div>
 </dialog>
 
@@ -466,13 +480,13 @@
   </div>
   <div class="dialog-body" tabindex="0" role="region" aria-labelledby="dlgDisclaimerTitle">
     <p class="disclaimer-muted">This disclaimer opens automatically on your first visit or if starting a new action plan.</p>
-    <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">What this is</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">What this is</h3>
     <p class="disclaimer-muted">This planner provides general information about UK legal processes, and the Irish passport gender recognition route where relevant, only. It is not legal, medical, financial, or tax advice, and using it does not create any professional relationship between you and the author. Your action plan is assembled from general information based on your answers and does not take account of your full personal circumstances.</p>
-    <p class="disclaimer-muted">This planner is for people aged 16 and over. The processes for under-16s are different and require parental or guardian consent; this planner does not cover them.</p>
-    <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">Using this planner</p>
+    <p class="disclaimer-muted">This planner is for people aged 16 and over. Processes for younger people can be different, and may involve parental responsibility, consent or other requirements depending on the document and circumstances. This planner does not cover those processes.</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Using this planner</h3>
     <p class="disclaimer-muted">Government rules, processes, and fees can change without notice. Any fees shown are for guidance only. Always check the current amount with the relevant organisation before making any payment. You should verify important steps against official sources, particularly GOV.UK, and consider speaking to a qualified legal professional before submitting formal applications.</p>
     <p class="disclaimer-muted">Links to external websites are provided for convenience. The author is not responsible for their content.</p>
-    <p style="margin:14px 0 6px 0;font-size:0.9em;font-weight:bold;color:var(--text-muted);">Legal terms</p>
+    <h3 style="border-top:1px solid var(--border);padding-top:10px;">Legal terms</h3>
     <p class="disclaimer-muted">To the fullest extent permitted by law, the author accepts no liability for any loss or adverse outcome arising from reliance on this planner. Nothing in this disclaimer excludes any liability that cannot lawfully be excluded.</p>
   </div>
 </dialog>
@@ -533,7 +547,8 @@ function encodeState(obj) {
   return btoa(bin);
 }
 function decodeState(str) {
-  const bin = atob(str);
+  if (typeof str !== 'string' || !str || str.length > SHARE_LINK_MAX_LENGTH) throw new Error('Unreadable link');
+  const bin = atob(str.replace(/ /g, '+'));
   const bytes = new Uint8Array(bin.length).map((_, i) => bin.charCodeAt(i));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
@@ -549,6 +564,7 @@ const CN_LABEL = 'Community advice, not an official source';
 const CN = '<span class="community-note" role="img" aria-label="' + CN_LABEL + '" title="' + CN_TEXT + '">i</span>';
 const HEALTH_NUMBER = { ni: 'a new Health and Care Number', scot: 'a new CHI number', default: 'a new NHS number' };
 const recordNote = (region) => '<p><strong>⚠️ Other services:</strong> Updating your details with your GP may not update them with other services you use. The same applies if you are given ' + (HEALTH_NUMBER[region] || HEALTH_NUMBER.default) + '. Tell any service that is treating you, or that you are waiting to see, yourself.</p>';
+const SCOT_SCREENING_NOTE = '<p><strong>⚠️ Screening note:</strong> NHS Inform says screening in Scotland uses your CHI number, which records you as male or female. If you changed your CHI number to reflect your gender after 14 June 2015, you should still be invited automatically for the screening your body needs, and you may also be invited for some you do not need. If you changed it on or before 14 June 2015, or you moved to Scotland from elsewhere, including England and Wales, you may not be invited automatically. If you think you have missed an invitation, contact your GP practice for cervical screening, or your local screening service for breast or AAA screening.</p>';
 const GENDER_SERVICE_NOTE = '<p><strong>⚠️ Gender service waiting list:</strong> If you are waiting for an NHS adult gender service in England, your referral is held by the Gender National Referral Support Service (GNRSS), separately from your GP record. Tell them about your new details yourself, using the contact form on their website. Your place on the list is set by your original referral date.</p><a href="https://adult.genderreferralservice.nhs.uk/faq" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS: Gender National Referral Support Service (GNRSS)</a>';
 const GENDER_SERVICE_NOTE_WALES = '<p><strong>⚠️ Gender service waiting list:</strong> If you are waiting for an NHS gender service in Wales, your referral is held by the Welsh Gender Service (WGS), separately from your GP record. Tell them about your new details yourself, using their change of details form.</p><a href="https://gender.wales/update-details/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Wales: Welsh Gender Service, update your details</a>';
 const SERVICES = [
@@ -580,6 +596,8 @@ const SERVICES = [
 ];
 const SVC_MAP = Object.fromEntries(SERVICES.map(s => [s.key, s.id]));
 const SHARE_PROGRESS_LIMIT = 200;
+const SHARE_LINK_MAX_LENGTH = 50000;
+let pendingShareParams = null;
 
 const GRC_MED_EVIDENCE = {
   idPrefix: 'grcmed',
@@ -701,7 +719,7 @@ const PLAN_ITEMS = {
       scot: {
         title: 'Register with a new GP',
         summary: 'Register at a new GP practice using your new name and correct gender marker from the start. A new CHI number may be issued.',
-        detail: '<p>When you register at a new practice in Scotland, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, NHS National Services Scotland (Practitioner Services) should then contact you to ask whether you want a new CHI (Community Health Index) number issued. This separates your new record from your previous one and protects your privacy.</p><p><strong>⚠️ Screening note:</strong> Your CHI number determines which NHS Scotland screening programmes you are automatically invited to. Ask your new GP to check you are enrolled in the programmes right for your body.</p><a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Registering with a GP practice</a><a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Screening for trans and non-binary people in Scotland</a>',
+        detail: '<p>When you register at a new practice in Scotland, you can show your deed poll or statutory declaration at registration so your correct details are on file from day one. Ask the practice to use the correct gender marker when registering.</p><p>Once registered, NHS National Services Scotland (Practitioner Services) should then contact you to ask whether you want a new CHI (Community Health Index) number issued. This separates your new record from your previous one and protects your privacy.</p>' + SCOT_SCREENING_NOTE + '<a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Registering with a GP practice</a><a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Screening for trans and non-binary people in Scotland</a>',
       },
       default: {
         title: 'Register with a new GP',
@@ -768,7 +786,7 @@ const PLAN_ITEMS = {
         variants: {
           gender: {
             summary: 'Your GP practice can update your gender marker. This is generally treated as a self-declaration process in Scotland, and a new CHI number may be issued.',
-            detail: '<p>In Scotland, updating your gender marker on your health record is a self-declaration process. No evidence is needed; you simply tell your GP practice, or Practitioner Services at NHS National Services Scotland, that you want it changed.</p>\n<p>A new CHI (Community Health Index) number may be issued to protect your privacy by separating your new record from your previous one.</p>\n<p><strong>⚠️ Screening note:</strong> Your CHI number determines which NHS Scotland screening programmes you are automatically invited to. Changing your CHI gender marker may affect which invitations you receive. Ask your GP to check you are enrolled in the right programmes.</p>\n<a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Registering with a GP practice</a>\n<a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Screening for trans and non-binary people in Scotland</a>',
+            detail: '<p>In Scotland, updating your gender marker on your health record is a self-declaration process. No evidence is needed; you simply tell your GP practice, or Practitioner Services at NHS National Services Scotland, that you want it changed.</p>\n<p>A new CHI (Community Health Index) number may be issued to protect your privacy by separating your new record from your previous one.</p>\n' + SCOT_SCREENING_NOTE + '\n<a href="https://www.nhsinform.scot/care-support-and-rights/nhs-services/doctors/registering-with-a-gp-practice/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Registering with a GP practice</a>\n<a href="https://www.nhsinform.scot/healthy-living/screening/screening-information-for-the-transgender-community/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS Inform: Screening for trans and non-binary people in Scotland</a>',
           },
           name: {
             summary: 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration.',
@@ -817,15 +835,15 @@ const PLAN_ITEMS = {
         title: 'Deed poll or statutory declaration',
         cost: { type:'split', value:'Free', value2:'Small cost' },
         time: '10-30 minutes',
-        summary: 'You need a document proving your name change before updating official records. In Scotland, both an unenrolled deed poll and a statutory declaration are accepted. A statutory declaration has traditionally been more common in Scotland, but a free deed poll is just as valid and simpler to arrange. If you use a deed poll, keep it unenrolled so your old name is not added to a public record.',
-        detail: '<p><strong>Option 1: Statutory declaration.</strong> A sworn document witnessed by a notary public, Justice of the Peace, solicitor, or local councillor. This has traditionally been the more usual way to evidence a name change in Scotland, and some organisations may be more familiar with it, though a small fee applies. This is different from a deed poll, and different from formally recording a name change with the National Records of Scotland (NRS) on your birth certificate, which is covered elsewhere in this plan if you were born in Scotland.</p>\n<p><strong>Option 2: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. It is equally valid and is widely accepted by organisations across the UK, including in Scotland. The GOV.UK and TransActual links below have details on the requirements and process. If using a deed poll, keeping it unenrolled is generally recommended for privacy, as enrolling puts your old name on a public government record.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> FreeDeedPoll.org.uk Generator</a>\n<a href="https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NRS: Changing your name in Scotland</a>',
+        summary: '<p>You need a document proving your name change before updating official records. In Scotland you can use an unenrolled deed poll or a statutory declaration. A free deed poll is simpler to arrange. If you use a deed poll, keep it unenrolled so your old name is not added to a public record.</p><p>' + CN + ' People report that a statutory declaration has traditionally been more common in Scotland, so some organisations there may be more familiar with one.</p>',
+        detail: '<p><strong>Option 1: Statutory declaration.</strong> A sworn document witnessed by a notary public, Justice of the Peace, solicitor, or local councillor. A small fee applies. This is different from a deed poll, and different from formally recording a name change with the National Records of Scotland (NRS) on your birth certificate, which is covered elsewhere in this plan if you were born in Scotland.</p>\n<p><strong>Option 2: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. HM Passport Office accepts an unenrolled deed poll as evidence of a change of name. GOV.UK guidance, written for England and Wales, says some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll. Check with an organisation before you rely on your deed poll. If it will not accept it, ask whether it accepts a statutory declaration. The GOV.UK and TransActual links below have details on the requirements and process. If using a deed poll, keeping it unenrolled is generally recommended for privacy, as enrolling puts your old name on a public government record.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> FreeDeedPoll.org.uk Generator</a>\n<a href="https://www.nrscotland.gov.uk/registration/change-your-name-in-scotland/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NRS: Changing your name in Scotland</a>',
       },
       ni: {
         title: 'Deed poll or statutory declaration',
         cost: { type:'split', value:'Free', value2:'Small cost' },
         time: '30 minutes - 1 day',
         summary: '<p>You need a document that records your name change before you can update most official records. In Northern Ireland, the DVA accepts a free unenrolled deed poll, a statutory declaration, or a GRC as evidence.</p><p>' + CN + ' Community experience suggests a statutory declaration witnessed by a solicitor (a small fee applies) is more widely accepted in practice, and one is used for the Irish passport gender-change route. The links below have the details.</p>',
-        detail: '<p><strong>Option 1: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. It is accepted for name changes by most organisations, and the DVA accepts it as evidence for a gender marker change. The TransActual, GOV.UK, and NI Direct links below have details on the requirements.</p>\n<p><strong>Option 2: Statutory declaration.</strong> A formal sworn statement witnessed by a solicitor, a magistrate, or a commissioner of oaths (a small fee applies). The DVA accepts it in the same way, and one is used for the Irish passport gender-change route.</p><p>' + CN + ' Community experience suggests some organisations in Northern Ireland are more familiar with statutory declarations than with deed polls.</p>\n<p><strong>⚠️ GRONI recording: not generally recommended.</strong> You can formally record a name change with the General Register Office for Northern Ireland, but this permanently links your old and new names on your official birth record, and any future certified copy will show both.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> FreeDeedPoll.org.uk Generator</a>\n<a href="https://www.nidirect.gov.uk/articles/recording-change-name" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NI Direct: Recording a change of name</a>',
+        detail: '<p><strong>Option 1: Free unenrolled deed poll.</strong> A simple document that can be created at home at no cost. HM Passport Office accepts an unenrolled deed poll as evidence of a change of name, and the DVA accepts it as evidence for a gender marker change. GOV.UK guidance, written for England and Wales, says some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll. Check with an organisation before you rely on your deed poll. The TransActual, GOV.UK, and NI Direct links below have details on the requirements.</p>\n<p><strong>Option 2: Statutory declaration.</strong> A formal sworn statement witnessed by a solicitor, a magistrate, or a commissioner of oaths (a small fee applies). The DVA accepts it in the same way, and one is used for the Irish passport gender-change route.</p><p>' + CN + ' Community experience suggests some organisations in Northern Ireland are more familiar with statutory declarations than with deed polls.</p>\n<p><strong>⚠️ GRONI recording: not generally recommended.</strong> You can formally record a name change with the General Register Office for Northern Ireland, but this permanently links your old and new names on your official birth record, and any future certified copy will show both.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> FreeDeedPoll.org.uk Generator</a>\n<a href="https://www.nidirect.gov.uk/articles/recording-change-name" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NI Direct: Recording a change of name</a>',
       },
       out: {
         title: 'Name-change document',
@@ -838,7 +856,7 @@ const PLAN_ITEMS = {
         cost: { type:'fixed', value:'Free' },
         time: '10-30 minutes',
         summary: 'A deed poll is a short legal document you sign to officially record your name change. You need one before you can update your details with UK services. It is free to create one yourself. <strong>An unenrolled deed poll is generally all you need.</strong> Enrolling a deed poll costs money and puts your old name on a public government record, which most people prefer to avoid for privacy reasons.',
-        detail: '<p>An unenrolled deed poll is a simple legal document that can be created at home at no cost. The GOV.UK and TransActual links below explain the requirements, including who can act as a witness.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> FreeDeedPoll.org.uk Generator</a>\n<div class="svc-detail"><p><strong>What if an organisation refuses?</strong> Most organisations will update their records when given a deed poll or statutory declaration. If you run into problems, the ICO has guidance on how to ask an organisation to correct your records, including how to escalate if they refuse. The ICO link below has details.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> ICO: Your right to get your data corrected</a></div>',
+        detail: '<p>An unenrolled deed poll is a simple legal document that can be created at home at no cost. The GOV.UK and TransActual links below explain the requirements, including who can act as a witness.</p><p>GOV.UK says some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll, so check with an organisation before you rely on one.</p>\n<a href="https://transactual.org.uk/names/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Name changes</a>\n<a href="https://www.gov.uk/change-name-deed-poll" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name by deed poll</a>\n<a href="https://freedeedpoll.org.uk" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> FreeDeedPoll.org.uk Generator</a>\n<div class="svc-detail"><p><strong>What if an organisation refuses?</strong> Most organisations will update their records when given a deed poll or statutory declaration. If you run into problems, the ICO has guidance on how to ask an organisation to correct your records, including how to escalate if they refuse. The ICO link below has details.</p><a href="https://ico.org.uk/for-the-public/your-right-to-get-your-data-corrected/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> ICO: Your right to get your data corrected</a></div>',
       },
     },
   },
@@ -896,7 +914,7 @@ const PLAN_ITEMS = {
         summary: 'HMPO will need your deed poll and evidence that you are using your new name. The GOV.UK link below has the full details.',
       },
     },
-    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change without a GRC, HMPO also asks for a letter from you asking for the change of gender, a letter from a medical professional (such as your GP or a gender specialist) confirming the change is likely to be permanent, and evidence that you use your name and gender for all purposes, such as a bank statement, utility bill or payslip. This applies even if your name is not changing. HMPO may also ask for someone who knows you to confirm your identity, unless it can match your photo to your previous passport. If you already have a GRC, HMPO does not usually ask for these letters or for evidence of use.</p><p><strong>⚠️ Medical letter:</strong> HMPO is strict about what this letter must include. According to HMPO\'s published guidance, it should:</p><ul class="bullet-list"><li>Be written by either a medical professional registered with the General Medical Council (GMC) or the Health and Care Professions Council (HCPC), or a medical professional, in the UK or overseas, who is not registered with either body but who can provide evidence of their qualifications and experience. HMPO gives examples including GPs, gender dysphoria clinicians and specialists, clinical psychologists, consultant psychologists and psychiatrists, practitioner psychologists, and specialist nurses, though this is not a complete list</li><li>Be dated and include the medical professional\'s handwritten signature</li><li>Confirm that the medical professional knows you well enough to make a diagnosis</li><li>State your name and specified gender</li><li>Confirm you use your name and gender for all purposes</li><li>State that your gender change is "likely to be permanent"</li></ul><p>If HMPO rejects a letter from a medical professional who is not registered with the GMC or HCPC, it will ask for a new letter from one who is registered. Treat the wider route as a fallback, not the easiest option.</p><p>The GOV.UK link below has the full requirements.</p><p><strong>⚠️ If you are 16 or 17:</strong> unlike a name-only change, a gender marker change usually needs the consent of everyone with parental responsibility for you. If you cannot get it, send HMPO a letter explaining why, and it will consider an exception. The exceptions include being within two weeks of turning 18 (HMPO holds your application until your birthday), your parents having died, having no contact with one or both parents, and being in contact with your parents but unable to get their consent. Each case is decided individually: HMPO may ask for evidence such as details of your care arrangements or a statutory declaration, and if it issues the passport without consent, your parents can object. If asking for consent would put you at risk, tell HMPO: it will ask for any evidence from the police or another organisation such as social services, and get advice from its safeguarding team. Contact HMPO directly to find out what applies to you.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><p><strong>⚠️ Non-binary marker:</strong> UK passports currently only offer M or F: there is no X or non-binary option. You can still note your identity in a covering letter or in the additional information section of your application. If you do, HMPO will phone you to explain that it can only print M or F, and to ask for your current gender, male or female. If that is different from your last passport, HMPO treats it as a change of gender, which needs the evidence above. If you cannot answer straight away, you have 7 days to call back, or your application may be withdrawn.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name or gender on your passport</a><a href="https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Gender recognition (caseworker guidance)</a><a href="https://www.gov.uk/government/publications/change-of-name-passport-applications-caseworker-guidance/names-change-of-name-passport-applications-accessible#name-change-gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Change of name because of a change of gender (caseworker guidance)</a>',
+    detail: '<p>For a name change, your deed poll and evidence of using your new name (such as a bank statement or utility bill) will be needed. For a gender marker change without a GRC, HMPO also asks for a letter from you asking for the change of gender, a letter from a medical professional (such as your GP or a gender specialist) confirming the change is likely to be permanent, and evidence that you use your name and gender for all purposes, such as a bank statement, utility bill or payslip. This applies even if your name is not changing. HMPO may also ask for someone who knows you to confirm your identity, unless it can match your photo to your previous passport. If you already have a GRC, HMPO does not usually ask for these letters or for evidence of use.</p><p><strong>If you have changed your name more than once:</strong> HM Passport Office\'s guidance for its staff says you must give evidence for each change of name, linking your new name back to the name on your last passport, or, for a first passport, on your birth, adoption, naturalisation or registration certificate. If you do not have evidence of every change, it asks for a statutory declaration that covers all the names you have used and, if you know, when you used each one. Other organisations may ask for different evidence, so check with each one.</p><p><strong>⚠️ Medical letter:</strong> HMPO is strict about what this letter must include. According to HMPO\'s published guidance, it should:</p><ul class="bullet-list"><li>Be written by either a medical professional registered with the General Medical Council (GMC) or the Health and Care Professions Council (HCPC), or a medical professional, in the UK or overseas, who is not registered with either body but who can provide evidence of their qualifications and experience. HMPO gives examples including GPs, gender dysphoria clinicians and specialists, clinical psychologists, consultant psychologists and psychiatrists, practitioner psychologists, and specialist nurses, though this is not a complete list</li><li>Be dated and include the medical professional\'s handwritten signature</li><li>Confirm that the medical professional knows you well enough to make a diagnosis</li><li>State your name and specified gender</li><li>Confirm you use your name and gender for all purposes</li><li>State that your gender change is "likely to be permanent"</li></ul><p>If HMPO rejects a letter from a medical professional who is not registered with the GMC or HCPC, it will ask for a new letter from one who is registered. Treat the wider route as a fallback, not the easiest option.</p><p>The GOV.UK link below has the full requirements.</p><p><strong>⚠️ If you are 16 or 17:</strong> unlike a name-only change, a gender marker change usually needs the consent of everyone with parental responsibility for you. If you cannot get it, send HMPO a letter explaining why, and it will consider an exception. The exceptions include being within two weeks of turning 18 (HMPO holds your application until your birthday), your parents having died, having no contact with one or both parents, and being in contact with your parents but unable to get their consent. Each case is decided individually: HMPO may ask for evidence such as details of your care arrangements or a statutory declaration, and if it issues the passport without consent, your parents can object. If asking for consent would put you at risk, tell HMPO: it will ask for any evidence from the police or another organisation such as social services, and get advice from its safeguarding team. Contact HMPO directly to find out what applies to you.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><p><strong>⚠️ Non-binary marker:</strong> UK passports currently only offer M or F: there is no X or non-binary option. You can still note your identity in a covering letter or in the additional information section of your application. If you do, HMPO will phone you to explain that it can only print M or F, and to ask for your current gender, male or female. If that is different from your last passport, HMPO treats it as a change of gender, which needs the evidence above. If you cannot answer straight away, you have 7 days to call back, or your application may be withdrawn.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name or gender on your passport</a><a href="https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Gender recognition (caseworker guidance)</a><a href="https://www.gov.uk/government/publications/change-of-name-passport-applications-caseworker-guidance/names-change-of-name-passport-applications-accessible#name-change-gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Change of name because of a change of gender (caseworker guidance)</a>',
   },
   iepass: {
     difficulty: 'medium', cost: { type:'fixed', value:'Medium cost' },
@@ -915,7 +933,7 @@ const PLAN_ITEMS = {
     difficulty: 'medium', cost: { type:'fixed', value:'Medium cost' },
     title: 'Irish passport (Good Friday Agreement route)',
     summary: 'As someone born in Northern Ireland, you may be able to claim Irish citizenship under the Good Friday Agreement. The Republic of Ireland has a separate process for updating a gender marker on a passport, which differs from the UK GRC route.',
-    detail: '<p>Under the Good Friday Agreement, people born in Northern Ireland can choose to be Irish citizens. If you were born on or after 1 January 2005, this depends on your parents: one of them must be a British or Irish citizen, or have lived on the island of Ireland for three of the four years before your birth. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI (Transgender Equality Network Ireland) links below have details on eligibility, requirements, and how to apply.</p>\n<p><strong>Evidence needed:</strong> If you live in Northern Ireland or anywhere else outside Ireland, the Passport Service asks for a statutory declaration stating that you have a settled and solemn intention of living in your new gender for the rest of your life, together with two documents from two different sources showing use of your new name over at least two years. The Passport Service does not accept a deed poll to change the name on an Irish passport. This applies whether you are applying for your first Irish passport or renewing one. A first application also asks for an identity verification form, your full original birth certificate showing your parents\' names, proof of address dated within the last 12 months, and original government-issued photo identification.</p>\n<p><strong>⚠️ If you were recently issued a passport in your previous name:</strong> The Passport Service says that if you applied for and were issued a passport in your previous name during the two years before you apply, your two years of proof start again from the date that passport was issued. It may make an exception if that passport was due to expire before you could build up two years, so contact them before applying.</p>\n<p><strong>Note on the Irish GRC:</strong> An Irish Gender Recognition Certificate is a separate route. It is only available to people ordinarily resident in the Republic of Ireland, or whose birth, adoption, or foreign birth registration is recorded there, so it does not apply to someone living in Northern Ireland or Great Britain. It is not covered further here. The TENI link below explains the Irish GRC process for people it does apply to.</p>\n<p><strong>⚠️ If you are 16 or 17:</strong> the published adult guidance does not say whether this route is open to 16 and 17 year olds. If this applies to you, contact the Passport Service before applying to check what you need to do.</p>\n<a href="https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> Irish Passports: Documentary requirements</a>\n<a href="https://www.ireland.ie/en/dfa/citizenship/born-abroad/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> Department of Foreign Affairs: Gender recognition and citizenship</a>\n<a href="https://teni.ie/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TENI: Gender recognition in Ireland</a>',
+    detail: '<p>Under the Good Friday Agreement, people born in Northern Ireland can choose to be Irish citizens. If you were born on or after 1 January 2005, this depends on your parents: one of them must be a British or Irish citizen, or have lived on the island of Ireland for three of the four years before your birth. The Republic of Ireland has its own gender recognition process, which works very differently from the UK GRC route. The Department of Foreign Affairs and TENI (Transgender Equality Network Ireland) links below have details on eligibility, requirements, and how to apply.</p>\n<p><strong>Evidence needed:</strong> If you live in Northern Ireland or anywhere else outside Ireland, the Passport Service asks for a statutory declaration stating that you have a settled and solemn intention of living in your new gender for the rest of your life, together with two documents from two different sources showing use of your new name over at least two years. The Passport Service does not accept a deed poll to change the name on an Irish passport. This applies whether you are applying for your first Irish passport or renewing one. A first application also asks for an identity verification form, your full original birth certificate showing your parents\' names, proof of address dated within the last 12 months, and original government-issued photo identification.</p>\n<p><strong>⚠️ If you were recently issued a passport in your previous name:</strong> The Passport Service says that if you applied for and were issued a passport in your previous name during the two years before you apply, your two years of proof start again from the date that passport was issued. It may make an exception if that passport was due to expire before you could build up two years, so contact them before applying.</p>\n<p><strong>Note on the Irish GRC:</strong> An Irish Gender Recognition Certificate is a separate process. You may be eligible if your birth, adoption or foreign birth is registered in the Republic of Ireland, even if you live elsewhere. If you were born in Northern Ireland but your birth or adoption is not registered in Ireland, you would generally need to be ordinarily resident in the Republic to qualify. This is separate from the Irish passport gender-change route described above. It is not covered further here, and the TENI link below explains it.</p>\n<p><strong>⚠️ If you are 16 or 17:</strong> the published adult guidance does not say whether this route is open to 16 and 17 year olds. If this applies to you, contact the Passport Service before applying to check what you need to do.</p>\n<a href="https://www.ireland.ie/en/dfa/passports/documentary-requirements/adult/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> Irish Passports: Documentary requirements</a>\n<a href="https://www.ireland.ie/en/dfa/citizenship/born-abroad/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> Department of Foreign Affairs: Gender recognition and citizenship</a>\n<a href="https://teni.ie/gender-recognition/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TENI: Gender recognition in Ireland</a>',
   },
   grc_med: {
     difficulty: 'hard', cost: { type:'split', value:'Small cost', value2:'Higher cost' },
@@ -1171,7 +1189,7 @@ function loadUrlParams(d) {
   if (wizardState.birthOutsideUK === S.YES) wizardState.birthRegion = REGION.E;
   wizardState.vehicle     = d.veh   === true ? S.YES : S.NO;
   const validSvcKeys = Object.keys(SVC_MAP);
-  wizardState.services    = (d.srv || '').split(',').filter(s => validSvcKeys.includes(s));
+  wizardState.services    = (typeof d.srv === 'string' ? d.srv : '').split(',').filter(s => validSvcKeys.includes(s));
   wizardState.svcNone     = d.svn === true ? S.YES : S.NO;
   if (d.prg && typeof d.prg === 'object') {
     Object.entries(d.prg).slice(0, SHARE_PROGRESS_LIMIT).forEach(([key, state]) => {
@@ -1201,8 +1219,8 @@ function handleUrlLoad(params) {
   isWizardMode = false;
   V.wizard.classList.add('hidden');
   updateLocks();
-  let d;
-  try { d = decodeState(params.get('p') || ''); } catch(e) { d = null; }
+  const d = readSharedPlan(params);
+  clearShareFromUrl();
   if (!d) {
     V.plan.classList.add('hidden');
     document.body.classList.remove('plan-ready','wizard-active');
@@ -1270,7 +1288,7 @@ function handleLegacyUrl(params) {
 }
 function copyShareableLink() {
   const w = wizardState;
-  const url = new URL(window.location.href.split('?')[0]);
+  const url = new URL(window.location.href.split(/[?#]/)[0]);
   const ps = {
     pv: PLAN_VERSION,
     reg:   w.region || REGION.E,
@@ -1316,7 +1334,7 @@ function copyShareableLink() {
     };
   }
   if (focusMode) ps.fm = 1;
-  url.searchParams.set('p', encodeState(ps));
+  url.hash = 'p=' + encodeURIComponent(encodeState(ps));
   const text = url.toString();
   const showSuccess = () => {
     const sBtn = gel('shareBtn');
@@ -1348,6 +1366,7 @@ function setNavControls(display) {
 }
 
 function backToStart() {
+  gel('sharedLinkUnreadable')?.classList.add('hidden');
   V.wizard.classList.add('hidden');
   V.checklist.classList.add('hidden');
   setNavControls('none');
@@ -1360,6 +1379,7 @@ function backToStart() {
   try {
     const savedApp = ssg('appState');
     if (savedApp && JSON.parse(savedApp).planGenerated) {
+      refreshPrivacyUpdateTip();
       gel('welcomeNormal').classList.remove('hidden');
       gel('welcomeOutdated').classList.add('hidden');
       V.welcome.classList.remove('hidden');
@@ -1399,17 +1419,46 @@ function checkAgeGateShared() {
   const cbDisc = gel('checklistDisclaimerConfirm');
   if (cbDisc) cbDisc.checked = true;
   gel('welcomeNewDevice').classList.add('hidden');
-  openSharedLink(new URLSearchParams(window.location.search));
+  openSharedLink(shareParams());
+}
+function readSharedPlan(params) {
+  try {
+    const d = decodeState(params.get('p'));
+    return d && typeof d === 'object' && !Array.isArray(d) ? d : null;
+  } catch(e) { return null; }
+}
+function readShareParams() {
+  const fromHash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  if (fromHash.has('p')) return new URLSearchParams({ p: fromHash.get('p') });
+  const fromQuery = new URLSearchParams(window.location.search);
+  return fromQuery.has('p') || fromQuery.has('goal') ? fromQuery : null;
+}
+function clearShareFromUrl() {
+  try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
+}
+function reloadForSharedHash() {
+  if (new URLSearchParams(window.location.hash.replace(/^#/, '')).has('p')) window.location.reload();
+}
+function shareParams() {
+  return pendingShareParams || new URLSearchParams();
 }
 function hasSavedPlan() {
   try { return !!JSON.parse(ssg('appState') || 'null')?.planGenerated; } catch(e) { return false; }
 }
 function loadSharedLink(params) {
+  pendingShareParams = null;
   if (params.has('p')) handleUrlLoad(params);
   else if (params.has('goal')) handleLegacyUrl(params);
 }
 function openSharedLink(params) {
   if (!hasSavedPlan()) { loadSharedLink(params); return; }
+  if (params.has('p') && !readSharedPlan(params)) {
+    pendingShareParams = null;
+    clearShareFromUrl();
+    restoreSavedApp();
+    gel('sharedLinkUnreadable')?.classList.remove('hidden');
+    return;
+  }
   V.start.classList.add('hidden');
   V.welcome.classList.remove('hidden');
   gel('welcomeNormal').classList.add('hidden');
@@ -1417,13 +1466,14 @@ function openSharedLink(params) {
 }
 function openSharedPlan() {
   gel('welcomeSharedReplace').classList.add('hidden');
-  loadSharedLink(new URLSearchParams(window.location.search));
+  loadSharedLink(shareParams());
 }
 function keepOwnPlan() {
+  pendingShareParams = null;
   gel('welcomeSharedReplace').classList.add('hidden');
   try { history.replaceState({}, '', window.location.pathname); } catch(e) {}
   if (!restoreSavedApp()) { V.welcome.classList.add('hidden'); V.start.classList.remove('hidden'); }
-  V.welcome.querySelector('.phase:not(.hidden) button')?.focus();
+  V.welcome.querySelector('.phase:not(.hidden):not(#privacyUpdateTip) button')?.focus();
 }
 function restoreSavedApp() {
   const savedApp = ssg('appState');
@@ -1437,6 +1487,7 @@ function restoreSavedApp() {
     V.start.classList.add('hidden');
     V.welcome.classList.remove('hidden');
     const outdated = (parseInt(app.planVersion, 10) || 0) < PLAN_VERSION;
+    refreshPrivacyUpdateTip();
     gel('welcomeNormal').classList.toggle('hidden', outdated);
     gel('welcomeOutdated').classList.toggle('hidden', !outdated);
     return true;
@@ -1525,6 +1576,7 @@ function startChecklist() {
   setChecklistMode(false);
 }
 function continuePlan() {
+  gel('sharedLinkUnreadable')?.classList.add('hidden');
   V.welcome.classList.add('hidden');
   setNavControls('none');
   renderChecklist();
@@ -1552,7 +1604,7 @@ function openChecklist() {
   showAdaptiveNoteIfNeeded();
   refreshToolbarTabindex();
 }
-function reviewAnswers() { openChecklist(); }
+function reviewAnswers() { gel('sharedLinkUnreadable')?.classList.add('hidden'); openChecklist(); }
 
 function dismissWizardEditTip() {
   const tip = gel('wizardEditTip');
@@ -1568,6 +1620,17 @@ function dismissTitlesInfo() {
   sss('titlesInfoDismissed', '1');
   gel('titlesInfoBox')?.remove();
   announce('Tip dismissed.');
+}
+const PRIVACY_UPDATE_UNTIL = '2027-02-01';
+function refreshPrivacyUpdateTip() {
+  const show = ssg('privacyUpdateSeen') !== '1' && Date.now() < Date.parse(PRIVACY_UPDATE_UNTIL);
+  gel('privacyUpdateTip')?.classList.toggle('hidden', !show);
+}
+function dismissPrivacyUpdate() {
+  sss('privacyUpdateSeen', '1');
+  gel('privacyUpdateTip')?.classList.add('hidden');
+  announce('Privacy update notice dismissed.');
+  V.welcome.querySelector('.phase:not(.hidden):not(#privacyUpdateTip) button')?.focus();
 }
 function dismissTrackTip() {
   sss('trackTipDismissed', '1');
@@ -1697,6 +1760,8 @@ function resetPlanOrder() {
 
 function restartApp() {
   fadeOutConfetti();
+  pendingShareParams = null;
+  gel('sharedLinkUnreadable')?.classList.add('hidden');
   _saveWarnShown = false;
   const swb = gel('saveWarnBanner'); if (swb) swb.classList.add('hidden');
   [V.plan, V.wizard, V.checklist, V.welcome].forEach(v => v.classList.add('hidden'));
@@ -1951,7 +2016,7 @@ const NOTES = {
   dwpNI: 'For example: Universal Credit, Personal Independence Payment (PIP), State Pension, or Employment and Support Allowance. A change of name or gender can affect how some benefits are administered while your details are updated.',
 };
 const questions = [
-  { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Under-16s need parental consent and follow a different process.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
+  { id:'age', q:'Are you aged 16 or over?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This planner is for people aged 16 and over. Processes for younger people can be different, and this planner does not cover them.</em>', cond:() => ssg('ageConfirmed') !== 'true', o:() => [
     [S.YES, 'Yes'],
     [S.NO,  'No']
   ]},
@@ -2510,9 +2575,9 @@ function computePlanMeta(p) {
   return { isGender, isName, isNI, costs, timeText, hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle };
 }
 const GRC_AGE_NOTE = '<p><strong>⚠️ Minimum age:</strong> You must be 18 or over to apply for a UK GRC. If you are 16 or 17, you can still start gathering the living-proof evidence now, since it needs to cover two years.</p>';
-const GRC_WHAT_IT_IS = '<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not typically required for day to day life, but it does allow you to update your birth certificate and means your marriage or civil partnership certificates will reflect your legal gender. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If your gender is already legally recognised in a country or territory on GOV.UK\'s approved list, you still need a UK GRC for it to be recognised here, but you can apply through a shorter overseas route.</p>';
+const GRC_WHAT_IT_IS = '<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not typically required for day to day life, but it does allow you to update your birth or adoption certificate, and your marriage or civil partnership certificate, if they were registered in the UK. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If your gender is already legally recognised in a country or territory on GOV.UK\'s approved list, you still need a UK GRC for it to be recognised here, but you can apply through a shorter overseas route.</p><p>GOV.UK says you do not need a GRC to update your driving licence, your passport, or your medical records, employment records or bank account. You can apply even if you have not had any gender affirming surgery or treatment, and do not plan to. A GRC does not change your legal status as the father or mother of a child.</p>';
 const GRC_MARRIED_NOTE = '<p><strong>If you are married or in a civil partnership:</strong> The GRC process requires either your spouse or civil partner\'s consent (a statutory declaration of consent), or that your marriage or civil partnership has already ended. If your spouse does not consent, this does not block the application outright. You can instead be issued an interim GRC, which does not itself change your legal gender. This gives you 6 months from the date it is issued to apply to end the marriage or civil partnership, after which a full GRC can be issued. If you stay married or in a civil partnership, your partner\'s entitlement to your pension if you die may also change. This is a significant legal consideration and you may want to speak to a solicitor before applying.</p>';
-const GRC_NI_NOTE = '<p>This step covers long-term legal gender recognition through a UK Gender Recognition Certificate (GRC). A GRC has practical uses in Northern Ireland for updating your birth certificate, marriage records, HMRC, and pensions.</p>';
+const GRC_NI_NOTE = '<p>This step covers long-term legal gender recognition through a UK Gender Recognition Certificate (GRC). A GRC has practical uses in Northern Ireland for updating your birth certificate, marriage records, HMRC, and pensions.</p><p>GOV.UK says you do not need a GRC to update your driving licence, your passport, or your medical records, employment records or bank account. You can apply even if you have not had any gender affirming surgery or treatment, and do not plan to. A GRC does not change your legal status as the father or mother of a child.</p>';
 const GRC_BENEFITS_NOTE = '<p>A GRC can change your entitlement to some benefits and pensions. Before you apply, GOV.UK suggests asking the office that pays your benefits and any pension providers what would change.</p>';
 const IRISH_ROUTE_STANDALONE = '<p>Because you were born in Northern Ireland, you may be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. It runs separately from the UK GRC route, and you can pursue either or both.</p>';
 const IRISH_TIME = 'Irish passport: 2+ years of name-use proof';
@@ -3357,7 +3422,7 @@ const ACTIONS = {
   startWizard, startChecklist, continuePlan, reviewAnswers, backToStart, makeChanges,
   prevWizard, nextWizard, generateChecklistPlan, toggleMode, toggleTheme, toggleFocusMode,
   copyShareableLink, panicExit, hideAgeKickout, hideDisclaimerKickout,
-  dismissWizardEditTip, dismissAdaptiveNote, dismissTitlesInfo, dismissPlanSummary, dismissTrackTip,
+  dismissWizardEditTip, dismissAdaptiveNote, dismissTitlesInfo, dismissPlanSummary, dismissTrackTip, dismissPrivacyUpdate,
   handleSvcItem, handleSvcAll, handleSvcNone,
   confirmRestart, confirmUtilityRestart, confirmResetProgress, confirmResetOrder,
   moveOrderable, downloadPage, openSharedPlan, keepOwnPlan, handleChecklistAge, handleChecklistDisclaimer, checkAgeGateShared,
@@ -3547,19 +3612,11 @@ window.onload = () => {
       updateLocks();
     });
   }
-  const params = new URLSearchParams(window.location.search);
-  if (params.has('p')) {
-    V.start.classList.add('hidden');
-    if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
-      V.welcome.classList.remove('hidden');
-      gel('welcomeNormal').classList.add('hidden');
-      gel('welcomeNewDevice').classList.remove('hidden');
-      return;
-    }
-    openSharedLink(params);
-    return;
-  }
-  if (params.has('goal')) {
+  window.addEventListener('hashchange', reloadForSharedHash);
+  const params = readShareParams();
+  if (params) {
+    pendingShareParams = params;
+    clearShareFromUrl();
     V.start.classList.add('hidden');
     if (ssg('ageConfirmed') !== 'true' || ssg('disclaimerConfirmed') !== 'true') {
       V.welcome.classList.remove('hidden');

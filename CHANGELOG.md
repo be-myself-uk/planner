@@ -13,7 +13,22 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [Unreleased]
+Releases:
+
+- [November 2026](#november-2026)
+- [October 2026 /2](#october-2026-2)
+- [October 2026 /1](#october-2026-1)
+- [September 2026](#september-2026)
+- [July 2026](#july-2026)
+- [May 2026 /2](#may-2026-2)
+- [May 2026 /1](#may-2026-1)
+- [April 2026 /2](#april-2026-2)
+- [April 2026 /1](#april-2026-1)
+- [March 2026 /3](#march-2026-3)
+- [March 2026 /2](#march-2026-2)
+- [March 2026 /1](#march-2026-1)
+
+## [November 2026]
 
 ### Information
 
@@ -21,15 +36,39 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The England screening note now says that if you have a cervix and your GP record does not say female, NHS England guidance says your GP practice can opt you in to cervical screening invitations.
 - The work step now says that if you hold national security vetting clearance, you must tell United Kingdom Security Vetting (UKSV) about a change of name, but not about a gender change.
 - The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
+- The UK passport step now explains what HM Passport Office asks for if you have changed your name more than once: evidence for each change, linking your new name back to your last passport or your birth certificate, or a statutory declaration covering all your names if you do not have evidence of every change.
+- The deed poll steps now say what GOV.UK says: some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll, so check before you rely on one. The Scotland and Northern Ireland steps no longer say an unenrolled deed poll is equally valid or accepted by most organisations, which no official source says, and the Scotland step now marks the point that statutory declarations are more common there as community advice.
+- The GRC introduction now says what GOV.UK says: you do not need a GRC to update your driving licence, passport, medical or employment records, or bank account; you can apply without having had any surgery or treatment; and a GRC does not change your legal status as the father or mother of a child. It also now says a GRC lets you update a marriage or civil partnership certificate registered in the UK, rather than that the certificate will change.
+- The Irish passport step for people born in Northern Ireland no longer says an Irish Gender Recognition Certificate does not apply to anyone living in Northern Ireland or Great Britain. It now says you may be eligible if your birth, adoption or foreign birth is registered in the Republic of Ireland, wherever you live, and that otherwise you would generally need to live in the Republic.
+- The Scotland screening note now follows NHS Inform: if you changed your CHI number to reflect your gender after 14 June 2015, you should still be invited automatically for the screening your body needs, and may also be invited for some you do not need. If you changed it on or before that date, or moved to Scotland from elsewhere, including England and Wales, you may not be invited, and the note says who to contact.
 - For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
+
+### Wording
+
+- The Privacy panel, the "What is this?" panel and the README no longer say that no personal information is collected. They now say that the planner sends nothing you enter to a server and has no analytics or tracking, that like any website the host receives technical information such as your IP address, and that the host's security measures can change at any time without notice.
+- The privacy wording now explains that a shared link is not encrypted, so anyone with it can read your answers, and which links send your answers to the host. It also says that New plan keeps a note that you have seen the disclaimer, as well as your light or dark mode choice, and that quick exit does not delete your saved plan, your browser history, anything you have copied, or links you have shared.
+- The planner no longer says that every process for people under 16 needs parental consent. It now says those processes can be different, and may involve parental responsibility, consent or other requirements depending on the document.
 
 ### Code
 
+- New shared plan links carry your answers after a # in the web address instead of after a ?. Browsers do not send the part after a # to the website's host, so opening a new link no longer sends your answers to the host. The answers are still not encrypted, so anyone with the link can read them. Older links still open as before.
+- When you open a shared link, the planner now removes your answers from the address bar straight away, before it asks you to confirm your age, so they do not stay in the address bar or in that page's history entry. If you reload the page before the plan opens, open the link again.
+- A shared link that cannot be read, for example because it was cut short when it was copied, no longer offers to replace your saved plan. The planner now says the link could not be read and keeps your plan. A link with an unexpected value can no longer leave the page blank.
+- Pasting a shared link into a tab that already has the planner open now opens the shared plan.
+- Until the end of January 2027, the welcome back screen shows a short notice that the privacy information has been updated, linking to the Privacy panel. It goes away for good when you dismiss it.
 - The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
+
+### Layout
+
+- The Privacy and Disclaimer panels now split their sections with headings and a line above each, like the other panels. Screen readers can now jump between those sections too.
 
 ### Infrastructure
 
 - The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
+- The two Python scripts that check sources and linked domains no longer carry comments, and the workflows no longer note a version beside each pinned action. The issue templates' reminder that issues are public is now plain text instead of a hidden comment, so it also stays in the posted issue unless you delete it. What the scripts' comments explained is now in CONTRIBUTING.md.
+- A new test checks that no file in the repository uses an em dash or an en dash, and the three that did no longer do.
+- Added tests for the changes above, including new and older shared links, links that cannot be read, a link pasted into an open tab, and what New plan keeps.
+- This changelog now starts with a list of releases that links to each one, and a test checks that the list matches the release headings.
 
 ## [October 2026 /2]
 
@@ -250,44 +289,44 @@ No government or policy changes affected the planner this month. If that looks w
 - Restructured the repository, and fixed the build command so `robots.txt` is deployed.
 - Added a test covering the community advice marker and its Usage guide entry.
 
-## [26 May 2026]
+## [May 2026 /2]
 
 ### Code
 
 - Added a disclaimer confirmation step, plus several small fixes.
 
-## [2 May 2026]
+## [May 2026 /1]
 
 ### Wording
 
 - Updated the wording for HM Passport Office medical letter requirements.
 
-## [22 April 2026]
+## [April 2026 /2]
 
 ### Infrastructure
 
 - Moved the test suite to Playwright, and added automated testing and a scheduled broken-link check.
 
-## [5 to 7 April 2026]
+## [April 2026 /1]
 
 ### Code
 
 - Bundled several months of accumulated fixes and features, including five affecting shared links, answers that persisted when they should not have, and Focus mode.
 
-## [31 March 2026]
+## [March 2026 /3]
 
 ### Code
 
 - Rebuilt parts of the site and changed the interface.
 
-## [24 March 2026]
+## [March 2026 /2]
 
 ### Code
 
 - Added Focus mode to shareable links, and a "new device" screen for shared links opened in an unrecognised browser.
 - Fixed shared-link answers being discarded when opened after an update.
 
-## [22 to 23 March 2026]
+## [March 2026 /1]
 
 ### Code
 

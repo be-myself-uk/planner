@@ -1,46 +1,3 @@
-"""
-Checks the domains of the websites that index.html links to. If a linked
-organisation lets its domain lapse, anyone can register it, and the planner
-would keep sending people to whoever did.
-
-Every http(s) link in index.html is reduced to its registrable domain: the
-host without a leading "www.", cut to its last three labels when its last two
-are one of THREE_LABEL_SUFFIXES (such as org.uk), and to its last two labels
-otherwise. bemyself.uk itself, and names under SKIPPED_SUFFIXES (such as
-gov.uk and nhs.uk), are skipped, because the public cannot register names
-there.
-
-Each remaining domain is looked up in its registry's RDAP service, found
-through IANA's bootstrap file. A domain is reported when:
-- the registry has no record of it (HTTP 404), so anyone can register it
-- its expiration date has passed
-- its status includes "redemption period" or "pending delete"
-- it was registered in the last 365 days, which can mean it changed hands,
-  unless the domain and that exact registration date are in ACKNOWLEDGED
-
-A domain whose registry has no RDAP service (currently .ie) is checked through
-DNS instead: if DNS has no record of it at all (NXDOMAIN), it is not
-registered, so it is reported. Any other answer is fine.
-
-Lookups wait about a second between requests. A timeout or other connection
-failure, a 429 or a 5xx is retried once after a few seconds. A lookup that
-still fails goes under "Could not check" in the report. It is not a finding,
-so a flaky registry does not open an issue.
-
-Fetches go through curl, as in check_source_updates.py, because some
-registries' servers reject Python's default TLS settings.
-
-Prints only changes_detected=true or changes_detected=false to stdout, for
-GITHUB_OUTPUT, and everything else to stderr. Writes link-domain-report.md
-at the repository root when there is anything to report.
-
-This is a trigger for review, not a verdict: a reported domain may still
-belong to the same organisation.
-
-Run `python3 check_link_domains.py --selftest` to check the logic against
-canned registry answers, with no network access. Test 227 in
-tests/planner.spec.js runs it on every push.
-"""
 import json
 import re
 import subprocess
@@ -51,10 +8,6 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
-# Domains checked by hand after being reported as newly registered, each with
-# the registration date the report showed for it, for example
-# "example.org.uk": "2026-03-01". If the domain is registered again later, its
-# date no longer matches, so it is reported again.
 ACKNOWLEDGED = {}
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -79,7 +32,6 @@ URL_PATTERN = re.compile(r"https?://[^\s\"'<>`)\\]+")
 
 
 def linked_urls(html):
-    """Return {host: [urls]} for every http(s) URL in the page, in order."""
     hosts = {}
     for url in URL_PATTERN.findall(html):
         host = (urlparse(url).hostname or "").rstrip(".").lower()
@@ -103,7 +55,6 @@ def is_skipped(domain):
 
 
 def linked_domains(html):
-    """Return {registrable domain: [urls]} for every link in the page."""
     domains = {}
     for host, urls in linked_urls(html).items():
         for url in urls:
@@ -114,7 +65,6 @@ def linked_domains(html):
 
 
 def curl(url):
-    """Fetch a URL. Returns (HTTP status or None, body, error or None)."""
     try:
         result = subprocess.run(
             [
@@ -151,7 +101,6 @@ def failure(status, error):
 
 
 def parse_bootstrap(body):
-    """Return {tld: RDAP base URL} from IANA's bootstrap file."""
     servers = {}
     for tlds, urls in json.loads(body).get("services", []):
         preferred = [u for u in urls if u.startswith("https://")] or urls
@@ -400,10 +349,6 @@ def rdap_body(registered, expires, statuses=("active",), registrar="Example Regi
 
 
 def run_selftest():
-    """Checks every rule against canned registry answers, with no network
-    access, and the registrable-domain rule against every host linked from
-    index.html. Exits non-zero, through a failed assert, if anything is wrong.
-    """
     today = date(2026, 10, 14)
 
     servers = parse_bootstrap(json.dumps({"services": [
