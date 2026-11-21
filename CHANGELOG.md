@@ -20,13 +20,13 @@ Releases:
 - [October 2026 /1](#october-2026-1)
 - [September 2026](#september-2026)
 - [July 2026](#july-2026)
-- [May 2026 /2](#26-may-2026)
-- [May 2026 /1](#2-may-2026)
-- [April 2026 /2](#22-april-2026)
-- [April 2026 /1](#5-to-7-april-2026)
-- [March 2026 /3](#31-march-2026)
-- [March 2026 /2](#24-march-2026)
-- [March 2026 /1](#22-to-23-march-2026)
+- [May 2026 /2](#may-2026-2)
+- [May 2026 /1](#may-2026-1)
+- [April 2026 /2](#april-2026-2)
+- [April 2026 /1](#april-2026-1)
+- [March 2026 /3](#march-2026-3)
+- [March 2026 /2](#march-2026-2)
+- [March 2026 /1](#march-2026-1)
 
 ## [November 2026]
 
