@@ -20,13 +20,13 @@ Releases:
 - [October 2026 /1](#october-2026-1)
 - [September 2026](#september-2026)
 - [July 2026](#july-2026)
-- [26 May 2026](#26-may-2026)
-- [2 May 2026](#2-may-2026)
-- [22 April 2026](#22-april-2026)
-- [5 to 7 April 2026](#5-to-7-april-2026)
-- [31 March 2026](#31-march-2026)
-- [24 March 2026](#24-march-2026)
-- [22 to 23 March 2026](#22-to-23-march-2026)
+- [May 2026 /2](#26-may-2026)
+- [May 2026 /1](#2-may-2026)
+- [April 2026 /2](#22-april-2026)
+- [April 2026 /1](#5-to-7-april-2026)
+- [March 2026 /3](#31-march-2026)
+- [March 2026 /2](#24-march-2026)
+- [March 2026 /1](#22-to-23-march-2026)
 
 ## [November 2026]
 
@@ -289,44 +289,44 @@ No government or policy changes affected the planner this month. If that looks w
 - Restructured the repository, and fixed the build command so `robots.txt` is deployed.
 - Added a test covering the community advice marker and its Usage guide entry.
 
-## [26 May 2026]
+## [May 2026 /2]
 
 ### Code
 
 - Added a disclaimer confirmation step, plus several small fixes.
 
-## [2 May 2026]
+## [May 2026 /1]
 
 ### Wording
 
 - Updated the wording for HM Passport Office medical letter requirements.
 
-## [22 April 2026]
+## [April 2026 /2]
 
 ### Infrastructure
 
 - Moved the test suite to Playwright, and added automated testing and a scheduled broken-link check.
 
-## [5 to 7 April 2026]
+## [April 2026 /1]
 
 ### Code
 
 - Bundled several months of accumulated fixes and features, including five affecting shared links, answers that persisted when they should not have, and Focus mode.
 
-## [31 March 2026]
+## [March 2026 /3]
 
 ### Code
 
 - Rebuilt parts of the site and changed the interface.
 
-## [24 March 2026]
+## [March 2026 /2]
 
 ### Code
 
 - Added Focus mode to shareable links, and a "new device" screen for shared links opened in an unrecognised browser.
 - Fixed shared-link answers being discarded when opened after an update.
 
-## [22 to 23 March 2026]
+## [March 2026 /1]
 
 ### Code
 
