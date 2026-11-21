@@ -13,7 +13,22 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - **Layout**: how the website looks
 - **Infrastructure**: testing, deployment, and repository changes
 
-## [Unreleased]
+Releases:
+
+- [November 2026](#november-2026)
+- [October 2026 /2](#october-2026-2)
+- [October 2026 /1](#october-2026-1)
+- [September 2026](#september-2026)
+- [July 2026](#july-2026)
+- [26 May 2026](#26-may-2026)
+- [2 May 2026](#2-may-2026)
+- [22 April 2026](#22-april-2026)
+- [5 to 7 April 2026](#5-to-7-april-2026)
+- [31 March 2026](#31-march-2026)
+- [24 March 2026](#24-march-2026)
+- [22 to 23 March 2026](#22-to-23-march-2026)
+
+## [November 2026]
 
 ### Information
 
@@ -53,6 +68,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 - The two Python scripts that check sources and linked domains no longer carry comments, and the workflows no longer note a version beside each pinned action. The issue templates' reminder that issues are public is now plain text instead of a hidden comment, so it also stays in the posted issue unless you delete it. What the scripts' comments explained is now in CONTRIBUTING.md.
 - A new test checks that no file in the repository uses an em dash or an en dash, and the three that did no longer do.
 - Added tests for the changes above, including new and older shared links, links that cannot be read, a link pasted into an open tab, and what New plan keeps.
+- This changelog now starts with a list of releases that links to each one, and a test checks that the list matches the release headings.
 
 ## [October 2026 /2]
 

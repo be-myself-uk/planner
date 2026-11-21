@@ -42,7 +42,7 @@ Everything else in the repo (GitHub Actions, the test suite, the README) exists 
 ├── index.html                     : the entire application (see below)
 ├── README.md                      : project overview, features, privacy, licence
 ├── CONTRIBUTING.md                : this file, how to contribute and how the repo is put together
-├── CHANGELOG.md                   : plain-English history of changes to the site
+├── CHANGELOG.md                   : plain-English history of changes to the site; the list of releases at the top must name every `## [...]` section, `[Unreleased]` included, newest first, linked to the anchor GitHub gives its heading (test 254)
 ├── SOURCES.md                     : canonical list of official sources behind planner content, with review-trigger automation
 ├── LICENCE.md                     : CC BY-NC-SA 4.0
 ├── robots.txt                     : allows all crawlers and points to sitemap.xml; copied to the deploy directory by the build command
@@ -102,7 +102,7 @@ No file in the repository carries comments, including HTML comments in Markdown 
 
 ### Tests
 
-`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 239 of them numbered up to 253; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
+`tests/planner.spec.js` is a single Playwright spec file containing the entire test suite (numbered tests, currently 240 of them numbered up to 254; numbers were assigned as tests were added, and some were removed or merged along the way, so they are not sequential). Tests are grouped into `test.describe()` blocks by scope (core flows, locks/gating/validation, progress tracking, sharing/links, plan content accuracy, plan reordering, accessibility/layout, content integrity), whose names are the only labels they carry; add new tests to whichever group they fit, keeping the existing numbering convention rather than renumbering.
 
 The `openChecklist()` helper opens the checklist and then answers what used to be pre-selected (`answerOldDefaults()`), so most tests start from the same situation they always did; a test about unanswered questions starts from `openBlankChecklist()` instead.
 

@@ -1856,6 +1856,20 @@ test.describe('Be myself Planner', () => {
       expect(names.dlgDisclaimer, 'these were styled paragraphs, so screen readers could not jump between them').toEqual(['What this is', 'Using this planner', 'Legal terms']);
     });
 
+    test('254. The changelog lists every release at the top, linked to its heading', async () => {
+      const log = fs.readFileSync(path.resolve('..', 'CHANGELOG.md'), 'utf8');
+      const releases = [...log.matchAll(/^## \[(.+)\]$/gm)].map(m => m[1]);
+      expect(releases.length).toBeGreaterThan(10);
+      const slug = name => name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s/g, '-');
+      expect(slug('October 2026 /2'), 'GitHub drops the brackets and the slash, as its own anchors on main show').toBe('october-2026-2');
+      const list = log.slice(log.indexOf('Releases:'), log.indexOf('\n## ['));
+      const entries = [...list.matchAll(/^- \[(.+)\]\(#(.+)\)$/gm)].map(m => ({ name: m[1], anchor: m[2] }));
+      expect(entries.map(e => e.name), 'add each new release to the list at the top, newest first').toEqual(releases);
+      for (const e of entries) {
+        expect(e.anchor, `${e.name} links to the anchor GitHub gives its heading`).toBe(slug(e.name));
+      }
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();
