@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-JQiJgfnSmHYVO09X9/f22JOOuFR+nMPcNTIaXhUGsLI='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-pvPXT2pRClpaciSu4gtMzV5VEAEsEiEP/Q3ZM2GtbxM='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -3266,9 +3266,9 @@ function releaseScrollHold() {
     idle = setTimeout(() => {
       const now = parseFloat(hold.style.height) || 0;
       const natural = document.documentElement.scrollHeight - now;
-      const needed = Math.max(0, Math.floor(window.scrollY + window.innerHeight - natural));
-      hold.style.height = `${Math.min(now, needed)}px`;
-      if (Math.min(now, needed) <= 0) window.removeEventListener('scroll', hold._trim);
+      if (natural - (window.scrollY + window.innerHeight) < window.innerHeight) return;
+      hold.style.height = '0px';
+      window.removeEventListener('scroll', hold._trim);
     }, 150);
   };
   window.addEventListener('scroll', hold._trim, { passive: true });

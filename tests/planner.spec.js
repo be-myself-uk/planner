@@ -2981,6 +2981,10 @@ test.describe('Be myself Planner', () => {
       expect(result.folded).toBe(true);
       expect(result.moved, 'the page never gets shorter under you, so the browser never pulls the view, or the toolbar, upwards (1px of rounding aside)').toBe(0);
       expect(result.hold, 'the space the step gave up is held at the bottom').toBeGreaterThan(0);
+      const heightThen = await page.evaluate(() => document.documentElement.scrollHeight);
+      await page.evaluate(() => window.scrollBy(0, -100));
+      await page.waitForTimeout(400);
+      expect(await page.evaluate(() => document.documentElement.scrollHeight), 'scrolling up a little near the bottom does not shorten the page, which made mobile browsers such as Firefox for Android blank the toolbar').toBe(heightThen);
       await page.evaluate(() => window.scrollTo(0, 0));
       await expect.poll(() => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0), { message: 'the held space goes once you have scrolled away' }).toBe(0);
     });
@@ -3005,6 +3009,29 @@ test.describe('Be myself Planner', () => {
       await expect(party, 'a mouse wheel, scroll keys, or the start of a finger scroll leave it running').toHaveCount(1);
       await page.mouse.click(5, 300);
       await expect(party, 'a tap stops it').toHaveCount(0, { timeout: 1500 });
+    });
+
+    test('299. The space held after a fold at the bottom is never trimmed bit by bit, only once you are a screen away', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(300);
+      const btns = page.locator('#planContent li.plan-item .item-header .step-state-btn');
+      const last = btns.nth(await btns.count() - 1);
+      await last.click();
+      await last.click();
+      await expect(page.locator('#planContent li.plan-item').last()).toHaveClass(/is-folded/);
+      await page.waitForTimeout(600);
+      const held = () => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0);
+      const start = await held();
+      expect(start).toBeGreaterThan(0);
+      const step = await page.evaluate(() => Math.floor(window.innerHeight / 4));
+      for (let i = 0; i < 3; i++) {
+        await page.evaluate(y => window.scrollBy(0, -y), step);
+        await page.waitForTimeout(300);
+        expect(await held(), `still within a screen of the bottom after ${i + 1} small scrolls`).toBe(start);
+      }
+      await page.evaluate(() => window.scrollBy(0, -2 * window.innerHeight));
+      await expect.poll(held, { message: 'a screen away, the held space goes in one go' }).toBe(0);
     });
 
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
