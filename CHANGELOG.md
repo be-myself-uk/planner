@@ -15,6 +15,7 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 Releases:
 
+- [Unreleased](#unreleased)
 - [November 2026](#november-2026)
 - [October 2026 /2](#october-2026-2)
 - [October 2026 /1](#october-2026-1)
@@ -27,6 +28,18 @@ Releases:
 - [March 2026 /3](#march-2026-3)
 - [March 2026 /2](#march-2026-2)
 - [March 2026 /1](#march-2026-1)
+
+## [Unreleased]
+
+**Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because plans can now have a new step, "A document in your new name". Check your answers once, and the message will not come back until a later change could affect your plan.
+
+### Information
+
+- Added a step called "A document in your new name" for anyone changing their name who needs to update a driving licence in England, Scotland or Wales, or a UK passport. The DVLA and HM Passport Office both ask for one document that already shows your new name, as well as your deed poll or statutory declaration, so someone who has only just made their deed poll may have nothing to send yet. The step lists the documents both accept, says the DVLA also needs it to be issued after your deed poll and your current licence, and comes first in its group so you can sort it out before you apply. It is not shown if you are only changing your gender marker, if your licence is from the DVA in Northern Ireland, for an Irish passport, or for a UK passport when you already have a Gender Recognition Certificate.
+
+### Code
+
+- In "Documents and services", "Services to update" now comes before the driving licence, since a bill or statement from one of those services can be the document the DVLA asks for.
 
 ## [November 2026]
 

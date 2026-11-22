@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-pqHyLBVIwO48XF1gGHwb65PHtjpUh/dr5I5rcJkSsgw='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-U46HxICaYzmDr1cyHFV2FfCmE3ttTSZuDwsaUTEbEuI='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -553,7 +553,7 @@ function decodeState(str) {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 const SCHEMA_VERSION = parseInt(document.querySelector('meta[name="schema-version"]')?.content, 10) || 0;
-const PLAN_VERSION = 3;
+const PLAN_VERSION = 4;
 const S = { YES:'yes', NO:'no', UPDATED:'updated', NEEDS_UPDATE:'needs_update', NONE:'none', IRISH:'irish', BOTH:'both', NAME:'name', GENDER:'gender' };
 const REGION = { E:'e', W:'w', S:'s', NI:'ni' };
 const REGION_LEGACY = { ew: REGION.E, wales: REGION.W, scot: REGION.S };
@@ -632,6 +632,12 @@ const HR_NAME_TEXT = {
 };
 const GENDERDOC_DETAIL_GB = '<p>You do not need one for every step. It is mainly useful for your driving licence. GOV.UK says your employer can update their payroll records once you tell them you have changed gender, and HM Passport Office asks for different evidence for a passport, which the passport step in this plan explains.</p><p>If you use a statutory declaration or a deed poll for your driving licence, the DVLA also asks for one document showing your name, issued after it. The driving licence step in this plan lists which documents count.</p><a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>';
 const DVLA_ID_DOCS = '<p>Issued in the last 12 months:</p><ul class="bullet-list"><li>A tax record, such as a letter from HMRC</li><li>An official letter from your employer</li><li>An education record, such as a school report</li><li>A letter from a government department or council</li><li>A visa or residence permit</li><li>A medical or health card</li><li>A voter card</li><li>A UK bank statement</li><li>A baptism or confirmation certificate</li><li>A child benefit record</li><li>A utility bill, including a mobile, broadband, or streaming bill</li></ul><p>With no time limit:</p><ul class="bullet-list"><li>A non-GB driving licence</li><li>A UK passport number</li><li>A non-UK passport</li><li>A national identity card</li></ul><p>Whichever you send, it must still be valid. If your UK passport has already been updated, its passport number counts as this document.</p>';
+const FIRST_DOC_QUICKEST = 'It is often quicker to get a mobile, broadband, or streaming bill changed to your new name first, or ask your employer for a letter, rather than wait on a bank statement or a voter card, both of which need you to already be set up under your new name with that organisation.';
+function firstDocNeeds(p) {
+  const dvla = !!p.needsDriving && p.region !== REGION.NI;
+  const ukpass = !!p.needsPassport && !p.isNonUK && !p.isIrish && !p.hasGRC;
+  return { dvla, ukpass, any: p.goal !== S.GENDER && (dvla || ukpass) };
+}
 const NHS_NAME_EW = {
   summary: 'Your GP practice can update your name on your record. They may ask to see your deed poll or statutory declaration. Updating your NHS record means your appointments, letters, and prescriptions all use your new name.',
   detail: '<p>Your GP practice can update your name once they have seen your deed poll or statutory declaration. Your NHS number stays the same for a name-only change.</p><a href="https://transactual.org.uk/updating-medical-records/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> TransActual: Updating medical records</a><a href="https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> NHS: Register with a GP surgery</a>',
@@ -754,6 +760,27 @@ const PLAN_ITEMS = {
       },
     },
   },
+  firstdoc: {
+    difficulty: 'easy',
+    title: 'A document in your new name',
+    summaryFn: (p) => {
+      const n = firstDocNeeds(p);
+      const apps = n.dvla && n.ukpass ? 'Your driving licence and passport applications each need' : n.dvla ? 'Your driving licence application needs' : 'Your passport application needs';
+      return `${apps} a document that already shows your new name, as well as your deed poll or statutory declaration. If you do not have one yet, get one before you apply.`;
+    },
+    detailFn: (p) => {
+      const n = firstDocNeeds(p);
+      const both = n.dvla && n.ukpass;
+      const who = both ? 'The DVLA and HM Passport Office (HMPO) each ask' : n.dvla ? 'The DVLA asks' : 'HM Passport Office (HMPO) asks';
+      const after = n.dvla ? (both ? ' The DVLA also says it must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.' : ' It must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.') : '';
+      const utility = n.dvla ? 'A utility bill. The DVLA says this includes a mobile, broadband, or streaming bill' : 'A utility bill';
+      const abroad = n.ukpass && p.outsideUK ? '<p>If you apply from outside the UK, HMPO may ask for more than one document, depending on the country, and a bank statement only counts for applications made in the UK.</p>' : '';
+      const quickest = n.dvla ? `<p>${CN} ${FIRST_DOC_QUICKEST}</p>` : '';
+      const links = (n.dvla ? '<a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>' : '')
+        + (n.ukpass ? '<a href="https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible#evidence-the-new-name-is-used-for-all-official-purposes" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Names, evidence to change a name (caseworker guidance)</a>' : '');
+      return `<p>${who} for one document that already shows your new name, issued in the last 12 months.${after}</p><p>${both ? 'Documents both accept include:' : 'Documents it accepts include:'}</p><ul class="bullet-list"><li>A tax record, such as a letter from HMRC</li><li>An official letter from your employer</li><li>An education record, such as a school report</li><li>A letter from a government department or your local council</li><li>A visa or residence permit</li><li>A medical or health card</li><li>A voter card</li><li>A UK bank statement</li><li>A baptism or confirmation certificate</li><li>A child benefit record</li><li>${utility}</li></ul>${abroad}${quickest}${links}`;
+    },
+  },
   dva: {
     difficulty: 'medium', cost: { type:'split', value:'Free', value2:'Small cost' },
     title: 'Driving licence (DVA)',
@@ -766,11 +793,11 @@ const PLAN_ITEMS = {
     variants: {
       both: {
         summary: '<p>The DVLA handles driving licence updates. You can use the title Mx on your driving licence. You will also need a separate document that already shows your new name.</p><p>' + CN + ' Your gender marker is stored in the number on your licence and should update as part of the process.</p>',
-        detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the application form.</p><p><strong>⚠️ Evidence needed:</strong> As well as your deed poll or statutory declaration, the DVLA asks for one other document that already shows your new name. It must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.</p>' + DVLA_ID_DOCS + '<p>' + CN + ' Your current driving licence cannot be used as this document, since it still shows your old name. It is often quicker to get a mobile, broadband, or streaming bill changed to your new name first, or ask your employer for a letter, rather than wait on a bank statement or a voter card, both of which need you to already be set up under your new name with that organisation.</p><p><strong>Gender marker evidence:</strong> The DVLA accepts a deed poll or a statutory declaration for a combined name and gender change. If you would rather use a GRC, it must be sent together with a deed poll or a statutory declaration, since a GRC on its own is not accepted for a combined change.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for prices.</p><p><strong>Cover letter:</strong> ' + CN + ' Not required, but it can help to include one, especially when changing your gender marker.</p><p><strong>⚠️ Legal requirement:</strong> Updating your gender marker is optional, but telling the DVLA about a name change is not as you can face a large fine for not doing so.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change the name or gender on your driving licence</a><a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>',
+        detail: '<p>Driving licence updates for name or gender are handled by post. The DVLA website linked below has the full details, including what to send and the application form.</p><p><strong>⚠️ Evidence needed:</strong> As well as your deed poll or statutory declaration, the DVLA asks for one other document that already shows your new name. It must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.</p>' + DVLA_ID_DOCS + '<p>' + CN + ' Your current driving licence cannot be used as this document, since it still shows your old name. ' + FIRST_DOC_QUICKEST + '</p><p><strong>Gender marker evidence:</strong> The DVLA accepts a deed poll or a statutory declaration for a combined name and gender change. If you would rather use a GRC, it must be sent together with a deed poll or a statutory declaration, since a GRC on its own is not accepted for a combined change.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name or gender marker.</p><p><strong>Cost note:</strong> Updating your name and gender marker is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for prices.</p><p><strong>Cover letter:</strong> ' + CN + ' Not required, but it can help to include one, especially when changing your gender marker.</p><p><strong>⚠️ Legal requirement:</strong> Updating your gender marker is optional, but telling the DVLA about a name change is not as you can face a large fine for not doing so.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change the name or gender on your driving licence</a><a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>',
       },
       name: {
         summary: '<p>The DVLA handles driving licence updates. You can use the title Mx on your driving licence. You will also need a separate document that already shows your new name.</p>',
-        detail: '<p>Driving licence updates for a name change are handled by post. The DVLA website linked below has the full details, including what to send and the application form.</p><p><strong>⚠️ Evidence needed:</strong> As well as your deed poll or statutory declaration, the DVLA asks for one other document that already shows your new name. It must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.</p>' + DVLA_ID_DOCS + '<p>' + CN + ' Your current driving licence cannot be used as this document, since it still shows your old name. It is often quicker to get a mobile, broadband, or streaming bill changed to your new name first, or ask your employer for a letter, rather than wait on a bank statement or a voter card, both of which need you to already be set up under your new name with that organisation.</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name.</p><p><strong>Cost note:</strong> Updating your name is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for prices.</p><p><strong>Cover letter:</strong> ' + CN + ' Not required, but it can help to include one.</p><p><strong>⚠️ Legal requirement:</strong> You must tell the DVLA about a name change, as you can face a large fine for not doing so.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change the name or gender on your driving licence</a><a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>',
+        detail: '<p>Driving licence updates for a name change are handled by post. The DVLA website linked below has the full details, including what to send and the application form.</p><p><strong>⚠️ Evidence needed:</strong> As well as your deed poll or statutory declaration, the DVLA asks for one other document that already shows your new name. It must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.</p>' + DVLA_ID_DOCS + '<p>' + CN + ' Your current driving licence cannot be used as this document, since it still shows your old name. ' + FIRST_DOC_QUICKEST + '</p><p><strong>Mx title:</strong> The DVLA accepts Mx as a title on driving licences. You can request this when applying to update your name.</p><p><strong>Cost note:</strong> Updating your name is usually free. A photo update at the same time may carry a small fee. Check GOV.UK for prices.</p><p><strong>Cover letter:</strong> ' + CN + ' Not required, but it can help to include one.</p><p><strong>⚠️ Legal requirement:</strong> You must tell the DVLA about a name change, as you can face a large fine for not doing so.</p><a href="https://www.gov.uk/change-name-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change the name or gender on your driving licence</a><a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>',
       },
       gender: {
         summary: '<p>The DVLA handles driving licence updates for a gender marker change. It accepts a deed poll, a statutory declaration, or a GRC as evidence. If you use a deed poll or statutory declaration, you also need one document showing your name that was issued after it.</p><p>' + CN + ' Your gender marker is stored in the number on your licence and should update as part of the process. You can also use the title Mx on your driving licence.</p>',
@@ -2558,7 +2585,7 @@ function computePlanMeta(p) {
   if (p.birthCert && !p.birthOutsideUK && !isName) costs.push(p.bornInNI ? '<strong>New birth certificate (Northern Ireland):</strong> A short certificate is issued free of charge.' : '<strong>New birth certificate:</strong> A fee applies. Check GOV.UK for prices.');
   const hasHealthGroup = p.needsNHS || p.newGP;
   const hasWorkGroup   = p.employment === S.NEEDS_UPDATE || p.dbs || p.student;
-  const hasCivicGroup  = p.needsHMRC || p.dwp || p.needsDriving || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
+  const hasCivicGroup  = firstDocNeeds(p).any || p.needsHMRC || p.dwp || p.needsDriving || p.birthCertName || (!isGender && p.services && p.services.length > 0) || (!isGender && p.vehicle);
   const hasStep3 = p.needsPassport || (p.isNonUK && !p.visaAlreadyUpdated);
   const hasStep4 = (((p.wantsGRC && !p.hasGRC) || p.birthCert) && !isName) || (p.showIrishRoute && !isName);
   const splitMiddle = [hasHealthGroup, hasWorkGroup, hasCivicGroup].filter(Boolean).length >= 2;
@@ -2689,6 +2716,10 @@ function buildSharedPlan(p) {
     }
   };
   const buildCivicItems = () => {
+    if (firstDocNeeds(p).any) {
+      const firstDocItem = PLAN_ITEMS.firstdoc;
+      addStep(li('firstdoc', easy, null, firstDocItem.title, firstDocItem.summaryFn(p), firstDocItem.detailFn(p)));
+    }
     if (p.needsHMRC) {
       const hmrcItem = PLAN_ITEMS.hmrc;
       const hmrcVariant = planItemVariant(hmrcItem, p.goal);
@@ -2698,20 +2729,6 @@ function buildSharedPlan(p) {
       const dwpRegional = planItemRegion(PLAN_ITEMS.dwp, p.outsideUK ? 'out' : isNI ? 'ni' : 'default');
       const dwpDetail = dwpRegional.detailFn ? dwpRegional.detailFn(p) : dwpRegional.detail;
       addStep(li('dwp', easy, renderCost(PLAN_ITEMS.dwp.cost), dwpRegional.title, dwpRegional.summary, dwpDetail));
-    }
-    if (p.needsDriving) {
-      const drivingItem = isNI ? PLAN_ITEMS.dva : PLAN_ITEMS.dvla;
-      const drivingKey = isNI ? 'dva' : 'dvla';
-      const drivingVariant = planItemVariant(drivingItem, p.goal);
-      addStep(li(drivingKey, medium, renderCost(drivingItem.cost), drivingItem.title, drivingVariant.summary, drivingVariant.detail));
-    }
-    if (!isGender && p.vehicle) {
-      const v5cItem = PLAN_ITEMS.v5c;
-      addStep(li('v5c', easy, renderCost(v5cItem.cost), v5cItem.titleFn(p), v5cItem.summaryFn(p), v5cItem.detailFn(p)));
-    }
-    if (p.birthCertName) {
-      const birthCertNameItem = planItemRegion(PLAN_ITEMS.birthcertname, p.bornInNI ? 'ni' : 'default');
-      addStep(li('birthcertname', medium, renderCost(PLAN_ITEMS.birthcertname.cost), birthCertNameItem.title, birthCertNameItem.summary, birthCertNameItem.detail));
     }
     if (!isGender) {
       const svcLabels = Object.fromEntries(SERVICES.map(s => [s.key, ((isNI && s.labelNI) || s.label).split(' (')[0]]));
@@ -2738,6 +2755,20 @@ function buildSharedPlan(p) {
           expandedDetails
         ));
       }
+    }
+    if (p.needsDriving) {
+      const drivingItem = isNI ? PLAN_ITEMS.dva : PLAN_ITEMS.dvla;
+      const drivingKey = isNI ? 'dva' : 'dvla';
+      const drivingVariant = planItemVariant(drivingItem, p.goal);
+      addStep(li(drivingKey, medium, renderCost(drivingItem.cost), drivingItem.title, drivingVariant.summary, drivingVariant.detail));
+    }
+    if (!isGender && p.vehicle) {
+      const v5cItem = PLAN_ITEMS.v5c;
+      addStep(li('v5c', easy, renderCost(v5cItem.cost), v5cItem.titleFn(p), v5cItem.summaryFn(p), v5cItem.detailFn(p)));
+    }
+    if (p.birthCertName) {
+      const birthCertNameItem = planItemRegion(PLAN_ITEMS.birthcertname, p.bornInNI ? 'ni' : 'default');
+      addStep(li('birthcertname', medium, renderCost(PLAN_ITEMS.birthcertname.cost), birthCertNameItem.title, birthCertNameItem.summary, birthCertNameItem.detail));
     }
   };
   if (splitMiddle) {
