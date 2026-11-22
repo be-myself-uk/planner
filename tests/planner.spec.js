@@ -3816,6 +3816,14 @@ test.describe('Be myself Planner', () => {
       expect(await frame(), 'the streamers should be flying').not.toBe(first);
       await page.waitForTimeout(4000);
       await expect(party, 'still celebrating well past the old five second mark').toHaveCount(1);
+      await page.waitForTimeout(3800);
+      const painted = await party.evaluate(c => {
+        const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        let n = 0;
+        for (let i = 3; i < d.length; i += 4 * 37) if (d[i] > 0) n++;
+        return n;
+      });
+      expect(painted, 'the streamers stay inside the window until the celebration ends').toBeGreaterThan(200);
       await expect(party, 'the celebration ends by itself after 12 seconds').toHaveCount(0, { timeout: 9000 });
       await expect(page.locator('#heroCanvas'), 'the streamers come back to the header').not.toHaveClass(/escaped/);
     });
@@ -3859,6 +3867,65 @@ test.describe('Be myself Planner', () => {
       await page.waitForTimeout(300);
       await expect(page.locator('#celebrationCanvas'), 'nothing may fly across the page under prefers-reduced-motion').toHaveCount(0);
       await expect(page.locator('#heroCanvas')).not.toHaveClass(/escaped/);
+    });
+
+    test('268. The celebration waits until the plan has stayed finished for 1.5 seconds', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count - 1; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const lastBtn = btns.nth(count - 1);
+      const party = page.locator('#celebrationCanvas');
+      await lastBtn.click();
+      await lastBtn.click();
+      await expect(page.locator('#allDoneBanner'), 'the banner itself does not wait').toBeVisible();
+      await page.waitForTimeout(600);
+      await lastBtn.click();
+      await page.waitForTimeout(1100);
+      await expect(party, 'changing the status again restarts the wait, so clicking through the states never sets it off').toHaveCount(0);
+      await lastBtn.click();
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      await page.waitForTimeout(2000);
+      await expect(party, 'going back to Not started cancels the wait').toHaveCount(0);
+      await lastBtn.click();
+      await lastBtn.click();
+      await page.waitForTimeout(1000);
+      await expect(party, 'still waiting one second after the last change').toHaveCount(0);
+      await expect(party, 'the celebration starts once the plan has stayed finished').toHaveCount(1, { timeout: 2000 });
+    });
+
+    test('269. The streamers leave from the header when it is in view, and from behind the toolbar when it is not', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count - 1; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const party = page.locator('#celebrationCanvas');
+      const finishLast = () => btns.nth(count - 1).evaluate(b => { b.click(); b.click(); });
+      const unfinishLast = () => btns.nth(count - 1).evaluate(b => { b.click(); b.click(); });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await finishLast();
+      await expect(party).toHaveCount(1, { timeout: 3000 });
+      await expect(party, 'with the header on screen they must break out of the header itself').toHaveAttribute('data-from', 'header');
+      const layers = await page.evaluate(() => ({
+        party: Number(getComputedStyle(document.getElementById('celebrationCanvas')).zIndex),
+        toolbar: Number(getComputedStyle(document.getElementById('controlBar')).zIndex),
+      }));
+      expect(layers.party, 'the streamers pass behind the toolbar, so it stays usable and they can come out from behind it').toBeLessThan(layers.toolbar);
+      await page.keyboard.press('Shift');
+      await expect(party).toHaveCount(0, { timeout: 1500 });
+      await unfinishLast();
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await expect.poll(() => page.evaluate(() => document.querySelector('.hero').getBoundingClientRect().bottom < 0)).toBe(true);
+      await finishLast();
+      await expect(party).toHaveCount(1, { timeout: 3000 });
+      await expect(party, 'at the bottom of a long plan the header is out of view, so they come out from behind the toolbar').toHaveAttribute('data-from', 'toolbar');
     });
   });
 
