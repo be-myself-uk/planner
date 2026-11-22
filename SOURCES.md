@@ -579,7 +579,7 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: Apply for a GRC, who can apply**
   - <https://www.gov.uk/apply-gender-recognition-certificate/who-can-apply>
   - Status: Consulted, not linked in the planner
-  - Note: Lists the standard route's requirements: aged 18 or over, diagnosed with gender dysphoria in the UK, living in the affirmed gender for at least 2 years, and intending to live in it for the rest of your life. Says "You can apply even if you have not had any gender affirming surgery or treatments, or you do not plan to have any." For someone with a certificate or similar from an approved country or territory, the only requirements are being 18 or over and having a document showing the affirmed gender is legally recognised there, which is the source for the shorter overseas route not needing the medical reports. Also the source for the minimum age of 18 and for the GRC introduction's sentence on surgery and treatment.
+  - Note: Lists the standard route's requirements: aged 18 or over, diagnosed with gender dysphoria in the UK, living in the affirmed gender for at least 2 years, and intending to live in it for the rest of your life. Says "You can apply even if you have not had any gender affirming surgery or treatments, or you do not plan to have any." For someone with a certificate or similar from an approved country or territory, the only requirements are being 18 or over and having a document showing the affirmed gender is legally recognised there, which is the source for the shorter overseas route not needing the medical reports. Re-read 2026-11-22: it describes someone who has "got a Gender Recognition Certificate or something similar from an approved country or territory" as needing only to be 18 or over and to have a document showing their affirmed gender is legally recognised there. It does not say whether that recognition has any effect in the UK on its own. Also the source for the minimum age of 18 and for the GRC introduction's sentence on surgery and treatment.
   - Last verified: 2026-11-20
 
 - **GOV.UK: Apply for a GRC, what documents you need**
@@ -598,7 +598,8 @@ For items with no official source, the links in the general data protection sect
 - **GOV.UK: List of approved countries and territories**
   - <https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories>
   - Status: Linked in the planner
-  - Last verified: 2026-09-19
+  - Note: Updated 9 April 2024. Says that if you "had your gender previously recognised in one of the countries or territories in this list", you are on the "overseas route", which "means you do not need to provide medical reports", and otherwise you are on the "main route". Ireland is not on the list (checked 2026-11-22: neither "Ireland" nor "Republic of Ireland" appears). Source for the GRC question's note and the GRC introduction saying Ireland is not on the list, so an Irish Gender Recognition Certificate does not give the shorter route. GOV.UK does not say in so many words that recognition from another country has no effect in the UK, so the planner no longer says that.
+  - Last verified: 2026-11-22
 
 - **Gender Recognition Act 2004, section 12**
   - <https://www.legislation.gov.uk/ukpga/2004/7/section/12>

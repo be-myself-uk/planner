@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-xJjr6cWzuiyBvWScG8FNy6wnJwsDpw8WSvDZYU7OFVU='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-xydjth0FpBgOiwHFAfPKNV3APRDWRJSTxrxEBRzMTfY='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -279,12 +279,12 @@
     <fieldset id="wrapSectionLongterm" data-section-label="Long-term goals" style="border:none;padding:0;margin:0 0 28px 0;">
       <legend class="section-title">4. Long-term goals</legend>
       <fieldset class="chk-section chk-section--mv" id="wrapGRC">
-        <legend class="chk-q">Do you have a Gender Recognition Certificate (GRC), or do you plan to apply for one?</legend>
+        <legend class="chk-q">Do you have a UK Gender Recognition Certificate (GRC), or do you plan to apply for one?<br><em class="note" style="margin-top:2px;" data-note="grc"></em></legend>
         <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCNo" value="no"> No</label>
         <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCYes" value="yes"> Not yet, but I plan to apply for one</label>
         <label class="option option-sm"><input type="radio" name="chkGRCOpt" id="chkGRCUpdated" value="updated"> I already have one</label>
       </fieldset>
-      <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a Gender Recognition Certificate (GRC).</em></span></label></div>
+      <div id="wrapBirthCert" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCert"><span>I would like to update my birth certificate to show my new gender<br><em class="note" style="margin-top:2px;">This requires a UK Gender Recognition Certificate (GRC).</em></span></label></div>
       <div id="wrapIrishRoute" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkIrishRoute"><span>I would like to see the Irish passport route<br><em class="note" style="margin-top:2px;" data-note="irishRoute"></em></span></label></div>
       <div id="wrapBirthCertName" class="hidden"><label class="checkbox-item"><input type="checkbox" id="chkBirthCertName"><span><span class="label-bcn-scot">I would like to update my Scottish birth certificate to show my new name<br><em class="note" style="margin-top:2px;" data-note="birthCertScot"></em></span><span class="label-bcn-ni">I would like to record my new name on my Northern Ireland birth certificate<br><em class="note" style="margin-top:2px;">⚠️ This permanently links your old and new names on your official birth record, and any future certified copy will show both. Most people prefer the privacy of a deed poll or statutory declaration instead.</em></span></span></label></div>
     </fieldset>
@@ -982,7 +982,7 @@ const PLAN_ITEMS = {
       },
       default: {
         evidence: GRC_MED_EVIDENCE,
-        title: 'Medical proof for GRC',
+        title: 'Medical proof for UK GRC',
         summary: 'A GRC is the UK\'s legal route to having your gender legally recognised. It only ever recognises you as male or female; GOV.UK states plainly that non-binary genders are not legally recognised in the UK. The application also requires two medical reports; the GOV.UK links below have details on what is needed.',
         detail: '<p>The GRC application requires two medical reports. Both must be written by either two different medical doctors registered in the UK, or a medical doctor and a clinical psychologist, both registered in the UK. A nurse practitioner cannot write either report.</p><p>The first report must come from a registered doctor or clinical psychologist who practises in the field of gender dysphoria. GOV.UK publishes a list of specialists, but says this list is not complete and not always up to date; someone not on the list can still write this report if they include a brief summary of their experience in the field.</p><p>The second report can come from any registered doctor or clinical psychologist, including a GP, a surgeon, or an endocrinologist. There is no set content for this second report. Reports do not need to be written specially for your application if you already have ones that meet these requirements.</p><p>Both reports must include the writer\'s name, practice address and contact details. At least one must describe any gender affirmation treatment you have had or plan to have, such as hormones or surgery, or explain why you have not had any and do not plan to.</p><p>If your gender is already legally recognised in a country or territory on GOV.UK\'s approved list, you can apply through the shorter overseas route instead, which does not need these medical reports. The GOV.UK links below have the application requirements, the list of specialists, and the list of recognised countries.</p><a href="https://www.gov.uk/apply-gender-recognition-certificate" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Apply for a GRC</a><a href="https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-medical-practitioners-in-gender-dysphoria" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: List of medical practitioners in gender dysphoria</a><a href="https://www.gov.uk/government/publications/gender-recognition-certificate-list-of-approved-countries-and-territories/gender-recognition-certificate-list-of-approved-countries-and-territories" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: List of approved countries and territories</a>',
       },
@@ -990,7 +990,7 @@ const PLAN_ITEMS = {
   },
   grc_docs: {
     difficulty: 'medium', cost: { type:'fixed', value:'Small cost' },
-    title: 'Paperwork for your GRC application',
+    title: 'Paperwork for your UK GRC application',
     summary: 'As well as the medical reports and the two years of evidence, the application asks for a statutory declaration, your full birth or adoption certificate, and copies of anything showing a change of name.',
     evidenceFn: (p) => ({
       idPrefix: 'grcdocs',
@@ -1009,7 +1009,7 @@ const PLAN_ITEMS = {
   grc_life: {
     difficulty: 'hard', cost: { type:'split', value:'Small cost', value2:'Medium cost' },
     evidence: GRC_LIFE_EVIDENCE,
-    title: 'Living proof for GRC',
+    title: 'Living proof for UK GRC',
     summary: 'The GRC application requires evidence of living in your acquired gender, alongside a statutory declaration. The GOV.UK link below has the details.',
     detail: '<p>The GRC panel requires documents from at least two years, showing that you have been using your new name and living in your acquired gender. The application also requires a statutory declaration. The GOV.UK link below has the details on what documents are accepted and how many are needed.</p><a href="https://www.gov.uk/apply-gender-recognition-certificate/what-documents-you-need" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Apply for a GRC: What documents you need</a>',
   },
@@ -2163,6 +2163,7 @@ const LOCK_REASONS = {
   visa: 'You usually need to update your home country passport first, as UKVI generally needs that as evidence before your eVisa can be changed.',
 };
 const NOTES = {
+  grc: 'A UK GRC legally recognises your acquired gender in UK law. It is required to update your birth certificate and affects how HMRC, DWP, and pension providers see your records. It is not needed for most day-to-day changes. You must be 18 or over to apply. This question is about a UK GRC. If your gender is already legally recognised in a country on GOV.UK\'s approved list, there is a shorter route to a UK GRC. Ireland is not on that list, so an Irish Gender Recognition Certificate does not give you the shorter route.',
   goal: 'Select "My gender marker" if your name is already correct, or tick both to update your name and gender marker.',
   birthRegion: 'This is asked as it might affect which legal routes are available to you.',
   irishRoute: 'People born in Northern Ireland can apply for an Irish passport under the Good Friday Agreement, and Ireland has its own process for the gender marker on it. It gives you a passport in your correct name and gender. It is not a Gender Recognition Certificate and does not change your UK records, so it sits alongside one rather than replacing it. Being born in Northern Ireland does not by itself make you an Irish citizen.',
@@ -2281,11 +2282,11 @@ const questions = [
   { id:'student', chk:'chkStudent', q:'Do you have qualifications, student records, or professional registrations to update?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.student + '</em>', o:() => [
     [S.YES,'Yes'],[S.NO,'No']
   ]},
-  { id:'grc', wrap:'wrapGRC', chkName:'chkGRCOpt', q:'Do you have a Gender Recognition Certificate (GRC), or do you plan to apply for one?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">A GRC legally recognises your acquired gender in UK law. It is required to update your birth certificate and affects how HMRC, DWP, and pension providers see your records. It is not needed for most day-to-day changes. You must be 18 or over to apply.</em>',
+  { id:'grc', wrap:'wrapGRC', chkName:'chkGRCOpt', q:'Do you have a UK Gender Recognition Certificate (GRC), or do you plan to apply for one?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">' + NOTES.grc + '</em>',
     cond:() => wizardState.goal !== S.NAME, o:() => [
     [S.NO,'No'],[S.YES,'Not yet, but I plan to apply for one'],[S.UPDATED,'I already have one']
   ]},
-  { id:'birthCert', chk:'chkBirthCert', wrap:'wrapBirthCert', q:'Would you like to update your birth certificate to show your new gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This requires a Gender Recognition Certificate (GRC), as it is not possible without one. It is a long-term step and is not needed for most day-to-day purposes.</em>',
+  { id:'birthCert', chk:'chkBirthCert', wrap:'wrapBirthCert', q:'Would you like to update your birth certificate to show your new gender?<br><em class="note" style="font-style:italic;display:block;margin-top:4px;">This requires a UK Gender Recognition Certificate (GRC), as it is not possible without one. It is a long-term step and is not needed for most day-to-day purposes.</em>',
     cond:() => wizardState.goal !== S.NAME, o:() => [
     [S.YES,'Yes'],[S.NO,'No, or not yet']
   ]},
@@ -2746,7 +2747,7 @@ function computePlanMeta(p) {
   return { isGender, isName, isNI, costs, timeText, hasHealthGroup, hasWorkGroup, hasCivicGroup, hasStep3, hasStep4, splitMiddle };
 }
 const GRC_AGE_NOTE = '<p><strong>⚠️ Minimum age:</strong> You must be 18 or over to apply for a UK GRC. If you are 16 or 17, you can still start gathering the living-proof evidence now, since it needs to cover two years.</p>';
-const GRC_WHAT_IT_IS = '<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not typically required for day to day life, but it does allow you to update your birth or adoption certificate, and your marriage or civil partnership certificate, if they were registered in the UK. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If your gender is already legally recognised in a country or territory on GOV.UK\'s approved list, you still need a UK GRC for it to be recognised here, but you can apply through a shorter overseas route.</p><p>GOV.UK says you do not need a GRC to update your driving licence, your passport, or your medical records, employment records or bank account. You can apply even if you have not had any gender affirming surgery or treatment, and do not plan to. A GRC does not change your legal status as the father or mother of a child.</p>';
+const GRC_WHAT_IT_IS = '<p>A Gender Recognition Certificate (GRC) legally recognises your acquired gender in UK law. It is not typically required for day to day life, but it does allow you to update your birth or adoption certificate, and your marriage or civil partnership certificate, if they were registered in the UK. When you receive your GRC, you will also receive guidance on next steps, including who you may need to inform. If your gender is already legally recognised in a country or territory on GOV.UK\'s approved list, you can apply for a UK GRC through a shorter overseas route, without the medical reports. Ireland is not on that list.</p><p>GOV.UK says you do not need a GRC to update your driving licence, your passport, or your medical records, employment records or bank account. You can apply even if you have not had any gender affirming surgery or treatment, and do not plan to. A GRC does not change your legal status as the father or mother of a child.</p>';
 const GRC_MARRIED_NOTE = '<p><strong>If you are married or in a civil partnership:</strong> The GRC process requires either your spouse or civil partner\'s consent (a statutory declaration of consent), or that your marriage or civil partnership has already ended. If your spouse does not consent, this does not block the application outright. You can instead be issued an interim GRC, which does not itself change your legal gender. This gives you 6 months from the date it is issued to apply to end the marriage or civil partnership, after which a full GRC can be issued. If you stay married or in a civil partnership, your partner\'s entitlement to your pension if you die may also change. This is a significant legal consideration and you may want to speak to a solicitor before applying.</p>';
 const GRC_NI_NOTE = '<p>This step covers long-term legal gender recognition through a UK Gender Recognition Certificate (GRC). A GRC has practical uses in Northern Ireland for updating your birth certificate, marriage records, HMRC, and pensions.</p><p>GOV.UK says you do not need a GRC to update your driving licence, your passport, or your medical records, employment records or bank account. You can apply even if you have not had any gender affirming surgery or treatment, and do not plan to. A GRC does not change your legal status as the father or mother of a child.</p>';
 const GRC_BENEFITS_NOTE = '<p>A GRC can change your entitlement to some benefits and pensions. Before you apply, GOV.UK suggests asking the office that pays your benefits and any pension providers what would change.</p>';
@@ -2766,7 +2767,7 @@ function finalStepMeta(p) {
   const wantsUkGrc = p.wantsGRC || p.birthCert;
   let grcIntro;
   if (p.hasGRC) {
-    grcIntro = `<p>You already have a Gender Recognition Certificate (GRC).</p>${p.birthCert ? '<p>The step below covers updating your birth certificate to match it.</p>' : ''}${p.showIrishRoute ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below.</p>' : ''}`;
+    grcIntro = `<p>You already have a UK Gender Recognition Certificate (GRC).</p>${p.birthCert ? '<p>The step below covers updating your birth certificate to match it.</p>' : ''}${p.showIrishRoute ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below.</p>' : ''}`;
   } else if (!wantsUkGrc) {
     grcIntro = '<p>Because you were born in Northern Ireland, you may be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This route is described below.</p><p>You have not included a UK Gender Recognition Certificate (GRC) in this plan. If you decide you want one later, for example to update your birth certificate, you can add it by editing your answers.</p>';
   } else if (isNI) {
@@ -2774,14 +2775,14 @@ function finalStepMeta(p) {
   } else {
     grcIntro = GRC_WHAT_IT_IS + GRC_MARRIED_NOTE + GRC_BENEFITS_NOTE + `${p.showIrishRoute ? '<p>Because you were born in Northern Ireland, you may also be eligible for the <strong>Irish passport gender-change route</strong> under the Good Friday Agreement, regardless of where you currently live. This is described below alongside the UK GRC route.</p>' : ''}` + GRC_AGE_NOTE;
   }
-  const stepTitle = p.showIrishRoute ? (wantsUkGrc ? 'Legal gender recognition (Irish passport and GRC)' : 'Legal gender recognition (Irish passport)') : 'Legal gender recognition (GRC)';
+  const stepTitle = p.showIrishRoute ? (wantsUkGrc ? 'Legal gender recognition (Irish passport and UK GRC)' : 'Legal gender recognition (Irish passport)') : 'Legal gender recognition (UK GRC)';
   const stepTime  = p.showIrishRoute ? (wantsUkGrc ? IRISH_TIME + ' · UK GRC: 2+ years' : IRISH_TIME) : p.hasGRC ? '1-3 weeks' : 'Long-term (2+ years)';
   return { grcIntro, stepTitle, stepTime, wantsUkGrc };
 }
 function dualRouteMeta(p) {
   let grcIntro;
   if (p.hasGRC) {
-    grcIntro = `<p>You already have a Gender Recognition Certificate (GRC).</p>${p.birthCert ? '<p>The step below covers updating your birth certificate to match it.</p>' : ''}`;
+    grcIntro = `<p>You already have a UK Gender Recognition Certificate (GRC).</p>${p.birthCert ? '<p>The step below covers updating your birth certificate to match it.</p>' : ''}`;
   } else if (p.isNI) {
     grcIntro = GRC_NI_NOTE + GRC_MARRIED_NOTE + GRC_BENEFITS_NOTE + GRC_AGE_NOTE;
   } else {
@@ -2789,7 +2790,7 @@ function dualRouteMeta(p) {
   }
   return {
     irish: { title: 'Legal gender recognition (Irish passport)', time: IRISH_TIME, intro: IRISH_ROUTE_STANDALONE },
-    grc:   { title: 'Legal gender recognition (GRC)', time: p.hasGRC ? '1-3 weeks' : 'Long-term (2+ years)', intro: grcIntro },
+    grc:   { title: 'Legal gender recognition (UK GRC)', time: p.hasGRC ? '1-3 weeks' : 'Long-term (2+ years)', intro: grcIntro },
   };
 }
 

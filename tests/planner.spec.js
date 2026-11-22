@@ -751,7 +751,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('input[name="ans"][value="updated"]')).toHaveCount(1);
       await page.locator('input[name="ans"][value="updated"]').check();
       await finishWizard(page);
-      await expect(page.locator('#planContent')).toContainText('You already have a Gender Recognition Certificate (GRC).');
+      await expect(page.locator('#planContent')).toContainText('You already have a UK Gender Recognition Certificate (GRC).');
       await expect(page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(0);
     });
 
@@ -1195,7 +1195,7 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(0);
       await expect(page.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(0);
-      await expect(page.locator('#planContent')).toContainText('You already have a Gender Recognition Certificate (GRC).');
+      await expect(page.locator('#planContent')).toContainText('You already have a UK Gender Recognition Certificate (GRC).');
       await expect(page.locator('#planContent')).toContainText('You already have a GRC. If the General Register Office (GRO) has not already issued you a new birth certificate, contact them to follow up.');
       await expect(page.locator('#planContent')).not.toContainText('Once you receive your GRC, the General Register Office (GRO) will usually contact you');
     });
@@ -2181,7 +2181,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('#chkIrishRoute').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#planContent')).toContainText('Legal gender recognition (Irish passport)');
-      await expect(page.locator('#planContent')).not.toContainText('Irish passport and GRC');
+      await expect(page.locator('#planContent')).not.toContainText('Irish passport and UK GRC');
       await expect(page.locator('#planContent')).toContainText('You have not included a UK Gender Recognition Certificate');
     });
 
@@ -2195,7 +2195,7 @@ test.describe('Be myself Planner', () => {
       await page.locator('#checklistStickyBar button').click();
       const walesHtml = await page.locator('#planContent').innerHTML();
       expect(walesHtml).toBe(englandHtml);
-      await expect(page.locator('#planContent')).toContainText('Legal gender recognition (GRC)');
+      await expect(page.locator('#planContent')).toContainText('Legal gender recognition (UK GRC)');
       await expect(page.locator('#planContent')).not.toContainText('Irish passport');
     });
 
@@ -2214,13 +2214,13 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('.phase[data-phase-key="final"]')).toHaveCount(0);
 
       await expect(irish.locator('> .phase-header h3')).toContainText('Legal gender recognition (Irish passport)');
-      await expect(grc.locator('> .phase-header h3')).toContainText('Legal gender recognition (GRC)');
+      await expect(grc.locator('> .phase-header h3')).toContainText('Legal gender recognition (UK GRC)');
       await expect(irish.locator('.badge-time')).toContainText('Irish passport: 2+ years of name-use proof');
       await expect(grc.locator('.badge-time')).toContainText('Long-term (2+ years)');
 
       await expect(irish).toContainText('Irish passport (Good Friday Agreement route)');
       await expect(grc).toContainText('UK Gender Recognition Certificate (GRC)');
-      await expect(grc).toContainText('Living proof for GRC');
+      await expect(grc).toContainText('Living proof for UK GRC');
       await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_med"]')).toHaveCount(2);
       await expect(grc.locator('.step-state-btn[data-svc-parent="trk_grc_life"]')).toHaveCount(8);
 
@@ -2908,6 +2908,23 @@ test.describe('Be myself Planner', () => {
       expect((await read()).bar).toBe('normal, normal');
       await page.evaluate(() => document.documentElement.classList.add('streamers-rtl'));
       expect((await read()).bar, 'right to left streamers reverse the bar').toBe('reverse, normal');
+    });
+
+    test('295. The GRC question and steps say UK GRC, and say Ireland is not on GOV.UK\'s approved list', async ({ page }) => {
+      await openChecklist(page);
+      const legend = page.locator('#wrapGRC legend');
+      await expect(legend).toContainText('Do you have a UK Gender Recognition Certificate (GRC)');
+      await expect(legend, 'a certificate from another country is not what the question means').toContainText('This question is about a UK GRC.');
+      await expect(legend).toContainText('Ireland is not on that list, so an Irish Gender Recognition Certificate does not give you the shorter route.');
+      await page.locator('#chkGRCYes').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const content = page.locator('#planContent');
+      await expect(content).toContainText('Legal gender recognition (UK GRC)');
+      await expect(content).toContainText('Medical proof for UK GRC');
+      await expect(content).toContainText('Living proof for UK GRC');
+      await expect(content).toContainText('Paperwork for your UK GRC application');
+      await expect(content, 'GOV.UK does not say recognition elsewhere has no effect here').not.toContainText('for it to be recognised here');
+      await expect(content).toContainText('you can apply for a UK GRC through a shorter overseas route, without the medical reports. Ireland is not on that list.');
     });
 
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
