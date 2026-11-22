@@ -40,10 +40,15 @@ Releases:
 
 ### Code
 
+- A new "Change order" button in the toolbar shows the arrows and drag handles for moving steps and groups. They are hidden the rest of the time, so they no longer appear beside every step, and they are out of the way of the Tab key until you need them.
 - In "Documents and services", "Services to update" now comes before the driving licence, since a bill or statement from one of those services can be the document the DVLA asks for.
 
 ### Layout
 
+- On smaller screens, when the action plan buttons do not fit on one row, they now show as a menu under a ☰ button instead, so the toolbar takes up a single row. Each item in the menu has its name written next to it, and Focus mode and Change order have a switch that shows when they are on. Reset progress and New plan still ask you to confirm, and the menu stays open while they do. The usage guide and the "What is this?" panel say so.
+- Each step in your plan now shows just its status box and title on the first line. Its difficulty and cost have moved to the top of its "More information" section.
+- Each step title now lines up with the middle of its status box, including titles that wrap onto two lines on a phone.
+- A step you mark as done or not needed now folds down to its title, with a Show button to open it again. Printed plans still show every step in full.
 - The box at the top of the page with the title now has streamers in the transgender and non-binary flag colours drifting across it, as if carried on a gentle wind. Each time the page loads they take a new random pattern and direction. In light mode they drift over a light background, and in dark mode over a dark one. The title and the line under it each sit on their own frosted glass panel, so they stay easy to read.
 - When you finish every step in your plan, the streamers now escape from the title box and drift around the page for 12 seconds, then fade away and drift back into the title box. If the title box is scrolled out of view, they come out from behind the toolbar instead. They stay on screen the whole time. This replaces the confetti. It starts once your plan has stayed finished for a second and a half, so clicking through the statuses of your last step does not set it off. A tap, a click or any key press ends it straight away, and it does not play if your device is set to reduce motion.
 - A pause button in the corner of the title box stops and restarts the streamers. If your device is set to reduce motion, the streamers stay still and the pause button is not shown. The streamers also stop while the title box is scrolled out of view, are hidden when your device uses high contrast colours, and are not printed.

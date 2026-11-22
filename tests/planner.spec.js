@@ -54,6 +54,18 @@ async function openMultiPhasePlan(page) {
   await page.getByRole('button', { name: 'Show my action plan' }).click();
 }
 
+async function openPlanMenuIfCollapsed(page) {
+  const menuBtn = page.locator('#planMenuBtn');
+  if (await menuBtn.isVisible() && await menuBtn.getAttribute('aria-expanded') !== 'true') await menuBtn.click();
+}
+
+async function enableReorder(page) {
+  await openPlanMenuIfCollapsed(page);
+  const btn = page.locator('#reorderToggleBtn');
+  if (await btn.getAttribute('aria-pressed') !== 'true') await btn.click();
+  await expect(btn).toHaveAttribute('aria-pressed', 'true');
+}
+
 async function wizardNext(page) {
   const radio = page.locator('input[name="ans"]:not([disabled])').first();
   if (await radio.count() > 0) {
@@ -1594,6 +1606,7 @@ test.describe('Be myself Planner', () => {
 
     test('171. An opened shared plan does not keep the old plan\'s custom order or Focus mode', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const firstKey = await page.locator('#planContent > .phase[data-phase-key]').first().getAttribute('data-phase-key');
       await page.locator(`.phase[data-phase-key="${firstKey}"] .phase-move-group .tmpl-move-down`).click();
       await page.locator('#focusToggleBtn').click();
@@ -1973,7 +1986,9 @@ test.describe('Be myself Planner', () => {
       await page.getByLabel(/Yes, I need to update my records/).check();
       await page.getByLabel(/I have qualifications/).check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await expect(page.locator('#planContent .split-badge').first()).toBeVisible();
+      const splitItem = page.locator('#planContent li.plan-item', { has: page.locator('.split-badge') }).first();
+      await splitItem.locator('summary.tmpl-summary').click();
+      await expect(splitItem.locator('.split-badge').first(), 'cost badges sit at the top of More information').toBeVisible();
     });
 
     test('64. Credit reference agencies service item', async ({ page }) => {
@@ -2552,6 +2567,199 @@ test.describe('Be myself Planner', () => {
   });
 
   test.describe('Plan reordering', () => {
+    test('279. A step header holds only its status, title and controls; difficulty and cost sit at the top of More information', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await expect(page.locator('#planContent .item-header .item-badge'), 'no badges in any step header').toHaveCount(0);
+      const placement = await page.locator('#planContent li.plan-item').evaluateAll(lis => lis.map(li => {
+        const badges = li.querySelector('.tmpl-badges');
+        const body = li.querySelector('.details-body');
+        if (!badges) return 'missing';
+        if (body && !body.classList.contains('hidden') && !li.querySelector('.tmpl-details').classList.contains('hidden')) return body.firstElementChild === badges ? 'top of details' : 'elsewhere';
+        return badges.parentElement.classList.contains('item-body') ? 'under summary' : 'elsewhere';
+      }));
+      expect(placement.length).toBeGreaterThan(3);
+      expect(placement.filter(x => x === 'missing' || x === 'elsewhere'), 'every step keeps its badges, either at the top of More information or under the summary').toEqual([]);
+      const first = page.locator('#planContent li.plan-item').first();
+      await first.locator('summary.tmpl-summary').click();
+      await expect(first.locator('.details-body > .tmpl-badges .item-badge').first()).toBeVisible();
+    });
+
+    test('280. The move controls stay hidden and out of the tab order until Change order is pressed', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const toggle = page.locator('#reorderToggleBtn');
+      await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+      await expect(page.locator('#planContent .item-move-btn:visible, #planContent .item-drag-handle:visible')).toHaveCount(0);
+      const tabbable = await page.locator('#planContent .item-move-btn').evaluateAll(els => els.filter(el => el.offsetParent).length);
+      expect(tabbable, 'hidden arrows cannot be reached with Tab').toBe(0);
+      await toggle.click();
+      await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#liveRegion')).toContainText('Change order on');
+      await expect(page.locator('.phase[data-phase-key="work"] .phase-move-group')).toBeVisible();
+      await expect(page.locator('.phase[data-phase-key="work"] li.plan-item').first().locator('.item-move-group')).toBeVisible();
+      await toggle.click();
+      await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+      await expect(page.locator('#liveRegion')).toContainText('Change order off');
+      await expect(page.locator('.phase[data-phase-key="work"] .phase-move-group')).toBeHidden();
+    });
+
+    test('281. A step marked done or not needed folds to its title, Show opens it again, and clearing it unfolds it', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const item = page.locator('.phase[data-phase-key="work"] li.plan-item').first();
+      const status = item.locator('.item-header .step-state-btn');
+      const fold = item.locator('.item-fold-btn');
+      const body = item.locator('.item-body');
+      await expect(fold).toBeHidden();
+      await expect(body).toBeVisible();
+      await status.click();
+      await expect(body, 'in progress stays open').toBeVisible();
+      await status.click();
+      await expect(body, 'done folds to the title').toBeHidden();
+      await expect(item.locator('.tmpl-title')).toBeVisible();
+      await expect(fold).toBeVisible();
+      await expect(fold).toHaveAttribute('aria-expanded', 'false');
+      await fold.click();
+      await expect(body).toBeVisible();
+      await expect(fold).toHaveAttribute('aria-expanded', 'true');
+      await expect(fold).toHaveText('Hide');
+      await status.click();
+      await expect(body, 'not needed folds again').toBeHidden();
+      await status.click();
+      await expect(body, 'clearing the status unfolds it').toBeVisible();
+      await expect(fold).toBeHidden();
+    });
+
+    test('282. A folded step still prints in full, and its service list does not fold one service at a time', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#chkSvcBanks').check();
+      await page.locator('#chkSvcUtilities').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const services = page.locator('li.plan-item[data-item-id="trk_services_all"]');
+      await services.locator('.step-state-btn[data-svc-parent]').first().click();
+      await services.locator('.step-state-btn[data-svc-parent]').first().click();
+      await expect(services.locator('.item-body'), 'one service done does not fold the whole list').toBeVisible();
+      const step = page.locator('li.plan-item[data-item-id="trk_ukpass"]');
+      await step.locator('.item-header .step-state-btn').click();
+      await step.locator('.item-header .step-state-btn').click();
+      await expect(step.locator('.item-body')).toBeHidden();
+      await page.emulateMedia({ media: 'print' });
+      await expect(step.locator('.item-body'), 'printed plans show every step in full').toBeVisible();
+      await expect(step.locator('.item-fold-btn')).toBeHidden();
+    });
+
+    test('283. Each step title is centred on its status box, on a computer and on a phone where titles wrap', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const offsets = () => page.locator('#planContent li.plan-item').evaluateAll(lis => lis.map(li => {
+        const box = li.querySelector('.item-header .step-state-btn').getBoundingClientRect();
+        const title = li.querySelector('.item-header .tmpl-title').getBoundingClientRect();
+        return { title: li.dataset.itemTitle, lines: Math.round(title.height / parseFloat(getComputedStyle(li.querySelector('.tmpl-title')).lineHeight)), gap: Math.abs((box.top + box.height / 2) - (title.top + title.height / 2)) };
+      }));
+      for (const width of [1000, 360]) {
+        await page.setViewportSize({ width, height: 900 });
+        const found = await offsets();
+        expect(found.length).toBeGreaterThan(3);
+        if (width === 360) expect(found.some(f => f.lines > 1), 'at phone width some titles wrap onto two lines').toBe(true);
+        for (const f of found) expect(f.gap, `${f.title} at ${width}px`).toBeLessThanOrEqual(2);
+      }
+    });
+
+    test('284. The plan buttons collapse into the Plan menu only when they do not fit on one row', async ({ page }) => {
+      await page.setViewportSize({ width: 1000, height: 900 });
+      await openMultiPhasePlan(page);
+      await expect(page.locator('#planMenuBtn')).toBeHidden();
+      await expect(page.locator('#ubRestartBtn')).toBeVisible();
+      await expect(page.locator('#shareBtn')).toBeVisible();
+      await page.setViewportSize({ width: 390, height: 844 });
+      await expect(page.locator('#planMenuBtn')).toBeVisible();
+      await expect(page.locator('#planMenuBtn')).toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('#ubRestartBtn')).toBeHidden();
+      await page.setViewportSize({ width: 1000, height: 900 });
+      await expect(page.locator('#planMenuBtn'), 'widening the screen brings the buttons back').toBeHidden();
+      await expect(page.locator('#ubRestartBtn')).toBeVisible();
+      await page.locator('#ubMakeChangesBtn').click();
+      await page.setViewportSize({ width: 390, height: 844 });
+      await expect(page.locator('#planMenuBtn'), 'the menu is only for the action plan buttons').toBeHidden();
+    });
+
+    test('285. The Plan menu works with the keyboard, closes when done, and shows which modes are on', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await openMultiPhasePlan(page);
+      const menuBtn = page.locator('#planMenuBtn');
+      await menuBtn.focus();
+      await page.keyboard.press('Enter');
+      await expect(menuBtn).toHaveAttribute('aria-expanded', 'true');
+      await expect(page.locator('#ubRestartBtn'), 'opening from the keyboard moves focus into the menu').toBeFocused();
+      await page.keyboard.press('ArrowDown');
+      await expect(page.locator('#ubMakeChangesBtn')).toBeFocused();
+      await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('ArrowUp');
+      await expect(page.locator('#cbPlanActions [data-action="print"]'), 'arrow keys wrap round').toBeFocused();
+      await expect(page.locator('#ubRestartBtn')).toContainText('New plan');
+      await page.keyboard.press('Escape');
+      await expect(menuBtn).toHaveAttribute('aria-expanded', 'false');
+      await expect(menuBtn, 'Escape returns focus to the menu button').toBeFocused();
+      await expect(page.locator('#planView'), 'one Escape only closes the menu').toBeVisible();
+      await page.waitForTimeout(1100);
+      await menuBtn.click();
+      await page.locator('#focusToggleBtn').click();
+      await expect(menuBtn, 'choosing an item closes the menu').toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'true');
+      await menuBtn.click();
+      const switchState = (id) => page.locator(id).evaluate(el => {
+        const track = getComputedStyle(el, '::before');
+        return { track: track.backgroundColor, width: parseFloat(track.width), knobRight: parseFloat(getComputedStyle(el, '::after').right) };
+      });
+      const onColours = [];
+      for (const theme of ['light', 'dark']) {
+        await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
+        await expect.poll(async () => (await switchState('#focusToggleBtn')).track, { message: `${theme}: the switch finishes its colour change` }).toBe('rgb(26, 115, 232)');
+        const on = await switchState('#focusToggleBtn');
+        const off = await switchState('#reorderToggleBtn');
+        expect(on.width, `${theme}: a toggled item shows a switch`).toBeGreaterThan(20);
+        expect(off.track, `${theme}: an off switch is not blue`).not.toBe(on.track);
+        expect(on.knobRight, `${theme}: the knob moves across when on`).toBeLessThan(off.knobRight);
+        onColours.push(on.track);
+      }
+      expect(onColours[0], 'an on switch is the same blue in both themes').toBe(onColours[1]);
+      await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+      const colours = await page.locator('#focusToggleBtn .ub-label').evaluate(el => ({ text: getComputedStyle(el).color, menu: getComputedStyle(document.getElementById('cbPlanActions')).backgroundColor, shown: el.getBoundingClientRect().width > 0 }));
+      expect(colours.shown, 'the Focus mode label is shown in the menu').toBe(true);
+      expect(colours.text, 'an on mode keeps readable text in the menu, not white on white').not.toBe(colours.menu);
+      const labels = await page.locator('#cbPlanActions .ub-icon-btn:visible .ub-label').evaluateAll(els => els.map(el => ({ left: Math.round(el.getBoundingClientRect().left), clipped: getComputedStyle(el).overflow !== 'visible' && el.scrollHeight > el.clientHeight })));
+      expect(labels.length).toBeGreaterThan(5);
+      expect(new Set(labels.map(l => l.left)).size, 'every menu label starts at the same point, whatever the width of its icon').toBe(1);
+      expect(labels.filter(l => l.clipped), 'letters such as g keep their tails').toEqual([]);
+      await page.locator('.phase-header h3').first().click();
+      await expect(menuBtn, 'clicking elsewhere closes the menu').toHaveAttribute('aria-expanded', 'false');
+    });
+
+    test('286. Reset progress and New plan ask for confirmation inside the Plan menu, which stays open until you confirm', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await openMultiPhasePlan(page);
+      const menuBtn = page.locator('#planMenuBtn');
+      const first = page.locator('#planContent li.plan-item .item-header .step-state-btn').first();
+      await first.click();
+      await expect(first).toHaveAttribute('data-state', '1');
+      await menuBtn.click();
+      const reset = page.locator('#resetProgressBtn');
+      await reset.click();
+      await expect(menuBtn, 'the first press only asks for confirmation, so the menu stays open').toHaveAttribute('aria-expanded', 'true');
+      await expect(reset).toBeVisible();
+      await expect(reset).toContainText('Confirm?');
+      await expect(first, 'nothing is reset yet').toHaveAttribute('data-state', '1');
+      await reset.click();
+      await expect(first).toHaveAttribute('data-state', '0');
+      await expect(menuBtn, 'confirming closes the menu').toHaveAttribute('aria-expanded', 'false');
+      await menuBtn.click();
+      await expect(reset).toContainText('Reset progress');
+      await page.locator('#ubRestartBtn').click();
+      await expect(page.locator('#ubRestartBtn')).toContainText('Confirm?');
+      await expect(menuBtn).toHaveAttribute('aria-expanded', 'true');
+      await page.waitForTimeout(4300);
+      await expect(page.locator('#ubRestartBtn'), 'an unconfirmed New plan goes back to normal after the countdown').toContainText('New plan');
+      await expect(page.locator('#planView')).toBeVisible();
+    });
+
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
       await openMultiPhasePlan(page);
       const workUl = page.locator('.phase[data-phase-key="work"] > ul');
@@ -2573,6 +2781,7 @@ test.describe('Be myself Planner', () => {
 
     test('114. Moving an item down swaps it with its sibling within the same phase', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const items = workPhase.locator('li.plan-item');
       await expect(items.nth(0)).toHaveAttribute('data-item-id', 'trk_hr');
@@ -2584,6 +2793,7 @@ test.describe('Be myself Planner', () => {
 
     test('115. The first item of any phase (not just the first phase) has no further "up" to go', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const civicPhase = page.locator('.phase[data-phase-key="civic"]');
       await expect(civicPhase.locator('li.plan-item'), 'a document in your new name, HMRC and the driving licence').toHaveCount(3);
       const civicFirstItem = civicPhase.locator('li.plan-item').first();
@@ -2602,6 +2812,7 @@ test.describe('Be myself Planner', () => {
 
     test('116. The last item of any phase (not just the last phase) has no further "down" to go', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const civicPhase = page.locator('.phase[data-phase-key="civic"]');
       const workLastItem = workPhase.locator('li.plan-item').last();
@@ -2616,6 +2827,7 @@ test.describe('Be myself Planner', () => {
 
     test('117. Moving a phase up reorders the phases and renumbers the Step headers', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const civicPhase = page.locator('.phase[data-phase-key="civic"]');
       await expect(civicPhase.locator('> .phase-header h3')).toContainText('Step 4:');
       await civicPhase.locator('.phase-move-group .tmpl-move-up').click();
@@ -2628,6 +2840,7 @@ test.describe('Be myself Planner', () => {
 
     test('118. A custom order persists across a reload, and is announced as reset if answers change what the plan contains', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       await workPhase.locator('li.plan-item').first().locator('.item-move-group .tmpl-move-down').click();
       await expect(workPhase.locator('li.plan-item').first()).toHaveAttribute('data-item-id', 'trk_dbs');
@@ -2644,6 +2857,7 @@ test.describe('Be myself Planner', () => {
 
     test('119. A move button is keyboard-operable', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const items = workPhase.locator('li.plan-item');
       await expect(items.nth(0)).toHaveAttribute('data-item-id', 'trk_hr');
@@ -2658,6 +2872,7 @@ test.describe('Be myself Planner', () => {
 
     test('120. A single-item phase\'s only item has its move/drag controls hidden, since it can\'t leave its phase', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const deedpollPhase = page.locator('.phase[data-phase-key="deedpoll"]');
       await expect(deedpollPhase.locator('li.plan-item')).toHaveCount(1);
       const onlyItem = deedpollPhase.locator('li.plan-item').first();
@@ -2673,6 +2888,7 @@ test.describe('Be myself Planner', () => {
 
     test('121. "Reset order" only appears once something has been reordered, and puts the plan back to default', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const resetBtn = page.locator('#resetOrderBtn');
       await expect(resetBtn).toBeHidden();
       const workPhase = page.locator('.phase[data-phase-key="work"]');
@@ -2713,6 +2929,7 @@ test.describe('Be myself Planner', () => {
 
     test('123. Dragging an item\'s handle reorders it via pointer events', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const items = workPhase.locator('li.plan-item');
       await expect(items.nth(0)).toHaveAttribute('data-item-id', 'trk_hr');
@@ -2731,6 +2948,7 @@ test.describe('Be myself Planner', () => {
 
     test('123b. Dragging an item\'s handle past its phase\'s boundary does not move it into another phase', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const civicPhase = page.locator('.phase[data-phase-key="civic"]');
       const workItems = workPhase.locator('li.plan-item');
@@ -2750,6 +2968,7 @@ test.describe('Be myself Planner', () => {
 
     test('124. Dragging a phase\'s handle reorders whole phases via pointer events', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const civicPhase = page.locator('.phase[data-phase-key="civic"]');
       await workPhase.scrollIntoViewIfNeeded();
@@ -2766,6 +2985,7 @@ test.describe('Be myself Planner', () => {
 
     test('125. A short pointer wiggle on a drag handle, below the move threshold, does not reorder anything', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       const items = workPhase.locator('li.plan-item');
       await items.nth(0).scrollIntoViewIfNeeded();
@@ -3013,7 +3233,7 @@ test.describe('Be myself Planner', () => {
       await expect(dlg).toBeVisible();
     });
 
-    test('60. Mobile toolbar layout: one row for wizard, two rows for plan and start views', async ({ page }) => {
+    test('60. Mobile toolbar layout: one row for the wizard and for a plan, which uses the Plan menu, and two rows for the start view', async ({ page }) => {
       await page.setViewportSize({ width: 412, height: 915 });
 
       const leftTopStart = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
@@ -3033,7 +3253,8 @@ test.describe('Be myself Planner', () => {
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       const leftTopPlan = await page.locator('#cbLeftGroup').evaluate(el => el.getBoundingClientRect().top);
       const rightTopPlan = await page.locator('#cbRightGroup').evaluate(el => el.getBoundingClientRect().top);
-      expect(leftTopPlan).toBeGreaterThan(rightTopPlan + 5);
+      await expect(page.locator('#planMenuBtn'), 'the plan buttons do not fit on one row at this width, so they collapse into the Plan menu').toBeVisible();
+      expect(Math.abs(leftTopPlan - rightTopPlan), 'with the Plan menu, the toolbar fits on one row').toBeLessThan(5);
     });
 
     test('95. Toolbar roving tabindex follows visual row order on mobile, not just horizontal position', async ({ page }) => {
@@ -3084,7 +3305,10 @@ test.describe('Be myself Planner', () => {
       expect(printWords).toBeGreaterThan(screenWords * 1.5);
       const probe = await page.evaluate(() => {
         const d = [...document.querySelectorAll('#planContent details.tmpl-details')].find(x => !x.open);
-        return d ? d.querySelector('.details-body').textContent.trim().split(/\s+/).slice(3, 11).join(' ') : null;
+        if (!d) return null;
+        const body = d.querySelector('.details-body').cloneNode(true);
+        body.querySelectorAll('.tmpl-badges').forEach(b => b.remove());
+        return body.textContent.trim().split(/\s+/).slice(3, 11).join(' ');
       });
       expect(probe).toBeTruthy();
       expect(await page.evaluate(() => document.body.innerText)).toContain(probe);
@@ -3236,6 +3460,7 @@ test.describe('Be myself Planner', () => {
         await page.keyboard.press('Shift+Tab');
         expect(await overlap(), 'moving back up the plan').toBe(0);
       }
+      await openPlanMenuIfCollapsed(page);
       await page.locator('#ubMakeChangesBtn').click();
       await expect(page.locator('#checklistStickyBar')).toBeVisible();
       await page.locator('#checklistIntroText').focus();
@@ -3351,27 +3576,43 @@ test.describe('Be myself Planner', () => {
         'the toolbar button cannot be clicked behind a modal panel').toHaveURL(/google\.(co\.uk|com)|chrome-error:/);
     });
 
-    test('186. On a phone, every plan toolbar button stays inside the toolbar and keeps its size', async ({ page }) => {
+    test('186. On a phone, the plan toolbar fits on one row, and every Plan menu item stays on screen and keeps its size', async ({ page }) => {
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const workPhase = page.locator('.phase[data-phase-key="work"]');
       await workPhase.locator('li.plan-item').first().locator('.item-move-group .tmpl-move-down').click();
-      await expect(page.locator('#resetOrderBtn')).toBeVisible();
+      await expect(page.locator('#resetOrderBtn')).toBeAttached();
       for (const width of [320, 360, 390]) {
         await page.setViewportSize({ width, height: 800 });
         await page.evaluate(() => window.scrollTo(0, 0));
-        const boxes = await page.evaluate(() => {
+        await expect(page.locator('#planMenuBtn'), `${width}px: the plan buttons do not fit, so the menu appears`).toBeVisible();
+        if (await page.locator('#planMenuBtn').getAttribute('aria-expanded') === 'true') await page.locator('#planMenuBtn').click();
+        const bar = await page.evaluate(() => {
           const card = document.getElementById('controlBarCard').getBoundingClientRect();
-          return Array.from(document.querySelectorAll('#cbPlanActions button')).filter(b => b.offsetParent).map(b => {
+          return Array.from(document.querySelectorAll('#controlBarButtons .ub-icon-btn')).filter(b => b.offsetParent).map(b => {
             const r = b.getBoundingClientRect();
-            return { id: b.id || b.getAttribute('aria-label'), inside: r.left >= card.left - 0.5 && r.right <= card.right + 0.5 && r.top >= card.top - 0.5 && r.bottom <= card.bottom + 0.5, w: r.width, h: r.height };
+            return { id: b.id, top: Math.round(r.top), inside: r.left >= card.left - 0.5 && r.right <= card.right + 0.5, w: r.width, h: r.height };
           });
         });
-        expect(boxes.length, `${width}px`).toBe(7);
-        for (const b of boxes) {
+        expect(bar.map(b => b.id), `${width}px`).toEqual(expect.arrayContaining(['planMenuBtn', 'helpBtn', 'themeToggleBtn', 'panicBtn']));
+        expect(bar.filter(b => b.id === 'ubRestartBtn'), `${width}px: plan buttons are in the closed menu`).toEqual([]);
+        expect(new Set(bar.map(b => b.top)).size, `${width}px: one toolbar row`).toBe(1);
+        for (const b of bar) {
           expect(b.inside, `${b.id} at ${width}px was squashed or cut off by the toolbar`).toBe(true);
           expect(b.w, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
           expect(b.h, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
         }
+        await page.locator('#planMenuBtn').click();
+        const items = await page.evaluate(() => Array.from(document.querySelectorAll('#cbPlanActions .ub-icon-btn')).filter(b => b.offsetParent).map(b => {
+          const r = b.getBoundingClientRect();
+          return { id: b.id || b.getAttribute('aria-label'), onScreen: r.left >= 0 && r.right <= window.innerWidth, w: r.width, h: r.height };
+        }));
+        expect(items.length, `${width}px: New plan, Edit plan, Reset progress, Reset order, Change order, Focus mode, Copy link and Print`).toBe(8);
+        for (const b of items) {
+          expect(b.onScreen, `${b.id} at ${width}px runs off the screen`).toBe(true);
+          expect(b.h, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
+        }
+        await page.locator('#planMenuBtn').click();
       }
     });
 
@@ -3649,6 +3890,7 @@ test.describe('Be myself Planner', () => {
         .filter(el => el.offsetParent)
         .map(el => { const r = el.getBoundingClientRect(); return [r.width, r.height]; }));
       await openMultiPhasePlan(page);
+      await enableReorder(page);
       const mouse = await sizes(page);
       expect(mouse.length).toBeGreaterThan(0);
       expect(mouse.every(([w, h]) => w === 26 && h === 26), 'a mouse is precise, so the compact size stays').toBe(true);
@@ -3658,6 +3900,7 @@ test.describe('Be myself Planner', () => {
         await phone.addInitScript(() => localStorage.setItem('disclaimerSeen', '1'));
         await phone.goto(filePath);
         await openMultiPhasePlan(phone);
+        await enableReorder(phone);
         const touch = await sizes(phone);
         expect(touch.length).toBeGreaterThan(0);
         expect(touch.every(([w, h]) => w >= 36 && h >= 36), 'the arrows sit 2px apart, so 26px was easy to miss with a finger').toBe(true);
