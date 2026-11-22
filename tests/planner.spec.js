@@ -1329,7 +1329,7 @@ test.describe('Be myself Planner', () => {
       await btn.click();
       await expect(page.locator('#liveRegion')).toHaveText(`${label} marked as in progress.`);
       await btn.click();
-      await expect(page.locator('#liveRegion')).toHaveText(new RegExp(`^${label} marked as done\\. Your next step is: Step 2: `));
+      await expect(page.locator('#liveRegion'), 'finishing the only step in a group also says the group is complete').toHaveText(new RegExp(`^${label} marked as done\\. Step 1: [^.]+ complete\\. Your next step is: Step 2: `));
     });
 
     test('185. A list step shows its list\'s progress, and clicking it never undoes a finished item', async ({ page }) => {
@@ -1604,19 +1604,17 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('li[data-item-id="trk_dbs"]')).toHaveCount(1);
     });
 
-    test('171. An opened shared plan does not keep the old plan\'s custom order or Focus mode', async ({ page }) => {
+    test('171. An opened shared plan does not keep the old plan\'s custom order', async ({ page }) => {
       await openMultiPhasePlan(page);
       await enableReorder(page);
       const firstKey = await page.locator('#planContent > .phase[data-phase-key]').first().getAttribute('data-phase-key');
       await page.locator(`.phase[data-phase-key="${firstKey}"] .phase-move-group .tmpl-move-down`).click();
-      await page.locator('#focusToggleBtn').click();
       await page.waitForTimeout(200);
       const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', dbs: true });
       await gotoUntil(page, url, () => page.locator('#welcomeSharedReplace').isVisible());
       await page.getByRole('button', { name: 'Open shared plan' }).click();
       await expect(page.locator('#planView')).toBeVisible();
       await expect(page.locator('#planContent > .phase[data-phase-key]').first()).toHaveAttribute('data-phase-key', firstKey);
-      await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'false');
       await expect(page.locator('#resetOrderBtn')).toBeHidden();
     });
 
@@ -2103,17 +2101,17 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#titlesInfoBox')).toBeAttached();
     });
 
-    test('112. Estimated time and costs box is collapsible and dismissible', async ({ page }) => {
+    test('112. Estimated time and costs box starts closed, opens and closes, and is dismissible', async ({ page }) => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       const box = page.locator('#planSummaryBox');
       const panel = box.locator('details');
       await expect(box).toBeAttached();
+      await expect(panel, 'the box starts closed, so the plan itself comes first').not.toHaveAttribute('open', '');
+      await box.locator('summary').click();
       await expect(panel).toHaveAttribute('open', '');
       await box.locator('summary').click();
       await expect(panel).not.toHaveAttribute('open', '');
-      await box.locator('summary').click();
-      await expect(panel).toHaveAttribute('open', '');
       await box.getByRole('button', { name: "Don't show this again" }).click();
       await expect(box).toHaveCount(0);
       expect(await page.evaluate(() => localStorage.getItem('planSummaryDismissed'))).toBe('1');
@@ -2168,7 +2166,7 @@ test.describe('Be myself Planner', () => {
       await openChecklist(page);
       await page.locator('input[name="chkRegion"][value="ni"]').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      const marker = page.locator('#planContent .community-note').first();
+      const marker = page.locator('#planContent .community-note:visible').first();
       await expect(marker).toBeVisible();
       await expect(marker).toHaveAttribute('title', /Community advice/);
       await expect(marker).toHaveAttribute('aria-label', /Community advice/);
@@ -2700,21 +2698,21 @@ test.describe('Be myself Planner', () => {
       await expect(menuBtn, 'Escape returns focus to the menu button').toBeFocused();
       await expect(page.locator('#planView'), 'one Escape only closes the menu').toBeVisible();
       await page.waitForTimeout(1100);
-      await menuBtn.click();
-      await page.locator('#focusToggleBtn').click();
-      await expect(menuBtn, 'choosing an item closes the menu').toHaveAttribute('aria-expanded', 'false');
-      await expect(page.locator('#focusToggleBtn')).toHaveAttribute('aria-pressed', 'true');
-      await menuBtn.click();
       const switchState = (id) => page.locator(id).evaluate(el => {
         const track = getComputedStyle(el, '::before');
         return { track: track.backgroundColor, width: parseFloat(track.width), knobRight: parseFloat(getComputedStyle(el, '::after').right) };
       });
+      await menuBtn.click();
+      const off = await switchState('#reorderToggleBtn');
+      await page.locator('#reorderToggleBtn').click();
+      await expect(menuBtn, 'choosing an item closes the menu').toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('#reorderToggleBtn')).toHaveAttribute('aria-pressed', 'true');
+      await menuBtn.click();
       const onColours = [];
       for (const theme of ['light', 'dark']) {
         await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
-        await expect.poll(async () => (await switchState('#focusToggleBtn')).track, { message: `${theme}: the switch finishes its colour change` }).toBe('rgb(26, 115, 232)');
-        const on = await switchState('#focusToggleBtn');
-        const off = await switchState('#reorderToggleBtn');
+        await expect.poll(async () => (await switchState('#reorderToggleBtn')).track, { message: `${theme}: the switch finishes its colour change` }).toBe('rgb(26, 115, 232)');
+        const on = await switchState('#reorderToggleBtn');
         expect(on.width, `${theme}: a toggled item shows a switch`).toBeGreaterThan(20);
         expect(off.track, `${theme}: an off switch is not blue`).not.toBe(on.track);
         expect(on.knobRight, `${theme}: the knob moves across when on`).toBeLessThan(off.knobRight);
@@ -2722,8 +2720,8 @@ test.describe('Be myself Planner', () => {
       }
       expect(onColours[0], 'an on switch is the same blue in both themes').toBe(onColours[1]);
       await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
-      const colours = await page.locator('#focusToggleBtn .ub-label').evaluate(el => ({ text: getComputedStyle(el).color, menu: getComputedStyle(document.getElementById('cbPlanActions')).backgroundColor, shown: el.getBoundingClientRect().width > 0 }));
-      expect(colours.shown, 'the Focus mode label is shown in the menu').toBe(true);
+      const colours = await page.locator('#reorderToggleBtn .ub-label').evaluate(el => ({ text: getComputedStyle(el).color, menu: getComputedStyle(document.getElementById('cbPlanActions')).backgroundColor, shown: el.getBoundingClientRect().width > 0 }));
+      expect(colours.shown, 'the Change order label is shown in the menu').toBe(true);
       expect(colours.text, 'an on mode keeps readable text in the menu, not white on white').not.toBe(colours.menu);
       const labels = await page.locator('#cbPlanActions .ub-icon-btn:visible .ub-label').evaluateAll(els => els.map(el => ({ left: Math.round(el.getBoundingClientRect().left), clipped: getComputedStyle(el).overflow !== 'visible' && el.scrollHeight > el.clientHeight })));
       expect(labels.length).toBeGreaterThan(5);
@@ -2758,6 +2756,158 @@ test.describe('Be myself Planner', () => {
       await page.waitForTimeout(4300);
       await expect(page.locator('#ubRestartBtn'), 'an unconfirmed New plan goes back to normal after the countdown').toContainText('New plan');
       await expect(page.locator('#planView')).toBeVisible();
+    });
+
+    test('287. A finished step waits a moment, then slides closed, and its title opens it again', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const item = page.locator('.phase[data-phase-key="work"] li.plan-item').first();
+      const status = item.locator('.item-header .step-state-btn');
+      const title = item.locator('.item-header .tmpl-title');
+      const body = item.locator('.item-body');
+      await title.click();
+      await expect(body, 'clicking the title of an open step does nothing').toBeVisible();
+      await status.click();
+      await status.click();
+      expect(await item.evaluate(el => el.classList.contains('is-folded')), 'the tick lands before the step moves').toBe(false);
+      await expect(item).toHaveClass(/is-folded/);
+      await expect(body).toBeHidden();
+      await title.click();
+      await expect(body, 'tapping the title of a folded step opens it').toBeVisible();
+      await expect(item.locator('.item-fold-btn')).toHaveAttribute('aria-expanded', 'true');
+      await title.click();
+      await expect(body).toBeHidden();
+    });
+
+    test('288. With reduce motion on, a finished step folds at once and boxes open without sliding', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await openMultiPhasePlan(page);
+      const item = page.locator('.phase[data-phase-key="work"] li.plan-item').first();
+      const status = item.locator('.item-header .step-state-btn');
+      await status.click();
+      await status.click();
+      expect(await item.evaluate(el => el.classList.contains('is-folded')), 'no pause with reduce motion').toBe(true);
+      const duration = await item.locator('.item-body').evaluate(el => getComputedStyle(el).transitionDuration);
+      expect(duration.split(',').every(d => parseFloat(d) === 0), 'no slide with reduce motion').toBe(true);
+      const details = page.locator('#planContent li.plan-item details.tmpl-details:not(.hidden)').nth(1);
+      await details.locator('summary').click();
+      expect(await details.evaluate(el => el.open && el.getAnimations().length === 0), 'boxes open straight away').toBe(true);
+    });
+
+    test('289. The text of a folded step cannot be reached with Tab or read out until it is opened', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const item = page.locator('.phase[data-phase-key="work"] li.plan-item').first();
+      const status = item.locator('.item-header .step-state-btn');
+      await status.click();
+      await status.click();
+      await expect(item).toHaveClass(/is-folded/);
+      await expect.poll(() => item.locator('.item-body summary').evaluate(el => getComputedStyle(el).visibility), { message: 'hidden text is out of the Tab order and the screen reader view' }).toBe('hidden');
+      await status.focus();
+      await page.keyboard.press('Tab');
+      await expect(item.locator('.item-fold-btn'), 'Tab goes from the status box to Show, not into the folded text').toBeFocused();
+      await page.keyboard.press('Tab');
+      expect(await page.evaluate(() => !!document.activeElement.closest('li.plan-item.is-folded .item-body'))).toBe(false);
+    });
+
+    test('290. Back to suggested order lives inside Change order, not in the toolbar', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const bar = page.locator('#reorderBar');
+      await expect(bar).toBeHidden();
+      await expect(page.locator('#cbPlanActions #resetOrderBtn'), 'the reset is no longer a toolbar button').toHaveCount(0);
+      await enableReorder(page);
+      await expect(bar).toBeVisible();
+      await expect(bar).toContainText('Change order is on');
+      const reset = page.locator('#resetOrderBtn');
+      await expect(reset, 'nothing has moved yet').toBeHidden();
+      const work = page.locator('.phase[data-phase-key="work"]');
+      await work.locator('li.plan-item').first().locator('.item-move-group .tmpl-move-down').click();
+      await expect(reset).toBeVisible();
+      await reset.click();
+      await expect(reset).toContainText('Confirm?');
+      await reset.click();
+      await expect(page.locator('.phase[data-phase-key="work"] li.plan-item').first()).toHaveAttribute('data-item-id', 'trk_hr');
+      await expect(reset).toBeHidden();
+      await expect(bar, 'Change order stays on after going back to the suggested order').toBeVisible();
+      await bar.getByRole('button', { name: 'Done' }).click();
+      await expect(bar).toBeHidden();
+      await expect(page.locator('#reorderToggleBtn')).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    test('291. Focus mode is gone, and a link made while it was on still opens normally', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'needs_update', dbs: true, fm: 1, prg: { hr: 2 } });
+      await page.evaluate(() => localStorage.clear());
+      await gotoFresh(page, url);
+      await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      await expect(page.locator('#planView')).toBeVisible();
+      await expect(page.locator('#focusToggleBtn')).toHaveCount(0);
+      const hr = page.locator('li.plan-item[data-item-id="trk_hr"]');
+      await expect(hr, 'the finished step is folded, not hidden').toBeVisible();
+      await expect(hr).toHaveClass(/is-folded/);
+      await page.evaluate(() => {
+        window._shareUrl = null;
+        navigator.clipboard.writeText = async (text) => { window._shareUrl = text.split('\n').pop(); };
+      });
+      await openPlanMenuIfCollapsed(page);
+      await page.getByRole('button', { name: 'Copy link to this plan' }).click();
+      await page.waitForFunction(() => window._shareUrl !== null);
+      expect(sharedPlanData(await page.evaluate(() => window._shareUrl)).fm, 'new links no longer carry the Focus mode setting').toBeUndefined();
+    });
+
+    test('292. The GRC step keeps its long introduction in a More information box, after a sentence saying what it covers', async ({ page }) => {
+      const url = await getShareUrl(page, { goal: 'both', reg: 'e', emp: 'no', grc: true, pass: 'none', dl: 'none' });
+      await page.evaluate(() => localStorage.clear());
+      await gotoFresh(page, url);
+      await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      const phase = page.locator('section.phase[data-phase-key="final"]');
+      await expect(phase).toContainText('Read this before you apply. It covers what a GRC does and does not change, and what to know if you are married or in a civil partnership, get benefits, or are under 18.');
+      const box = phase.locator(':scope > details.step-intro-details');
+      await expect(box).toHaveCount(1);
+      await expect(box).not.toHaveAttribute('open', '');
+      await expect(box.locator('summary')).toHaveText('More information about: Legal gender recognition');
+      await expect(box, 'the full text is still there').toContainText('statutory declaration of consent');
+      await expect(phase.locator(':scope > p', { hasText: 'consent' }), 'the long notes no longer sit above the steps').toHaveCount(0);
+      await box.locator('summary').click();
+      await expect(box.locator('.details-body')).toBeVisible();
+    });
+
+    test('293. Boxes in the plan slide open and closed', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const box = page.locator('#planSummaryBox details');
+      await expect(box).not.toHaveAttribute('open', '');
+      await box.locator('summary').click();
+      await expect(box).toHaveAttribute('open', '');
+      expect(await box.evaluate(el => el.getAnimations().length), 'opening slides rather than jumping').toBeGreaterThan(0);
+      await expect.poll(() => box.evaluate(el => el.getAnimations().length)).toBe(0);
+      await box.locator('summary').click();
+      expect(await box.evaluate(el => el.open), 'it stays open while it slides closed').toBe(true);
+      await expect(box).not.toHaveAttribute('open', '');
+      const more = page.locator('#planContent li.plan-item details.tmpl-details:not(.hidden)').first();
+      await more.locator('summary').click();
+      await expect(more).toHaveAttribute('open', '');
+      await expect(more.locator('.details-body')).toBeVisible();
+    });
+
+    test('294. The progress bar and the all-done border travel the same way as the header streamers', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const read = () => page.evaluate(() => ({
+        dir: typeof heroMotion !== 'undefined' && heroMotion && heroMotion.draw ? heroMotion.draw.dir : null,
+        rtl: document.documentElement.classList.contains('streamers-rtl'),
+        bar: getComputedStyle(document.getElementById('controlBarProgressFill')).animationDirection,
+      }));
+      const now = await read();
+      if (now.dir !== null) expect(now.rtl, 'the page follows the direction the streamers were given').toBe(now.dir < 0);
+      const keyframes = await page.evaluate(() => {
+        const out = {};
+        for (const sheet of document.styleSheets) for (const rule of sheet.cssRules) if (rule.type === CSSRule.KEYFRAMES_RULE) out[rule.name] = [rule.cssRules[0].style.backgroundPosition, rule.cssRules[rule.cssRules.length - 1].style.backgroundPosition];
+        return out;
+      });
+      expect(keyframes['rainbow-flow'], 'the bar runs left to right by default').toEqual(['200% 50%', '0px 50%']);
+      expect(keyframes['rainbow-border-spin']).toEqual(['300% 50%', '0px 50%']);
+      await page.evaluate(() => document.documentElement.classList.remove('streamers-rtl'));
+      expect((await read()).bar).toBe('normal, normal');
+      await page.evaluate(() => document.documentElement.classList.add('streamers-rtl'));
+      expect((await read()).bar, 'right to left streamers reverse the bar').toBe('reverse, normal');
     });
 
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
@@ -3065,17 +3215,18 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => localStorage.getItem('theme'))).not.toBeNull();
     });
 
-    test('24. Utility bar and Focus mode', async ({ page }) => {
+    test('24. Utility bar and Change order', async ({ page }) => {
       await openChecklist(page);
       await page.getByRole('button', { name: 'Show my action plan' }).click();
       await expect(page.locator('#controlBar')).toBeVisible();
-      const focusBtn = page.locator('#focusToggleBtn');
-      await expect(focusBtn).toHaveAttribute('aria-pressed', 'false');
-      await focusBtn.click();
-      await expect(focusBtn).toHaveAttribute('aria-pressed', 'true');
-      await expect(focusBtn).toHaveClass(/focus-active/);
-      await focusBtn.click();
-      await expect(focusBtn).toHaveAttribute('aria-pressed', 'false');
+      await expect(page.locator('#focusToggleBtn'), 'Focus mode was removed once finished steps started folding').toHaveCount(0);
+      const order = page.locator('#reorderToggleBtn');
+      await expect(order).toHaveAttribute('aria-pressed', 'false');
+      await order.click();
+      await expect(order).toHaveAttribute('aria-pressed', 'true');
+      await expect(order).toHaveClass(/focus-active/);
+      await order.click();
+      await expect(order).toHaveAttribute('aria-pressed', 'false');
     });
 
     test('108. Step-state button label names the status across all four cycle states', async ({ page }) => {
@@ -3106,89 +3257,28 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#checklistGoalWarning')).toHaveAttribute('role', 'alert');
     });
 
-    test('106. Focus mode announces per-phase completion once, not on every refresh', async ({ page }) => {
+    test('106. Finishing a whole group announces it once, and keeps the group on screen', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkEmployedNeeds').check();
       await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await page.locator('#focusToggleBtn').click();
       const workPhase = page.locator('.phase', { hasText: 'Work and qualifications' });
       const workBtn = workPhase.locator('.step-state-btn[data-track-id]').first();
       await workBtn.click();
       await workBtn.click();
-      await expect(workPhase).toHaveClass(/collapsed-phase/);
-      await expect(page.locator('#liveRegion')).toContainText('Work and qualifications complete and hidden by Focus mode.');
-      const deedPhase = page.locator('.phase', { hasText: 'Your name-change document' });
-      await expect(deedPhase).not.toHaveClass(/collapsed-phase/);
+      await expect(page.locator('#liveRegion')).toContainText('Work and qualifications complete.');
+      await expect(workPhase, 'a finished group stays on screen, with its steps folded').toBeVisible();
+      await expect(workPhase.locator('.tmpl-title').first()).toBeVisible();
       await page.evaluate(() => { document.getElementById('liveRegion').textContent = ''; window.refreshPlan(); });
       await page.waitForTimeout(250);
       await expect(page.locator('#liveRegion')).not.toContainText('Work and qualifications complete');
+      await reloadUntil(page, () => page.locator('#welcomeBackView').isVisible());
+      await page.getByRole('button', { name: 'Continue my plan' }).click();
+      await expect(page.locator('#liveRegion'), 'opening a plan with a finished group does not announce it').not.toContainText('Work and qualifications complete');
     });
 
-    test('128. Focus mode defers hiding a completed step, then hides it', async ({ page }) => {
-      await openChecklist(page);
-      await page.locator('#chkEmployedNeeds').check();
-      await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await page.locator('#focusToggleBtn').click();
-      const workPhase = page.locator('.phase', { hasText: 'Work and qualifications' });
-      const workItem = workPhase.locator('li.plan-item').first();
-      const workBtn = workPhase.locator('.step-state-btn[data-track-id]').first();
-      await workBtn.click();
-      await workBtn.click();
-      expect(await workItem.evaluate(el => el.classList.contains('collapsed-step'))).toBe(false);
-      await expect(workItem).toHaveClass(/collapsed-step/);
-    });
 
-    test('129. A click inside the grace period cancels the hide', async ({ page }) => {
-      await openChecklist(page);
-      await page.locator('#chkEmployedNeeds').check();
-      await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await page.locator('#focusToggleBtn').click();
-      const workPhase = page.locator('.phase', { hasText: 'Work and qualifications' });
-      const workItem = workPhase.locator('li.plan-item').first();
-      const workBtn = workPhase.locator('.step-state-btn[data-track-id]').first();
-      await workBtn.click();
-      await workBtn.click();
-      await workBtn.click();
-      await expect(workBtn).toHaveAttribute('data-state', '3');
-      await workBtn.click();
-      await page.waitForTimeout(2600);
-      await expect(workBtn).toHaveAttribute('data-state', '0');
-      await expect(workItem).not.toHaveClass(/collapsed-step/);
-      await expect(workPhase).not.toHaveClass(/collapsed-phase/);
-    });
 
-    test('130. A phase cancelled mid-grace can still announce when completed again', async ({ page }) => {
-      await openChecklist(page);
-      await page.locator('#chkEmployedNeeds').check();
-      await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await page.locator('#focusToggleBtn').click();
-      const workPhase = page.locator('.phase', { hasText: 'Work and qualifications' });
-      const workBtn = workPhase.locator('.step-state-btn[data-track-id]').first();
-      await workBtn.click();
-      await workBtn.click();
-      await workBtn.click();
-      await workBtn.click();
-      await page.evaluate(() => { document.getElementById('liveRegion').textContent = ''; });
-      await workBtn.click();
-      await workBtn.click();
-      await expect(page.locator('#liveRegion')).toContainText('Work and qualifications complete and hidden by Focus mode.');
-      await expect(workPhase).toHaveClass(/collapsed-phase/);
-    });
 
-    test('131. The grace period still applies under prefers-reduced-motion', async ({ page }) => {
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await openChecklist(page);
-      await page.locator('#chkEmployedNeeds').check();
-      await page.getByRole('button', { name: 'Show my action plan' }).click();
-      await page.locator('#focusToggleBtn').click();
-      const workPhase = page.locator('.phase', { hasText: 'Work and qualifications' });
-      const workItem = workPhase.locator('li.plan-item').first();
-      const workBtn = workPhase.locator('.step-state-btn[data-track-id]').first();
-      await workBtn.click();
-      await workBtn.click();
-      expect(await workItem.evaluate(el => el.classList.contains('collapsed-step'))).toBe(false);
-      await expect(workItem).toHaveClass(/collapsed-step/);
-    });
 
     test('35-40. Accessibility / WCAG checks', async ({ page }) => {
       await page.getByRole('link', { name: 'Usage guide' }).click();
@@ -3406,39 +3496,7 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#chkSvcBanks')).toBeChecked();
     });
 
-    test('172. Steps hidden by Focus mode cannot be reached with Tab, and focus moves on to a visible step', async ({ page }) => {
-      await openMultiPhasePlan(page);
-      await page.locator('#focusToggleBtn').click();
-      const btn = page.locator('.step-state-btn[data-track-id]').first();
-      const id = await btn.getAttribute('data-track-id');
-      await btn.click();
-      await btn.click();
-      await expect(btn).toBeFocused();
-      await expect(page.locator(`li[data-item-id="${id}"]`)).toHaveClass(/collapsed-step/, { timeout: 5000 });
-      await expect(btn).toBeHidden();
-      const focused = await page.evaluate(() => ({ id: document.activeElement.id, hidden: !!document.activeElement.closest('.collapsed-step, .collapsed-phase, .collapsed-svc') }));
-      expect(focused.hidden, 'focus must not be left on a hidden step').toBe(false);
-      expect(focused.id).toMatch(/^ssb_trk_/);
-      await page.locator('#controlBarCard .ub-icon-btn[tabindex="0"]').focus();
-      for (let i = 0; i < 12; i++) {
-        await page.keyboard.press('Tab');
-        expect(await page.evaluate(() => !!document.activeElement.closest('.collapsed-step, .collapsed-phase, .collapsed-svc')),
-          'Tab must skip steps hidden by Focus mode').toBe(false);
-      }
-    });
 
-    test('173. Printing in Focus mode shows only the steps Focus mode still shows', async ({ page }) => {
-      await openMultiPhasePlan(page);
-      await page.locator('#focusToggleBtn').click();
-      const btn = page.locator('.step-state-btn[data-track-id]').first();
-      const id = await btn.getAttribute('data-track-id');
-      await btn.click();
-      await btn.click();
-      await expect(page.locator(`li[data-item-id="${id}"]`)).toHaveClass(/collapsed-step/, { timeout: 5000 });
-      await page.emulateMedia({ media: 'print' });
-      await expect(page.locator(`li[data-item-id="${id}"]`)).toBeHidden();
-      await expect(page.locator('.step-state-btn[data-track-id]').nth(1)).toBeVisible();
-    });
 
     test('175. The sticky toolbar and checklist bar never cover the focused item', async ({ page }) => {
       await page.setViewportSize({ width: 320, height: 640 });
@@ -3607,7 +3665,7 @@ test.describe('Be myself Planner', () => {
           const r = b.getBoundingClientRect();
           return { id: b.id || b.getAttribute('aria-label'), onScreen: r.left >= 0 && r.right <= window.innerWidth, w: r.width, h: r.height };
         }));
-        expect(items.length, `${width}px: New plan, Edit plan, Reset progress, Reset order, Change order, Focus mode, Copy link and Print`).toBe(8);
+        expect(items.length, `${width}px: New plan, Edit plan, Reset progress, Change order, Copy link and Print`).toBe(6);
         for (const b of items) {
           expect(b.onScreen, `${b.id} at ${width}px runs off the screen`).toBe(true);
           expect(b.h, `${b.id} at ${width}px`).toBeGreaterThanOrEqual(44);
@@ -4138,6 +4196,8 @@ test.describe('Be myself Planner', () => {
         await btns.nth(i).click();
         await btns.nth(i).click();
       }
+      await expect(page.locator('#planContent li.plan-item.is-folded'), 'every finished step has folded, so the last box has stopped moving before the timing starts').toHaveCount(count - 1);
+      await page.waitForTimeout(400);
       const lastBtn = btns.nth(count - 1);
       const party = page.locator('#celebrationCanvas');
       await lastBtn.click();
@@ -4424,13 +4484,14 @@ test.describe('Be myself Planner', () => {
       const guide = page.locator('#dlgUsage');
 
       await expect(guide,
-        'every toolbar button that can appear has a legend entry').toContainText('Reset order');
+        'every toolbar button that can appear has a legend entry').toContainText('Change order');
       await expect(guide).toContainText('Reset progress');
-      await expect(guide).toContainText('Focus mode');
       await expect(guide).toContainText('Copy link');
+      await expect(guide).toContainText('Plan menu');
+      await expect(guide, 'Focus mode was removed').not.toContainText('Focus mode');
 
       await expect(guide,
-        'reordering exists on every plan, so the guide has to mention it').toContainText('Reset order');
+        'reordering exists on every plan, so the guide has to mention how to undo it').toContainText('Back to suggested order');
       await expect(guide.locator('text=/▲ and ▼/')).toHaveCount(1);
 
       await expect(guide,
