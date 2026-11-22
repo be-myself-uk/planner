@@ -3052,6 +3052,8 @@ test.describe('Be myself Planner', () => {
       const zeroBtnId = await page.locator('#controlBarCard .ub-icon-btn[tabindex="0"]').first().getAttribute('id');
       await page.locator('.skip-link').focus();
       await page.keyboard.press('Tab');
+      await expect(page.locator('#heroMotionBtn'), 'the header pause button sits between the skip link and the toolbar').toBeFocused();
+      await page.keyboard.press('Tab');
       const focusedId = await page.evaluate(() => document.activeElement.id);
       expect(focusedId).toBe(zeroBtnId);
     });
@@ -3680,6 +3682,250 @@ test.describe('Be myself Planner', () => {
       for (const name of ['button', 'toolbar', 'skipLink']) {
         expect(fonts[name], `${name} used sans-serif while the page used the system font`).toBe(fonts.body);
       }
+    });
+
+    test('260. The header streamers move, and the pause button stops and restarts them', async ({ page }) => {
+      const btn = page.locator('#heroMotionBtn');
+      const frame = () => page.locator('#heroCanvas').evaluate(c => c.toDataURL());
+      await expect(page.locator('#heroCanvas'), 'the streamers are decoration only').toHaveAttribute('aria-hidden', 'true');
+      await expect(btn).toBeVisible();
+      await expect(btn).toHaveAttribute('aria-label', 'Pause the header animation');
+      const first = await frame();
+      await page.waitForTimeout(400);
+      expect(await frame(), 'the streamers should be moving').not.toBe(first);
+      await btn.click();
+      await expect(btn).toHaveAttribute('aria-label', 'Play the header animation');
+      const paused = await frame();
+      await page.waitForTimeout(400);
+      expect(await frame(), 'WCAG 2.2.2 needs a way to stop motion that lasts more than five seconds').toBe(paused);
+      await btn.click();
+      await expect(btn).toHaveAttribute('aria-label', 'Pause the header animation');
+      await page.waitForTimeout(400);
+      expect(await frame(), 'Play should start the streamers again').not.toBe(paused);
+    });
+
+    test('261. With reduced motion the header shows still streamers and no pause button', async ({ page }) => {
+      const frame = () => page.locator('#heroCanvas').evaluate(c => c.toDataURL());
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.reload();
+      await expect(page.locator('#heroMotionBtn'), 'there is nothing to pause when nothing moves').toBeHidden();
+      const colours = await page.locator('#heroCanvas').evaluate(c => {
+        const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        const seen = new Set();
+        for (let i = 0; i < d.length; i += 4 * 97) seen.add(`${d[i]},${d[i + 1]},${d[i + 2]}`);
+        return seen.size;
+      });
+      expect(colours, 'reduced motion still gets a picture, just a still one').toBeGreaterThan(3);
+      const still = await frame();
+      await page.waitForTimeout(400);
+      expect(await frame(), 'nothing may move under prefers-reduced-motion').toBe(still);
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await expect(page.locator('#heroMotionBtn'), 'turning reduced motion off brings the streamers back').toBeVisible();
+      await page.waitForTimeout(400);
+      expect(await frame()).not.toBe(still);
+    });
+
+    test('262. The title and tagline stay readable over the streamers in light and dark mode', async ({ page }) => {
+      for (const theme of ['light', 'dark']) {
+        await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
+        for (let i = 0; i < 4; i++) {
+          await page.waitForTimeout(150);
+          const worst = await page.evaluate(() => {
+            const canvas = document.getElementById('heroCanvas');
+            const ctx = canvas.getContext('2d');
+            const cr = canvas.getBoundingClientRect();
+            const scale = canvas.width / cr.width;
+            const lin = v => { v /= 255; return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; };
+            const lum = c => .2126 * lin(c[0]) + .7152 * lin(c[1]) + .0722 * lin(c[2]);
+            const parse = str => {
+              const n = (str.match(/[\d.]+/g) || []).map(Number);
+              const rgb = str.startsWith('color(') ? n.slice(0, 3).map(v => v * 255) : n.slice(0, 3);
+              return { rgb, a: n.length > 3 ? n[3] : 1 };
+            };
+            const out = {};
+            for (const [key, sel] of [['title', '.hero-title'], ['tagline', '.hero .hero-tagline']]) {
+              const el = document.querySelector(sel);
+              const style = getComputedStyle(el);
+              const panel = parse(style.backgroundColor);
+              const text = lum(parse(style.color).rgb);
+              const r = el.getBoundingClientRect();
+              const x0 = Math.max(0, Math.floor((r.left - cr.left) * scale)), y0 = Math.max(0, Math.floor((r.top - cr.top) * scale));
+              const x1 = Math.min(canvas.width, Math.ceil((r.right - cr.left) * scale)), y1 = Math.min(canvas.height, Math.ceil((r.bottom - cr.top) * scale));
+              const d = ctx.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+              let min = Infinity;
+              for (let k = 0; k < d.length; k += 4 * 7) {
+                const mixed = [0, 1, 2].map(j => panel.a * panel.rgb[j] + (1 - panel.a) * d[k + j]);
+                const l = lum(mixed);
+                min = Math.min(min, (Math.max(l, text) + .05) / (Math.min(l, text) + .05));
+              }
+              out[key] = min;
+            }
+            return out;
+          });
+          expect(worst.title, `${theme} mode: large text needs 3:1 over every streamer colour`).toBeGreaterThanOrEqual(3);
+          expect(worst.tagline, `${theme} mode: normal text needs 4.5:1 over every streamer colour`).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    });
+
+    test('263. The header streamers stop while the header is scrolled out of view', async ({ page }) => {
+      const frame = () => page.locator('#heroCanvas').evaluate(c => c.toDataURL());
+      await openMultiPhasePlan(page);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await expect.poll(() => page.evaluate(() => document.querySelector('.hero').getBoundingClientRect().bottom < 0)).toBe(true);
+      await page.waitForTimeout(300);
+      const hidden = await frame();
+      await page.waitForTimeout(400);
+      expect(await frame(), 'drawing an unseen header only costs battery').toBe(hidden);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(500);
+      expect(await frame(), 'the streamers carry on once the header is back in view').not.toBe(hidden);
+    });
+
+    test('264. Printing leaves out the streamers, the pause button and the glass panels', async ({ page }) => {
+      await page.emulateMedia({ media: 'print' });
+      await expect(page.locator('#heroCanvas')).toBeHidden();
+      await expect(page.locator('#heroMotionBtn')).toBeHidden();
+      for (const sel of ['.hero-title', '.hero .hero-tagline']) {
+        const bg = await page.locator(sel).evaluate(el => getComputedStyle(el).backgroundColor);
+        expect(bg, `${sel} should print on plain paper`).toBe('rgba(0, 0, 0, 0)');
+      }
+      await page.emulateMedia({ media: 'screen' });
+    });
+
+    test('265. Finishing the plan sends the header streamers across the page for 12 seconds, then they return', async ({ page }) => {
+      test.setTimeout(40000);
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      const party = page.locator('#celebrationCanvas');
+      await expect(party, 'the celebration replaces the old confetti').toHaveCount(1);
+      await expect(page.locator('#confettiCanvas')).toHaveCount(0);
+      await expect(party).toHaveAttribute('aria-hidden', 'true');
+      expect(await party.evaluate(el => getComputedStyle(el).pointerEvents), 'the celebration must never block the page').toBe('none');
+      await expect(page.locator('#heroCanvas'), 'the streamers leave the header while they are out').toHaveClass(/escaped/);
+      await page.waitForTimeout(1500);
+      const frame = () => party.evaluate(c => c.toDataURL());
+      const first = await frame();
+      await page.waitForTimeout(300);
+      expect(await frame(), 'the streamers should be flying').not.toBe(first);
+      await page.waitForTimeout(4000);
+      await expect(party, 'still celebrating well past the old five second mark').toHaveCount(1);
+      await page.waitForTimeout(3800);
+      const painted = await party.evaluate(c => {
+        const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        let n = 0;
+        for (let i = 3; i < d.length; i += 4 * 37) if (d[i] > 0) n++;
+        return n;
+      });
+      expect(painted, 'the streamers stay inside the window until the celebration ends').toBeGreaterThan(200);
+      await expect(party, 'the celebration ends by itself after 12 seconds').toHaveCount(0, { timeout: 9000 });
+      await expect(page.locator('#heroCanvas'), 'the streamers come back to the header').not.toHaveClass(/escaped/);
+    });
+
+    test('266. A tap or a key press ends the celebration early, as WCAG 2.2.2 needs for motion over five seconds', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const party = page.locator('#celebrationCanvas');
+      await expect(party).toHaveCount(1);
+      await page.waitForTimeout(500);
+      await page.keyboard.press('Shift');
+      await expect(party, 'a key press stops it within a second').toHaveCount(0, { timeout: 1500 });
+      await expect(page.locator('#heroCanvas')).not.toHaveClass(/escaped/);
+      await btns.first().click();
+      await btns.first().click();
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      await btns.first().click();
+      await btns.first().click();
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await expect(party, 'finishing again celebrates again').toHaveCount(1);
+      await page.waitForTimeout(500);
+      await page.mouse.click(5, 300);
+      await expect(party, 'a tap stops it within a second').toHaveCount(0, { timeout: 1500 });
+    });
+
+    test('267. With reduced motion, finishing the plan shows the banner and no celebration', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await page.waitForTimeout(300);
+      await expect(page.locator('#celebrationCanvas'), 'nothing may fly across the page under prefers-reduced-motion').toHaveCount(0);
+      await expect(page.locator('#heroCanvas')).not.toHaveClass(/escaped/);
+    });
+
+    test('268. The celebration waits until the plan has stayed finished for 1.5 seconds', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count - 1; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const lastBtn = btns.nth(count - 1);
+      const party = page.locator('#celebrationCanvas');
+      await lastBtn.click();
+      await lastBtn.click();
+      await expect(page.locator('#allDoneBanner'), 'the banner itself does not wait').toBeVisible();
+      await page.waitForTimeout(600);
+      await lastBtn.click();
+      await page.waitForTimeout(1100);
+      await expect(party, 'changing the status again restarts the wait, so clicking through the states never sets it off').toHaveCount(0);
+      await lastBtn.click();
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      await page.waitForTimeout(2000);
+      await expect(party, 'going back to Not started cancels the wait').toHaveCount(0);
+      await lastBtn.click();
+      await lastBtn.click();
+      await page.waitForTimeout(1000);
+      await expect(party, 'still waiting one second after the last change').toHaveCount(0);
+      await expect(party, 'the celebration starts once the plan has stayed finished').toHaveCount(1, { timeout: 2000 });
+    });
+
+    test('269. The streamers leave from the header when it is in view, and from behind the toolbar when it is not', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count - 1; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const party = page.locator('#celebrationCanvas');
+      const finishLast = () => btns.nth(count - 1).evaluate(b => { b.click(); b.click(); });
+      const unfinishLast = () => btns.nth(count - 1).evaluate(b => { b.click(); b.click(); });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await finishLast();
+      await expect(party).toHaveCount(1, { timeout: 3000 });
+      await expect(party, 'with the header on screen they must break out of the header itself').toHaveAttribute('data-from', 'header');
+      const layers = await page.evaluate(() => ({
+        party: Number(getComputedStyle(document.getElementById('celebrationCanvas')).zIndex),
+        toolbar: Number(getComputedStyle(document.getElementById('controlBar')).zIndex),
+      }));
+      expect(layers.party, 'the streamers pass behind the toolbar, so it stays usable and they can come out from behind it').toBeLessThan(layers.toolbar);
+      await page.keyboard.press('Shift');
+      await expect(party).toHaveCount(0, { timeout: 1500 });
+      await unfinishLast();
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await expect.poll(() => page.evaluate(() => document.querySelector('.hero').getBoundingClientRect().bottom < 0)).toBe(true);
+      await finishLast();
+      await expect(party).toHaveCount(1, { timeout: 3000 });
+      await expect(party, 'at the bottom of a long plan the header is out of view, so they come out from behind the toolbar').toHaveAttribute('data-from', 'toolbar');
     });
   });
 
