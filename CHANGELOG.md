@@ -36,6 +36,7 @@ Releases:
 ### Information
 
 - Added a step called "A document in your new name" for anyone changing their name who needs to update a driving licence in England, Scotland or Wales, or a UK passport. The DVLA and HM Passport Office both ask for one document that already shows your new name, as well as your deed poll or statutory declaration, so someone who has only just made their deed poll may have nothing to send yet. The step lists the documents both accept, says the DVLA also needs it to be issued after your deed poll and your current licence, and comes first in its group so you can sort it out before you apply. It is not shown if you are only changing your gender marker, if your licence is from the DVA in Northern Ireland, for an Irish passport, or for a UK passport when you already have a Gender Recognition Certificate.
+- If you already have a Gender Recognition Certificate, the UK passport step now says first that HM Passport Office accepts it as evidence of your change of name, and leaves out the medical letter, the letter asking for the change, and the other evidence it does not usually ask for. It also leaves out the section for 16 and 17 year olds, since you must be 18 or over to have a GRC.
 
 ### Code
 
