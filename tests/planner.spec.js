@@ -1870,6 +1870,83 @@ test.describe('Be myself Planner', () => {
       }
     });
 
+    async function openLinkedPlan(page, data) {
+      const url = await getShareUrl(page, Object.assign({ reg: 'e', emp: 'no', dp: true, dl: 'none', pass: 'none' }, data));
+      await page.evaluate(() => localStorage.clear());
+      await gotoUntil(page, url, () => page.evaluate(() =>
+        ['welcomeBackView', 'planView'].some(id => !document.getElementById(id).classList.contains('hidden'))));
+      if (await page.locator('#ageConfirmShared').isVisible()) await checkAgeGateShared(page);
+      await openSharedPlanIfAsked(page);
+      await expect(page.locator('#planView')).toBeVisible();
+    }
+
+    test('255. A document in your new name comes first in its group for a GB licence or a UK passport, naming only the offices in the plan', async ({ page }) => {
+      await openLinkedPlan(page, { goal: 'both', dl: 'needs_update', pass: 'needs_update' });
+      const item = page.locator('li.plan-item[data-item-id="trk_firstdoc"]');
+      await expect(item).toHaveCount(1);
+      await expect(item.locator('xpath=ancestor::section[1]').locator('li.plan-item').first(), 'it is the first thing to do in its group').toHaveAttribute('data-item-id', 'trk_firstdoc');
+      await expect(item).toContainText('Your driving licence and passport applications each need a document that already shows your new name');
+      await expect(item).toContainText('Documents both accept include:');
+      await expect(item).toContainText('The DVLA also says it must have been issued after your deed poll');
+      await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(1);
+      await expect(item.locator('a[href*="names-evidence-to-change-a-name"]')).toHaveCount(1);
+      await expect(page.locator('li.plan-item[data-item-id="trk_dvla"] .item-badge', { hasText: 'Approximate cost' }), 'the driving licence step shows the cost badge this check looks for').toHaveCount(1);
+      await expect(item.locator('.item-badge', { hasText: 'Approximate cost' }), 'whether a document costs anything depends on the document').toHaveCount(0);
+
+      await openLinkedPlan(page, { goal: 'name', dl: 'needs_update' });
+      await expect(item).toContainText('Your driving licence application needs');
+      await expect(item).toContainText('Documents it accepts include:');
+      await expect(item.locator('a[href*="names-evidence-to-change-a-name"]'), 'HMPO is not named when the plan has no UK passport').toHaveCount(0);
+
+      await openLinkedPlan(page, { goal: 'name', pass: 'needs_update' });
+      await expect(item).toContainText('Your passport application needs');
+      await expect(item, 'the DVLA date rule and its community note are only for a licence').not.toContainText('DVLA');
+      await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(0);
+      const keys = await page.locator('section.phase').evaluateAll(els => els.map(el => el.dataset.phaseKey));
+      const firstDocKey = await item.evaluate(el => el.closest('section.phase').dataset.phaseKey);
+      expect(keys.indexOf('documents')).toBeGreaterThan(-1);
+      expect(keys.indexOf(firstDocKey), `the step comes in a group before the passport, in ${keys.join(', ')}`).toBeLessThan(keys.indexOf('documents'));
+    });
+
+    test('256. A document in your new name is left out where neither office asks for one', async ({ page }) => {
+      const item = page.locator('li.plan-item[data-item-id="trk_firstdoc"]');
+      await openLinkedPlan(page, { goal: 'gender', dl: 'needs_update', pass: 'needs_update' });
+      await expect(item, 'a gender marker change alone does not need a document in a new name').toHaveCount(0);
+      await openLinkedPlan(page, { goal: 'name', reg: 'ni', dl: 'needs_update' });
+      await expect(item, 'the DVA in Northern Ireland does not ask for one').toHaveCount(0);
+      await openLinkedPlan(page, { goal: 'name', ie: true, pass: 'needs_update' });
+      await expect(item, 'the Irish passport has its own evidence rules').toHaveCount(0);
+      await openLinkedPlan(page, { goal: 'both', grc: 'updated', pass: 'needs_update' });
+      await expect(item, 'HMPO accepts a GRC as evidence of the change of name').toHaveCount(0);
+      await openLinkedPlan(page, { goal: 'both', grc: 'updated', dl: 'needs_update', pass: 'needs_update' });
+      await expect(item).toHaveCount(1);
+      await expect(item).toContainText('Your driving licence application needs');
+    });
+
+    test('257. Services to update comes before the driving licence, since their bills can be the document it asks for', async ({ page }) => {
+      await openLinkedPlan(page, { goal: 'name', dl: 'needs_update', srv: 'utilities,banks' });
+      const order = await page.locator('li.plan-item').evaluateAll(els => els.map(el => el.dataset.itemId));
+      expect(order.indexOf('trk_services_all')).toBeGreaterThan(-1);
+      expect(order.indexOf('trk_services_all')).toBeLessThan(order.indexOf('trk_dvla'));
+      expect(order.indexOf('trk_firstdoc')).toBeLessThan(order.indexOf('trk_services_all'));
+    });
+
+    test('258. A document in your new name says HMPO may want more from outside the UK only to people applying from abroad', async ({ page }) => {
+      const item = page.locator('li.plan-item[data-item-id="trk_firstdoc"]');
+      await openLinkedPlan(page, { goal: 'name', ro: true, pass: 'needs_update' });
+      await expect(item).toContainText('If you apply from outside the UK, HMPO may ask for more than one document');
+      await openLinkedPlan(page, { goal: 'name', pass: 'needs_update' });
+      await expect(item).not.toContainText('outside the UK');
+    });
+
+    test('259. A link from before PLAN_VERSION 4 asks for one review, since plans can now have a new step', async ({ page }) => {
+      const url = await getShareUrl(page, { pv: 3, reg: 'e', goal: 'name', emp: 'no', dp: true, dl: 'needs_update', pass: 'none' });
+      await page.evaluate(() => localStorage.clear());
+      await page.goto(url);
+      await checkAgeGateShared(page);
+      await expect(page.locator('#welcomeOutdated')).toBeVisible();
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();
@@ -2490,8 +2567,9 @@ test.describe('Be myself Planner', () => {
     test('115. The first item of any phase (not just the first phase) has no further "up" to go', async ({ page }) => {
       await openMultiPhasePlan(page);
       const civicPhase = page.locator('.phase[data-phase-key="civic"]');
-      await expect(civicPhase.locator('li.plan-item')).toHaveCount(2);
+      await expect(civicPhase.locator('li.plan-item'), 'a document in your new name, HMRC and the driving licence').toHaveCount(3);
       const civicFirstItem = civicPhase.locator('li.plan-item').first();
+      await expect(civicFirstItem).toHaveAttribute('data-item-id', 'trk_firstdoc');
       await expect(civicFirstItem.locator('.item-move-group')).toBeVisible();
       await expect(civicFirstItem.locator('.item-move-group .tmpl-move-up')).toBeDisabled();
       await expect(civicFirstItem.locator('.item-move-group .tmpl-move-up')).toHaveAttribute('aria-label', /already first/);
