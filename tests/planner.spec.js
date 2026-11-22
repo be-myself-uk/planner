@@ -1947,6 +1947,24 @@ test.describe('Be myself Planner', () => {
       await expect(page.locator('#welcomeOutdated')).toBeVisible();
     });
 
+    test('270. With a GRC, the UK passport step says first that HMPO accepts it, and leaves out what it does not usually ask for', async ({ page }) => {
+      const pass = page.locator('li.plan-item[data-item-id="trk_ukpass"]');
+      await openLinkedPlan(page, { goal: 'both', grc: 'updated', pass: 'needs_update' });
+      await expect(pass).toContainText('You already have a GRC. HMPO accepts it as evidence of your change of name');
+      await expect(pass, 'the medical letter is not needed with a GRC').not.toContainText('medical professional registered with');
+      await expect(pass, 'a GRC holder is 18 or over').not.toContainText('If you are 16 or 17');
+      await expect(pass, 'nothing points at evidence that is no longer listed').not.toContainText('the evidence above');
+      await expect(pass).toContainText('Non-binary marker');
+      await expect(pass).toContainText('Travel note');
+
+      await openLinkedPlan(page, { goal: 'both', grc: false, pass: 'needs_update' });
+      await expect(pass).toContainText('a letter from a medical professional confirming the change is likely to be permanent');
+      await expect(pass).toContainText('If you are 16 or 17');
+
+      await openLinkedPlan(page, { goal: 'name', grc: 'updated', pass: 'needs_update' });
+      await expect(pass).toContainText('HMPO will need your deed poll and evidence that you are using your new name');
+    });
+
     test('54. renderCost: split cost badge renders correctly', async ({ page }) => {
       await openChecklist(page);
       await page.locator('#chkGoalName').check();
@@ -4470,7 +4488,7 @@ test.describe('Be myself Planner', () => {
       expect(date.toISOString().slice(0, 10)).toBe(lastmod[1]);
     });
 
-    test('270. favicon.ico holds the site icon at 16, 32 and 48 pixels, and the page never loads it', async ({ page }) => {
+    test('271. favicon.ico holds the site icon at 16, 32 and 48 pixels, and the page never loads it', async ({ page }) => {
       const source = fs.readFileSync(filePath.replace(/^file:\/\//, ''), 'utf8');
       expect(source, 'the page must not load favicon.ico, so a saved copy still works offline with no other files').not.toContain('favicon.ico');
       const ico = fs.readFileSync(path.resolve('..', 'favicon.ico'));

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-hhBJaM/ISZWk5pOpjLgysi6ZQCz001D1/IAceEgB7JA='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-H6e9nNEgbaMU3JRCupSJ6h3pHjLMGXSAluBYG5UEx9U='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -938,6 +938,10 @@ const PLAN_ITEMS = {
     variants: {
       gender: {
         summary: 'HMPO needs a written letter asking for the change of gender, a letter from a medical professional confirming the change is likely to be permanent, and evidence that you use your name and gender for all purposes, such as a bank statement or payslip, unless you already have a GRC. The GOV.UK link below has the full details.',
+      },
+      grc: {
+        summary: 'You already have a GRC. HMPO accepts it as evidence of your change of name, and does not usually ask for a letter requesting the change, a medical letter, or evidence that you use your name and gender for all purposes. The GOV.UK link below has the full details.',
+        detail: '<p>You already have a GRC. HM Passport Office\'s guidance for its staff says it accepts a full or interim GRC as evidence of your change of name, and does not usually ask for a letter requesting the change, a letter from a medical professional, or evidence that you use your name and gender for all purposes. HMPO may also ask for someone who knows you to confirm your identity, unless it can match your photo to your previous passport.</p><p><strong>⚠️ Travel note:</strong> Make sure the name on your travel ticket matches your passport. Border Force and airlines may check documents including any eVisa. Mismatches can lead to delays or difficulties when travelling.</p><p><strong>⚠️ Non-binary marker:</strong> UK passports currently only offer M or F: there is no X or non-binary option. You can still note your identity in a covering letter or in the additional information section of your application. If you do, HMPO will phone you to explain that it can only print M or F, and to ask for your current gender, male or female. If that is different from your last passport, HMPO treats it as a change of gender. If you cannot answer straight away, you have 7 days to call back, or your application may be withdrawn.</p><a href="https://www.gov.uk/changing-passport-information/gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Change your name or gender on your passport</a><a href="https://www.gov.uk/government/publications/gender-recognition/gender-recognition-accessible" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Gender recognition (caseworker guidance)</a><a href="https://www.gov.uk/government/publications/change-of-name-passport-applications-caseworker-guidance/names-change-of-name-passport-applications-accessible#name-change-gender" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Change of name because of a change of gender (caseworker guidance)</a>',
       },
       name: {
         summary: 'HMPO will need your deed poll and evidence that you are using your new name. The GOV.UK link below has the full details.',
@@ -2952,8 +2956,8 @@ function buildSharedPlan(p) {
       addStep(li('iepass', medium, renderCost(iepassItem.cost), iepassItem.title, `The Passport Service handles Irish passports. ${iepassVariant.summary}`, iepassItem.detail));
     } else if (p.needsPassport) {
       const ukpassItem = PLAN_ITEMS.ukpass;
-      const ukpassVariant = planItemVariant(ukpassItem, (isBoth || isGender) ? 'gender' : 'name');
-      addStep(li('ukpass', hard, renderCost(ukpassItem.cost), ukpassItem.title, `HM Passport Office (HMPO) handles UK passport updates. ${ukpassVariant.summary}`, ukpassItem.detail));
+      const ukpassVariant = planItemVariant(ukpassItem, (isBoth || isGender) ? (p.hasGRC ? 'grc' : 'gender') : 'name');
+      addStep(li('ukpass', hard, renderCost(ukpassItem.cost), ukpassItem.title, `HM Passport Office (HMPO) handles UK passport updates. ${ukpassVariant.summary}`, ukpassVariant.detail || ukpassItem.detail));
     }
     addStep('</ul></section>');
   }
