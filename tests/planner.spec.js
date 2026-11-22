@@ -3792,6 +3792,74 @@ test.describe('Be myself Planner', () => {
       }
       await page.emulateMedia({ media: 'screen' });
     });
+
+    test('265. Finishing the plan sends the header streamers across the page for 12 seconds, then they return', async ({ page }) => {
+      test.setTimeout(40000);
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      const party = page.locator('#celebrationCanvas');
+      await expect(party, 'the celebration replaces the old confetti').toHaveCount(1);
+      await expect(page.locator('#confettiCanvas')).toHaveCount(0);
+      await expect(party).toHaveAttribute('aria-hidden', 'true');
+      expect(await party.evaluate(el => getComputedStyle(el).pointerEvents), 'the celebration must never block the page').toBe('none');
+      await expect(page.locator('#heroCanvas'), 'the streamers leave the header while they are out').toHaveClass(/escaped/);
+      await page.waitForTimeout(1500);
+      const frame = () => party.evaluate(c => c.toDataURL());
+      const first = await frame();
+      await page.waitForTimeout(300);
+      expect(await frame(), 'the streamers should be flying').not.toBe(first);
+      await page.waitForTimeout(4000);
+      await expect(party, 'still celebrating well past the old five second mark').toHaveCount(1);
+      await expect(party, 'the celebration ends by itself after 12 seconds').toHaveCount(0, { timeout: 9000 });
+      await expect(page.locator('#heroCanvas'), 'the streamers come back to the header').not.toHaveClass(/escaped/);
+    });
+
+    test('266. A tap or a key press ends the celebration early, as WCAG 2.2.2 needs for motion over five seconds', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const party = page.locator('#celebrationCanvas');
+      await expect(party).toHaveCount(1);
+      await page.waitForTimeout(500);
+      await page.keyboard.press('Shift');
+      await expect(party, 'a key press stops it within a second').toHaveCount(0, { timeout: 1500 });
+      await expect(page.locator('#heroCanvas')).not.toHaveClass(/escaped/);
+      await btns.first().click();
+      await btns.first().click();
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      await btns.first().click();
+      await btns.first().click();
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await expect(party, 'finishing again celebrates again').toHaveCount(1);
+      await page.waitForTimeout(500);
+      await page.mouse.click(5, 300);
+      await expect(party, 'a tap stops it within a second').toHaveCount(0, { timeout: 1500 });
+    });
+
+    test('267. With reduced motion, finishing the plan shows the banner and no celebration', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await page.waitForTimeout(300);
+      await expect(page.locator('#celebrationCanvas'), 'nothing may fly across the page under prefers-reduced-motion').toHaveCount(0);
+      await expect(page.locator('#heroCanvas')).not.toHaveClass(/escaped/);
+    });
   });
 
   test.describe('Content integrity', () => {
