@@ -2620,7 +2620,11 @@ test.describe('Be myself Planner', () => {
       await expect(fold).toHaveAttribute('aria-expanded', 'true');
       await expect(fold).toHaveText('Hide');
       await status.click();
-      await expect(body, 'not needed folds again').toBeHidden();
+      await expect(status).toHaveAttribute('data-state', '3');
+      await page.waitForTimeout(1200);
+      await expect(body, 'going from done to not needed keeps an opened step open, as you left it').toBeVisible();
+      await fold.click();
+      await expect(body).toBeHidden();
       await status.click();
       await expect(body, 'clearing the status unfolds it').toBeVisible();
       await expect(fold).toBeHidden();
@@ -2925,6 +2929,82 @@ test.describe('Be myself Planner', () => {
       await expect(content).toContainText('Paperwork for your UK GRC application');
       await expect(content, 'GOV.UK does not say recognition elsewhere has no effect here').not.toContainText('for it to be recognised here');
       await expect(content).toContainText('you can apply for a UK GRC through a shorter overseas route, without the medical reports. Ireland is not on that list.');
+    });
+
+    test('296. Changing a sub-item inside an opened finished step keeps it open, and finishing the last one folds it after the pause', async ({ page }) => {
+      await openChecklist(page);
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#chkSvcBanks').check();
+      await page.locator('#chkSvcUtilities').check();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      const step = page.locator('li.plan-item[data-item-id="trk_services_all"]');
+      const parent = step.locator('.item-header .step-state-btn');
+      const subs = step.locator('.step-state-btn[data-svc-parent]');
+      const body = step.locator('.item-body');
+      await parent.click();
+      await parent.click();
+      await expect(step).toHaveClass(/is-folded/);
+      await step.locator('.item-header .tmpl-title').click();
+      await expect(body).toBeVisible();
+      await subs.first().click();
+      await expect(subs.first()).toHaveAttribute('data-state', '3');
+      await page.waitForTimeout(1200);
+      await expect(body, 'the step is still finished, so it stays as you left it').toBeVisible();
+      await subs.first().click();
+      await expect(parent).toHaveAttribute('data-state', '1');
+      await subs.first().click();
+      await subs.first().click();
+      await expect(parent).toHaveAttribute('data-state', '2');
+      expect(await step.evaluate(el => el.classList.contains('is-folded')), 'finishing the last sub-item waits before folding').toBe(false);
+      await expect(step).toHaveClass(/is-folded/);
+    });
+
+    test('297. A step folding at the bottom of the page does not shorten the page under you', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(300);
+      const result = await page.evaluate(() => new Promise(resolve => {
+        const btns = document.querySelectorAll('#planContent li.plan-item .item-header .step-state-btn');
+        const last = btns[btns.length - 1];
+        const startY = window.scrollY;
+        const ys = [];
+        last.click();
+        last.click();
+        const t0 = performance.now();
+        const tick = () => {
+          ys.push(window.scrollY);
+          if (performance.now() - t0 < 1800) requestAnimationFrame(tick);
+          else resolve({ startY, moved: ys.filter(y => Math.abs(y - startY) > 1.5).length, folded: last.closest('li').classList.contains('is-folded'), hold: parseFloat(document.getElementById('scrollHold').style.height) || 0 });
+        };
+        requestAnimationFrame(tick);
+      }));
+      expect(result.folded).toBe(true);
+      expect(result.moved, 'the page never gets shorter under you, so the browser never pulls the view, or the toolbar, upwards (1px of rounding aside)').toBe(0);
+      expect(result.hold, 'the space the step gave up is held at the bottom').toBeGreaterThan(0);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect.poll(() => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0), { message: 'the held space goes once you have scrolled away' }).toBe(0);
+    });
+
+    test('298. Scrolling does not end the celebration, but a tap or another key does', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) {
+        await btns.nth(i).click();
+        await btns.nth(i).click();
+      }
+      const party = page.locator('#celebrationCanvas');
+      await expect(party).toHaveCount(1, { timeout: 3000 });
+      await page.waitForTimeout(400);
+      await page.mouse.move(200, 300);
+      await page.mouse.wheel(0, -400);
+      await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('PageDown');
+      await page.evaluate(() => document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' })));
+      await page.waitForTimeout(900);
+      await expect(party, 'a mouse wheel, scroll keys, or the start of a finger scroll leave it running').toHaveCount(1);
+      await page.mouse.click(5, 300);
+      await expect(party, 'a tap stops it').toHaveCount(0, { timeout: 1500 });
     });
 
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
@@ -4254,7 +4334,8 @@ test.describe('Be myself Planner', () => {
         party: Number(getComputedStyle(document.getElementById('celebrationCanvas')).zIndex),
         toolbar: Number(getComputedStyle(document.getElementById('controlBar')).zIndex),
       }));
-      expect(layers.party, 'the streamers pass behind the toolbar, so it stays usable and they can come out from behind it').toBeLessThan(layers.toolbar);
+      expect(layers.party, 'the streamers fly over the toolbar, not behind it').toBeGreaterThan(layers.toolbar);
+      expect(await party.evaluate(el => getComputedStyle(el).pointerEvents), 'clicks still reach the toolbar, including quick exit').toBe('none');
       await page.keyboard.press('Shift');
       await expect(party).toHaveCount(0, { timeout: 1500 });
       await unfinishLast();
