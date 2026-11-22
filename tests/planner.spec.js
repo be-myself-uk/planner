@@ -3043,6 +3043,34 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => localStorage.getItem('planOrder'))).toBeNull();
     });
 
+    test('303. Closed tips can be brought back with Show hidden tips, keeping the plan and its progress', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const row = page.locator('#hiddenTipsRow');
+      await expect(row, 'nothing is hidden yet').toHaveCount(0);
+      const first = page.locator('#planContent li.plan-item .item-header .step-state-btn').first();
+      await first.click();
+      await expect(first).toHaveAttribute('data-state', '1');
+      await page.locator('#planSummaryBox .tip-close').click();
+      await expect(row).toBeVisible();
+      await expect(row).toHaveText('Show hidden tips (1)');
+      await page.locator('#titlesInfoBox .tip-close').click();
+      await page.locator('#trackTipBox .tip-close').click();
+      await expect(row).toHaveText('Show hidden tips (3)');
+      await row.getByRole('button').click();
+      for (const id of ['#planSummaryBox', '#titlesInfoBox', '#trackTipBox']) await expect(page.locator(id)).toBeVisible();
+      await expect(row).toHaveCount(0);
+      await expect(page.locator('#planContent li.plan-item .item-header .step-state-btn').first(), 'progress is kept').toHaveAttribute('data-state', '1');
+      expect(await page.evaluate(() => ['planSummaryDismissed', 'titlesInfoDismissed', 'trackTipDismissed'].map(k => localStorage.getItem(k)))).toEqual([null, null, null]);
+      await expect(page.locator('#liveRegion')).toContainText('Hidden tips are showing again.');
+      await page.locator('#titlesInfoBox .tip-close').click();
+      await expect(row).toHaveText('Show hidden tips (1)');
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) await btns.nth(i).evaluate(b => { while (b.dataset.state !== '2') b.click(); });
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await expect(row, 'it goes away with the other top boxes when the plan is done').toBeHidden();
+    });
+
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
       await openMultiPhasePlan(page);
       const workUl = page.locator('.phase[data-phase-key="work"] > ul');
@@ -4119,7 +4147,8 @@ test.describe('Be myself Planner', () => {
       await page.locator('#titlesInfoBox').getByRole('button', { name: "Don't show this again" }).click();
       const after = await page.evaluate(() =>
         [...document.getElementById('planContent').children].map(el => el.id).filter(Boolean));
-      expect(after,
+      expect(after[0], 'the way to bring the closed panel back sits at the very top, above the remaining panels').toBe('hiddenTipsRow');
+      expect(after.slice(1),
         'dismissing the titles panel leaves the tip adjacent to the summary').toEqual(['planSummaryBox', 'trackTipBox']);
     });
 
