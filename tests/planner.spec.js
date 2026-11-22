@@ -3034,6 +3034,35 @@ test.describe('Be myself Planner', () => {
       await expect.poll(held, { message: 'a screen away, the held space goes in one go' }).toBe(0);
     });
 
+    test('300. A step folded well away from the bottom leaves no held space once scrolling settles', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const first = page.locator('#planContent li.plan-item').first();
+      await first.locator('.item-header .step-state-btn').click();
+      await first.locator('.item-header .step-state-btn').click();
+      await expect(first).toHaveClass(/is-folded/);
+      const far = await page.evaluate(() => document.documentElement.scrollHeight - (window.scrollY + window.innerHeight) > 2 * window.innerHeight);
+      expect(far, 'this plan is long enough for the first step to be well away from the bottom').toBe(true);
+      await expect.poll(() => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0), { message: 'the held space is removed out of sight' }).toBe(0);
+    });
+
+    test('301. When every step is done, the top boxes go away whole, with their close buttons, and come back when one is undone', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const boxes = ['#planSummaryBox', '#titlesInfoBox'];
+      for (const id of boxes) await expect(page.locator(id)).toBeVisible();
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) await btns.nth(i).evaluate(b => { b.click(); b.click(); });
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      for (const id of boxes) {
+        await expect(page.locator(id), `${id} is hidden whole`).toBeHidden();
+        await expect(page.locator(`${id} .tip-close`), `no close button is left behind for ${id}`).toBeHidden();
+      }
+      await btns.first().evaluate(b => { b.click(); b.click(); });
+      await expect(page.locator('#allDoneBanner')).toHaveCount(0);
+      for (const id of boxes) await expect(page.locator(id)).toBeVisible();
+    });
+
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
       await openMultiPhasePlan(page);
       const workUl = page.locator('.phase[data-phase-key="work"] > ul');

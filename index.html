@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-pvPXT2pRClpaciSu4gtMzV5VEAEsEiEP/Q3ZM2GtbxM='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-F9GU97dHnU18DMkbxeGPMn/9R4qXVYwqfhY944KimrQ='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -3246,10 +3246,12 @@ function applyStepState(id, state) {
     }
   }
 }
+function screenHeight() {
+  return Math.max(window.innerHeight, window.visualViewport ? window.visualViewport.height : 0);
+}
 function holdScrollBottom(shrinkBy) {
   const hold = gel('scrollHold');
-  const doc = document.documentElement;
-  if (!hold || shrinkBy <= 0 || window.scrollY + window.innerHeight < doc.scrollHeight - 4) return;
+  if (!hold || shrinkBy <= 0) return;
   hold.style.height = `${(parseFloat(hold.style.height) || 0) + shrinkBy + 32}px`;
   clearTimeout(hold._release);
   hold._release = setTimeout(releaseScrollHold, BOX_SLIDE_MS + 60);
@@ -3266,7 +3268,7 @@ function releaseScrollHold() {
     idle = setTimeout(() => {
       const now = parseFloat(hold.style.height) || 0;
       const natural = document.documentElement.scrollHeight - now;
-      if (natural - (window.scrollY + window.innerHeight) < window.innerHeight) return;
+      if (natural - (window.scrollY + screenHeight()) < screenHeight()) return;
       hold.style.height = '0px';
       window.removeEventListener('scroll', hold._trim);
     }, 150);
@@ -3502,7 +3504,7 @@ function checkAllDone() {
     return s === 2 || s === 3;
   });
   const banner = gel('allDoneBanner');
-  const topBoxes = document.querySelectorAll('.plan-top-details');
+  const topBoxes = Array.from(document.querySelectorAll('.plan-top-details')).map(el => el.closest('.tip-box') || el);
   if (done && !banner) {
     const b = document.createElement('div');
     b.id = 'allDoneBanner'; b.className = 'phase success'; b.setAttribute('role','status'); b.style.marginTop = '25px';
