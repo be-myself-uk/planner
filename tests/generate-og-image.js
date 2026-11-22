@@ -37,6 +37,7 @@ const background = `url("data:image/svg+xml,${encodeURIComponent(flags)}")`;
       body { margin: 0; padding: 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 24px; background: ${background} 0 0 / 100% 100% no-repeat; }
       header.hero, #controlBar { zoom: 1.4; width: 680px; max-width: 680px; margin: 0 auto; padding: 0; position: static; box-sizing: border-box; }
       .hero .hero-tagline { max-width: none; }
+      #heroCanvas, #heroMotionBtn { display: none; }
       .hero-inner, #controlBarCard { box-shadow: 0 2px 8px rgba(0, 0, 0, .35); }
       #controlBarButtons { display: flex; flex-wrap: nowrap; justify-content: center; gap: 12px; width: 100%; }
       #controlBarButtons .ub-icon-btn { display: inline-flex; align-items: center; cursor: default; }
