@@ -5,7 +5,8 @@
     "generate-source-snapshots": "node source-content-check.js --write",
     "check-source-content": "node source-content-check.js",
     "generate-og-image": "node generate-og-image.js",
-    "update-csp-hashes": "node csp-hash-lib.js"
+    "update-csp-hashes": "node csp-hash-lib.js",
+    "generate-favicon": "node generate-favicon.js"
   },
   "devDependencies": {
     "@mozilla/readability": "^0.6.0",

@@ -52,6 +52,7 @@ Releases:
 - Added tests for the streamers: that they move and the pause button stops and restarts them, that they stay still when your device is set to reduce motion, that the title and the line under it stay readable over them in light and dark mode, that they stop while the title box is out of view, and that they are left out when printing. Test 97 now also checks that pressing Tab after the skip link reaches the pause button before the toolbar.
 - Added tests that finishing your plan starts the celebration, that the streamers stay on screen and it ends by itself after 12 seconds with the streamers coming back to the title box, that it waits until the plan has stayed finished, that the streamers leave from the title box when it is in view and from behind the toolbar when it is not, that a tap or a key press ends it early, and that it does not play when your device is set to reduce motion.
 - The script that makes the link preview image now hides the streamers and the pause button, so the image stays the same if it is made again.
+- Added a favicon.ico file at the site root, made from the planner's own icon, for search engines that do not use the icon built into the page. The page itself does not load it, so the planner still works offline as a single file. A new script remakes it from the page's icon, and a test checks the two match.
 
 ## [November 2026]
 

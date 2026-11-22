@@ -4470,6 +4470,48 @@ test.describe('Be myself Planner', () => {
       expect(date.toISOString().slice(0, 10)).toBe(lastmod[1]);
     });
 
+    test('270. favicon.ico holds the site icon at 16, 32 and 48 pixels, and the page never loads it', async ({ page }) => {
+      const source = fs.readFileSync(filePath.replace(/^file:\/\//, ''), 'utf8');
+      expect(source, 'the page must not load favicon.ico, so a saved copy still works offline with no other files').not.toContain('favicon.ico');
+      const ico = fs.readFileSync(path.resolve('..', 'favicon.ico'));
+      expect([ico.readUInt16LE(0), ico.readUInt16LE(2)], 'an ICO file starts with 0 then 1').toEqual([0, 1]);
+      const count = ico.readUInt16LE(4);
+      const images = [];
+      for (let i = 0; i < count; i++) {
+        const e = 6 + 16 * i;
+        const w = ico.readUInt8(e), h = ico.readUInt8(e + 1), size = ico.readUInt32LE(e + 8), offset = ico.readUInt32LE(e + 12);
+        expect(w, 'Google needs a square favicon').toBe(h);
+        expect(offset + size, 'every image must lie inside the file').toBeLessThanOrEqual(ico.length);
+        const png = ico.subarray(offset, offset + size);
+        expect(png.subarray(1, 4).toString(), 'each image is stored as a PNG').toBe('PNG');
+        images.push({ size: w, png: png.toString('base64') });
+      }
+      expect(images.map(i => i.size), 'Google recommends larger than 48 by 48, and browsers use 16 and 32').toEqual([16, 32, 48]);
+      const svg = source.match(/<link rel="icon" href="data:image\/svg\+xml,([^"]+)">/)[1];
+      const diffs = await page.evaluate(async ({ svg, images }) => {
+        const load = async src => { const img = new Image(); img.src = src; await img.decode(); return img; };
+        const pixels = (img, n) => {
+          const c = document.createElement('canvas');
+          c.width = c.height = n;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0, n, n);
+          return ctx.getImageData(0, 0, n, n).data;
+        };
+        const vector = await load('data:image/svg+xml,' + encodeURIComponent(decodeURIComponent(svg)));
+        const out = [];
+        for (const { size, png } of images) {
+          const a = pixels(vector, size), b = pixels(await load('data:image/png;base64,' + png), size);
+          let total = 0;
+          for (let i = 0; i < a.length; i++) total += Math.abs(a[i] - b[i]);
+          out.push(total / a.length);
+        }
+        return out;
+      }, { svg, images });
+      for (const d of diffs) {
+        expect(d, 'favicon.ico is out of date with the icon in index.html: run npm run generate-favicon in tests/').toBeLessThan(2);
+      }
+    });
+
     test('174. The security policy still lets the page talk to its own site', async ({ page }) => {
       const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
       expect(csp, 'Cloudflare adds a check that posts to /cdn-cgi on this site, which connect-src \'none\' blocks').toContain("connect-src 'self'");
