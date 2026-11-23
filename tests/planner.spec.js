@@ -3980,6 +3980,41 @@ test.describe('Be myself Planner', () => {
         await page.keyboard.press('Escape');
       }
     });
+
+    test('310. Folding a step or closing a box away from the bottom of the page never makes the page longer, not even for a moment', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 744 });
+      await openMultiPhasePlan(page);
+      const maxHeightDuring = (act) => page.evaluate(async (act) => {
+        const start = document.documentElement.scrollHeight;
+        let max = start;
+        let running = true;
+        const tick = () => { max = Math.max(max, document.documentElement.scrollHeight); if (running) requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+        if (act.kind === 'fold') { const b = document.querySelectorAll('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])')[act.index]; b.click(); b.click(); }
+        else { document.querySelectorAll('#planContent li.plan-item details.tmpl-details > summary')[act.index].click(); }
+        await new Promise(r => setTimeout(r, 1600));
+        running = false;
+        return { start, max };
+      }, act);
+      for (const [where, scroll] of [['at the top', 'top'], ['in the middle', 'middle']]) {
+        await page.evaluate(s => window.scrollTo(0, s === 'top' ? 0 : Math.round(document.documentElement.scrollHeight / 3)), scroll);
+        await page.waitForTimeout(300);
+        const index = await page.evaluate(() => {
+          const btns = Array.from(document.querySelectorAll('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])'));
+          return btns.findIndex(b => b.dataset.state === '0' && b.getBoundingClientRect().top > 60 && b.getBoundingClientRect().bottom < innerHeight);
+        });
+        expect(index, `a step is on screen ${where}`).toBeGreaterThan(-1);
+        const fold = await maxHeightDuring({ kind: 'fold', index });
+        expect(fold.max, `folding a step ${where} never makes the page longer`).toBeLessThanOrEqual(fold.start);
+      }
+      const open = 0;
+      await page.evaluate(() => document.querySelectorAll('#planContent li.plan-item details.tmpl-details > summary')[0].scrollIntoView({ block: 'center' }));
+      await page.waitForTimeout(300);
+      expect(await page.evaluate(() => document.documentElement.scrollHeight - (scrollY + innerHeight)), 'the box is well away from the bottom of the page').toBeGreaterThan(1500);
+      await maxHeightDuring({ kind: 'box', index: open });
+      const close = await maxHeightDuring({ kind: 'box', index: open });
+      expect(close.max, 'closing a box near the top never makes the page longer').toBeLessThanOrEqual(close.start);
+    });
   });
 
   test.describe('Accessibility & layout', () => {
