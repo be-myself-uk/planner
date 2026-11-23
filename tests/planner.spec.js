@@ -2653,13 +2653,12 @@ test.describe('Be myself Planner', () => {
       await expect(item).toHaveCount(1);
       await expect(item.locator('xpath=ancestor::section[1]').locator('li.plan-item').first(), 'it is the first thing to do in its group').toHaveAttribute('data-item-id', 'trk_firstdoc');
       await expect(item).toContainText('Your driving licence and passport applications each need a document that already shows your new name');
-      await expect(item).toContainText('If it was issued in the last 12 months, both accept:');
       await expect(item).toContainText('The DVLA also says it must have been issued after your deed poll');
       expect(await item.locator('.details-body > p').first().textContent(), 'neither office limits every document to the last 12 months, so the opening sentence does not either').not.toContain('12 months');
-      await expect(item, 'the DVLA also takes documents with no 12-month limit, which the driving licence step lists').toContainText('The DVLA also accepts a few documents with no 12-month limit, such as a UK passport number. The driving licence step in this plan lists every document the DVLA accepts.');
-      await expect(item, 'HMPO also takes some older documents, including a driving licence in the new name').toContainText('HMPO also accepts a few documents that can be more than 12 months old, such as a driving licence in your new name, if it is still valid and was issued after your deed poll or statutory declaration and after your current passport.');
-      await expect(item.locator('li', { hasText: 'non-GB driving licence' }), 'the older documents are listed once, in the driving licence step, not copied here').toHaveCount(0);
-      await expect(page.locator('li.plan-item[data-item-id="trk_dvla"]'), 'the driving licence step this points to does list them').toContainText('A non-GB driving licence');
+      await expect(item).toContainText('The driving licence step in this plan lists the documents the DVLA accepts. HMPO accepts the ones on that list that were issued in the last 12 months, and its guidance for staff, linked below, lists everything it accepts.');
+      await expect(item.locator('ul, li'), 'the documents are listed once, in the driving licence step, and only pointed to here').toHaveCount(0);
+      await expect(item, 'no document from the list is repeated here').not.toContainText('A tax record');
+      await expect(page.locator('li.plan-item[data-item-id="trk_dvla"]'), 'the driving licence step this points to does list them').toContainText('A tax record, such as a letter from HMRC');
       await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(1);
       await expect(item.locator('a[href*="names-evidence-to-change-a-name"]')).toHaveCount(1);
       await expect(page.locator('li.plan-item[data-item-id="trk_dvla"] .item-badge', { hasText: 'Approximate cost' }), 'the driving licence step shows the cost badge this check looks for').toHaveCount(1);
@@ -2667,15 +2666,16 @@ test.describe('Be myself Planner', () => {
 
       await openLinkedPlan(page, { goal: 'name', dl: 'needs_update' });
       await expect(item).toContainText('Your driving licence application needs');
-      await expect(item).toContainText('If it was issued in the last 12 months, it accepts:');
-      await expect(item).toContainText('The driving licence step in this plan lists every document the DVLA accepts.');
+      await expect(item).toContainText('The driving licence step in this plan lists the documents the DVLA accepts.');
+      await expect(item.locator('ul, li'), 'the list is only in the driving licence step').toHaveCount(0);
       await expect(item, 'HMPO is not named when the plan has no UK passport').not.toContainText('HMPO');
       await expect(item.locator('a[href*="names-evidence-to-change-a-name"]'), 'HMPO is not named when the plan has no UK passport').toHaveCount(0);
 
       await openLinkedPlan(page, { goal: 'name', pass: 'needs_update' });
       await expect(item).toContainText('Your passport application needs');
       await expect(item, 'the DVLA date rule and its community note are only for a licence').not.toContainText('DVLA');
-      await expect(item).toContainText('HMPO also accepts a few documents that can be more than 12 months old');
+      await expect(item).toContainText('HMPO\'s guidance for staff, linked below, lists the documents it accepts.');
+      await expect(item.locator('ul, li'), 'HMPO\'s list is pointed to, not copied').toHaveCount(0);
       await expect(item, 'there is no driving licence step to point to').not.toContainText('The driving licence step in this plan');
       await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(0);
       const keys = await page.locator('section.phase').evaluateAll(els => els.map(el => el.dataset.phaseKey));
