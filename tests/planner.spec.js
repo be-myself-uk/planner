@@ -2653,8 +2653,13 @@ test.describe('Be myself Planner', () => {
       await expect(item).toHaveCount(1);
       await expect(item.locator('xpath=ancestor::section[1]').locator('li.plan-item').first(), 'it is the first thing to do in its group').toHaveAttribute('data-item-id', 'trk_firstdoc');
       await expect(item).toContainText('Your driving licence and passport applications each need a document that already shows your new name');
-      await expect(item).toContainText('Documents both accept include:');
+      await expect(item).toContainText('If it was issued in the last 12 months, both accept:');
       await expect(item).toContainText('The DVLA also says it must have been issued after your deed poll');
+      expect(await item.locator('.details-body > p').first().textContent(), 'neither office limits every document to the last 12 months, so the opening sentence does not either').not.toContain('12 months');
+      await expect(item, 'the DVLA also takes documents with no 12-month limit, which the driving licence step lists').toContainText('The DVLA also accepts a few documents with no 12-month limit, such as a UK passport number. The driving licence step in this plan lists every document the DVLA accepts.');
+      await expect(item, 'HMPO also takes some older documents, including a driving licence in the new name').toContainText('HMPO also accepts a few documents that can be more than 12 months old, such as a driving licence in your new name, if it is still valid and was issued after your deed poll or statutory declaration and after your current passport.');
+      await expect(item.locator('li', { hasText: 'non-GB driving licence' }), 'the older documents are listed once, in the driving licence step, not copied here').toHaveCount(0);
+      await expect(page.locator('li.plan-item[data-item-id="trk_dvla"]'), 'the driving licence step this points to does list them').toContainText('A non-GB driving licence');
       await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(1);
       await expect(item.locator('a[href*="names-evidence-to-change-a-name"]')).toHaveCount(1);
       await expect(page.locator('li.plan-item[data-item-id="trk_dvla"] .item-badge', { hasText: 'Approximate cost' }), 'the driving licence step shows the cost badge this check looks for').toHaveCount(1);
@@ -2662,12 +2667,16 @@ test.describe('Be myself Planner', () => {
 
       await openLinkedPlan(page, { goal: 'name', dl: 'needs_update' });
       await expect(item).toContainText('Your driving licence application needs');
-      await expect(item).toContainText('Documents it accepts include:');
+      await expect(item).toContainText('If it was issued in the last 12 months, it accepts:');
+      await expect(item).toContainText('The driving licence step in this plan lists every document the DVLA accepts.');
+      await expect(item, 'HMPO is not named when the plan has no UK passport').not.toContainText('HMPO');
       await expect(item.locator('a[href*="names-evidence-to-change-a-name"]'), 'HMPO is not named when the plan has no UK passport').toHaveCount(0);
 
       await openLinkedPlan(page, { goal: 'name', pass: 'needs_update' });
       await expect(item).toContainText('Your passport application needs');
       await expect(item, 'the DVLA date rule and its community note are only for a licence').not.toContainText('DVLA');
+      await expect(item).toContainText('HMPO also accepts a few documents that can be more than 12 months old');
+      await expect(item, 'there is no driving licence step to point to').not.toContainText('The driving licence step in this plan');
       await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(0);
       const keys = await page.locator('section.phase').evaluateAll(els => els.map(el => el.dataset.phaseKey));
       const firstDocKey = await item.evaluate(el => el.closest('section.phase').dataset.phaseKey);
@@ -2709,7 +2718,10 @@ test.describe('Be myself Planner', () => {
     test('270. With a GRC, the UK passport step says first that HMPO accepts it, and leaves out what it does not usually ask for', async ({ page }) => {
       const pass = page.locator('li.plan-item[data-item-id="trk_ukpass"]');
       await openLinkedPlan(page, { goal: 'both', grc: 'updated', pass: 'needs_update' });
-      await expect(pass).toContainText('You already have a GRC. HMPO accepts it as evidence of your change of name');
+      await expect(pass).toContainText('You already have a GRC. HMPO needs your GRC, or a birth certificate issued in your new gender with a letter explaining the change.');
+      await expect(pass, 'HMPO asks for name evidence when the application is not in the name on the GRC').toContainText('If you apply in a name that is not the one on your GRC, it also asks for evidence of your change of name.');
+      await expect(pass).toContainText('If you have an interim GRC, it also needs your full birth certificate if this is your first passport.');
+      await expect(pass).toContainText('If you apply in a different name:');
       await expect(pass, 'the medical letter is not needed with a GRC').not.toContainText('medical professional registered with');
       await expect(pass, 'a GRC holder is 18 or over').not.toContainText('If you are 16 or 17');
       await expect(pass, 'nothing points at evidence that is no longer listed').not.toContainText('the evidence above');
@@ -2722,6 +2734,10 @@ test.describe('Be myself Planner', () => {
 
       await openLinkedPlan(page, { goal: 'name', grc: 'updated', pass: 'needs_update' });
       await expect(pass).toContainText('HMPO will need your deed poll and evidence that you are using your new name');
+
+      await openLinkedPlan(page, { goal: 'gender', grc: 'updated', pass: 'needs_update' });
+      await expect(pass, 'someone changing only their gender marker sees the GRC version too').toContainText('You already have a GRC. HMPO needs your GRC');
+      await expect(pass.locator('.tmpl-desc'), 'the summary does not frame a gender marker change as a change of name').not.toContainText('change of name, and');
     });
 
     test('292. The GRC step keeps its long introduction in a More information box, after a sentence saying what it covers', async ({ page }) => {
@@ -2777,6 +2793,29 @@ test.describe('Be myself Planner', () => {
       await expect(planContent).not.toContainText('Student Finance England');
       await expect(planContent).not.toContainText('Student Finance Wales');
       await expect(planContent).not.toContainText('Student Finance NI');
+    });
+
+    test('305. A name-only plan keeps the passport in A document in your new name, even with a GRC answer left from an earlier goal', async ({ page }) => {
+      const item = page.locator('li.plan-item[data-item-id="trk_firstdoc"]');
+      const pass = page.locator('li.plan-item[data-item-id="trk_ukpass"]');
+      await openLinkedPlan(page, { goal: 'name', grc: 'updated', pass: 'needs_update' });
+      await expect(pass, 'a name-only plan uses the name version of the passport step').toContainText('evidence that you are using your new name');
+      await expect(item, 'the GRC question is not asked for a name-only plan, so a saved answer to it cannot remove this step').toHaveCount(1);
+      await expect(item).toContainText('Your passport application needs');
+      await expect(item.locator('a[href*="names-evidence-to-change-a-name"]')).toHaveCount(1);
+
+      await freshPage(page);
+      await openBlankChecklist(page);
+      await page.locator('#chkGoalGender').check();
+      for (const id of ['#chkRegionEW', '#chkBirthRegionEW', '#chkDrivingLicenceNone', '#chkPassportNeeds', '#chkVisaNone', '#chkEmployedNo', '#chkGRCUpdated']) await page.locator(id).check();
+      await page.locator('#chkGoalGender').uncheck();
+      await page.locator('#chkGoalName').check();
+      await page.locator('#chkDeedPoll').check();
+      await page.locator('#chkPassportNeeds').check();
+      await expect(page.locator('#chkGRCUpdated'), 'the GRC answer stays saved while its question is hidden').toBeChecked();
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(pass).toContainText('evidence that you are using your new name');
+      await expect(item, 'answering the GRC question and then changing the goal to name only keeps the step').toHaveCount(1);
     });
   });
 
@@ -3043,57 +3082,6 @@ test.describe('Be myself Planner', () => {
       expect(await page.evaluate(() => localStorage.getItem('planOrder'))).toBeNull();
     });
 
-    test('303. Closed tips can be brought back with Show hidden tips, keeping the plan and its progress', async ({ page }) => {
-      await openMultiPhasePlan(page);
-      const row = page.locator('#hiddenTipsRow');
-      await expect(row, 'nothing is hidden yet').toHaveCount(0);
-      const first = page.locator('#planContent li.plan-item .item-header .step-state-btn').first();
-      await first.click();
-      await expect(first).toHaveAttribute('data-state', '1');
-      await page.locator('#planSummaryBox .tip-close').click();
-      await expect(row).toBeVisible();
-      await expect(row).toHaveText('Show hidden tips (1)');
-      await page.locator('#titlesInfoBox .tip-close').click();
-      await page.locator('#trackTipBox .tip-close').click();
-      await expect(row).toHaveText('Show hidden tips (3)');
-      await row.getByRole('button').click();
-      for (const id of ['#planSummaryBox', '#titlesInfoBox', '#trackTipBox']) await expect(page.locator(id)).toBeVisible();
-      await expect(row).toHaveCount(0);
-      await expect(page.locator('#planContent li.plan-item .item-header .step-state-btn').first(), 'progress is kept').toHaveAttribute('data-state', '1');
-      expect(await page.evaluate(() => ['planSummaryDismissed', 'titlesInfoDismissed', 'trackTipDismissed'].map(k => localStorage.getItem(k)))).toEqual([null, null, null]);
-      await expect(page.locator('#liveRegion')).toContainText('Hidden tips are showing again.');
-      await page.locator('#titlesInfoBox .tip-close').click();
-      await expect(row).toHaveText('Show hidden tips (1)');
-      const btns = page.locator('.step-state-btn[data-track-id]');
-      const count = await btns.count();
-      for (let i = 0; i < count; i++) await btns.nth(i).evaluate(b => { while (b.dataset.state !== '2') b.click(); });
-      await expect(page.locator('#allDoneBanner')).toBeVisible();
-      await expect(row, 'it goes away with the other top boxes when the plan is done').toBeHidden();
-    });
-
-    test('304. Opening and closing a box again and again never makes the page longer, and Show hidden tips stays readable on hover', async ({ page }) => {
-      await openMultiPhasePlan(page);
-      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-      await page.waitForTimeout(300);
-      const height = () => page.evaluate(() => document.documentElement.scrollHeight);
-      const start = await height();
-      const box = page.locator('#planContent li.plan-item details.tmpl-details:not(.hidden) > summary').last();
-      for (let i = 0; i < 4; i++) {
-        await box.click();
-        await page.waitForTimeout(450);
-        await box.click();
-        await page.waitForTimeout(700);
-        expect(await height(), `after opening and closing ${i + 1} times`).toBeLessThanOrEqual(start + 1);
-      }
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.locator('#planSummaryBox .tip-close').click();
-      const show = page.locator('#hiddenTipsRow button');
-      await show.hover();
-      const colours = await show.evaluate(el => ({ text: getComputedStyle(el).color, back: getComputedStyle(el).backgroundColor }));
-      expect(colours.back, 'the general button hover must not paint it dark blue behind its blue text').toBe('rgba(0, 0, 0, 0)');
-      expect(colours.text).not.toBe(colours.back);
-    });
-
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
       await openMultiPhasePlan(page);
       const workUl = page.locator('.phase[data-phase-key="work"] > ul');
@@ -3132,7 +3120,7 @@ test.describe('Be myself Planner', () => {
         await expect(order).toHaveAttribute('aria-pressed', 'false');
         await order.click();
         await expect(order).toHaveAttribute('aria-pressed', 'true');
-        await expect(order).toHaveClass(/focus-active/);
+        await expect(order).toHaveClass(/\bis-on\b/);
         await order.click();
         await expect(order).toHaveAttribute('aria-pressed', 'false');
       }
@@ -3577,6 +3565,7 @@ test.describe('Be myself Planner', () => {
       await page.keyboard.press('Enter');
       await expect(menuBtn).toHaveAttribute('aria-expanded', 'true');
       await expect(page.locator('#ubRestartBtn'), 'opening from the keyboard moves focus into the menu').toBeFocused();
+      await expect(page.getByRole('group', { name: 'Plan actions' }), 'the menu is a named group, since a name on a plain div is ignored by screen readers').toBeVisible();
       await page.keyboard.press('ArrowDown');
       await expect(page.locator('#ubMakeChangesBtn')).toBeFocused();
       await page.keyboard.press('ArrowUp');
@@ -3850,6 +3839,85 @@ test.describe('Be myself Planner', () => {
       await btns.first().evaluate(b => { b.click(); b.click(); });
       await expect(page.locator('#allDoneBanner')).toHaveCount(0);
       for (const id of boxes) await expect(page.locator(id)).toBeVisible();
+    });
+
+    test('303. Closed tips can be brought back with Show hidden tips, keeping the plan and its progress', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const row = page.locator('#hiddenTipsRow');
+      await expect(row, 'nothing is hidden yet').toHaveCount(0);
+      const first = page.locator('#planContent li.plan-item .item-header .step-state-btn').first();
+      await first.click();
+      await expect(first).toHaveAttribute('data-state', '1');
+      await page.locator('#planSummaryBox .tip-close').click();
+      await expect(row).toBeVisible();
+      await expect(row).toHaveText('Show hidden tips (1)');
+      await page.locator('#titlesInfoBox .tip-close').click();
+      await page.locator('#trackTipBox .tip-close').click();
+      await expect(row).toHaveText('Show hidden tips (3)');
+      await row.getByRole('button').click();
+      for (const id of ['#planSummaryBox', '#titlesInfoBox', '#trackTipBox']) await expect(page.locator(id)).toBeVisible();
+      await expect(row).toHaveCount(0);
+      await expect(page.locator('#planContent li.plan-item .item-header .step-state-btn').first(), 'progress is kept').toHaveAttribute('data-state', '1');
+      expect(await page.evaluate(() => ['planSummaryDismissed', 'titlesInfoDismissed', 'trackTipDismissed'].map(k => localStorage.getItem(k)))).toEqual([null, null, null]);
+      await expect(page.locator('#liveRegion')).toContainText('Hidden tips are showing again.');
+      await page.locator('#titlesInfoBox .tip-close').click();
+      await expect(row).toHaveText('Show hidden tips (1)');
+      const btns = page.locator('.step-state-btn[data-track-id]');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) await btns.nth(i).evaluate(b => { while (b.dataset.state !== '2') b.click(); });
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await expect(row, 'it goes away with the other top boxes when the plan is done').toBeHidden();
+    });
+
+    test('304. Opening and closing a box again and again never makes the page longer, and Show hidden tips stays readable on hover', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(300);
+      const height = () => page.evaluate(() => document.documentElement.scrollHeight);
+      const start = await height();
+      const box = page.locator('#planContent li.plan-item details.tmpl-details:not(.hidden) > summary').last();
+      for (let i = 0; i < 4; i++) {
+        await box.click();
+        await page.waitForTimeout(450);
+        await box.click();
+        await page.waitForTimeout(700);
+        expect(await height(), `after opening and closing ${i + 1} times`).toBeLessThanOrEqual(start + 1);
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.locator('#planSummaryBox .tip-close').click();
+      const show = page.locator('#hiddenTipsRow button');
+      await show.hover();
+      const colours = await show.evaluate(el => ({ text: getComputedStyle(el).color, back: getComputedStyle(el).backgroundColor }));
+      expect(colours.back, 'the general button hover must not paint it dark blue behind its blue text').toBe('rgba(0, 0, 0, 0)');
+      expect(colours.text).not.toBe(colours.back);
+    });
+
+    test('306. The celebration plays only when you finish the last step yourself, not when a finished plan is opened again or put back in order', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const party = page.locator('#celebrationCanvas');
+      const btns = page.locator('.step-state-btn[data-track-id]:not([data-svc-parent])');
+      const count = await btns.count();
+      for (let i = 0; i < count; i++) await btns.nth(i).evaluate(b => { if (b.dataset.state !== '2') { b.click(); if (b.dataset.state !== '2') b.click(); } });
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await expect(party, 'finishing the last step starts it').toHaveCount(1, { timeout: 4000 });
+      await page.keyboard.press('x');
+      await expect(party).toHaveCount(0, { timeout: 2000 });
+
+      await reloadUntil(page, () => page.evaluate(() => !document.getElementById('welcomeBackView').classList.contains('hidden') || !document.getElementById('planView').classList.contains('hidden')));
+      const cont = page.locator('#welcomeBackView:not(.hidden) button[data-action="continuePlan"]');
+      if (await cont.count()) await cont.first().click();
+      await expect(page.locator('#allDoneBanner'), 'a finished plan still says it is finished').toBeVisible();
+      await page.waitForTimeout(2200);
+      await expect(party, 'opening a finished plan again does not replay it').toHaveCount(0);
+
+      await enableReorder(page);
+      await page.locator('.phase-move-group .tmpl-move-down').first().click();
+      const back = page.locator('#resetOrderBtn');
+      await back.click();
+      await back.click();
+      await expect(page.locator('#allDoneBanner')).toBeVisible();
+      await page.waitForTimeout(2200);
+      await expect(party, 'putting a finished plan back in order rebuilds it without replaying the celebration').toHaveCount(0);
     });
   });
 
