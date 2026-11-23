@@ -49,6 +49,7 @@ Releases:
 
 ### Layout
 
+- The image shown when someone shares a link to the planner now matches the new title box: the title box, with its streamers and glass panels, and the four labels, over streamers in all the colours of the transgender and non-binary flags. Its description for screen readers says so.
 - On smaller screens, when the action plan buttons do not fit on one row, they now show as a menu under a ☰ button instead, so the toolbar takes up a single row. Each item in the menu has its name written next to it, and Change order has a switch that shows when it is on. Reset progress and New plan still ask you to confirm, and the menu stays open while they do. The usage guide and the "What is this?" panel say so.
 - Each step in your plan now shows just its status box and title on the first line. Its difficulty and cost have moved to the top of its "More information" section.
 - Each step title now lines up with the middle of its status box, including titles that wrap onto two lines on a phone.
@@ -68,7 +69,7 @@ Releases:
 - Fixed a test of shared links that failed now and then when the computer was busy: if saved data was lost on reload, the link opened on the age check, which the test never answered.
 - Added tests for the streamers: that they move and the pause button stops and restarts them, that they stay still when your device is set to reduce motion, that the title and the line under it stay readable over them in light and dark mode, that they stop while the title box is out of view, and that they are left out when printing. Test 97 now also checks that pressing Tab after the skip link reaches the pause button before the toolbar.
 - Added tests that finishing your plan starts the celebration, that the streamers stay on screen and it ends by itself after 12 seconds with the streamers coming back to the title box, that it waits until the plan has stayed finished, that the streamers leave from the title box when it is in view and from behind the toolbar when it is not, that a tap or a key press ends it early, and that it does not play when your device is set to reduce motion.
-- The script that makes the link preview image now hides the streamers and the pause button, so the image stays the same if it is made again.
+- The script that makes the link preview image now draws the streamer background itself and shows the title box's own streamers, from fixed starting points, so the image comes out the same each time it is made.
 - Added a favicon.ico file at the site root, made from the planner's own icon, for search engines that do not use the icon built into the page. The page itself does not load it, so the planner still works offline as a single file. A new script remakes it from the page's icon, and a test checks the two match.
 
 ## [November 2026]
