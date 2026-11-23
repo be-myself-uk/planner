@@ -3071,6 +3071,29 @@ test.describe('Be myself Planner', () => {
       await expect(row, 'it goes away with the other top boxes when the plan is done').toBeHidden();
     });
 
+    test('304. Opening and closing a box again and again never makes the page longer, and Show hidden tips stays readable on hover', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(300);
+      const height = () => page.evaluate(() => document.documentElement.scrollHeight);
+      const start = await height();
+      const box = page.locator('#planContent li.plan-item details.tmpl-details:not(.hidden) > summary').last();
+      for (let i = 0; i < 4; i++) {
+        await box.click();
+        await page.waitForTimeout(450);
+        await box.click();
+        await page.waitForTimeout(700);
+        expect(await height(), `after opening and closing ${i + 1} times`).toBeLessThanOrEqual(start + 1);
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.locator('#planSummaryBox .tip-close').click();
+      const show = page.locator('#hiddenTipsRow button');
+      await show.hover();
+      const colours = await show.evaluate(el => ({ text: getComputedStyle(el).color, back: getComputedStyle(el).backgroundColor }));
+      expect(colours.back, 'the general button hover must not paint it dark blue behind its blue text').toBe('rgba(0, 0, 0, 0)');
+      expect(colours.text).not.toBe(colours.back);
+    });
+
     test('126. Phase item lists carry an explicit list/listitem role, restored after list-style: none', async ({ page }) => {
       await openMultiPhasePlan(page);
       const workUl = page.locator('.phase[data-phase-key="work"] > ul');
