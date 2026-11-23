@@ -15,7 +15,6 @@ Small fixes and one-off wording tweaks are left out. Changes are grouped under t
 
 Releases:
 
-- [Unreleased](#unreleased)
 - [November 2026](#november-2026)
 - [October 2026 /2](#october-2026-2)
 - [October 2026 /1](#october-2026-1)
@@ -29,26 +28,49 @@ Releases:
 - [March 2026 /2](#march-2026-2)
 - [March 2026 /1](#march-2026-1)
 
-## [Unreleased]
+## [November 2026]
 
 **Every saved plan and shared link made before this update will show "Your action plan may be out of date" once.** That is because plans can now have a new step, "A document in your new name". Check your answers once, and the message will not come back until a later change could affect your plan.
 
 ### Information
 
+- The waiting list note for adult gender services in England now uses the service's own name, the Gender National Referral Support Service (GNRSS).
+- The England screening note now says that if you have a cervix and your GP record does not say female, NHS England guidance says your GP practice can opt you in to cervical screening invitations.
+- The work step now says that if you hold national security vetting clearance, you must tell United Kingdom Security Vetting (UKSV) about a change of name, but not about a gender change.
+- The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
+- The UK passport step now explains what HM Passport Office asks for if you have changed your name more than once: evidence for each change, linking your new name back to your last passport or your birth certificate, or a statutory declaration covering all your names if you do not have evidence of every change.
+- The deed poll steps now say what GOV.UK says: some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll, so check before you rely on one. The Scotland and Northern Ireland steps no longer say an unenrolled deed poll is equally valid or accepted by most organisations, which no official source says, and the Scotland step now marks the point that statutory declarations are more common there as community advice.
+- The GRC introduction now says what GOV.UK says: you do not need a GRC to update your driving licence, passport, medical or employment records, or bank account; you can apply without having had any surgery or treatment; and a GRC does not change your legal status as the father or mother of a child. It also now says a GRC lets you update a marriage or civil partnership certificate registered in the UK, rather than that the certificate will change.
+- The Irish passport step for people born in Northern Ireland no longer says an Irish Gender Recognition Certificate does not apply to anyone living in Northern Ireland or Great Britain. It now says you may be eligible if your birth, adoption or foreign birth is registered in the Republic of Ireland, wherever you live, and that otherwise you would generally need to live in the Republic.
+- The Scotland screening note now follows NHS Inform: if you changed your CHI number to reflect your gender after 14 June 2015, you should still be invited automatically for the screening your body needs, and may also be invited for some you do not need. If you changed it on or before that date, or moved to Scotland from elsewhere, including England and Wales, you may not be invited, and the note says who to contact.
+- For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
 - Added a step called "A document in your new name" for anyone changing their name who needs to update a driving licence in England, Scotland or Wales, or a UK passport. The DVLA and HM Passport Office both ask for one document that already shows your new name, as well as your deed poll or statutory declaration, so someone who has only just made their deed poll may have nothing to send yet. The step lists the documents both accept if they were issued in the last 12 months, says the DVLA also needs it to be issued after your deed poll and your current licence, and comes first in its group so you can sort it out before you apply. Each office also accepts a few older documents: the step says the driving licence step lists the DVLA's, such as a UK passport number, and that HMPO's include a driving licence in your new name. It is not shown if you are only changing your gender marker, if your licence is from the DVA in Northern Ireland, for an Irish passport, or for a UK passport when you are changing your name and gender marker and already have a Gender Recognition Certificate.
 - If you already have a Gender Recognition Certificate, the UK passport step now says first what HM Passport Office needs instead: your GRC, or a birth certificate issued in your new gender with a letter explaining the change, and your full birth certificate too for a first passport if your GRC is interim. It leaves out the medical letter and the evidence of use it does not usually ask for, and says that if you apply in a name that is not the one on your GRC, HMPO asks for evidence of your change of name. It also leaves out the section for 16 and 17 year olds, since you must be 18 or over to have a GRC.
 - The GRC question, the GRC step titles, and the notes about already having a GRC or needing one for a birth certificate now say "UK GRC" or "UK Gender Recognition Certificate", so it is clear a certificate from another country is not what they mean. The GRC question's note now explains that a shorter route to a UK GRC exists for countries on GOV.UK's approved list, and that Ireland is not on it, so an Irish Gender Recognition Certificate does not give you the shorter route.
 - Corrected the GRC introduction, which said that if your gender is recognised in an approved country you "still need a UK GRC for it to be recognised here". GOV.UK does not say that. It now says only what GOV.UK does: that you can apply for a UK GRC through a shorter route without the medical reports, and that Ireland is not on the list.
 - The Gender Recognition Certificate step's long introduction, on what a GRC does, marriage and civil partnership, benefits and the minimum age, is now in its own "More information" box at the top of the step. One sentence above it says which of these it covers for your plan, so the steps themselves are no longer pushed down the page.
 
+### Wording
+
+- The Privacy panel, the "What is this?" panel and the README no longer say that no personal information is collected. They now say that the planner sends nothing you enter to a server and has no analytics or tracking, that like any website the host receives technical information such as your IP address, and that the host's security measures can change at any time without notice.
+- The privacy wording now explains that a shared link is not encrypted, so anyone with it can read your answers, and which links send your answers to the host. It also says that New plan keeps a note that you have seen the disclaimer, as well as your light or dark mode choice, and that quick exit does not delete your saved plan, your browser history, anything you have copied, or links you have shared.
+- The planner no longer says that every process for people under 16 needs parental consent. It now says those processes can be different, and may involve parental responsibility, consent or other requirements depending on the document.
+
 ### Code
 
+- New shared plan links carry your answers after a # in the web address instead of after a ?. Browsers do not send the part after a # to the website's host, so opening a new link no longer sends your answers to the host. The answers are still not encrypted, so anyone with the link can read them. Older links still open as before.
+- When you open a shared link, the planner now removes your answers from the address bar straight away, before it asks you to confirm your age, so they do not stay in the address bar or in that page's history entry. If you reload the page before the plan opens, open the link again.
+- A shared link that cannot be read, for example because it was cut short when it was copied, no longer offers to replace your saved plan. The planner now says the link could not be read and keeps your plan. A link with an unexpected value can no longer leave the page blank.
+- Pasting a shared link into a tab that already has the planner open now opens the shared plan.
+- Until the end of January 2027, the welcome back screen shows a short notice that the privacy information has been updated, linking to the Privacy panel. It goes away for good when you dismiss it.
+- The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
 - A new "Change order" button in the toolbar shows the arrows and drag handles for moving steps and groups. They are hidden the rest of the time, so they no longer appear beside every step, and they are out of the way of the Tab key until you need them. While it is on, a bar above your plan says so, and has a "Back to suggested order" button once you have moved something and a Done button. This replaces the separate "Reset order" button in the toolbar.
 - Removed Focus mode, since steps you finish now fold down to their title instead. Shared links made while Focus mode was on still open normally. Screen readers still hear when you finish every step in a group, which only Focus mode used to announce.
 - In "Documents and services", "Services to update" now comes before the driving licence, since a bill or statement from one of those services can be the document the DVLA asks for.
 
 ### Layout
 
+- The Privacy and Disclaimer panels now split their sections with headings and a line above each, like the other panels. Screen readers can now jump between those sections too.
 - The image shown when someone shares a link to the planner now matches the new title box: the title box, with its streamers and glass panels, and the four labels, over streamers in all the colours of the transgender and non-binary flags. Its description for screen readers says so.
 - On smaller screens, when the action plan buttons do not fit on one row, they now show as a menu under a ☰ button instead, so the toolbar takes up a single row. Each item in the menu has its name written next to it, and Change order has a switch that shows when it is on, and is easy to see when it is off too. Screen readers hear the menu as a group called Plan actions. Reset progress and New plan still ask you to confirm, and the menu stays open while they do. The usage guide and the "What is this?" panel say so.
 - Each step in your plan now shows just its status box and title on the first line. Its difficulty and cost have moved to the top of its "More information" section.
@@ -66,6 +88,11 @@ Releases:
 
 ### Infrastructure
 
+- The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
+- The two Python scripts that check sources and linked domains no longer carry comments, and the workflows no longer note a version beside each pinned action. The issue templates' reminder that issues are public is now plain text instead of a hidden comment, so it also stays in the posted issue unless you delete it. What the scripts' comments explained is now in CONTRIBUTING.md.
+- A new test checks that no file in the repository uses an em dash or an en dash, and the three that did no longer do.
+- Added tests for the changes above, including new and older shared links, links that cannot be read, a link pasted into an open tab, and what New plan keeps.
+- This changelog now starts with a list of releases that links to each one, and a test checks that the list matches the release headings.
 - Tidied the test suite. Tests that checked the same thing from different angles are combined, keeping every check they made (275 tests became 253, with the same 1,340 assertions). Each group's tests are now in number order, tests sit in the group they belong to, and a new group holds the folding, Plan menu and motion tests. The two tests that shared the number 105 now have their own numbers. Test numbers are otherwise unchanged.
 - Fixed a test of shared links that failed now and then when the computer was busy: if saved data was lost on reload, the link opened on the age check, which the test never answered.
 - Added tests for the streamers: that they move and the pause button stops and restarts them, that they stay still when your device is set to reduce motion, that the title and the line under it stay readable over them in light and dark mode, that they stop while the title box is out of view, and that they are left out when printing. Test 97 now also checks that pressing Tab after the skip link reaches the pause button before the toolbar.
@@ -73,48 +100,6 @@ Releases:
 - Added tests that the celebration does not replay when a finished plan is opened again or put back in order, and that a name-only plan keeps the passport in "A document in your new name" when the GRC question was answered under an earlier goal. Added tests that the Show button matches the other buttons, that the last step in a group leaves no extra space below it, and that the Change order switch is easy to see when off in light and dark mode. The tests for showing hidden tips and for boxes never making the page longer now sit in the folding, Plan menu and motion group, in number order.
 - The script that makes the link preview image now draws the streamer background itself and shows the title box's own streamers, from fixed starting points, so the image comes out the same each time it is made.
 - Added a favicon.ico file at the site root, made from the planner's own icon, for search engines that do not use the icon built into the page. The page itself does not load it, so the planner still works offline as a single file. A new script remakes it from the page's icon, and a test checks the two match.
-
-## [November 2026]
-
-### Information
-
-- The waiting list note for adult gender services in England now uses the service's own name, the Gender National Referral Support Service (GNRSS).
-- The England screening note now says that if you have a cervix and your GP record does not say female, NHS England guidance says your GP practice can opt you in to cervical screening invitations.
-- The work step now says that if you hold national security vetting clearance, you must tell United Kingdom Security Vetting (UKSV) about a change of name, but not about a gender change.
-- The work step now says that HMRC's more detailed guide for employers links a gender change on payroll to a GRC or new birth certificate, so some employers may ask to see one.
-- The UK passport step now explains what HM Passport Office asks for if you have changed your name more than once: evidence for each change, linking your new name back to your last passport or your birth certificate, or a statutory declaration covering all your names if you do not have evidence of every change.
-- The deed poll steps now say what GOV.UK says: some organisations, such as some banks, mobile phone companies or energy providers, may only accept an enrolled deed poll, so check before you rely on one. The Scotland and Northern Ireland steps no longer say an unenrolled deed poll is equally valid or accepted by most organisations, which no official source says, and the Scotland step now marks the point that statutory declarations are more common there as community advice.
-- The GRC introduction now says what GOV.UK says: you do not need a GRC to update your driving licence, passport, medical or employment records, or bank account; you can apply without having had any surgery or treatment; and a GRC does not change your legal status as the father or mother of a child. It also now says a GRC lets you update a marriage or civil partnership certificate registered in the UK, rather than that the certificate will change.
-- The Irish passport step for people born in Northern Ireland no longer says an Irish Gender Recognition Certificate does not apply to anyone living in Northern Ireland or Great Britain. It now says you may be eligible if your birth, adoption or foreign birth is registered in the Republic of Ireland, wherever you live, and that otherwise you would generally need to live in the Republic.
-- The Scotland screening note now follows NHS Inform: if you changed your CHI number to reflect your gender after 14 June 2015, you should still be invited automatically for the screening your body needs, and may also be invited for some you do not need. If you changed it on or before that date, or moved to Scotland from elsewhere, including England and Wales, you may not be invited, and the note says who to contact.
-- For people living outside the UK, the name-change step now links to the standard letters British embassies publish for some countries, which explain to local authorities that UK law allows a change of name.
-
-### Wording
-
-- The Privacy panel, the "What is this?" panel and the README no longer say that no personal information is collected. They now say that the planner sends nothing you enter to a server and has no analytics or tracking, that like any website the host receives technical information such as your IP address, and that the host's security measures can change at any time without notice.
-- The privacy wording now explains that a shared link is not encrypted, so anyone with it can read your answers, and which links send your answers to the host. It also says that New plan keeps a note that you have seen the disclaimer, as well as your light or dark mode choice, and that quick exit does not delete your saved plan, your browser history, anything you have copied, or links you have shared.
-- The planner no longer says that every process for people under 16 needs parental consent. It now says those processes can be different, and may involve parental responsibility, consent or other requirements depending on the document.
-
-### Code
-
-- New shared plan links carry your answers after a # in the web address instead of after a ?. Browsers do not send the part after a # to the website's host, so opening a new link no longer sends your answers to the host. The answers are still not encrypted, so anyone with the link can read them. Older links still open as before.
-- When you open a shared link, the planner now removes your answers from the address bar straight away, before it asks you to confirm your age, so they do not stay in the address bar or in that page's history entry. If you reload the page before the plan opens, open the link again.
-- A shared link that cannot be read, for example because it was cut short when it was copied, no longer offers to replace your saved plan. The planner now says the link could not be read and keeps your plan. A link with an unexpected value can no longer leave the page blank.
-- Pasting a shared link into a tab that already has the planner open now opens the shared plan.
-- Until the end of January 2027, the welcome back screen shows a short notice that the privacy information has been updated, linking to the Privacy panel. It goes away for good when you dismiss it.
-- The usage guide now also opens when you press / on its own, so you no longer need to hold Shift to type a question mark.
-
-### Layout
-
-- The Privacy and Disclaimer panels now split their sections with headings and a line above each, like the other panels. Screen readers can now jump between those sections too.
-
-### Infrastructure
-
-- The source text report now shows each changed line before and after, says which words changed, and folds away changes that are only punctuation, spacing or capitals.
-- The two Python scripts that check sources and linked domains no longer carry comments, and the workflows no longer note a version beside each pinned action. The issue templates' reminder that issues are public is now plain text instead of a hidden comment, so it also stays in the posted issue unless you delete it. What the scripts' comments explained is now in CONTRIBUTING.md.
-- A new test checks that no file in the repository uses an em dash or an en dash, and the three that did no longer do.
-- Added tests for the changes above, including new and older shared links, links that cannot be read, a link pasted into an open tab, and what New plan keeps.
-- This changelog now starts with a list of releases that links to each one, and a test checks that the list matches the release headings.
 
 ## [October 2026 /2]
 
