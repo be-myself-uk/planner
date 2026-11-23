@@ -1940,11 +1940,15 @@ test.describe('Be myself Planner', () => {
         const visible = id => !document.getElementById(id).classList.contains('hidden') && document.getElementById(id).offsetParent !== null;
         return !visible('welcomeNewDevice') && (visible('welcomeBackView') || visible('planView'));
       });
-      await navigateUntil(page, () => gotoFresh(page, filePath + cases.truncated), shown, 12, 'gotoUntil');
+      const open = suffix => async () => {
+        await page.evaluate(() => { localStorage.setItem('ageConfirmed', 'true'); localStorage.setItem('disclaimerConfirmed', 'true'); }).catch(() => {});
+        await gotoFresh(page, filePath + suffix);
+      };
+      await navigateUntil(page, open(cases.truncated), shown, 12, 'gotoUntil');
       await expect(page.locator('#welcomeOutdated'), 'with no saved plan, the person is told the link was cut short').toBeVisible();
       await expect(page.locator('#welcomeOutdated')).toContainText('Your link appears to be incomplete');
       for (const [name, suffix] of Object.entries(cases)) {
-        await navigateUntil(page, () => gotoFresh(page, filePath + suffix), shown, 12, 'gotoUntil');
+        await navigateUntil(page, open(suffix), shown, 12, 'gotoUntil');
         expect(await shown(), `${name}: something must be shown, not a blank page or the age check`).toBe(true);
         expect(await page.evaluate(() => location.href), `${name}: the address should be cleared`).not.toMatch(/[?#]/);
       }
@@ -3982,6 +3986,7 @@ test.describe('Be myself Planner', () => {
     });
 
     test('310. Folding a step or closing a box away from the bottom of the page never makes the page longer, not even for a moment', async ({ page }) => {
+      test.setTimeout(24000);
       await page.setViewportSize({ width: 390, height: 744 });
       await openMultiPhasePlan(page);
       const maxHeightDuring = (act) => page.evaluate(async (act) => {
@@ -4007,6 +4012,32 @@ test.describe('Be myself Planner', () => {
         const fold = await maxHeightDuring({ kind: 'fold', index });
         expect(fold.max, `folding a step ${where} never makes the page longer`).toBeLessThanOrEqual(fold.start);
       }
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(300);
+      const tight = await page.evaluate(() => {
+        const btns = Array.from(document.querySelectorAll('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])'));
+        const index = btns.findIndex(b => b.dataset.state === '0');
+        const li = btns[index].closest('li.plan-item');
+        li.scrollIntoView({ block: 'center' });
+        const title = li.querySelector('.tmpl-title');
+        const show = li.querySelector('.item-fold-btn');
+        show.classList.remove('hidden');
+        const showW = show.getBoundingClientRect().width;
+        show.classList.add('hidden');
+        const room = title.getBoundingClientRect().width;
+        const probe = document.createElement('span');
+        probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:${getComputedStyle(title).font}`;
+        document.body.appendChild(probe);
+        let text = 'Step';
+        for (;;) { probe.textContent = `${text} word`; if (probe.getBoundingClientRect().width > room - showW / 2) break; text += ' word'; }
+        probe.remove();
+        title.textContent = text;
+        return { index, oneLine: title.getBoundingClientRect().height < parseFloat(getComputedStyle(title).lineHeight) * 1.5, belowView: document.documentElement.scrollHeight - (scrollY + innerHeight) };
+      });
+      expect(tight.oneLine, 'the title fits on one line until the Show button takes some of its room').toBe(true);
+      expect(tight.belowView, 'the step is well away from the bottom of the page').toBeGreaterThan(1500);
+      const tightFold = await maxHeightDuring({ kind: 'fold', index: tight.index });
+      expect(tightFold.max, 'a title that wraps once the Show button appears does not make the page longer while the step folds').toBeLessThanOrEqual(tightFold.start);
       const open = 0;
       await page.evaluate(() => document.querySelectorAll('#planContent li.plan-item details.tmpl-details > summary')[0].scrollIntoView({ block: 'center' }));
       await page.waitForTimeout(300);

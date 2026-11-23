@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-P/Sddcq4zkarrhDqpWkCo0wT7p7x4NdvxeY3I8Vg9Os='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-mqwIRXOYEGYtKpgKn1j/Q4ujkVBj797Vas3R/pkC4Rw='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -3267,7 +3267,9 @@ function applyStepState(id, state) {
       if (body && body.contains(document.activeElement)) btn.focus();
       if (animateFoldNow && body) holdScrollBottom(body.getBoundingClientRect().height + (parseFloat(getComputedStyle(body).marginTop) || 0));
       li.classList.add('is-folded');
-      if (foldBtn) foldBtn.classList.remove('hidden');
+      if (!foldBtn) return;
+      if (animateFoldNow) li._foldTimer = setTimeout(() => foldBtn.classList.remove('hidden'), BOX_SLIDE_MS);
+      else foldBtn.classList.remove('hidden');
     };
     let animateFoldNow = false;
     if (foldBtn) {
