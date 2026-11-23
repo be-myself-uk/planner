@@ -1940,11 +1940,15 @@ test.describe('Be myself Planner', () => {
         const visible = id => !document.getElementById(id).classList.contains('hidden') && document.getElementById(id).offsetParent !== null;
         return !visible('welcomeNewDevice') && (visible('welcomeBackView') || visible('planView'));
       });
-      await navigateUntil(page, () => gotoFresh(page, filePath + cases.truncated), shown, 12, 'gotoUntil');
+      const open = suffix => async () => {
+        await page.evaluate(() => { localStorage.setItem('ageConfirmed', 'true'); localStorage.setItem('disclaimerConfirmed', 'true'); }).catch(() => {});
+        await gotoFresh(page, filePath + suffix);
+      };
+      await navigateUntil(page, open(cases.truncated), shown, 12, 'gotoUntil');
       await expect(page.locator('#welcomeOutdated'), 'with no saved plan, the person is told the link was cut short').toBeVisible();
       await expect(page.locator('#welcomeOutdated')).toContainText('Your link appears to be incomplete');
       for (const [name, suffix] of Object.entries(cases)) {
-        await navigateUntil(page, () => gotoFresh(page, filePath + suffix), shown, 12, 'gotoUntil');
+        await navigateUntil(page, open(suffix), shown, 12, 'gotoUntil');
         expect(await shown(), `${name}: something must be shown, not a blank page or the age check`).toBe(true);
         expect(await page.evaluate(() => location.href), `${name}: the address should be cleared`).not.toMatch(/[?#]/);
       }
@@ -2653,13 +2657,12 @@ test.describe('Be myself Planner', () => {
       await expect(item).toHaveCount(1);
       await expect(item.locator('xpath=ancestor::section[1]').locator('li.plan-item').first(), 'it is the first thing to do in its group').toHaveAttribute('data-item-id', 'trk_firstdoc');
       await expect(item).toContainText('Your driving licence and passport applications each need a document that already shows your new name');
-      await expect(item).toContainText('If it was issued in the last 12 months, both accept:');
       await expect(item).toContainText('The DVLA also says it must have been issued after your deed poll');
       expect(await item.locator('.details-body > p').first().textContent(), 'neither office limits every document to the last 12 months, so the opening sentence does not either').not.toContain('12 months');
-      await expect(item, 'the DVLA also takes documents with no 12-month limit, which the driving licence step lists').toContainText('The DVLA also accepts a few documents with no 12-month limit, such as a UK passport number. The driving licence step in this plan lists every document the DVLA accepts.');
-      await expect(item, 'HMPO also takes some older documents, including a driving licence in the new name').toContainText('HMPO also accepts a few documents that can be more than 12 months old, such as a driving licence in your new name, if it is still valid and was issued after your deed poll or statutory declaration and after your current passport.');
-      await expect(item.locator('li', { hasText: 'non-GB driving licence' }), 'the older documents are listed once, in the driving licence step, not copied here').toHaveCount(0);
-      await expect(page.locator('li.plan-item[data-item-id="trk_dvla"]'), 'the driving licence step this points to does list them').toContainText('A non-GB driving licence');
+      await expect(item).toContainText('The driving licence step in this plan lists the documents the DVLA accepts. HMPO accepts the ones on that list that were issued in the last 12 months, and its guidance for staff, linked below, lists everything it accepts.');
+      await expect(item.locator('ul, li'), 'the documents are listed once, in the driving licence step, and only pointed to here').toHaveCount(0);
+      await expect(item, 'no document from the list is repeated here').not.toContainText('A tax record');
+      await expect(page.locator('li.plan-item[data-item-id="trk_dvla"]'), 'the driving licence step this points to does list them').toContainText('A tax record, such as a letter from HMRC');
       await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(1);
       await expect(item.locator('a[href*="names-evidence-to-change-a-name"]')).toHaveCount(1);
       await expect(page.locator('li.plan-item[data-item-id="trk_dvla"] .item-badge', { hasText: 'Approximate cost' }), 'the driving licence step shows the cost badge this check looks for').toHaveCount(1);
@@ -2667,15 +2670,16 @@ test.describe('Be myself Planner', () => {
 
       await openLinkedPlan(page, { goal: 'name', dl: 'needs_update' });
       await expect(item).toContainText('Your driving licence application needs');
-      await expect(item).toContainText('If it was issued in the last 12 months, it accepts:');
-      await expect(item).toContainText('The driving licence step in this plan lists every document the DVLA accepts.');
+      await expect(item).toContainText('The driving licence step in this plan lists the documents the DVLA accepts.');
+      await expect(item.locator('ul, li'), 'the list is only in the driving licence step').toHaveCount(0);
       await expect(item, 'HMPO is not named when the plan has no UK passport').not.toContainText('HMPO');
       await expect(item.locator('a[href*="names-evidence-to-change-a-name"]'), 'HMPO is not named when the plan has no UK passport').toHaveCount(0);
 
       await openLinkedPlan(page, { goal: 'name', pass: 'needs_update' });
       await expect(item).toContainText('Your passport application needs');
       await expect(item, 'the DVLA date rule and its community note are only for a licence').not.toContainText('DVLA');
-      await expect(item).toContainText('HMPO also accepts a few documents that can be more than 12 months old');
+      await expect(item).toContainText('HMPO\'s guidance for staff, linked below, lists the documents it accepts.');
+      await expect(item.locator('ul, li'), 'HMPO\'s list is pointed to, not copied').toHaveCount(0);
       await expect(item, 'there is no driving licence step to point to').not.toContainText('The driving licence step in this plan');
       await expect(item.locator('a[href^="https://www.gov.uk/id-for-driving-licence"]')).toHaveCount(0);
       const keys = await page.locator('section.phase').evaluateAll(els => els.map(el => el.dataset.phaseKey));
@@ -3979,6 +3983,68 @@ test.describe('Be myself Planner', () => {
         expect(c.knobOnTrack, `${theme}: the knob stands out from the off track by at least 3:1`).toBeGreaterThanOrEqual(3);
         await page.keyboard.press('Escape');
       }
+    });
+
+    test('310. Folding a step or closing a box away from the bottom of the page never makes the page longer, not even for a moment', async ({ page }) => {
+      test.setTimeout(24000);
+      await page.setViewportSize({ width: 390, height: 744 });
+      await openMultiPhasePlan(page);
+      const maxHeightDuring = (act) => page.evaluate(async (act) => {
+        const start = document.documentElement.scrollHeight;
+        let max = start;
+        let running = true;
+        const tick = () => { max = Math.max(max, document.documentElement.scrollHeight); if (running) requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+        if (act.kind === 'fold') { const b = document.querySelectorAll('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])')[act.index]; b.click(); b.click(); }
+        else { document.querySelectorAll('#planContent li.plan-item details.tmpl-details > summary')[act.index].click(); }
+        await new Promise(r => setTimeout(r, 1600));
+        running = false;
+        return { start, max };
+      }, act);
+      for (const [where, scroll] of [['at the top', 'top'], ['in the middle', 'middle']]) {
+        await page.evaluate(s => window.scrollTo(0, s === 'top' ? 0 : Math.round(document.documentElement.scrollHeight / 3)), scroll);
+        await page.waitForTimeout(300);
+        const index = await page.evaluate(() => {
+          const btns = Array.from(document.querySelectorAll('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])'));
+          return btns.findIndex(b => b.dataset.state === '0' && b.getBoundingClientRect().top > 60 && b.getBoundingClientRect().bottom < innerHeight);
+        });
+        expect(index, `a step is on screen ${where}`).toBeGreaterThan(-1);
+        const fold = await maxHeightDuring({ kind: 'fold', index });
+        expect(fold.max, `folding a step ${where} never makes the page longer`).toBeLessThanOrEqual(fold.start);
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(300);
+      const tight = await page.evaluate(() => {
+        const btns = Array.from(document.querySelectorAll('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])'));
+        const index = btns.findIndex(b => b.dataset.state === '0');
+        const li = btns[index].closest('li.plan-item');
+        li.scrollIntoView({ block: 'center' });
+        const title = li.querySelector('.tmpl-title');
+        const show = li.querySelector('.item-fold-btn');
+        show.classList.remove('hidden');
+        const showW = show.getBoundingClientRect().width;
+        show.classList.add('hidden');
+        const room = title.getBoundingClientRect().width;
+        const probe = document.createElement('span');
+        probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:${getComputedStyle(title).font}`;
+        document.body.appendChild(probe);
+        let text = 'Step';
+        for (;;) { probe.textContent = `${text} word`; if (probe.getBoundingClientRect().width > room - showW / 2) break; text += ' word'; }
+        probe.remove();
+        title.textContent = text;
+        return { index, oneLine: title.getBoundingClientRect().height < parseFloat(getComputedStyle(title).lineHeight) * 1.5, belowView: document.documentElement.scrollHeight - (scrollY + innerHeight) };
+      });
+      expect(tight.oneLine, 'the title fits on one line until the Show button takes some of its room').toBe(true);
+      expect(tight.belowView, 'the step is well away from the bottom of the page').toBeGreaterThan(1500);
+      const tightFold = await maxHeightDuring({ kind: 'fold', index: tight.index });
+      expect(tightFold.max, 'a title that wraps once the Show button appears does not make the page longer while the step folds').toBeLessThanOrEqual(tightFold.start);
+      const open = 0;
+      await page.evaluate(() => document.querySelectorAll('#planContent li.plan-item details.tmpl-details > summary')[0].scrollIntoView({ block: 'center' }));
+      await page.waitForTimeout(300);
+      expect(await page.evaluate(() => document.documentElement.scrollHeight - (scrollY + innerHeight)), 'the box is well away from the bottom of the page').toBeGreaterThan(1500);
+      await maxHeightDuring({ kind: 'box', index: open });
+      const close = await maxHeightDuring({ kind: 'box', index: open });
+      expect(close.max, 'closing a box near the top never makes the page longer').toBeLessThanOrEqual(close.start);
     });
   });
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-nEnOoNhR4aZgCBjeI4nhME0OqBN5zz/MuXELYFzF22I='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2whQiR0aFqHEQew/3e21KWomDenhygXhX4Fo/6yvXpU=' 'sha256-mqwIRXOYEGYtKpgKn1j/Q4ujkVBj797Vas3R/pkC4Rw='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none';">
 <title>Be myself: change your name and gender marker in the UK</title>
 <meta name="description" content="Made for trans and non-binary people: a free, private, step-by-step plan for your deed poll, passport, driving licence, NHS, HMRC and more.">
 <link rel="canonical" href="https://bemyself.uk/">
@@ -781,14 +781,16 @@ const PLAN_ITEMS = {
       const both = n.dvla && n.ukpass;
       const who = both ? 'The DVLA and HM Passport Office (HMPO) each ask' : n.dvla ? 'The DVLA asks' : 'HM Passport Office (HMPO) asks';
       const after = n.dvla ? (both ? ' The DVLA also says it must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.' : ' It must have been issued after your deed poll or statutory declaration, and after your current licence if you already hold one.') : '';
-      const utility = n.dvla ? 'A utility bill. The DVLA says this includes a mobile, broadband, or streaming bill' : 'A utility bill';
+      const where = both
+        ? '<p>The driving licence step in this plan lists the documents the DVLA accepts. HMPO accepts the ones on that list that were issued in the last 12 months, and its guidance for staff, linked below, lists everything it accepts.</p>'
+        : n.dvla
+          ? '<p>The driving licence step in this plan lists the documents the DVLA accepts.</p>'
+          : '<p>HMPO\'s guidance for staff, linked below, lists the documents it accepts.</p>';
       const abroad = n.ukpass && p.outsideUK ? '<p>If you apply from outside the UK, HMPO may ask for more than one document, depending on the country, and a bank statement only counts for applications made in the UK.</p>' : '';
-      const older = (n.dvla ? '<p>The DVLA also accepts a few documents with no 12-month limit, such as a UK passport number. The driving licence step in this plan lists every document the DVLA accepts.</p>' : '')
-        + (n.ukpass ? '<p>HMPO also accepts a few documents that can be more than 12 months old, such as a driving licence in your new name, if it is still valid and was issued after your deed poll or statutory declaration and after your current passport. The HMPO link below lists them.</p>' : '');
       const quickest = n.dvla ? `<p>${CN} ${FIRST_DOC_QUICKEST}</p>` : '';
       const links = (n.dvla ? '<a href="https://www.gov.uk/id-for-driving-licence" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> GOV.UK: Identity documents needed for a driving licence application</a>' : '')
         + (n.ukpass ? '<a href="https://www.gov.uk/government/publications/names-evidence-to-change-a-name-caseworker-guidance/names-evidence-to-change-a-name-accessible#evidence-the-new-name-is-used-for-all-official-purposes" target="_blank" rel="noopener noreferrer" class="links"><span aria-hidden="true">🔗</span> HMPO: Names, evidence to change a name (caseworker guidance)</a>' : '');
-      return `<p>${who} for one document that already shows your new name.${after}</p><p>${both ? 'If it was issued in the last 12 months, both accept:' : 'If it was issued in the last 12 months, it accepts:'}</p><ul class="bullet-list"><li>A tax record, such as a letter from HMRC</li><li>An official letter from your employer</li><li>An education record, such as a school report</li><li>A letter from a government department or your local council</li><li>A visa or residence permit</li><li>A medical or health card</li><li>A voter card</li><li>A UK bank statement</li><li>A baptism or confirmation certificate</li><li>A child benefit record</li><li>${utility}</li></ul>${older}${abroad}${quickest}${links}`;
+      return `<p>${who} for one document that already shows your new name.${after}</p>${where}${abroad}${quickest}${links}`;
     },
   },
   dva: {
@@ -3265,7 +3267,9 @@ function applyStepState(id, state) {
       if (body && body.contains(document.activeElement)) btn.focus();
       if (animateFoldNow && body) holdScrollBottom(body.getBoundingClientRect().height + (parseFloat(getComputedStyle(body).marginTop) || 0));
       li.classList.add('is-folded');
-      if (foldBtn) foldBtn.classList.remove('hidden');
+      if (!foldBtn) return;
+      if (animateFoldNow) li._foldTimer = setTimeout(() => foldBtn.classList.remove('hidden'), BOX_SLIDE_MS);
+      else foldBtn.classList.remove('hidden');
     };
     let animateFoldNow = false;
     if (foldBtn) {
@@ -3294,8 +3298,13 @@ function heldPx(hold) {
 function holdScrollBottom(shrinkBy) {
   const hold = gel('scrollHold');
   if (!hold || shrinkBy <= 0) return;
-  holdTarget = Math.max(holdTarget, document.documentElement.scrollHeight);
-  hold.style.height = `${heldPx(hold) + shrinkBy + 32}px`;
+  const held = heldPx(hold);
+  const viewBottom = window.scrollY + screenHeight();
+  const need = Math.ceil(viewBottom - (document.documentElement.scrollHeight - held - shrinkBy));
+  if (need > 0) {
+    holdTarget = Math.max(holdTarget, viewBottom);
+    hold.style.height = `${Math.max(held, need + 32)}px`;
+  }
   clearTimeout(hold._release);
   hold._release = setTimeout(releaseScrollHold, BOX_SLIDE_MS + 60);
 }
