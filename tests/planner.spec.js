@@ -3919,6 +3919,67 @@ test.describe('Be myself Planner', () => {
       await page.waitForTimeout(2200);
       await expect(party, 'putting a finished plan back in order rebuilds it without replaying the celebration').toHaveCount(0);
     });
+
+    test('307. The Show button on a finished step is the site\'s own secondary button, as tall as the status box', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const btn = page.locator('.step-state-btn[data-track-id]:not([data-svc-parent])').first();
+      await btn.click();
+      await btn.click();
+      const show = page.locator('.item-fold-btn:not(.hidden)').first();
+      await expect(show).toBeVisible();
+      await expect(show).toHaveClass(/\bsecondary\b/);
+      const look = await page.evaluate(() => {
+        const pick = el => { const c = getComputedStyle(el); return { bg: c.backgroundColor, color: c.color, border: c.borderTopColor, radius: c.borderTopLeftRadius, weight: c.fontWeight, size: c.fontSize }; };
+        const show = document.querySelector('.item-fold-btn:not(.hidden)');
+        const done = document.querySelector('#reorderBar button[data-action="toggleReorderMode"]');
+        const state = show.closest('.item-header').querySelector('.step-state-btn');
+        return { show: pick(show), done: pick(done), h: show.getBoundingClientRect().height, stateH: state.getBoundingClientRect().height };
+      });
+      expect(look.show, 'it looks like the other secondary buttons, such as Done in the Change order bar').toEqual(look.done);
+      expect(look.h, 'it is as tall as the status box beside it, so it is easy to tap').toBeGreaterThanOrEqual(look.stateH - 0.5);
+    });
+
+    test('308. The last step in a group leaves the same space below it whether it is open or folded, with no extra gap', async ({ page }) => {
+      await openMultiPhasePlan(page);
+      const gaps = () => page.evaluate(() => Array.from(document.querySelectorAll('section.phase[data-phase-key]')).map(ph => {
+        const items = ph.querySelectorAll(':scope > ul > li.plan-item');
+        const last = items[items.length - 1];
+        return { key: ph.dataset.phaseKey, below: Math.round(ph.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom), above: Math.round(ph.getBoundingClientRect().top - ph.querySelector('.phase-header').getBoundingClientRect().top) };
+      }));
+      for (const g of await gaps()) expect(g.below, `${g.key}: the space under the last step is about the box's own padding, not that plus a step's bottom margin`).toBeLessThanOrEqual(26);
+      const btns = page.locator('.step-state-btn[data-track-id]:not([data-svc-parent])');
+      const first = btns.first();
+      const key = await first.evaluate(b => b.closest('section.phase').dataset.phaseKey);
+      const before = (await gaps()).find(g => g.key === key).below;
+      await first.click();
+      await first.click();
+      await expect(first.locator('xpath=ancestor::li[contains(@class,"plan-item")][1]')).toHaveClass(/is-folded/);
+      await page.waitForTimeout(900);
+      const after = (await gaps()).find(g => g.key === key).below;
+      expect(Math.abs(after - before), 'folding the last step does not change the space below it').toBeLessThanOrEqual(1);
+    });
+
+    test('309. The Change order switch in the Plan menu is easy to see when off, in light and dark mode', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await openMultiPhasePlan(page);
+      for (const theme of ['light', 'dark']) {
+        await page.evaluate(t => document.documentElement.setAttribute('data-theme', t), theme);
+        await openPlanMenuIfCollapsed(page);
+        const c = await page.evaluate(() => {
+          const lum = rgb => { const v = rgb.match(/\d+(\.\d+)?/g).slice(0, 3).map(Number).map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+          const ratio = (a, b) => { const [h, l] = [lum(a), lum(b)].sort((x, y) => y - x); return (h + 0.05) / (l + 0.05); };
+          const btn = document.getElementById('reorderToggleBtn');
+          const track = getComputedStyle(btn, '::before').backgroundColor;
+          const knob = getComputedStyle(btn, '::after').backgroundColor;
+          const menu = getComputedStyle(document.getElementById('cbPlanActions')).backgroundColor;
+          return { pressed: btn.getAttribute('aria-pressed'), trackOnMenu: ratio(track, menu), knobOnTrack: ratio(knob, track) };
+        });
+        expect(c.pressed).toBe('false');
+        expect(c.trackOnMenu, `${theme}: the off track stands out from the menu by at least 3:1, as WCAG 1.4.11 asks of a control's state`).toBeGreaterThanOrEqual(3);
+        expect(c.knobOnTrack, `${theme}: the knob stands out from the off track by at least 3:1`).toBeGreaterThanOrEqual(3);
+        await page.keyboard.press('Escape');
+      }
+    });
   });
 
   test.describe('Accessibility & layout', () => {
