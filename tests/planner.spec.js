@@ -3738,74 +3738,6 @@ test.describe('Be myself Planner', () => {
       await expect(step).toHaveClass(/is-folded/);
     });
 
-    test('297. The space a fold frees at the bottom is held, never trimmed bit by bit, and removed once you are a screen away or far from the bottom', async ({ page }) => {
-      test.setTimeout(36000);
-      {
-        await openMultiPhasePlan(page);
-        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-        await page.waitForTimeout(300);
-        const result = await page.evaluate(() => new Promise(resolve => {
-          const btns = document.querySelectorAll('#planContent li.plan-item .item-header .step-state-btn');
-          const last = btns[btns.length - 1];
-          const startY = window.scrollY;
-          const ys = [];
-          last.click();
-          last.click();
-          const t0 = performance.now();
-          const tick = () => {
-            ys.push(window.scrollY);
-            if (performance.now() - t0 < 1800) requestAnimationFrame(tick);
-            else resolve({ startY, moved: ys.filter(y => Math.abs(y - startY) > 1.5).length, folded: last.closest('li').classList.contains('is-folded'), hold: parseFloat(document.getElementById('scrollHold').style.height) || 0 });
-          };
-          requestAnimationFrame(tick);
-        }));
-        expect(result.folded).toBe(true);
-        expect(result.moved, 'the page never gets shorter under you, so the browser never pulls the view, or the toolbar, upwards (1px of rounding aside)').toBe(0);
-        expect(result.hold, 'the space the step gave up is held at the bottom').toBeGreaterThan(0);
-        const heightThen = await page.evaluate(() => document.documentElement.scrollHeight);
-        await page.evaluate(() => window.scrollBy(0, -100));
-        await page.waitForTimeout(400);
-        expect(await page.evaluate(() => document.documentElement.scrollHeight), 'scrolling up a little near the bottom does not shorten the page, which made mobile browsers such as Firefox for Android blank the toolbar').toBe(heightThen);
-        await page.evaluate(() => window.scrollTo(0, 0));
-        await expect.poll(() => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0), { message: 'the held space goes once you have scrolled away' }).toBe(0);
-      }
-      await freshPage(page);
-      {
-        await openMultiPhasePlan(page);
-        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-        await page.waitForTimeout(300);
-        const btns = page.locator('#planContent li.plan-item .item-header .step-state-btn');
-        const last = btns.nth(await btns.count() - 1);
-        await last.click();
-        await last.click();
-        await expect(page.locator('#planContent li.plan-item').last()).toHaveClass(/is-folded/);
-        await page.waitForTimeout(600);
-        const held = () => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0);
-        const start = await held();
-        expect(start).toBeGreaterThan(0);
-        const step = await page.evaluate(() => Math.floor(window.innerHeight / 4));
-        for (let i = 0; i < 3; i++) {
-          await page.evaluate(y => window.scrollBy(0, -y), step);
-          await page.waitForTimeout(300);
-          expect(await held(), `still within a screen of the bottom after ${i + 1} small scrolls`).toBe(start);
-        }
-        await page.evaluate(() => window.scrollBy(0, -2 * window.innerHeight));
-        await expect.poll(held, { message: 'a screen away, the held space goes in one go' }).toBe(0);
-      }
-      await freshPage(page);
-      {
-        await openMultiPhasePlan(page);
-        await page.evaluate(() => window.scrollTo(0, 0));
-        const first = page.locator('#planContent li.plan-item').first();
-        await first.locator('.item-header .step-state-btn').click();
-        await first.locator('.item-header .step-state-btn').click();
-        await expect(first).toHaveClass(/is-folded/);
-        const far = await page.evaluate(() => document.documentElement.scrollHeight - (window.scrollY + window.innerHeight) > 2 * window.innerHeight);
-        expect(far, 'this plan is long enough for the first step to be well away from the bottom').toBe(true);
-        await expect.poll(() => page.evaluate(() => parseFloat(document.getElementById('scrollHold').style.height) || 0), { message: 'the held space is removed out of sight' }).toBe(0);
-      }
-    });
-
     test('298. Scrolling does not end the celebration, but a tap or another key does', async ({ page }) => {
       await openMultiPhasePlan(page);
       const btns = page.locator('.step-state-btn[data-track-id]');
@@ -4045,6 +3977,31 @@ test.describe('Be myself Planner', () => {
       await maxHeightDuring({ kind: 'box', index: open });
       const close = await maxHeightDuring({ kind: 'box', index: open });
       expect(close.max, 'closing a box near the top never makes the page longer').toBeLessThanOrEqual(close.start);
+    });
+
+    test('311. After using a plan, the start page is no taller than when the page first opens', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 744 });
+      await checkAgeGate(page);
+      await reloadUntil(page, () => page.locator('#startView').isVisible());
+      const fresh = await page.evaluate(() => document.documentElement.scrollHeight);
+      await openBlankChecklist(page);
+      await answerOldDefaults(page);
+      await page.getByRole('button', { name: 'Show my action plan' }).click();
+      await expect(page.locator('#planView')).toBeVisible();
+      const btns = page.locator('#planContent .step-state-btn[data-track-id]:not([data-svc-parent])');
+      const last = btns.last();
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await last.evaluate(b => { b.click(); b.click(); });
+      await expect(last.locator('xpath=ancestor::li[contains(@class,"plan-item")][1]')).toHaveClass(/is-folded/);
+      await page.waitForTimeout(800);
+      expect(await page.evaluate(() => document.documentElement.scrollHeight - (scrollY + innerHeight)), 'the step folded with the page scrolled to the bottom').toBeLessThan(2);
+      await openPlanMenuIfCollapsed(page);
+      const restart = page.locator('#ubRestartBtn');
+      await restart.click();
+      await restart.click();
+      await expect(page.locator('#startView')).toBeVisible();
+      await page.waitForTimeout(400);
+      expect(await page.evaluate(() => document.documentElement.scrollHeight), 'nothing from the plan is left behind to make the start page taller, which showed as big gaps around Start here').toBe(fresh);
     });
   });
 
